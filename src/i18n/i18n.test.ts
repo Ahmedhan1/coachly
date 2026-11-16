@@ -7,7 +7,7 @@ describe('t()', () => {
     expect(t('activation.errors.used')).toBe(ar.activation.errors.used);
   });
   it('interpolates params with Western digits', () => {
-    expect(t('clients.remaining', { n: 12 })).toBe('الحصص المتبقية: 12');
+    expect(t('clients.remaining', { n: 12 })).toBe('باقي 12 حصة');
     expect(t('home.greetingNamed', { name: 'محمد' })).toBe('أهلاً يا كابتن محمد');
   });
   it('leaves unknown placeholders visible', () => {

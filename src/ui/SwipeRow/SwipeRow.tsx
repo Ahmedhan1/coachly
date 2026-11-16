@@ -10,6 +10,8 @@ export interface SwipeRowProps {
   children: ReactNode;
   onDelete: () => void;
   deleteLabel: string;
+  /** Accessible name naming the item, e.g. "حذف سارة". */
+  deleteAccessibleLabel?: string;
 }
 
 interface Drag {
@@ -25,7 +27,7 @@ interface Drag {
  * iOS swipe-to-delete. Swipe toward the inline start to reveal "delete"; a long swipe deletes
  * directly. The delete button is also reachable by keyboard (focus reveals it).
  */
-export function SwipeRow({ children, onDelete, deleteLabel }: SwipeRowProps) {
+export function SwipeRow({ children, onDelete, deleteLabel, deleteAccessibleLabel }: SwipeRowProps) {
   const [offset, setOffset] = useState(0);
   const [dragging, setDragging] = useState(false);
   const [rtl, setRtl] = useState(() => typeof document !== 'undefined' && document.documentElement.dir === 'rtl');
@@ -99,8 +101,10 @@ export function SwipeRow({ children, onDelete, deleteLabel }: SwipeRowProps) {
       <button
         type="button"
         className={styles.action}
+        data-hidden={offset === 0 || undefined}
         style={{ inlineSize: Math.max(offset, ACTION_WIDTH) }}
         onClick={onDelete}
+        aria-label={deleteAccessibleLabel}
         onFocus={() => setOffset(ACTION_WIDTH)}
         onBlur={() => setOffset(0)}
         tabIndex={0}
@@ -117,6 +121,7 @@ export function SwipeRow({ children, onDelete, deleteLabel }: SwipeRowProps) {
         onPointerUp={finish}
         onPointerCancel={finish}
         onClickCapture={onClickCapture}
+        onDragStart={(e) => e.preventDefault()}
       >
         {children}
       </div>

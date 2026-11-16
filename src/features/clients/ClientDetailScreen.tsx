@@ -64,22 +64,22 @@ function ClientDetail({ client, payments, back }: { client: Client; payments: Pa
               </span>
             </div>
             <div className={styles.fact}>
-              <span className={styles.factLabel}>{t('clientDetail.period')}</span>
+              <span className={styles.factLabel}>{t('clientDetail.endsOn')}</span>
               <span className={styles.factValue}>
                 {client.endDate ? formatIsoDate(client.endDate) : t('common.none')}
               </span>
             </div>
           </div>
-          {attention && (
-            <ListRow title={<Badge tone={attentionTone(attention)}>{attentionLabel(attention)}</Badge>} />
-          )}
-          {client.startDate && client.endDate && (
+          {client.startDate && client.endDate ? (
             <ListRow
               title={t('clientDetail.periodValue', {
                 start: formatIsoDate(client.startDate),
                 end: formatIsoDate(client.endDate),
               })}
+              trailing={attention && <Badge tone={attentionTone(attention)}>{attentionLabel(attention)}</Badge>}
             />
+          ) : (
+            attention && <ListRow title={<Badge tone={attentionTone(attention)}>{attentionLabel(attention)}</Badge>} />
           )}
         </ListSection>
 

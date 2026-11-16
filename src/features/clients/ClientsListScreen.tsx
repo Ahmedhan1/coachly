@@ -53,7 +53,12 @@ export function ClientsListScreen() {
         {results && results.length > 0 && (
           <ListSection>
             {results.map((client) => (
-              <SwipeRow key={client.id} onDelete={() => void deleteClient(client)} deleteLabel={t('clients.deleteAction')}>
+              <SwipeRow
+                key={client.id}
+                onDelete={() => void deleteClient(client)}
+                deleteLabel={t('clients.deleteAction')}
+                deleteAccessibleLabel={t('clients.deleteNamed', { name: client.name })}
+              >
                 <ClientRow client={client} today={today} />
               </SwipeRow>
             ))}
@@ -66,10 +71,13 @@ export function ClientsListScreen() {
 
 function ClientRow({ client, today }: { client: Client; today: string }) {
   const attention = subscriptionAttention(client, today);
-  const subtitle = [
-    t(`goals.${client.goal}`),
-    client.package ? t('clients.remaining', { n: client.remainingSessions }) : t('clients.noPackage'),
-  ].join(' · ');
+  // When a badge is shown it already carries the urgent fact; keep the subtitle short so nothing truncates.
+  const subtitle = attention
+    ? t(`goals.${client.goal}`)
+    : [
+        t(`goals.${client.goal}`),
+        client.package ? t('clients.remaining', { n: client.remainingSessions }) : t('clients.noPackage'),
+      ].join(' · ');
   return (
     <ListRow
       to={`/clients/${client.id}`}

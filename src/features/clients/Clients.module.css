@@ -27,6 +27,10 @@
   background: var(--surface);
 }
 
+.fact:last-child:nth-child(odd) {
+  grid-column: 1 / -1;
+}
+
 .factLabel {
   font-size: var(--text-xs);
   color: var(--text-secondary);

@@ -1,7 +1,12 @@
 .row {
   position: relative;
   overflow: hidden;
-  background: var(--danger);
+  background: var(--surface);
+}
+
+/* Closed rows keep the action focusable (focus reveals it) but invisible, so no red bleeds at rounded corners. */
+.action[data-hidden] {
+  opacity: 0;
 }
 
 .action {
@@ -28,6 +33,7 @@
   transition: transform var(--duration) var(--ease-out);
   user-select: none;
   -webkit-user-select: none;
+  -webkit-user-drag: none;
 }
 
 .content[data-dragging] {

@@ -5,7 +5,6 @@ import { VitePWA } from 'vite-plugin-pwa';
 
 export default defineConfig({
   resolve: { alias: { '@': fileURLToPath(new URL('./src', import.meta.url)) } },
-  build: { outDir: process.env.VITE_E2E === '1' ? 'dist-e2e' : 'dist' },
   plugins: [
     react(),
     VitePWA({
