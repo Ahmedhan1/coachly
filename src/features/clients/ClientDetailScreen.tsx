@@ -2,12 +2,16 @@ import { useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useRepos } from '@/app/services';
 import { useLive } from '@/app/useLive';
-import { subscriptionAttention, toIsoDate, type Client, type Payment, type Session } from '@/domain/models';
+import { subscriptionAttention, toIsoDate, type Client, type Payment, type Program, type Session } from '@/domain/models';
 import { t } from '@/i18n';
-import { Badge, Button, EmptyState, Icon, ListRow, ListSection, Money, Num, PackageRing, PageHeader, Tx } from '@/ui';
+import { Badge, Button, EmptyState, Icon, IconButton, ListRow, ListSection, Money, Num, PackageRing, PageHeader, Tx } from '@/ui';
 import { formatIsoDate, formatNumber, timeParts } from '@/ui/format';
 import { attentionLabel, attentionTone } from './attention';
 import { telUrl, whatsappUrl } from './contact';
+import { EditClientSheet } from './EditClientSheet';
+import { PackageSheet } from './PackageSheet';
+import { PaymentSheet } from './PaymentSheet';
+import { useDeletePayment, useRenewPackage } from './useMoneyActions';
 import { useDeleteClient } from './useDeleteClient';
 import styles from './ClientDetail.module.css';
 
@@ -20,6 +24,8 @@ export function ClientDetailScreen() {
   const client = useLive(async () => (await repos.clients.get(clientId)) ?? null, [repos, clientId]);
   const payments = useLive(() => repos.payments.listByClient(clientId), [repos, clientId]);
   const sessions = useLive(() => repos.sessions.listByClient(clientId), [repos, clientId]);
+  const programs = useLive(() => repos.programs.listByClient(clientId), [repos, clientId]);
+  const settings = useLive(() => repos.settings.get(), [repos]);
 
   if (client === undefined) return <PageHeader title="" back={BACK} />;
   if (client === null) {
@@ -30,7 +36,7 @@ export function ClientDetailScreen() {
       </>
     );
   }
-  return <ClientDetail client={client} payments={payments ?? []} sessions={sessions ?? []} />;
+  return <ClientDetail client={client} payments={payments ?? []} sessions={sessions ?? []} programs={programs ?? []} currency={settings?.currency ?? 'EGP'} />;
 }
 
 function nextSessionOf(sessions: Session[], now: number): Session | null {
@@ -41,9 +47,23 @@ function nextSessionOf(sessions: Session[], now: number): Session | null {
   );
 }
 
-function ClientDetail({ client, payments, sessions }: { client: Client; payments: Payment[]; sessions: Session[] }) {
+type SheetName = null | 'edit' | 'package' | { payment: Payment | null };
+
+interface ClientDetailProps {
+  client: Client;
+  payments: Payment[];
+  sessions: Session[];
+  programs: Program[];
+  currency: string;
+}
+
+function ClientDetail({ client, payments, sessions, programs, currency }: ClientDetailProps) {
   const navigate = useNavigate();
   const deleteClient = useDeleteClient();
+  const renew = useRenewPackage();
+  const deletePayment = useDeletePayment();
+  const [sheet, setSheet] = useState<SheetName>(null);
+  const program = [...programs].sort((a, b) => b.updatedAt - a.updatedAt)[0];
   const [now] = useState(() => Date.now());
   const today = toIsoDate(new Date(now));
   const attention = subscriptionAttention(client, today);
@@ -61,11 +81,14 @@ function ClientDetail({ client, payments, sessions }: { client: Client; payments
         title=""
         back={BACK}
         actions={
-          client.phone ? (
-            <a className={styles.roundLink} href={telUrl(client.phone)} aria-label={t('clientDetail.call')} title={t('clientDetail.call')}>
-              <Icon name="phone" />
-            </a>
-          ) : undefined
+          <>
+            <IconButton icon="edit" label={t('clientDetail.editClient')} onClick={() => setSheet('edit')} />
+            {client.phone && (
+              <a className={styles.roundLink} href={telUrl(client.phone)} aria-label={t('clientDetail.call')} title={t('clientDetail.call')}>
+                <Icon name="phone" />
+              </a>
+            )}
+          </>
         }
       />
       <header className={styles.who}>
@@ -91,10 +114,30 @@ function ClientDetail({ client, payments, sessions }: { client: Client; payments
         </div>
       </header>
 
-      <PackageSection client={client} next={next} />
+      <PackageSection client={client} next={next} onEdit={() => setSheet('package')} onRenew={() => void renew(client)} />
+      <ListSection title={t('clientDetail.plan')}>
+        <ListRow
+          leading={<Icon name="list" />}
+          title={t('clientDetail.program')}
+          subtitle={program ? program.name : t('clientDetail.programNone')}
+          to={program ? `/programs/${program.id}?from=client` : `/more/programs?client=${client.id}`}
+        />
+        {program && (
+          <ListRow
+            leading={<Icon name="timer" />}
+            title={t('clientDetail.startSession')}
+            subtitle={t('clientDetail.startSessionHint')}
+            to={`/session/new?client=${client.id}&program=${program.id}`}
+          />
+        )}
+        <ListRow leading={<Icon name="utensils" />} title={t('clientDetail.nutrition')} to={`/clients/${client.id}/nutrition`} />
+        <ListRow leading={<Icon name="note" />} title={t('clientDetail.meals')} to={`/clients/${client.id}/meals`} />
+        <ListRow leading={<Icon name="pill" />} title={t('clientDetail.supplements')} to={`/clients/${client.id}/supplements`} />
+        <ListRow leading={<Icon name="chart" />} title={t('clientDetail.progress')} to={`/clients/${client.id}/progress`} />
+      </ListSection>
       <MeasurementsSection client={client} />
       <InjuriesSection client={client} />
-      <PaymentsSection payments={payments} today={today} />
+      <PaymentsSection payments={payments} today={today} onAdd={() => setSheet({ payment: null })} onOpen={(p) => setSheet({ payment: p })} />
 
       <ListSection title={t('clientDetail.notes')}>
         <p className={client.notes ? styles.note : `${styles.note} ${styles.muted}`}>{client.notes || t('clientDetail.noNotes')}</p>
@@ -122,15 +165,30 @@ function ClientDetail({ client, payments, sessions }: { client: Client; payments
           <Icon name="calendarPlus" />
           {t('clientDetail.book')}
         </button>
-        <Button size="large" icon="send" className={styles.primary} onClick={() => navigate('/more/pdf')}>
+        <Button size="large" icon="send" className={styles.primary} onClick={() => navigate(`/more/pdf?client=${client.id}`)}>
           {t('clientDetail.sendProgram')}
         </Button>
       </nav>
+
+      {sheet === 'edit' && <EditClientSheet client={client} onClose={() => setSheet(null)} />}
+      {sheet === 'package' && <PackageSheet client={client} currency={currency} onClose={() => setSheet(null)} />}
+      {sheet !== null && typeof sheet === 'object' && (
+        <PaymentSheet
+          client={client}
+          payment={sheet.payment}
+          currency={currency}
+          onClose={() => setSheet(null)}
+          onDelete={(p) => {
+            setSheet(null);
+            void deletePayment(p);
+          }}
+        />
+      )}
     </>
   );
 }
 
-function PackageSection({ client, next }: { client: Client; next: Session | null }) {
+function PackageSection({ client, next, onEdit, onRenew }: { client: Client; next: Session | null; onEdit: () => void; onRenew: () => void }) {
   const pkg = client.package;
   if (!pkg || pkg.totalSessions <= 0) {
     return (
@@ -138,6 +196,11 @@ function PackageSection({ client, next }: { client: Client; next: Session | null
         <div className={styles.pkgEmpty}>
           <p className={styles.pkgTitle}>{t('clientDetail.noPackage')}</p>
           <p className={styles.pkgSub}>{t('clientDetail.noPackageBody')}</p>
+          <div className={styles.chips}>
+            <Button size="small" icon="plus" onClick={onEdit}>
+              {t('clientDetail.addPackage')}
+            </Button>
+          </div>
         </div>
       </ListSection>
     );
@@ -179,6 +242,14 @@ function PackageSection({ client, next }: { client: Client; next: Session | null
                 {nextIsToday ? t('home.title') : formatIsoDate(toIsoDate(new Date(next.startsAt)))} <Num>{nextTime.clock}</Num> {nextTime.period}
               </Badge>
             )}
+          </div>
+          <div className={styles.chips}>
+            <Button size="small" variant="secondary" icon="edit" onClick={onEdit}>
+              {t('clientDetail.editPackage')}
+            </Button>
+            <Button size="small" variant="secondary" icon="undo" onClick={onRenew}>
+              {t('clientDetail.renew')}
+            </Button>
           </div>
         </div>
       </div>
@@ -239,9 +310,16 @@ function InjuriesSection({ client }: { client: Client }) {
   );
 }
 
-function PaymentsSection({ payments, today }: { payments: Payment[]; today: string }) {
+function PaymentsSection({ payments, today, onAdd, onOpen }: { payments: Payment[]; today: string; onAdd: () => void; onOpen: (p: Payment) => void }) {
   return (
-    <ListSection title={t('clientDetail.payments')}>
+    <ListSection
+      title={t('clientDetail.payments')}
+      action={
+        <Button size="small" variant="plain" icon="plus" onClick={onAdd}>
+          {t('clientDetail.addPayment')}
+        </Button>
+      }
+    >
       {payments.length === 0 ? (
         <ListRow leading={<Icon name="wallet" />} title={t('clientDetail.noPayments')} />
       ) : (
@@ -255,6 +333,7 @@ function PaymentsSection({ payments, today }: { payments: Payment[]; today: stri
               </>
             }
             trailing={<Badge tone={p.status === 'paid' ? 'ok' : 'warning'}>{p.status === 'paid' ? t('clientDetail.paid') : t('clientDetail.due')}</Badge>}
+            onClick={() => onOpen(p)}
           />
         ))
       )}
