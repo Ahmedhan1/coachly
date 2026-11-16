@@ -7,18 +7,17 @@
 
 .legend {
   padding: 0;
-  margin-block-end: var(--space-1);
-  font-size: var(--text-sm);
-  font-weight: var(--weight-medium);
-  color: var(--text-secondary);
+  margin-block-end: var(--sp-2);
+  font: var(--t-label);
+  color: var(--text-2);
 }
 
 .track {
   display: flex;
   gap: 2px;
-  padding: 2px;
-  border-radius: var(--radius-md);
-  background: var(--fill);
+  padding: 3px;
+  border-radius: var(--r-md);
+  background: var(--field-bg, var(--surface));
 }
 
 .wrap {
@@ -26,18 +25,25 @@
 }
 
 .segment {
+  position: relative;
   flex: 1 1 0;
   display: grid;
   place-items: center;
-  min-block-size: var(--touch);
+  min-block-size: 38px;
   min-inline-size: 64px;
-  padding-inline: var(--space-2);
-  border-radius: calc(var(--radius-md) - 2px);
-  font-size: var(--text-sm);
-  font-weight: var(--weight-medium);
-  color: var(--text-secondary);
+  padding-inline: var(--sp-2);
+  border-radius: 11px;
+  font: 500 14px/1.2 var(--font-ui);
+  color: var(--text-2);
   cursor: pointer;
   text-align: center;
+}
+
+/* 44pt hit area */
+.segment::after {
+  content: '';
+  position: absolute;
+  inset: -3px 0;
 }
 
 .wrap .segment {
@@ -45,12 +51,10 @@
 }
 
 .selected {
-  background: var(--surface-raised);
-  color: var(--text);
-  font-weight: var(--weight-semibold);
-  box-shadow: 0 0 0 var(--border-width) var(--separator);
+  background: var(--text);
+  color: var(--bg);
 }
 
 .segment:has(:focus-visible) {
-  outline: 3px solid var(--focus-ring);
+  outline: 3px solid var(--brand-ink);
 }

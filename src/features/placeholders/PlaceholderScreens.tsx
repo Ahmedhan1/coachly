@@ -55,5 +55,4 @@ export const NutritionScreen = make('nutrition');
 export const SupplementsScreen = make('supplements');
 export const ProgressScreen = make('progress');
 export const PdfScreen = make('pdf');
-export const SettingsScreen = make('settings');
 export { SCREEN_ICONS };

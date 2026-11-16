@@ -1,24 +1,37 @@
 import { expect, test } from '@playwright/test';
-import { openApp, swipeToReveal } from './helpers';
+import { ADD_BUTTON, openApp, openAddClient, swipeToReveal } from './helpers';
 
 test('with the bypass, home renders today, ending subscriptions and demo data', async ({ page }) => {
   await openApp(page);
-  await expect(page.getByRole('heading', { name: 'حصص النهارده' })).toBeVisible();
-  await expect(page.getByRole('heading', { name: 'اشتراكات هتخلص خلال 7 أيام' })).toBeVisible();
+  await expect(page.getByRole('heading', { level: 1, name: 'النهارده' })).toBeVisible();
+  await expect(page.getByRole('heading', { name: 'باقي اليوم' })).toBeVisible();
+  await expect(page.getByRole('heading', { name: /بتخلص قريب/ })).toBeVisible();
+  await expect(page.getByRole('heading', { name: 'محتاجين متابعة' })).toBeVisible();
   await expect(page.getByText('دي بيانات تجريبية')).toBeVisible();
-  await expect(page.getByRole('link', { name: /سارة محمود/ }).first()).toBeVisible();
+  await expect(page.getByText('سارة محمود').first()).toBeVisible();
+  // ending soon: renew buttons named after the client
+  await expect(page.getByRole('button', { name: 'جدّد اشتراك منى حسن' })).toBeVisible();
+});
+
+test('the tab bar has four tabs and a center add button; More is behind the trainer button', async ({ page }) => {
+  await openApp(page);
+  const tabs = page.getByRole('navigation', { name: 'التنقل الرئيسي' });
+  await expect(tabs.getByRole('link')).toHaveCount(4);
+  await expect(tabs.getByRole('button', { name: ADD_BUTTON })).toBeVisible();
+  await page.getByRole('button', { name: 'المزيد والإعدادات' }).click();
+  await expect(page.getByRole('heading', { level: 1, name: 'المزيد' })).toBeVisible();
 });
 
 test('add a client from home in three taps or fewer', async ({ page }) => {
   await openApp(page);
-  await page.getByRole('button', { name: 'عميل جديد' }).click(); // tap 1
+  await openAddClient(page); // taps 1-2: "+" then "عميل جديد"
   const sheet = page.getByRole('dialog', { name: 'عميل جديد' });
   await expect(sheet).toBeVisible();
   await expect(sheet.getByLabel('الاسم')).toBeFocused();
   await sheet.getByLabel('الاسم').fill('حسام فتحي');
-  await sheet.getByRole('button', { name: 'حفظ' }).click(); // tap 2
+  await sheet.getByRole('button', { name: 'حفظ' }).click(); // tap 3
   await expect(page.getByRole('heading', { level: 1, name: 'حسام فتحي' })).toBeVisible();
-  await page.getByRole('link', { name: 'العملاء' }).first().click();
+  await page.getByRole('link', { name: 'رجوع للعملاء' }).click();
   await expect(page.getByRole('link', { name: /حسام فتحي/ })).toBeVisible();
 });
 
@@ -80,7 +93,8 @@ test('placeholder routes render through the tab bar and More', async ({ page }) 
   await openApp(page);
   await page.getByRole('link', { name: 'المواعيد' }).click();
   await expect(page.getByRole('heading', { level: 1, name: 'المواعيد' })).toBeVisible();
-  await page.getByRole('link', { name: 'المزيد' }).click();
+  await page.getByRole('link', { name: 'الرئيسية' }).click();
+  await page.getByRole('button', { name: 'المزيد والإعدادات' }).click();
   await page.getByRole('link', { name: /المكملات والمنتجات/ }).click();
   await expect(page.getByRole('heading', { level: 1, name: 'المكملات والمنتجات' })).toBeVisible();
 });

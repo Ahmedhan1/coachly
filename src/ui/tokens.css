@@ -104,6 +104,10 @@
   --danger: #b42318;
   --danger-tint: #f9deda;
   --on-danger: #ffffff;
+  /* Package ring "left" segments: --surface-2 in light, lifted in dark so they stay visible on a tile. */
+  --ring-left: var(--surface-2);
+  /* Fields: no border in light, 1px line-strong in dark. */
+  --field-border: 0;
 
   --shadow-sheet: 0 -8px 40px rgb(0 0 0 / 0.18);
   --shadow-raise: none;
@@ -139,6 +143,8 @@
     --danger: #ff8a7e;
     --danger-tint: #2e1614;
     --on-danger: #111111;
+    --field-border: 1px solid var(--line-strong);
+    --ring-left: var(--line-strong);
     --shadow-sheet: 0 -8px 40px rgb(0 0 0 / 0.6);
   }
 }
@@ -171,6 +177,8 @@
   --danger: #ff8a7e;
   --danger-tint: #2e1614;
   --on-danger: #111111;
+  --field-border: 1px solid var(--line-strong);
+  --ring-left: var(--line-strong);
   --shadow-sheet: 0 -8px 40px rgb(0 0 0 / 0.6);
   color-scheme: dark;
 }

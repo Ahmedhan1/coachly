@@ -33,7 +33,7 @@ export function InstallGateScreen() {
         {STEPS.map((step, i) => (
           <li key={step.title} className={styles.step}>
             <span className={styles.number} aria-hidden="true">
-              {i + 1}
+              <bdi className="num">{i + 1}</bdi>
             </span>
             <div className={styles.stepText}>
               <h2 className={styles.stepTitle}>{t(step.title)}</h2>

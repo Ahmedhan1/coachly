@@ -1,22 +1,17 @@
 .row {
   display: flex;
   align-items: center;
-  gap: var(--space-3);
+  gap: var(--sp-3);
   inline-size: 100%;
-  min-block-size: calc(var(--touch) + var(--space-3));
-  padding-block: var(--space-2);
-  padding-inline: var(--gutter);
+  min-block-size: var(--row-h);
+  padding: var(--sp-3) var(--sp-4);
   background: var(--surface);
-  border: 0;
   text-align: start;
-}
-
-.interactive {
-  cursor: pointer;
+  color: var(--text);
 }
 
 .interactive:active {
-  background: var(--fill);
+  background: var(--surface-2);
 }
 
 .leading {
@@ -33,16 +28,15 @@
 }
 
 .title {
-  font-size: var(--text-md);
-  font-weight: var(--weight-medium);
+  font: var(--t-headline);
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
 
 .subtitle {
-  font-size: var(--text-sm);
-  color: var(--text-secondary);
+  font: var(--t-sub);
+  color: var(--text-2);
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -50,13 +44,16 @@
 
 .trailing {
   flex: none;
-  font-size: var(--text-sm);
-  color: var(--text-secondary);
+  display: flex;
+  align-items: center;
+  gap: var(--sp-2);
+  font: var(--t-sub);
+  color: var(--text-2);
 }
 
 .chevron {
   flex: none;
-  color: var(--text-tertiary);
-  inline-size: 18px;
-  block-size: 18px;
+  color: var(--text-3);
+  inline-size: 20px;
+  block-size: 20px;
 }

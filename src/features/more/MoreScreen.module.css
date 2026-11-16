@@ -1,10 +1,8 @@
-.body {
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-6);
-  padding-inline: var(--gutter);
+.first {
+  margin-block-start: var(--sp-5);
 }
 
 .demo {
-  align-self: center;
+  display: flex;
+  margin: var(--sp-6) auto 0;
 }

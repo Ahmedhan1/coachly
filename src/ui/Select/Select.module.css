@@ -1,13 +1,12 @@
 .field {
   display: flex;
   flex-direction: column;
-  gap: var(--space-1);
+  gap: var(--sp-2);
 }
 
 .label {
-  font-size: var(--text-sm);
-  font-weight: var(--weight-medium);
-  color: var(--text-secondary);
+  font: var(--t-label);
+  color: var(--text-2);
 }
 
 .wrap {
@@ -17,19 +16,24 @@
 .select {
   appearance: none;
   inline-size: 100%;
-  min-block-size: var(--control-height);
-  padding-inline: var(--space-4) calc(var(--space-4) + var(--icon));
-  border: var(--border-width) solid var(--separator);
-  border-radius: var(--radius-md);
-  background: var(--surface);
-  font-size: var(--text-md);
+  min-block-size: var(--field-h);
+  padding-inline: var(--sp-4) calc(var(--sp-4) + var(--icon));
+  border: var(--field-border, 0);
+  border-radius: var(--r-md);
+  background: var(--field-bg, var(--surface));
+  font: var(--t-body);
+}
+
+.select:focus {
+  outline: none;
+  box-shadow: 0 0 0 3px var(--focus-ring);
 }
 
 .chevron {
   position: absolute;
-  inset-inline-end: var(--space-3);
+  inset-inline-end: var(--sp-3);
   inset-block-start: 50%;
   translate: 0 -50%;
-  color: var(--text-tertiary);
+  color: var(--text-3);
   pointer-events: none;
 }

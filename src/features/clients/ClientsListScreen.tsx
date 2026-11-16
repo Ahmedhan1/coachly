@@ -4,7 +4,7 @@ import { useUiStore } from '@/app/uiStore';
 import { useLive } from '@/app/useLive';
 import { subscriptionAttention, toIsoDate, type Client } from '@/domain/models';
 import { t } from '@/i18n';
-import { Avatar, Badge, Button, EmptyState, IconButton, ListRow, ListSection, PageHeader, SearchField, SwipeRow } from '@/ui';
+import { Avatar, Badge, Button, EmptyState, IconButton, ListRow, ListSection, PageHeader, SearchField, SwipeRow, Tx } from '@/ui';
 import { attentionLabel, attentionTone } from './attention';
 import { useDeleteClient } from './useDeleteClient';
 import styles from './Clients.module.css';
@@ -22,8 +22,8 @@ export function ClientsListScreen() {
     <>
       <PageHeader
         title={t('clients.title')}
-        subtitle={all ? t('clients.count', { n: all.length }) : undefined}
-        actions={<IconButton icon="plus" tone="brand" label={t('clients.add')} onClick={openAddClient} />}
+        subtitle={all ? <Tx k="clients.count" params={{ n: all.length }} /> : undefined}
+        actions={<IconButton icon="plus" label={t('clients.add')} onClick={openAddClient} />}
       />
       <div className={styles.body}>
         {all && all.length > 0 && (
@@ -51,7 +51,7 @@ export function ClientsListScreen() {
           <EmptyState icon="search" title={t('clients.noResultsTitle')} body={t('clients.noResultsBody')} />
         )}
         {results && results.length > 0 && (
-          <ListSection>
+          <ListSection className={styles.list} label={t('clients.title')}>
             {results.map((client) => (
               <SwipeRow
                 key={client.id}

@@ -1,34 +1,33 @@
-import { Outlet } from 'react-router-dom';
+import { Outlet, useMatch } from 'react-router-dom';
 import { AddClientSheet } from '@/features/clients/AddClientSheet';
+import { QuickAddSheet } from '@/features/quickAdd/QuickAddSheet';
 import { t } from '@/i18n';
-import { TabBar, ToastHost, type TabItem } from '@/ui';
-import { useServices } from './services';
+import { cx, TabBar, ToastHost, type TabItem } from '@/ui';
 import { useUiStore } from './uiStore';
-import { useBrandTheme } from './useBrandTheme';
-import { useLive } from './useLive';
 import styles from './AppShell.module.css';
 
+/** 4 tabs + center add (DESIGN.md §5). "More"/settings lives behind the trainer button on Home. */
 const TABS: readonly TabItem[] = [
   { to: '/', label: t('tabs.home'), icon: 'home', end: true },
-  { to: '/clients', label: t('tabs.clients'), icon: 'users' },
+  { to: '/clients', label: t('tabs.clients'), icon: 'users', end: true },
   { to: '/schedule', label: t('tabs.schedule'), icon: 'calendar' },
   { to: '/exercises', label: t('tabs.exercises'), icon: 'dumbbell' },
-  { to: '/more', label: t('tabs.more'), icon: 'more' },
 ];
 
 export function AppShell() {
-  const { data } = useServices();
-  const settings = useLive(() => data.repos.settings.get(), [data]);
-  useBrandTheme(settings);
   const toasts = useUiStore((s) => s.toasts);
   const dismissToast = useUiStore((s) => s.dismissToast);
+  const openQuickAdd = useUiStore((s) => s.openQuickAdd);
+  // Pushed screens hide the tab bar and show their own bottom action bar.
+  const pushed = useMatch('/clients/:clientId') !== null;
   return (
-    <div className={styles.shell}>
+    <div className={cx(styles.shell, pushed && styles.pushed)}>
       <main className={styles.main}>
         <Outlet />
       </main>
-      <TabBar items={TABS} label={t('tabs.label')} />
+      {!pushed && <TabBar items={TABS} label={t('tabs.label')} center={{ label: t('tabs.add'), onClick: openQuickAdd }} />}
       <ToastHost toasts={toasts} onDismiss={dismissToast} />
+      <QuickAddSheet />
       <AddClientSheet />
     </div>
   );

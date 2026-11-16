@@ -26,9 +26,9 @@ export function MoreScreen() {
 
   return (
     <>
-      <PageHeader title={t('screens.more.title')} />
-      <div className={styles.body}>
-        <ListSection>
+      <PageHeader title={t('screens.more.title')} back={{ to: '/', label: t('tabs.home') }} />
+      <div>
+        <ListSection className={styles.first} label={t('screens.more.title')}>
           {LINKS.map((link) => (
             <ListRow
               key={link.to}

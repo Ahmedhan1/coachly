@@ -6,21 +6,21 @@
 
 .icon {
   position: absolute;
-  inset-inline-start: var(--space-3);
-  color: var(--text-tertiary);
-  inline-size: 18px;
-  block-size: 18px;
+  inset-inline-start: var(--sp-3);
+  color: var(--text-3);
+  inline-size: 20px;
+  block-size: 20px;
   pointer-events: none;
 }
 
 .input {
   inline-size: 100%;
-  min-block-size: var(--touch);
-  padding-inline: calc(var(--space-3) + 18px + var(--space-2)) var(--touch);
+  min-block-size: var(--field-h);
+  padding-inline: calc(var(--sp-3) + 20px + var(--sp-2)) var(--tap);
   border: 0;
-  border-radius: var(--radius-md);
-  background: var(--fill);
-  font-size: var(--text-md);
+  border-radius: var(--r-md);
+  background: var(--surface);
+  font: var(--t-body);
   appearance: none;
 }
 
@@ -29,7 +29,12 @@
 }
 
 .input::placeholder {
-  color: var(--text-tertiary);
+  color: var(--text-3);
+}
+
+.input:focus {
+  outline: none;
+  box-shadow: 0 0 0 3px var(--focus-ring);
 }
 
 .clear {
@@ -37,12 +42,9 @@
   inset-inline-end: 0;
   display: grid;
   place-items: center;
-  inline-size: var(--touch);
-  block-size: var(--touch);
-  border: 0;
-  background: transparent;
-  color: var(--text-tertiary);
-  cursor: pointer;
+  inline-size: var(--tap);
+  block-size: var(--tap);
+  color: var(--text-3);
 }
 
 .clear svg {

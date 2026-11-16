@@ -27,7 +27,11 @@ export const routes: RouteObject[] = [
       { path: 'more/supplements', ...screen(placeholders, 'SupplementsScreen') },
       { path: 'more/progress', ...screen(placeholders, 'ProgressScreen') },
       { path: 'more/pdf', ...screen(placeholders, 'PdfScreen') },
-      { path: 'more/settings', ...screen(placeholders, 'SettingsScreen') },
+      { path: 'more/settings', ...screen(() => import('@/features/settings/SettingsScreen'), 'SettingsScreen') },
+      {
+        path: 'more/settings/identity',
+        ...screen(() => import('@/features/identity/IdentityEditScreen'), 'IdentityEditScreen'),
+      },
       { path: '*', element: <Navigate to="/" replace /> },
     ],
   },

@@ -6,11 +6,20 @@
 .main {
   max-inline-size: var(--content-max);
   margin-inline: auto;
-  padding-block-end: calc(var(--tabbar-height) + var(--safe-bottom) + var(--space-8));
+  padding-block-end: calc(var(--tabbar-h) + var(--safe-bottom) + var(--sp-6));
+}
+
+/* Pushed screen: no tab bar; room for the bottom action bar (52pt button + padding) instead. */
+.pushed .main {
+  padding-block-end: calc(var(--safe-bottom) + 104px);
+}
+
+.pushed :global(.toast-host) {
+  inset-block-end: calc(var(--safe-bottom) + 88px);
 }
 
 .fallback {
-  padding: calc(var(--safe-top) + var(--space-8)) var(--gutter);
-  color: var(--text-tertiary);
+  padding: calc(var(--safe-top) + var(--sp-8)) var(--gutter);
+  color: var(--text-2);
   text-align: center;
 }

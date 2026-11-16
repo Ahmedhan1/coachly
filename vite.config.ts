@@ -30,7 +30,7 @@ export default defineConfig({
     VitePWA({
       registerType: 'autoUpdate',
       injectRegister: 'script-defer',
-      includeAssets: ['icons/*.png', 'fonts/*.woff2'],
+      includeAssets: ['icons/*.png'],
       manifest: {
         id: '/',
         name: 'كوتش',

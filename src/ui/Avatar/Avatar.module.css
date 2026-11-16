@@ -1,12 +1,12 @@
 .avatar {
   display: grid;
   place-items: center;
-  inline-size: var(--avatar);
-  block-size: var(--avatar);
-  border-radius: var(--radius-pill);
-  background: var(--brand-tint);
-  color: var(--brand);
-  font-size: var(--text-md);
-  font-weight: var(--weight-semibold);
+  flex: none;
+  inline-size: 44px;
+  block-size: 44px;
+  border-radius: var(--r-sm);
+  background: var(--surface-2);
+  color: var(--text-2);
+  font: 700 17px/1 var(--font-display);
   white-space: nowrap;
 }

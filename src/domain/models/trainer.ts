@@ -41,7 +41,7 @@ export function defaultTrainerSettings(now: number): TrainerSettings {
     id: TRAINER_SETTINGS_ID,
     name: '',
     logoImageId: null,
-    primaryColor: '#2F6F5E',
+    primaryColor: '#F25C1F',
     secondaryColor: '#3A3A3C',
     fontId: 'system',
     currency: DEFAULT_CURRENCY,

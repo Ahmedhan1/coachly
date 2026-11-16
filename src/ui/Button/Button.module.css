@@ -1,18 +1,15 @@
 .button {
+  position: relative;
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  gap: var(--space-2);
-  min-block-size: var(--control-height);
-  min-inline-size: var(--touch);
-  padding-inline: var(--space-5);
-  border: 0;
-  border-radius: var(--radius-md);
-  font-size: var(--text-md);
-  font-weight: var(--weight-semibold);
-  cursor: pointer;
-  transition: background-color var(--duration-fast) ease, opacity var(--duration-fast) ease;
-  touch-action: manipulation;
+  gap: var(--sp-2);
+  min-block-size: var(--field-h);
+  min-inline-size: var(--tap);
+  padding-inline: var(--sp-5);
+  border-radius: var(--r-md);
+  font: 600 16px/1.2 var(--font-ui);
+  text-align: center;
 }
 
 .button:disabled {
@@ -20,41 +17,58 @@
   cursor: default;
 }
 
+.button:active:not(:disabled) {
+  opacity: 0.85;
+}
+
 .block {
   display: flex;
   inline-size: 100%;
 }
 
+.large {
+  min-block-size: 52px;
+  font-size: 17px;
+}
+
+/* 36pt visual, 44pt hit area (DESIGN.md §1.5) */
+.small {
+  min-block-size: 36px;
+  min-inline-size: 0;
+  padding-inline: var(--sp-3);
+  border-radius: var(--r-sm);
+  font-size: 14px;
+}
+
+.small::after {
+  content: '';
+  position: absolute;
+  inset: -4px 0;
+}
+
 .primary {
   background: var(--brand);
-  color: var(--on-brand);
-}
-.primary:active:not(:disabled) {
-  opacity: 0.85;
+  color: var(--brand-on);
 }
 
 .secondary {
-  background: var(--fill);
+  background: var(--surface-2);
   color: var(--text);
 }
-.secondary:active:not(:disabled) {
-  background: var(--fill-pressed);
+
+.onBrand {
+  background: var(--brand-on);
+  color: var(--brand);
 }
 
 .plain {
   background: transparent;
-  color: var(--brand);
-  padding-inline: var(--space-3);
-}
-.plain:active:not(:disabled) {
-  background: var(--brand-tint);
+  color: var(--brand-ink);
+  padding-inline: var(--sp-3);
 }
 
 .danger {
   background: transparent;
   color: var(--danger);
-  padding-inline: var(--space-3);
-}
-.danger:active:not(:disabled) {
-  background: var(--fill);
+  padding-inline: var(--sp-3);
 }

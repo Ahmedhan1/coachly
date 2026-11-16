@@ -1,10 +1,10 @@
 # Licenses
 
 > **ملخص بالعربي:** كل المكتبات الحالية والمخططة رخصها مسموحة (MIT / Apache / ISC / BSD / OFL). ما فيش GPL
-> ولا AGPL في الكود اللي بيتشحن للمدرب. **العلامة الحمرا الوحيدة: صور التمارين بتاعة free-exercise-db.**
+> ولا AGPL في الكود اللي بيتشحن للمدرب. **المخاطرة الوحيدة: صور التمارين بتاعة free-exercise-db.**
 > صاحب الريبو نفسه كتب إنه "مش عارف الصور جاية منين ولا لو مجانية، والاستخدام على مسؤوليتك"، والمصدر
-> الأصلي كاتب إن الصور "اتسحبت من الإنترنت" وبينصح ما تستخدمهاش تجارياً. القرار المقترح: ما نشحنش الصور دي
-> في النسخة اللي بتتباع لحد ما تتبدل (تفاصيل تحت). ده مش رأي قانوني.
+> الأصلي كاتب إن الصور "اتسحبت من الإنترنت" وبينصح ما تستخدمهاش تجارياً. **صاحب التطبيق قرر يوم 2026-11-16
+> يشحن الصور ويتحمل المخاطرة دي** (تفاصيل تحت). ده مش رأي قانوني.
 
 Checked on **2026-11-16**. Rule (CLAUDE.md): check before adding, pin exact versions, no GPL/AGPL in shipped
 code, never copy code from wger.
@@ -111,7 +111,14 @@ and **2 LGPL packages**:
 | Cairo | OFL-1.1 | upstream `google/fonts/ofl/cairo/OFL.txt` ("Copyright 2009 The Cairo Project Authors") + `npm view @fontsource/cairo` → OFL-1.1 | OK |
 | Tajawal | OFL-1.1 | upstream `google/fonts/ofl/tajawal/OFL.txt` ("Copyright 2018 Boutros International") + npm view @fontsource/tajawal | OK |
 | IBM Plex Sans Arabic | OFL-1.1 | upstream `google/fonts/ofl/ibmplexsansarabic/OFL.txt` ("Copyright © 2017 IBM Corp. with Reserved Font Name 'Plex'") + npm view | OK — Reserved Font Name: if we subset/modify the font file we must not call it "Plex" |
-| Readex Pro | OFL-1.1 | upstream `google/fonts/ofl/readexpro/OFL.txt` (Reserved Font Name "RevReading Lexend") + npm view | OK — same reserved-name note |
+| Readex Pro | OFL-1.1 | upstream `google/fonts/ofl/readexpro/OFL.txt` (Reserved Font Name "RevReading Lexend") + npm view | OK — same reserved-name note. **Bundled** (UI font, direction B) |
+| Alexandria | OFL-1.1 | upstream `google/fonts/ofl/alexandria/OFL.txt` fetched 2026-11-16 ("Copyright 2022 The Alexandria Project Authors", no Reserved Font Name) | OK. **Bundled** (display + numbers, direction B) |
+
+**Bundled in the app (Phase 2b, 2026-11-16):** `public/fonts/alexandria-{arabic,latin}.woff2` and
+`public/fonts/readex-pro-{arabic,latin}.woff2` — unmodified Google Fonts woff2 subset files (copied from
+`design/fonts/`, renamed only), declared in `src/ui/fonts.css` with `font-display: swap` and Arabic/Latin
+`unicode-range`, precached by the service worker. License texts shipped next to them:
+`public/fonts/OFL-Alexandria.txt`, `public/fonts/OFL-ReadexPro.txt` (official upstream files).
 
 OFL obligations: ship the OFL.txt next to the font files (e.g. `public/fonts/<font>/OFL.txt`), do not sell the
 font on its own (embedding in an app is fine), subsetted/modified copies must not use a Reserved Font Name.
@@ -142,13 +149,14 @@ font on its own (embedding in an app is fine), subsetted/modified copies must no
 | --- | --- | --- |
 | Exercise **names, muscles, equipment, level, category** | **OK** | Unlicense; short factual labels. Our Arabic names are our own work. |
 | Exercise **instructions** (English text) | **YELLOW** | Unlicense on the repo, but their origin is not documented and upstream admits the images were scraped, so the text may be too. Do not ship the English text verbatim; write our own short Arabic cues (Phase 5) — and keep the trainer able to edit them. |
-| Exercise **images** (JPG) | **RED for the paid product** | Both maintainers say they do not own them / do not know their source; upstream advises against commercial use. The Unlicense cannot grant rights the author does not have. Residual risk if shipped: a copyright holder (likely the original fitness site) could send takedown notices to Cloudflare Pages / GitHub, and the owner, as seller, is the exposed party. |
+| Exercise **images** (re-encoded to WebP in `public/exercise-pack/img/`) | **YELLOW — shipped by owner decision (2026-11-16), risk accepted** | Both maintainers say they do not own them / do not know their source; upstream advises against commercial use. The Unlicense cannot grant rights the author does not have. Residual risk: a copyright holder (likely the original fitness site) could send takedown notices to Cloudflare Pages / GitHub, and the owner, as seller, is the exposed party. |
 
-**Recommendation for the owner (decision needed, see docs/PLAN.md):** ship the library **without** these
-images by default. Show instead (a) the 2D muscle map from react-body-highlighter (MIT) highlighting the target
-muscles, and (b) the trainer's own photo/video when they add one (the app already lets them replace any
-image). Optionally, later: commission or self-produce a royalty-free image set. Only `data-src/` (local, not
-shipped) holds the JSON for now; the images have not been downloaded.
+**Owner decision (2026-11-16):** bundle the photos in the exercise pack (`public/exercise-pack/`, see
+docs/EXERCISE_PACK.md) and **accept the licensing risk** described above. Mitigations kept in place: the photos
+are not precached by the service worker (cached on first view only), every exercise image can be replaced by
+the trainer's own photo in the app, and the pack can be rebuilt without photos if a takedown notice arrives.
+The earlier recommendation (ship without these photos, or commission a royalty-free set) remains the
+lower-risk alternative.
 
 ### Z-Anatomy — <https://github.com/Z-Anatomy/Models-of-human-anatomy>
 
@@ -192,5 +200,5 @@ Other agents are adding dependencies in `worker/` and the root **right now**. At
 2. Add a row here for every new direct dependency (version pinned, license read from the installed
    package.json **and** LICENSE file).
 3. Re-check: `react-body-highlighter` with React 19 (Phase 5), drei helpers that fetch remote assets (Phase 6),
-   Z-Anatomy NC objects excluded (Phase 6), font OFL.txt files shipped (Phase 2), Rate Limiting binding plan
+   Z-Anatomy NC objects excluded (Phase 6), font OFL.txt files shipped (done in Phase 2b), Rate Limiting binding plan
    availability (Phase 3, see LIMITS.md).
