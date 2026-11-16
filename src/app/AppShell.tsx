@@ -22,7 +22,8 @@ export function AppShell() {
   const client = useMatch('/clients/:clientId') !== null;
   const program = useMatch('/programs/:programId') !== null;
   const session = useMatch('/session/:key') !== null;
-  const pushed = client || program || session;
+  const pdf = useMatch('/more/pdf') !== null;
+  const pushed = client || program || session || pdf;
   return (
     <div className={cx(styles.shell, pushed && styles.pushed)}>
       <main className={styles.main}>

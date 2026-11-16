@@ -5,8 +5,6 @@ import { nutritionRoutes } from './routes/nutrition';
 import { scheduleRoutes } from './routes/schedule';
 import { trainingRoutes } from './routes/training';
 
-const placeholders = () => import('@/features/placeholders/PlaceholderScreens');
-
 export const routes: RouteObject[] = [
   {
     path: '/',
@@ -20,7 +18,7 @@ export const routes: RouteObject[] = [
       { path: 'clients', ...screen(() => import('@/features/clients/ClientsListScreen'), 'ClientsListScreen') },
       { path: 'clients/:clientId', ...screen(() => import('@/features/clients/ClientDetailScreen'), 'ClientDetailScreen') },
       { path: 'more', ...screen(() => import('@/features/more/MoreScreen'), 'MoreScreen') },
-      { path: 'more/pdf', ...screen(placeholders, 'PdfScreen') },
+      { path: 'more/pdf', ...screen(() => import('@/features/pdf/PdfBuilderScreen'), 'PdfBuilderScreen') },
       { path: 'more/settings', ...screen(() => import('@/features/settings/SettingsScreen'), 'SettingsScreen') },
       {
         path: 'more/settings/identity',

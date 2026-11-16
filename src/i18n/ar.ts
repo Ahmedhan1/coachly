@@ -1,4 +1,5 @@
 import { nutrition } from './features/nutrition';
+import { pdf } from './features/pdf';
 import { schedule } from './features/schedule';
 import { training } from './features/training';
 
@@ -401,6 +402,7 @@ export const ar = {
   schedule,
   training,
   nutrition,
+  pdf,
   units: {
     mb: '{n} ميجا',
     gb: '{n} جيجا',
