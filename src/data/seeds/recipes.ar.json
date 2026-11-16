@@ -1,0 +1,1084 @@
+{
+ "version": 1,
+ "recipes": [
+  {
+   "id": "foul",
+   "name": "فول مدمس بزيت الزيتون",
+   "servings": 1,
+   "tags": [
+    "فطار"
+   ],
+   "items": [
+    {
+     "ingredient": "fava_cooked",
+     "grams": 200
+    },
+    {
+     "ingredient": "olive_oil",
+     "grams": 10
+    },
+    {
+     "ingredient": "cumin",
+     "grams": 2
+    },
+    {
+     "ingredient": "lemon_juice",
+     "grams": 10
+    },
+    {
+     "ingredient": "tomato",
+     "grams": 50
+    }
+   ],
+   "instructions": "سخّن الفول، وتبّله بالكمون والليمون، وزوّد زيت الزيتون والطماطم المقطعة على الوش."
+  },
+  {
+   "id": "taameya",
+   "name": "طعمية مشوية في الفرن",
+   "servings": 3,
+   "tags": [
+    "فطار"
+   ],
+   "items": [
+    {
+     "ingredient": "fava_split_dry",
+     "grams": 150
+    },
+    {
+     "ingredient": "green_herbs",
+     "grams": 60
+    },
+    {
+     "ingredient": "onion",
+     "grams": 50
+    },
+    {
+     "ingredient": "garlic",
+     "grams": 10
+    },
+    {
+     "ingredient": "cumin",
+     "grams": 4
+    },
+    {
+     "ingredient": "olive_oil",
+     "grams": 15
+    }
+   ],
+   "instructions": "انقع الفول ليلة، اطحنه مع الخضرة والبصل والتوم والكمون، شكّل أقراص، وادهنها زيت خفيف واشويها في الفرن لحد ما تحمر."
+  },
+  {
+   "id": "koshari",
+   "name": "كشري خفيف",
+   "servings": 4,
+   "tags": [
+    "غدا"
+   ],
+   "items": [
+    {
+     "ingredient": "rice_cooked",
+     "grams": 300
+    },
+    {
+     "ingredient": "lentils_brown_cooked",
+     "grams": 200
+    },
+    {
+     "ingredient": "pasta_cooked",
+     "grams": 200
+    },
+    {
+     "ingredient": "chickpeas_cooked",
+     "grams": 80
+    },
+    {
+     "ingredient": "tomato_paste",
+     "grams": 60
+    },
+    {
+     "ingredient": "tomato",
+     "grams": 150
+    },
+    {
+     "ingredient": "onion",
+     "grams": 100
+    },
+    {
+     "ingredient": "garlic",
+     "grams": 10
+    },
+    {
+     "ingredient": "vinegar",
+     "grams": 15
+    },
+    {
+     "ingredient": "olive_oil",
+     "grams": 15
+    }
+   ],
+   "instructions": "قلّب الرز مع العدس، وزوّد المكرونة والحمص. اعمل صلصة بالطماطم والتوم والخل، والبصل يتشوّح بملعقة زيت بدل القلي."
+  },
+  {
+   "id": "molokhia_chicken",
+   "name": "ملوخية بالفراخ",
+   "servings": 4,
+   "tags": [
+    "غدا"
+   ],
+   "items": [
+    {
+     "ingredient": "molokhia",
+     "grams": 400
+    },
+    {
+     "ingredient": "chicken_breast",
+     "grams": 400
+    },
+    {
+     "ingredient": "garlic",
+     "grams": 20
+    },
+    {
+     "ingredient": "olive_oil",
+     "grams": 10
+    }
+   ],
+   "instructions": "اسلق الفراخ واستعمل الشوربة للملوخية. التقلية بالتوم وملعقة زيت بس."
+  },
+  {
+   "id": "grilled_chicken",
+   "name": "فراخ مشوية",
+   "servings": 4,
+   "tags": [
+    "غدا",
+    "عشا"
+   ],
+   "items": [
+    {
+     "ingredient": "chicken_breast",
+     "grams": 600
+    },
+    {
+     "ingredient": "lemon_juice",
+     "grams": 30
+    },
+    {
+     "ingredient": "garlic",
+     "grams": 15
+    },
+    {
+     "ingredient": "onion",
+     "grams": 100
+    },
+    {
+     "ingredient": "olive_oil",
+     "grams": 15
+    },
+    {
+     "ingredient": "cumin",
+     "grams": 3
+    }
+   ],
+   "instructions": "تتبّل الفراخ بالليمون والتوم والبصل المبشور والكمون ساعة على الأقل، وتتشوي على نار عالية."
+  },
+  {
+   "id": "kofta",
+   "name": "كفتة مشوية",
+   "servings": 4,
+   "tags": [
+    "غدا",
+    "عشا"
+   ],
+   "items": [
+    {
+     "ingredient": "beef_mince_lean",
+     "grams": 500
+    },
+    {
+     "ingredient": "onion",
+     "grams": 100
+    },
+    {
+     "ingredient": "green_herbs",
+     "grams": 30
+    },
+    {
+     "ingredient": "cumin",
+     "grams": 3
+    }
+   ],
+   "instructions": "اخلط اللحمة مع البصل المبشور والبقدونس والتوابل، شكّلها أصابع واشويها."
+  },
+  {
+   "id": "tilapia",
+   "name": "سمك بلطي مشوي",
+   "servings": 3,
+   "tags": [
+    "غدا"
+   ],
+   "items": [
+    {
+     "ingredient": "tilapia",
+     "grams": 600
+    },
+    {
+     "ingredient": "lemon_juice",
+     "grams": 30
+    },
+    {
+     "ingredient": "garlic",
+     "grams": 15
+    },
+    {
+     "ingredient": "cumin",
+     "grams": 3
+    },
+    {
+     "ingredient": "tomato",
+     "grams": 100
+    },
+    {
+     "ingredient": "green_pepper",
+     "grams": 50
+    },
+    {
+     "ingredient": "olive_oil",
+     "grams": 10
+    }
+   ],
+   "instructions": "تبّل السمك بالتوم والكمون والليمون، وحطه في صينية فوق شرايح طماطم وفلفل واشويه في الفرن."
+  },
+  {
+   "id": "lentil_soup",
+   "name": "شوربة عدس",
+   "servings": 4,
+   "tags": [
+    "عشا"
+   ],
+   "items": [
+    {
+     "ingredient": "red_lentils_dry",
+     "grams": 200
+    },
+    {
+     "ingredient": "onion",
+     "grams": 100
+    },
+    {
+     "ingredient": "carrot",
+     "grams": 100
+    },
+    {
+     "ingredient": "tomato",
+     "grams": 100
+    },
+    {
+     "ingredient": "cumin",
+     "grams": 4
+    },
+    {
+     "ingredient": "olive_oil",
+     "grams": 10
+    },
+    {
+     "ingredient": "garlic",
+     "grams": 10
+    }
+   ],
+   "instructions": "اسلق العدس مع البصل والجزر والطماطم لحد ما يستوي، اضربه في الخلاط وتبّله بالكمون."
+  },
+  {
+   "id": "eggs_basterma",
+   "name": "بيض بالبسطرمة خفيف",
+   "servings": 1,
+   "tags": [
+    "فطار"
+   ],
+   "items": [
+    {
+     "ingredient": "egg",
+     "grams": 120
+    },
+    {
+     "ingredient": "basterma",
+     "grams": 30
+    },
+    {
+     "ingredient": "olive_oil",
+     "grams": 5
+    }
+   ],
+   "instructions": "شوّح البسطرمة في نص ملعقة زيت وضيف البيض وقلّب على نار هادية."
+  },
+  {
+   "id": "areesh_tomato",
+   "name": "جبنة قريش بالطماطم",
+   "servings": 1,
+   "tags": [
+    "فطار",
+    "عشا"
+   ],
+   "items": [
+    {
+     "ingredient": "areesh_cheese",
+     "grams": 150
+    },
+    {
+     "ingredient": "tomato",
+     "grams": 100
+    },
+    {
+     "ingredient": "green_pepper",
+     "grams": 30
+    },
+    {
+     "ingredient": "olive_oil",
+     "grams": 5
+    }
+   ],
+   "instructions": "اهرس الجبنة القريش مع الطماطم والفلفل المقطعين ورشّة زيت زيتون."
+  },
+  {
+   "id": "pasta_chicken",
+   "name": "مكرونة بالفراخ",
+   "servings": 4,
+   "tags": [
+    "غدا"
+   ],
+   "items": [
+    {
+     "ingredient": "pasta_cooked",
+     "grams": 400
+    },
+    {
+     "ingredient": "chicken_breast",
+     "grams": 300
+    },
+    {
+     "ingredient": "tomato_paste",
+     "grams": 60
+    },
+    {
+     "ingredient": "tomato",
+     "grams": 200
+    },
+    {
+     "ingredient": "onion",
+     "grams": 80
+    },
+    {
+     "ingredient": "garlic",
+     "grams": 10
+    },
+    {
+     "ingredient": "olive_oil",
+     "grams": 15
+    }
+   ],
+   "instructions": "شوّح الفراخ مكعبات، ضيف الصلصة والطماطم، وقلّب المكرونة فيها."
+  },
+  {
+   "id": "rice_veg",
+   "name": "أرز بالخضار",
+   "servings": 4,
+   "tags": [
+    "غدا"
+   ],
+   "items": [
+    {
+     "ingredient": "rice_cooked",
+     "grams": 400
+    },
+    {
+     "ingredient": "mixed_veg",
+     "grams": 200
+    },
+    {
+     "ingredient": "olive_oil",
+     "grams": 10
+    },
+    {
+     "ingredient": "onion",
+     "grams": 50
+    }
+   ],
+   "instructions": "شوّح البصل والخضار، وقلّب معاهم الرز المطبوخ."
+  },
+  {
+   "id": "baladi_salad",
+   "name": "سلطة بلدي",
+   "servings": 3,
+   "tags": [
+    "سلطات"
+   ],
+   "items": [
+    {
+     "ingredient": "tomato",
+     "grams": 200
+    },
+    {
+     "ingredient": "cucumber",
+     "grams": 150
+    },
+    {
+     "ingredient": "onion",
+     "grams": 50
+    },
+    {
+     "ingredient": "green_pepper",
+     "grams": 50
+    },
+    {
+     "ingredient": "green_herbs",
+     "grams": 20
+    },
+    {
+     "ingredient": "lemon_juice",
+     "grams": 20
+    },
+    {
+     "ingredient": "olive_oil",
+     "grams": 10
+    }
+   ],
+   "instructions": "قطّع الخضار صغير، وتبّلها بالليمون والزيت والملح."
+  },
+  {
+   "id": "yogurt_oats",
+   "name": "زبادي بالشوفان والفاكهة",
+   "servings": 1,
+   "tags": [
+    "فطار",
+    "سناك"
+   ],
+   "items": [
+    {
+     "ingredient": "yogurt",
+     "grams": 170
+    },
+    {
+     "ingredient": "oats",
+     "grams": 40
+    },
+    {
+     "ingredient": "banana",
+     "grams": 60
+    },
+    {
+     "ingredient": "strawberry",
+     "grams": 50
+    },
+    {
+     "ingredient": "honey",
+     "grams": 10
+    }
+   ],
+   "instructions": "حط الزبادي، وفوقه الشوفان والفاكهة المقطعة ونقطة عسل."
+  },
+  {
+   "id": "sweet_potato",
+   "name": "بطاطا مشوية",
+   "servings": 2,
+   "tags": [
+    "سناك"
+   ],
+   "items": [
+    {
+     "ingredient": "sweet_potato",
+     "grams": 300
+    }
+   ],
+   "instructions": "اشوي البطاطا في الفرن بقشرها لحد ما تطرى."
+  },
+  {
+   "id": "okra_beef",
+   "name": "بامية باللحمة",
+   "servings": 4,
+   "tags": [
+    "غدا"
+   ],
+   "items": [
+    {
+     "ingredient": "okra",
+     "grams": 500
+    },
+    {
+     "ingredient": "beef_lean",
+     "grams": 300
+    },
+    {
+     "ingredient": "tomato_paste",
+     "grams": 50
+    },
+    {
+     "ingredient": "tomato",
+     "grams": 200
+    },
+    {
+     "ingredient": "onion",
+     "grams": 80
+    },
+    {
+     "ingredient": "garlic",
+     "grams": 10
+    },
+    {
+     "ingredient": "olive_oil",
+     "grams": 10
+    }
+   ],
+   "instructions": "اسلق اللحمة، وطبّخ البامية في الصلصة وشوربة اللحمة."
+  },
+  {
+   "id": "potato_chicken_tray",
+   "name": "صينية بطاطس بالفراخ",
+   "servings": 4,
+   "tags": [
+    "غدا"
+   ],
+   "items": [
+    {
+     "ingredient": "potato",
+     "grams": 500
+    },
+    {
+     "ingredient": "chicken_breast",
+     "grams": 500
+    },
+    {
+     "ingredient": "tomato",
+     "grams": 200
+    },
+    {
+     "ingredient": "onion",
+     "grams": 100
+    },
+    {
+     "ingredient": "bell_pepper",
+     "grams": 100
+    },
+    {
+     "ingredient": "olive_oil",
+     "grams": 15
+    },
+    {
+     "ingredient": "garlic",
+     "grams": 10
+    }
+   ],
+   "instructions": "رص البطاطس والفراخ والخضار في صينية مع الصلصة وادخلها الفرن."
+  },
+  {
+   "id": "zucchini_sauce",
+   "name": "كوسة بالصلصة",
+   "servings": 3,
+   "tags": [
+    "غدا"
+   ],
+   "items": [
+    {
+     "ingredient": "zucchini",
+     "grams": 500
+    },
+    {
+     "ingredient": "tomato_paste",
+     "grams": 40
+    },
+    {
+     "ingredient": "tomato",
+     "grams": 150
+    },
+    {
+     "ingredient": "onion",
+     "grams": 60
+    },
+    {
+     "ingredient": "olive_oil",
+     "grams": 10
+    }
+   ],
+   "instructions": "شوّح البصل، ضيف الكوسة والطماطم والصلصة وسيبها تستوي على نار هادية."
+  },
+  {
+   "id": "baba_ghanoug",
+   "name": "بابا غنوج",
+   "servings": 4,
+   "tags": [
+    "سلطات"
+   ],
+   "items": [
+    {
+     "ingredient": "eggplant",
+     "grams": 400
+    },
+    {
+     "ingredient": "tahini",
+     "grams": 30
+    },
+    {
+     "ingredient": "garlic",
+     "grams": 5
+    },
+    {
+     "ingredient": "lemon_juice",
+     "grams": 20
+    },
+    {
+     "ingredient": "olive_oil",
+     "grams": 5
+    }
+   ],
+   "instructions": "اشوي البتنجان، قشّره واهرسه مع الطحينة والتوم والليمون."
+  },
+  {
+   "id": "tahini_salad",
+   "name": "سلطة طحينة",
+   "servings": 4,
+   "tags": [
+    "سلطات"
+   ],
+   "items": [
+    {
+     "ingredient": "tahini",
+     "grams": 60
+    },
+    {
+     "ingredient": "lemon_juice",
+     "grams": 30
+    },
+    {
+     "ingredient": "garlic",
+     "grams": 5
+    },
+    {
+     "ingredient": "cumin",
+     "grams": 2
+    }
+   ],
+   "instructions": "اخلط الطحينة مع الليمون والتوم والكمون ومية لحد ما تبقى ناعمة."
+  },
+  {
+   "id": "tuna_salad",
+   "name": "سلطة تونة",
+   "servings": 2,
+   "tags": [
+    "عشا"
+   ],
+   "items": [
+    {
+     "ingredient": "tuna_water",
+     "grams": 150
+    },
+    {
+     "ingredient": "cucumber",
+     "grams": 100
+    },
+    {
+     "ingredient": "tomato",
+     "grams": 100
+    },
+    {
+     "ingredient": "onion",
+     "grams": 30
+    },
+    {
+     "ingredient": "lemon_juice",
+     "grams": 15
+    },
+    {
+     "ingredient": "olive_oil",
+     "grams": 5
+    }
+   ],
+   "instructions": "صفّي التونة وقلّبها مع الخضار المقطع والليمون."
+  },
+  {
+   "id": "peas_carrot_beef",
+   "name": "بسلة بالجزر واللحمة",
+   "servings": 4,
+   "tags": [
+    "غدا"
+   ],
+   "items": [
+    {
+     "ingredient": "peas",
+     "grams": 400
+    },
+    {
+     "ingredient": "carrot",
+     "grams": 150
+    },
+    {
+     "ingredient": "beef_lean",
+     "grams": 300
+    },
+    {
+     "ingredient": "tomato_paste",
+     "grams": 50
+    },
+    {
+     "ingredient": "onion",
+     "grams": 80
+    },
+    {
+     "ingredient": "olive_oil",
+     "grams": 10
+    }
+   ],
+   "instructions": "اسلق اللحمة، وطبّخ البسلة والجزر في الصلصة وشوربة اللحمة."
+  },
+  {
+   "id": "spinach_mince",
+   "name": "سبانخ باللحمة المفرومة",
+   "servings": 3,
+   "tags": [
+    "غدا"
+   ],
+   "items": [
+    {
+     "ingredient": "spinach",
+     "grams": 500
+    },
+    {
+     "ingredient": "beef_mince_lean",
+     "grams": 200
+    },
+    {
+     "ingredient": "onion",
+     "grams": 80
+    },
+    {
+     "ingredient": "garlic",
+     "grams": 10
+    },
+    {
+     "ingredient": "olive_oil",
+     "grams": 10
+    },
+    {
+     "ingredient": "tomato_paste",
+     "grams": 30
+    }
+   ],
+   "instructions": "شوّح اللحمة مع البصل والتوم، ضيف السبانخ والصلصة وسيبها تسبك."
+  },
+  {
+   "id": "alex_liver",
+   "name": "كبدة إسكندراني",
+   "servings": 3,
+   "tags": [
+    "عشا"
+   ],
+   "items": [
+    {
+     "ingredient": "beef_liver",
+     "grams": 400
+    },
+    {
+     "ingredient": "green_pepper",
+     "grams": 100
+    },
+    {
+     "ingredient": "garlic",
+     "grams": 15
+    },
+    {
+     "ingredient": "cumin",
+     "grams": 3
+    },
+    {
+     "ingredient": "lemon_juice",
+     "grams": 20
+    },
+    {
+     "ingredient": "olive_oil",
+     "grams": 10
+    }
+   ],
+   "instructions": "قطّع الكبدة شرايح، وشوّحها على نار عالية مع التوم والفلفل والكمون، وفي الآخر الليمون."
+  },
+  {
+   "id": "grilled_shrimp",
+   "name": "جمبري مشوي",
+   "servings": 2,
+   "tags": [
+    "غدا",
+    "عشا"
+   ],
+   "items": [
+    {
+     "ingredient": "shrimp",
+     "grams": 400
+    },
+    {
+     "ingredient": "garlic",
+     "grams": 10
+    },
+    {
+     "ingredient": "lemon_juice",
+     "grams": 20
+    },
+    {
+     "ingredient": "olive_oil",
+     "grams": 10
+    },
+    {
+     "ingredient": "cumin",
+     "grams": 2
+    }
+   ],
+   "instructions": "تبّل الجمبري بالتوم والليمون والكمون، واشويه دقايق قليلة."
+  },
+  {
+   "id": "oats_milk_banana",
+   "name": "شوفان باللبن والموز",
+   "servings": 1,
+   "tags": [
+    "فطار"
+   ],
+   "items": [
+    {
+     "ingredient": "oats",
+     "grams": 50
+    },
+    {
+     "ingredient": "skim_milk",
+     "grams": 250
+    },
+    {
+     "ingredient": "banana",
+     "grams": 100
+    },
+    {
+     "ingredient": "honey",
+     "grams": 5
+    }
+   ],
+   "instructions": "اطبخ الشوفان في اللبن، وزوّد الموز والعسل."
+  },
+  {
+   "id": "veg_omelette",
+   "name": "أومليت بالخضار",
+   "servings": 1,
+   "tags": [
+    "فطار",
+    "عشا"
+   ],
+   "items": [
+    {
+     "ingredient": "egg",
+     "grams": 180
+    },
+    {
+     "ingredient": "tomato",
+     "grams": 50
+    },
+    {
+     "ingredient": "bell_pepper",
+     "grams": 40
+    },
+    {
+     "ingredient": "onion",
+     "grams": 30
+    },
+    {
+     "ingredient": "olive_oil",
+     "grams": 5
+    }
+   ],
+   "instructions": "شوّح الخضار، واضرب البيض وصبّه عليها لحد ما يستوي."
+  },
+  {
+   "id": "fruit_salad",
+   "name": "سلطة فواكه",
+   "servings": 3,
+   "tags": [
+    "سناك"
+   ],
+   "items": [
+    {
+     "ingredient": "apple",
+     "grams": 150
+    },
+    {
+     "ingredient": "orange",
+     "grams": 150
+    },
+    {
+     "ingredient": "banana",
+     "grams": 100
+    },
+    {
+     "ingredient": "strawberry",
+     "grams": 100
+    }
+   ],
+   "instructions": "قطّع الفاكهة مكعبات وقلّبها مع بعض."
+  },
+  {
+   "id": "chicken_veg_soup",
+   "name": "شوربة خضار بالفراخ",
+   "servings": 4,
+   "tags": [
+    "عشا"
+   ],
+   "items": [
+    {
+     "ingredient": "chicken_breast",
+     "grams": 300
+    },
+    {
+     "ingredient": "carrot",
+     "grams": 150
+    },
+    {
+     "ingredient": "zucchini",
+     "grams": 150
+    },
+    {
+     "ingredient": "potato",
+     "grams": 150
+    },
+    {
+     "ingredient": "onion",
+     "grams": 80
+    }
+   ],
+   "instructions": "اسلق الفراخ مع البصل، وضيف الخضار مكعبات لحد ما تستوي."
+  },
+  {
+   "id": "chicken_mushroom",
+   "name": "فراخ بالمشروم والفلفل",
+   "servings": 4,
+   "tags": [
+    "غدا",
+    "عشا"
+   ],
+   "items": [
+    {
+     "ingredient": "chicken_breast",
+     "grams": 500
+    },
+    {
+     "ingredient": "mushroom",
+     "grams": 250
+    },
+    {
+     "ingredient": "bell_pepper",
+     "grams": 200
+    },
+    {
+     "ingredient": "onion",
+     "grams": 100
+    },
+    {
+     "ingredient": "garlic",
+     "grams": 10
+    },
+    {
+     "ingredient": "olive_oil",
+     "grams": 15
+    }
+   ],
+   "instructions": "شوّح الفراخ شرايح، وضيف المشروم والفلفل والبصل على نار عالية."
+  },
+  {
+   "id": "oven_cauliflower",
+   "name": "قرنبيط في الفرن",
+   "servings": 3,
+   "tags": [
+    "سلطات"
+   ],
+   "items": [
+    {
+     "ingredient": "cauliflower",
+     "grams": 500
+    },
+    {
+     "ingredient": "olive_oil",
+     "grams": 15
+    },
+    {
+     "ingredient": "cumin",
+     "grams": 3
+    },
+    {
+     "ingredient": "garlic",
+     "grams": 10
+    }
+   ],
+   "instructions": "قطّع القرنبيط، قلّبه في الزيت والتوم والكمون، وادخله الفرن لحد ما يحمر."
+  },
+  {
+   "id": "vermicelli_rice",
+   "name": "أرز بالشعرية",
+   "servings": 4,
+   "tags": [
+    "غدا"
+   ],
+   "items": [
+    {
+     "ingredient": "rice_cooked",
+     "grams": 400
+    },
+    {
+     "ingredient": "vermicelli_dry",
+     "grams": 30
+    },
+    {
+     "ingredient": "olive_oil",
+     "grams": 10
+    }
+   ],
+   "instructions": "حمّر الشعرية في الزيت، وقلّبها مع الرز."
+  },
+  {
+   "id": "baladi_loaf",
+   "name": "رغيف عيش بلدي",
+   "servings": 1,
+   "tags": [
+    "فطار",
+    "غدا",
+    "عشا"
+   ],
+   "items": [
+    {
+     "ingredient": "baladi_bread",
+     "grams": 90
+    }
+   ],
+   "instructions": "رغيف متوسط حوالي 90 جرام."
+  },
+  {
+   "id": "boiled_eggs",
+   "name": "بيض مسلوق",
+   "servings": 1,
+   "tags": [
+    "فطار",
+    "سناك"
+   ],
+   "items": [
+    {
+     "ingredient": "egg",
+     "grams": 100
+    }
+   ],
+   "instructions": "بيضتين مسلوقين تقريباً 100 جرام."
+  },
+  {
+   "id": "dates_snack",
+   "name": "بلح",
+   "servings": 1,
+   "tags": [
+    "سناك"
+   ],
+   "items": [
+    {
+     "ingredient": "dates",
+     "grams": 40
+    }
+   ],
+   "instructions": "حوالي 4 بلحات متوسطين."
+  }
+ ]
+}

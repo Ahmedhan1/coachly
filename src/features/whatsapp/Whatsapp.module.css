@@ -1,0 +1,156 @@
+/* WhatsApp templates screen, edit sheet and picker — direction B tiles and chips. */
+
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-5);
+}
+
+.save {
+  position: relative;
+  min-block-size: 36px;
+  padding-inline: var(--sp-4);
+  border-radius: var(--r-sm);
+  background: var(--brand);
+  color: var(--brand-on);
+  font: 600 15px/1 var(--font-ui);
+}
+
+.save::after {
+  content: '';
+  position: absolute;
+  inset: -4px 0;
+}
+
+.bodyField {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-2);
+}
+
+.bodyField textarea {
+  min-block-size: 132px;
+  resize: vertical;
+}
+
+.chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--sp-2);
+}
+
+.chip {
+  position: relative;
+  min-block-size: 32px;
+  padding-inline: var(--sp-3);
+  border-radius: var(--r-full);
+  background: var(--brand-tint);
+  color: var(--brand-ink);
+  font: 600 14px/32px var(--font-ui);
+}
+
+.chip::after {
+  content: '';
+  position: absolute;
+  inset: -6px -2px;
+}
+
+.preview {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-2);
+}
+
+.previewLabel {
+  font: var(--t-label);
+  color: var(--text-2);
+}
+
+/* A plain message bubble; no WhatsApp branding. */
+.bubble {
+  align-self: flex-start;
+  max-inline-size: 92%;
+  padding: var(--sp-3) var(--sp-4);
+  border-radius: var(--r-md);
+  border-start-start-radius: var(--r-xs);
+  background: var(--surface-2);
+  font: var(--t-body);
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+
+.emptyTile {
+  border-radius: var(--r-lg);
+  background: var(--surface);
+}
+
+.notice {
+  margin-block-end: var(--sp-3);
+  padding: var(--sp-3) var(--sp-4);
+  border-radius: var(--r-md);
+  background: var(--warn-tint);
+  color: var(--warn);
+  font: var(--t-sub);
+}
+
+.pickList {
+  display: flex;
+  flex-direction: column;
+  border-radius: var(--r-lg);
+  overflow: hidden;
+  background: var(--surface-2);
+}
+
+.pickList > li + li {
+  border-block-start: var(--hairline) solid var(--line);
+}
+
+.pick {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--sp-3);
+  min-block-size: var(--row-h);
+  padding: var(--sp-3) var(--sp-4);
+  color: var(--text);
+}
+
+.pick:active {
+  background: var(--line);
+}
+
+.preferred .pickIcon {
+  background: var(--brand);
+  color: var(--brand-on);
+}
+
+.pickIcon {
+  display: grid;
+  place-items: center;
+  flex: none;
+  inline-size: 40px;
+  block-size: 40px;
+  border-radius: var(--r-sm);
+  background: var(--surface);
+  color: var(--text);
+}
+
+.pickText {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-inline-size: 0;
+}
+
+.pickTitle {
+  font: var(--t-headline);
+}
+
+.pickBody {
+  font: var(--t-sub);
+  color: var(--text-2);
+  white-space: pre-wrap;
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}

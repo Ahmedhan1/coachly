@@ -1,0 +1,535 @@
+{
+ "version": 1,
+ "ingredients": [
+  {
+   "id": "fava_cooked",
+   "name": "فول مدمس مطبوخ",
+   "per100g": {
+    "kcal": 110,
+    "proteinG": 7.6,
+    "carbG": 19.7,
+    "fatG": 0.4
+   }
+  },
+  {
+   "id": "fava_split_dry",
+   "name": "فول مدشوش ناشف",
+   "per100g": {
+    "kcal": 341,
+    "proteinG": 26.1,
+    "carbG": 58.3,
+    "fatG": 1.5
+   }
+  },
+  {
+   "id": "olive_oil",
+   "name": "زيت زيتون",
+   "per100g": {
+    "kcal": 884,
+    "proteinG": 0,
+    "carbG": 0,
+    "fatG": 100
+   }
+  },
+  {
+   "id": "cumin",
+   "name": "كمون",
+   "per100g": {
+    "kcal": 375,
+    "proteinG": 17.8,
+    "carbG": 44.2,
+    "fatG": 22.3
+   }
+  },
+  {
+   "id": "lemon_juice",
+   "name": "عصير لمون",
+   "per100g": {
+    "kcal": 22,
+    "proteinG": 0.4,
+    "carbG": 6.9,
+    "fatG": 0.2
+   }
+  },
+  {
+   "id": "tomato",
+   "name": "طماطم",
+   "per100g": {
+    "kcal": 18,
+    "proteinG": 0.9,
+    "carbG": 3.9,
+    "fatG": 0.2
+   }
+  },
+  {
+   "id": "onion",
+   "name": "بصل",
+   "per100g": {
+    "kcal": 40,
+    "proteinG": 1.1,
+    "carbG": 9.3,
+    "fatG": 0.1
+   }
+  },
+  {
+   "id": "garlic",
+   "name": "توم",
+   "per100g": {
+    "kcal": 149,
+    "proteinG": 6.4,
+    "carbG": 33.1,
+    "fatG": 0.5
+   }
+  },
+  {
+   "id": "green_herbs",
+   "name": "خضرة (كزبرة وشبت وبقدونس)",
+   "per100g": {
+    "kcal": 36,
+    "proteinG": 3,
+    "carbG": 6.3,
+    "fatG": 0.8
+   }
+  },
+  {
+   "id": "baladi_bread",
+   "name": "عيش بلدي",
+   "per100g": {
+    "kcal": 266,
+    "proteinG": 9.8,
+    "carbG": 55,
+    "fatG": 2.6
+   }
+  },
+  {
+   "id": "rice_cooked",
+   "name": "رز أبيض مطبوخ",
+   "per100g": {
+    "kcal": 130,
+    "proteinG": 2.7,
+    "carbG": 28.2,
+    "fatG": 0.3
+   }
+  },
+  {
+   "id": "lentils_brown_cooked",
+   "name": "عدس بجبة مطبوخ",
+   "per100g": {
+    "kcal": 116,
+    "proteinG": 9,
+    "carbG": 20.1,
+    "fatG": 0.4
+   }
+  },
+  {
+   "id": "pasta_cooked",
+   "name": "مكرونة مطبوخة",
+   "per100g": {
+    "kcal": 158,
+    "proteinG": 5.8,
+    "carbG": 30.9,
+    "fatG": 0.9
+   }
+  },
+  {
+   "id": "chickpeas_cooked",
+   "name": "حمص مطبوخ",
+   "per100g": {
+    "kcal": 164,
+    "proteinG": 8.9,
+    "carbG": 27.4,
+    "fatG": 2.6
+   }
+  },
+  {
+   "id": "tomato_paste",
+   "name": "صلصة طماطم مركزة",
+   "per100g": {
+    "kcal": 82,
+    "proteinG": 4.3,
+    "carbG": 18.9,
+    "fatG": 0.5
+   }
+  },
+  {
+   "id": "vinegar",
+   "name": "خل",
+   "per100g": {
+    "kcal": 18,
+    "proteinG": 0,
+    "carbG": 0.1,
+    "fatG": 0
+   }
+  },
+  {
+   "id": "molokhia",
+   "name": "ملوخية خضرا",
+   "per100g": {
+    "kcal": 34,
+    "proteinG": 4.7,
+    "carbG": 5.8,
+    "fatG": 0.3
+   }
+  },
+  {
+   "id": "chicken_breast",
+   "name": "صدر فراخ من غير جلد",
+   "per100g": {
+    "kcal": 120,
+    "proteinG": 22.5,
+    "carbG": 0,
+    "fatG": 2.6
+   }
+  },
+  {
+   "id": "beef_mince_lean",
+   "name": "لحمة مفرومة قليلة الدهن",
+   "per100g": {
+    "kcal": 176,
+    "proteinG": 20,
+    "carbG": 0,
+    "fatG": 10
+   }
+  },
+  {
+   "id": "beef_lean",
+   "name": "لحمة حمرا صافية",
+   "per100g": {
+    "kcal": 140,
+    "proteinG": 21,
+    "carbG": 0,
+    "fatG": 6
+   }
+  },
+  {
+   "id": "beef_liver",
+   "name": "كبدة بقري",
+   "per100g": {
+    "kcal": 135,
+    "proteinG": 20.4,
+    "carbG": 3.9,
+    "fatG": 3.6
+   }
+  },
+  {
+   "id": "tilapia",
+   "name": "سمك بلطي",
+   "per100g": {
+    "kcal": 96,
+    "proteinG": 20.1,
+    "carbG": 0,
+    "fatG": 1.7
+   }
+  },
+  {
+   "id": "shrimp",
+   "name": "جمبري",
+   "per100g": {
+    "kcal": 85,
+    "proteinG": 20.1,
+    "carbG": 0,
+    "fatG": 0.5
+   }
+  },
+  {
+   "id": "tuna_water",
+   "name": "تونة في مية مصفاة",
+   "per100g": {
+    "kcal": 116,
+    "proteinG": 25.5,
+    "carbG": 0,
+    "fatG": 0.8
+   }
+  },
+  {
+   "id": "red_lentils_dry",
+   "name": "عدس أصفر ناشف",
+   "per100g": {
+    "kcal": 352,
+    "proteinG": 24.6,
+    "carbG": 60.1,
+    "fatG": 1.1
+   }
+  },
+  {
+   "id": "carrot",
+   "name": "جزر",
+   "per100g": {
+    "kcal": 41,
+    "proteinG": 0.9,
+    "carbG": 9.6,
+    "fatG": 0.2
+   }
+  },
+  {
+   "id": "egg",
+   "name": "بيض",
+   "per100g": {
+    "kcal": 143,
+    "proteinG": 12.6,
+    "carbG": 0.7,
+    "fatG": 9.5
+   }
+  },
+  {
+   "id": "basterma",
+   "name": "بسطرمة",
+   "per100g": {
+    "kcal": 260,
+    "proteinG": 29,
+    "carbG": 1,
+    "fatG": 15
+   }
+  },
+  {
+   "id": "areesh_cheese",
+   "name": "جبنة قريش",
+   "per100g": {
+    "kcal": 90,
+    "proteinG": 14,
+    "carbG": 3,
+    "fatG": 2
+   }
+  },
+  {
+   "id": "cucumber",
+   "name": "خيار",
+   "per100g": {
+    "kcal": 15,
+    "proteinG": 0.7,
+    "carbG": 3.6,
+    "fatG": 0.1
+   }
+  },
+  {
+   "id": "green_pepper",
+   "name": "فلفل أخضر",
+   "per100g": {
+    "kcal": 20,
+    "proteinG": 0.9,
+    "carbG": 4.6,
+    "fatG": 0.2
+   }
+  },
+  {
+   "id": "bell_pepper",
+   "name": "فلفل ألوان",
+   "per100g": {
+    "kcal": 26,
+    "proteinG": 1,
+    "carbG": 6,
+    "fatG": 0.3
+   }
+  },
+  {
+   "id": "yogurt",
+   "name": "زبادي",
+   "per100g": {
+    "kcal": 61,
+    "proteinG": 3.5,
+    "carbG": 4.7,
+    "fatG": 3.3
+   }
+  },
+  {
+   "id": "oats",
+   "name": "شوفان",
+   "per100g": {
+    "kcal": 389,
+    "proteinG": 16.9,
+    "carbG": 66.3,
+    "fatG": 6.9
+   }
+  },
+  {
+   "id": "banana",
+   "name": "موز",
+   "per100g": {
+    "kcal": 89,
+    "proteinG": 1.1,
+    "carbG": 22.8,
+    "fatG": 0.3
+   }
+  },
+  {
+   "id": "apple",
+   "name": "تفاح",
+   "per100g": {
+    "kcal": 52,
+    "proteinG": 0.3,
+    "carbG": 13.8,
+    "fatG": 0.2
+   }
+  },
+  {
+   "id": "orange",
+   "name": "برتقال",
+   "per100g": {
+    "kcal": 47,
+    "proteinG": 0.9,
+    "carbG": 11.8,
+    "fatG": 0.1
+   }
+  },
+  {
+   "id": "strawberry",
+   "name": "فراولة",
+   "per100g": {
+    "kcal": 32,
+    "proteinG": 0.7,
+    "carbG": 7.7,
+    "fatG": 0.3
+   }
+  },
+  {
+   "id": "honey",
+   "name": "عسل نحل",
+   "per100g": {
+    "kcal": 304,
+    "proteinG": 0.3,
+    "carbG": 82.4,
+    "fatG": 0
+   }
+  },
+  {
+   "id": "sweet_potato",
+   "name": "بطاطا",
+   "per100g": {
+    "kcal": 86,
+    "proteinG": 1.6,
+    "carbG": 20.1,
+    "fatG": 0.1
+   }
+  },
+  {
+   "id": "potato",
+   "name": "بطاطس",
+   "per100g": {
+    "kcal": 77,
+    "proteinG": 2,
+    "carbG": 17.5,
+    "fatG": 0.1
+   }
+  },
+  {
+   "id": "zucchini",
+   "name": "كوسة",
+   "per100g": {
+    "kcal": 17,
+    "proteinG": 1.2,
+    "carbG": 3.1,
+    "fatG": 0.3
+   }
+  },
+  {
+   "id": "eggplant",
+   "name": "بتنجان",
+   "per100g": {
+    "kcal": 25,
+    "proteinG": 1,
+    "carbG": 5.9,
+    "fatG": 0.2
+   }
+  },
+  {
+   "id": "tahini",
+   "name": "طحينة",
+   "per100g": {
+    "kcal": 595,
+    "proteinG": 17,
+    "carbG": 21.2,
+    "fatG": 53.8
+   }
+  },
+  {
+   "id": "skim_milk",
+   "name": "لبن خالي الدسم",
+   "per100g": {
+    "kcal": 34,
+    "proteinG": 3.4,
+    "carbG": 5,
+    "fatG": 0.1
+   }
+  },
+  {
+   "id": "peas",
+   "name": "بسلة",
+   "per100g": {
+    "kcal": 81,
+    "proteinG": 5.4,
+    "carbG": 14.5,
+    "fatG": 0.4
+   }
+  },
+  {
+   "id": "okra",
+   "name": "بامية",
+   "per100g": {
+    "kcal": 33,
+    "proteinG": 1.9,
+    "carbG": 7.5,
+    "fatG": 0.2
+   }
+  },
+  {
+   "id": "mixed_veg",
+   "name": "خضار مشكل",
+   "per100g": {
+    "kcal": 65,
+    "proteinG": 2.9,
+    "carbG": 13,
+    "fatG": 0.5
+   }
+  },
+  {
+   "id": "spinach",
+   "name": "سبانخ",
+   "per100g": {
+    "kcal": 23,
+    "proteinG": 2.9,
+    "carbG": 3.6,
+    "fatG": 0.4
+   }
+  },
+  {
+   "id": "mushroom",
+   "name": "مشروم",
+   "per100g": {
+    "kcal": 22,
+    "proteinG": 3.1,
+    "carbG": 3.3,
+    "fatG": 0.3
+   }
+  },
+  {
+   "id": "cauliflower",
+   "name": "قرنبيط",
+   "per100g": {
+    "kcal": 25,
+    "proteinG": 1.9,
+    "carbG": 5,
+    "fatG": 0.3
+   }
+  },
+  {
+   "id": "vermicelli_dry",
+   "name": "شعرية ناشفة",
+   "per100g": {
+    "kcal": 371,
+    "proteinG": 13,
+    "carbG": 75,
+    "fatG": 1.5
+   }
+  },
+  {
+   "id": "dates",
+   "name": "بلح",
+   "per100g": {
+    "kcal": 282,
+    "proteinG": 2.5,
+    "carbG": 75,
+    "fatG": 0.4
+   }
+  }
+ ]
+}

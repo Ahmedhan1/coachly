@@ -1,0 +1,26 @@
+{
+ "version": 1,
+ "note": "dose and timing are intentionally absent: the trainer types them",
+ "supplements": [
+  {
+   "id": "creatine",
+   "name": "كرياتين"
+  },
+  {
+   "id": "whey",
+   "name": "واي بروتين"
+  },
+  {
+   "id": "omega3",
+   "name": "أوميجا 3"
+  },
+  {
+   "id": "multivitamin",
+   "name": "مالتي فيتامين"
+  },
+  {
+   "id": "caffeine",
+   "name": "كافيين"
+  }
+ ]
+}
