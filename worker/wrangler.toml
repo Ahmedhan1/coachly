@@ -37,6 +37,6 @@ migrations_dir = "migrations"
 binding = "BACKUPS"
 bucket_name = "pt-coach-backups"
 
-# One cron (the Free plan allows 5 per account): sends due Web Push notifications every 5 minutes.
+# One cron (the Free plan allows 5 per account): sends due Web Push notifications every minute.
 [triggers]
 crons = ["* * * * *"]

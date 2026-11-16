@@ -76,7 +76,7 @@ with Web Crypto in the Worker (`worker/src/push/`); verified against RFC 8291 Ap
   POST to arbitrary URLs.
 - **What the service worker receives** (`event.data.json()`): `{v:1, id, title, body}`. The app's service worker
   shows `self.registration.showNotification(title, {body, tag: id})`.
-- **Cron** (`*/5 * * * *`): each run sends at most `PUSH_BATCH_SIZE` = 20 due items, oldest first (indexed query on
+- **Cron** (`* * * * *`): each run sends at most `PUSH_BATCH_SIZE` = 20 due items, oldest first (indexed query on
   `push_items(due_at)`, checked with `EXPLAIN QUERY PLAN` in tests), then deletes them. Push service answers:
   2xx → done; 404/410 → subscription and all its items deleted; 429/5xx/network → retried in 5 min, up to 3
   attempts; other 4xx → dropped. Items more than 1 h late are dropped unsent. `TTL: 3600`, `Urgency: high`.
@@ -96,7 +96,7 @@ The workerd figure is from local workerd on the build machine, not Cloudflare's 
 Worker's CPU time for cron invocations in the Cloudflare dashboard and lower `PUSH_BATCH_SIZE`
 (`worker/src/cloud/config.ts`) if it approaches 10 ms.
 
-**Capacity**: every 5 minutes × 20 = 240/hour = **5,760/day**, close to LIMITS.md's *typical* 5,000/day and below
+**Capacity**: every minute × 20 = 1,200/hour = **28,800/day**, close to LIMITS.md's *typical* 5,000/day and below
 its *heavy* 12,500/day; a backlog is sent on the following runs (5 min late each). If trainers schedule more, change
 the cron to every minute (`crons = ["* * * * *"]` in `worker/wrangler.toml`, still one trigger): 28,800/day, the
 design LIMITS.md assumed. Worker requests rise by 1,152/day (fits).
@@ -202,7 +202,7 @@ light and dark, Western digits, system fonts, styled after design direction B.
 | Name | Kind | Default / note |
 | --- | --- | --- |
 | `BACKUPS` | R2 binding | bucket `pt-coach-backups` |
-| `[triggers] crons` | cron | `*/5 * * * *` (1 of the account's 5) |
+| `[triggers] crons` | cron | `* * * * *` (1 of the account's 5) |
 | `BACKUP_MAX_BYTES` | var | `104857600` (100 MiB) |
 | `STORAGE_GUARD_BYTES` | var | `9663676416` (9 GiB) |
 | `VAPID_PRIVATE_KEY`, `VAPID_PUBLIC_KEY`, `VAPID_SUBJECT` | secrets | from `npm run vapid:keys`; push is off until all three exist |

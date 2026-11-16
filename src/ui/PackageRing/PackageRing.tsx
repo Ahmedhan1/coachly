@@ -4,22 +4,22 @@ import styles from './PackageRing.module.css';
 export interface PackageRingProps {
   total: number;
   remaining: number;
-  /** Next session already booked: one brand segment. */
-  booked?: boolean;
   /** Accessible summary, e.g. "5 حصص باقية من 12". */
   label: string;
   /** Caption under the big number. */
   caption: string;
 }
 
-const STROKE = { used: 'var(--text-3)', booked: 'var(--brand)', left: 'var(--ring-left)' } as const;
+/** Remaining = brand (what the client still has), used = the neutral ring track. */
+const STROKE = { left: 'var(--brand)', used: 'var(--ring-left)' } as const;
 
 /**
- * 12-segment package ring (DESIGN.md §5). Fills counter-clockwise from the top, i.e. right-to-left
- * across the top for an RTL reader: used = --text-3, booked = --brand, left = --ring-left (--surface-2 in light).
+ * 12-segment package ring (DESIGN.md §5). The brand arc is what is LEFT: it starts at 12 o'clock and runs
+ * counter-clockwise (right-to-left across the top, the RTL reading direction); used sessions fall back to
+ * the neutral `--ring-left` track, so the arc visibly shrinks as sessions are attended.
  */
-export function PackageRing({ total, remaining, booked = false, label, caption }: PackageRingProps) {
-  const segments = ringSegments(total, remaining, booked);
+export function PackageRing({ total, remaining, label, caption }: PackageRingProps) {
+  const segments = ringSegments(total, remaining);
   return (
     <div className={styles.ring} role="img" aria-label={label}>
       <svg viewBox="0 0 104 104" aria-hidden="true" className={styles.svg}>
