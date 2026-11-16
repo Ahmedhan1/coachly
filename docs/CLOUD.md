@@ -96,8 +96,7 @@ The workerd figure is from local workerd on the build machine, not Cloudflare's 
 Worker's CPU time for cron invocations in the Cloudflare dashboard and lower `PUSH_BATCH_SIZE`
 (`worker/src/cloud/config.ts`) if it approaches 10 ms.
 
-**Capacity**: every minute × 20 = 1,200/hour = **28,800/day**, close to LIMITS.md's *typical* 5,000/day and below
-its *heavy* 12,500/day; a backlog is sent on the following runs (5 min late each). If trainers schedule more, change
+**Capacity**: every minute × 20 = 1,200/hour = **28,800/day**, well above LIMITS.md's *heavy* 12,500/day; a backlog is sent on the following runs (1 min late each). If trainers schedule more, change
 the cron to every minute (`crons = ["* * * * *"]` in `worker/wrangler.toml`, still one trigger): 28,800/day, the
 design LIMITS.md assumed. Worker requests rise by 1,152/day (fits).
 
