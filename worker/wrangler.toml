@@ -1,0 +1,34 @@
+# Cloudflare Worker for PT Coach activation codes. Free tier only: Workers + D1.
+# Owner guide (Arabic): ../docs/ACTIVATION.md
+name = "pt-coach-license"
+main = "src/index.ts"
+compatibility_date = "2026-08-01"
+
+# shared/license.ts lives outside this folder; make it use this package's copy of @noble/ed25519.
+[alias]
+"@noble/ed25519" = "./node_modules/@noble/ed25519/index.js"
+
+[vars]
+# Address of the installed app (Cloudflare Pages). Several origins may be separated by commas.
+APP_ORIGIN = "https://pt-coach.pages.dev"
+# Public key printed by tools/keygen.mjs (hex). Not secret. Must match LICENSE_PRIVATE_KEY.
+LICENSE_PUBLIC_KEY = "REPLACE_WITH_PUBLIC_KEY_HEX"
+
+# Secrets (never in this file) - set with `npx wrangler secret put NAME`:
+#   LICENSE_PRIVATE_KEY  Ed25519 private key (hex, 64 chars) from tools/keygen.mjs
+#   ADMIN_PASSWORD       password for /admin
+#   DATA_KEY             key that unlocks the app's data pack (returned on activation)
+
+[[d1_databases]]
+binding = "DB"
+database_name = "pt-coach-licenses"
+database_id = "REPLACE_WITH_D1_DATABASE_ID"
+migrations_dir = "migrations"
+
+# ---- later phases (not used yet) ----
+# [[r2_buckets]]
+# binding = "BACKUPS"
+# bucket_name = "pt-coach-backups"
+#
+# [triggers]
+# crons = ["*/5 * * * *"]

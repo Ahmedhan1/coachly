@@ -1,0 +1,12 @@
+.avatar {
+  display: grid;
+  place-items: center;
+  inline-size: var(--avatar);
+  block-size: var(--avatar);
+  border-radius: var(--radius-pill);
+  background: var(--brand-tint);
+  color: var(--brand);
+  font-size: var(--text-sm);
+  font-weight: var(--weight-semibold);
+  white-space: nowrap;
+}

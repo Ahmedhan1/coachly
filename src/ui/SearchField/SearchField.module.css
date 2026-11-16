@@ -1,0 +1,51 @@
+.wrap {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.icon {
+  position: absolute;
+  inset-inline-start: var(--space-3);
+  color: var(--text-tertiary);
+  inline-size: 18px;
+  block-size: 18px;
+  pointer-events: none;
+}
+
+.input {
+  inline-size: 100%;
+  min-block-size: var(--touch);
+  padding-inline: calc(var(--space-3) + 18px + var(--space-2)) var(--touch);
+  border: 0;
+  border-radius: var(--radius-md);
+  background: var(--fill);
+  font-size: var(--text-md);
+  appearance: none;
+}
+
+.input::-webkit-search-cancel-button {
+  display: none;
+}
+
+.input::placeholder {
+  color: var(--text-tertiary);
+}
+
+.clear {
+  position: absolute;
+  inset-inline-end: 0;
+  display: grid;
+  place-items: center;
+  inline-size: var(--touch);
+  block-size: var(--touch);
+  border: 0;
+  background: transparent;
+  color: var(--text-tertiary);
+  cursor: pointer;
+}
+
+.clear svg {
+  inline-size: 18px;
+  block-size: 18px;
+}

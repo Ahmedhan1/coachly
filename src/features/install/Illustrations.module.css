@@ -1,0 +1,74 @@
+.art {
+  display: block;
+  inline-size: 100%;
+  max-inline-size: 280px;
+  block-size: auto;
+  margin-inline: auto;
+}
+
+.device {
+  fill: var(--surface);
+  stroke: var(--gray-300);
+  stroke-width: 1.5;
+}
+
+.screen {
+  fill: var(--fill);
+}
+
+.bar {
+  fill: var(--fill);
+}
+
+.highlight {
+  fill: var(--brand-tint);
+  stroke: var(--brand);
+  stroke-width: 1.5;
+}
+
+.focus {
+  fill: var(--brand-tint);
+  stroke: var(--brand);
+  stroke-width: 1.5;
+}
+
+.focusRing {
+  fill: none;
+  stroke: var(--brand);
+  stroke-width: 1.5;
+  stroke-dasharray: 3 3;
+}
+
+.icon,
+.lineStrong,
+.muted {
+  fill: none;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.icon {
+  stroke: var(--brand);
+  stroke-width: 2;
+}
+
+.lineStrong {
+  stroke: var(--text-secondary);
+  stroke-width: 4;
+}
+
+.muted {
+  stroke: var(--gray-300);
+  stroke-width: 4;
+}
+
+.appIcon {
+  fill: var(--gray-900);
+}
+
+.appMark {
+  fill: var(--gray-50);
+  font-size: 15px;
+  font-weight: 700;
+  font-family: var(--font-heading);
+}

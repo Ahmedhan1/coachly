@@ -1,0 +1,39 @@
+.empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-10) var(--space-6);
+  text-align: center;
+}
+
+.icon {
+  display: grid;
+  place-items: center;
+  inline-size: 56px;
+  block-size: 56px;
+  margin-block-end: var(--space-2);
+  border-radius: var(--radius-pill);
+  background: var(--fill);
+  color: var(--text-secondary);
+}
+
+.icon svg {
+  inline-size: 28px;
+  block-size: 28px;
+}
+
+.title {
+  font-size: var(--text-lg);
+  font-weight: var(--weight-semibold);
+}
+
+.body {
+  max-inline-size: 32ch;
+  color: var(--text-secondary);
+  font-size: var(--text-sm);
+}
+
+.action {
+  margin-block-start: var(--space-4);
+}

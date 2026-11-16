@@ -1,0 +1,56 @@
+.fieldset {
+  border: 0;
+  margin: 0;
+  padding: 0;
+  min-inline-size: 0;
+}
+
+.legend {
+  padding: 0;
+  margin-block-end: var(--space-1);
+  font-size: var(--text-sm);
+  font-weight: var(--weight-medium);
+  color: var(--text-secondary);
+}
+
+.track {
+  display: flex;
+  gap: 2px;
+  padding: 2px;
+  border-radius: var(--radius-md);
+  background: var(--fill);
+}
+
+.wrap {
+  flex-wrap: wrap;
+}
+
+.segment {
+  flex: 1 1 0;
+  display: grid;
+  place-items: center;
+  min-block-size: var(--touch);
+  min-inline-size: 64px;
+  padding-inline: var(--space-2);
+  border-radius: calc(var(--radius-md) - 2px);
+  font-size: var(--text-sm);
+  font-weight: var(--weight-medium);
+  color: var(--text-secondary);
+  cursor: pointer;
+  text-align: center;
+}
+
+.wrap .segment {
+  flex-basis: 30%;
+}
+
+.selected {
+  background: var(--surface-raised);
+  color: var(--text);
+  font-weight: var(--weight-semibold);
+  box-shadow: 0 0 0 var(--border-width) var(--separator);
+}
+
+.segment:has(:focus-visible) {
+  outline: 3px solid var(--focus-ring);
+}

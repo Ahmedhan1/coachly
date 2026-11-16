@@ -1,0 +1,42 @@
+.bar {
+  position: fixed;
+  inset-inline: 0;
+  inset-block-end: 0;
+  z-index: 10;
+  padding-block-end: var(--safe-bottom);
+  padding-inline: var(--safe-left) var(--safe-right);
+  background: var(--surface);
+  border-block-start: var(--border-width) solid var(--separator);
+}
+
+.list {
+  display: flex;
+  margin: 0 auto;
+  padding: 0;
+  list-style: none;
+  max-inline-size: var(--content-max);
+}
+
+.item {
+  flex: 1;
+}
+
+.link {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+  min-block-size: var(--tabbar-height);
+  color: var(--text-tertiary);
+  font-size: 0.6875rem;
+  font-weight: var(--weight-medium);
+}
+
+.active {
+  color: var(--brand);
+}
+
+.label {
+  line-height: 1.2;
+}

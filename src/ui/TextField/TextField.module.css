@@ -1,0 +1,53 @@
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+}
+
+.label {
+  font-size: var(--text-sm);
+  font-weight: var(--weight-medium);
+  color: var(--text-secondary);
+}
+
+.input {
+  min-block-size: var(--control-height);
+  padding-inline: var(--space-4);
+  border: var(--border-width) solid var(--separator);
+  border-radius: var(--radius-md);
+  background: var(--surface);
+  font-size: var(--text-md); /* >= 16px so iOS does not zoom on focus */
+  inline-size: 100%;
+}
+
+.input::placeholder {
+  color: var(--text-tertiary);
+}
+
+.input:focus {
+  outline: none;
+  border-color: var(--brand);
+  box-shadow: 0 0 0 3px var(--focus-ring);
+}
+
+.ltr {
+  text-align: start;
+  letter-spacing: 0.04em;
+}
+
+.invalid {
+  border-color: var(--danger);
+}
+
+.hint,
+.error {
+  font-size: var(--text-xs);
+}
+
+.hint {
+  color: var(--text-tertiary);
+}
+
+.error {
+  color: var(--danger);
+}

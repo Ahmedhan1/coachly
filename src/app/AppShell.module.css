@@ -1,0 +1,16 @@
+.shell {
+  min-block-size: 100dvh;
+  padding-inline: var(--safe-left) var(--safe-right);
+}
+
+.main {
+  max-inline-size: var(--content-max);
+  margin-inline: auto;
+  padding-block-end: calc(var(--tabbar-height) + var(--safe-bottom) + var(--space-8));
+}
+
+.fallback {
+  padding: calc(var(--safe-top) + var(--space-8)) var(--gutter);
+  color: var(--text-tertiary);
+  text-align: center;
+}
