@@ -10,7 +10,11 @@
     "db:migrate:remote": "wrangler d1 migrations apply pt-coach-licenses --remote",
     "test": "vitest run",
     "typecheck": "tsc --noEmit",
-    "bench": "node bench/sign-benchmark.mjs"
+    "bench": "node bench/sign-benchmark.mjs",
+    "bench:push": "node bench/push-benchmark.mjs",
+    "test:viewer": "node test-browser/viewer.test.mjs",
+    "test:e2e": "node test-browser/e2e-dev.test.mjs",
+    "vapid:keys": "node scripts/vapid-keys.mjs"
   },
   "dependencies": {
     "@noble/ed25519": "3.2.0"

@@ -155,3 +155,39 @@ Contract in CLAUDE.md; implemented in `shared/license.ts` (phase 3, in progress 
 
 Security issues: contact the owner privately (contact to be added before release). Never open a public issue
 containing a key, token, backup file or client data.
+
+## Phase 9 (implemented)
+
+Server side of cloud backup, Web Push and the client page, built 2026-11-16 in `worker/` (contract and owner
+steps: `docs/CLOUD.md`). Sections 1, 3 and 5 above described these as planned; this is what was built and where
+it differs.
+
+- **Auth on every non-public endpoint**: license token signature + not revoked/replaced in D1 + not expired
+  (`worker/src/cloud/auth.ts`); per-IP memory pre-filter before the signature check, then a per-license (or
+  per-device for push) D1 rate limit. Public endpoints: `GET /api/push/vapid`, `GET /api/share/:id`,
+  `POST /api/share/:id/checkins`, `GET /c/:id` — each rate-limited (per IP, plus per page id where it applies).
+- **Cloud backup**: R2 stores only the PTP1 envelope; the Worker checks the 4-byte magic and the size, never the
+  content. Two slots per license with a D1 pointer, so an interrupted upload can never destroy the latest copy.
+  Per-trainer cap 100 MiB; global guard `storage_full` at 9 GiB (tracked in D1, no bucket listing).
+- **Client page**: as planned in section 3 — key only in the fragment; `writeToken = HKDF-SHA-256(k, salt = empty,
+  info = "pt-checkin-write")`; D1 stores `base64url(SHA-256(writeToken))`; check-ins are accepted only with the
+  matching token (constant-time compare), so someone who sees only the page id (e.g. in Cloudflare request logs)
+  can read ciphertext but cannot post. Differences from the plan: the page is served by the Worker at `/c/:id`
+  with **inline script and style allowed only by a per-response nonce** (`default-src 'none'; script-src
+  'nonce-…'; style-src 'nonce-…'; img-src 'self' data: blob: <app origin>; connect-src 'self'; base-uri 'none';
+  form-action 'none'; frame-ancestors 'none'`) instead of `script-src 'self'`; no third-party requests; every
+  decrypted value is validated and rendered with `textContent` only. Check-ins: max **3 MiB** each (not 5),
+  20 pending per page, 6/hour and 20/day per IP, 10/day per page. Photos are re-encoded in the browser to JPEG
+  ≤ 1200 px, which drops EXIF (including GPS). Revoke deletes the page and all its check-ins and the id is never
+  reusable.
+- **Web Push**: RFC 8291 + VAPID in Web Crypto (`worker/src/push/`), verified against RFC 8291 Appendix A.
+  Subscription endpoints are restricted to known push services (Apple, Google FCM, Mozilla, Microsoft), https,
+  default port — the Worker cannot be turned into a request proxy. Title/body ≤ 120 chars and stored in plain
+  form in D1: the **app** must keep them generic (fixed templates, no names); the server cannot verify that.
+  Subscriptions answering 404/410 are deleted. VAPID private key is a Worker secret only.
+- **Logging**: the Worker logs nothing about requests; the cron logs counts only (`{sent, gone, retry, failed,
+  stale}`). Cloudflare's own request logs still contain paths (page ids, never keys) and IPs.
+- **Residual risks**: anyone with the full link can read and post (bearer link, as planned); push text is
+  readable by the owner/Cloudflare; metadata (sizes, times, number of clients with pages) is visible; the
+  Free-plan CPU limit for the cron is designed from a local workerd measurement and must be checked on the
+  dashboard after deploy.

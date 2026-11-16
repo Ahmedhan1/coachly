@@ -39,4 +39,4 @@ bucket_name = "pt-coach-backups"
 
 # One cron (the Free plan allows 5 per account): sends due Web Push notifications every 5 minutes.
 [triggers]
-crons = ["*/5 * * * *"]
+crons = ["* * * * *"]
