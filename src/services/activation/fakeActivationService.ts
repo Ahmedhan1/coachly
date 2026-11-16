@@ -14,11 +14,12 @@ const memoryStore = (): KeyValueStore => {
 };
 
 /**
- * Stand-in until the real license service lands. Accepts any well-formed short code except
- * codes starting with "XXXX" (to exercise the error path). Not used in production builds.
+ * Test/e2e stand-in. Accepts any well-formed short code except codes starting with "XXXX" (to exercise
+ * the error path). Selected only in the e2e build or with VITE_FAKE_ACTIVATION=1 in dev — never in production.
  */
 export class FakeActivationService implements ActivationService {
   private static readonly KEY = 'pt-coach.fake-activation';
+  static readonly DEVICE_ID = '00000000-0000-4000-8000-00000000fa4e';
 
   constructor(private readonly store: KeyValueStore = memoryStore()) {}
 
@@ -32,5 +33,13 @@ export class FakeActivationService implements ActivationService {
     if (code.startsWith('XXXX')) return { ok: false, error: 'used' };
     this.store.setItem(FakeActivationService.KEY, code);
     return { ok: true, state: await this.getState() };
+  }
+
+  async getDeviceId(): Promise<string> {
+    return FakeActivationService.DEVICE_ID;
+  }
+
+  async checkRevocation(): Promise<ActivationState | null> {
+    return null;
   }
 }

@@ -27,4 +27,25 @@ export function t(key: TKey, params?: TParams): string {
   });
 }
 
+/**
+ * Like t(), but parameters may be any value (e.g. a React node such as <Num>): returns the template split
+ * into an array of strings and parameter values, so numbers can be wrapped in an LTR isolate.
+ */
+export function tParts<T>(key: TKey, params: Record<string, T | string | number>): Array<T | string> {
+  const template = lookup(key);
+  const out: Array<T | string> = [];
+  let last = 0;
+  for (const match of template.matchAll(/\{(\w+)\}/g)) {
+    const name = match[1] ?? '';
+    if (!(name in params)) continue;
+    const at = match.index ?? 0;
+    if (at > last) out.push(template.slice(last, at));
+    const value = params[name] as T | string | number;
+    out.push(typeof value === 'number' ? String(value) : value);
+    last = at + match[0].length;
+  }
+  if (last < template.length) out.push(template.slice(last));
+  return out;
+}
+
 export { ar };

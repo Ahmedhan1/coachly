@@ -1,19 +1,38 @@
 /**
- * What the app shell needs from licensing. The real implementation (phase 3) wraps
- * src/domain/license + shared/license.ts and the Worker API; until then a fake is used.
+ * What the app shell needs from licensing. Real implementation: src/services/license (wraps
+ * src/domain/license + shared/license.ts and the Worker API). FakeActivationService is for tests/e2e only.
  */
+export type LockReason = 'expired' | 'revoked' | 'clock_rollback';
+
 export type ActivationState =
   | { status: 'inactive' }
+  /** `expiresAt` is unix milliseconds, null = lifetime. */
   | { status: 'active'; licenseId: string; trainerName: string; expiresAt: number | null }
-  | { status: 'locked'; reason: 'expired' | 'revoked' | 'clock_rollback' };
+  | { status: 'locked'; reason: LockReason };
 
-export type ActivationError = 'invalid' | 'used' | 'expired' | 'rate_limited' | 'offline' | 'malformed';
+export type ActivationError =
+  | 'invalid'
+  | 'used'
+  | 'expired'
+  | 'rate_limited'
+  | 'offline'
+  | 'unavailable'
+  | 'malformed'
+  | 'wrong_device'
+  | 'clock';
 
 export type ActivationResult = { ok: true; state: ActivationState } | { ok: false; error: ActivationError };
 
 export interface ActivationService {
-  /** Current state, verified offline. Never needs the network. */
+  /** Current state, verified offline on every launch. Never needs the network. */
   getState(): Promise<ActivationState>;
   /** Short `XXXX-XXXX-XXXX` code (online) or `PT1.` long code (offline fallback). */
   activate(code: string): Promise<ActivationResult>;
+  /** Install-time random id; the trainer sends it to the owner to get an offline long code. */
+  getDeviceId(): Promise<string>;
+  /**
+   * Background check with the server (only when online). Resolves to the new state when the server's
+   * answer changed it (explicit `revoked: true`), otherwise null. Never throws.
+   */
+  checkRevocation(): Promise<ActivationState | null>;
 }

@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { ar, t } from './index';
+import { ar, t, tParts } from './index';
 
 describe('t()', () => {
   it('looks up nested keys', () => {
@@ -15,5 +15,16 @@ describe('t()', () => {
   });
   it('contains no Arabic-Indic digits anywhere', () => {
     expect(JSON.stringify(ar)).not.toMatch(/[٠-٩۰-۹]/);
+  });
+});
+
+describe('tParts()', () => {
+  it('splits a template around parameters of any type', () => {
+    const node = { n: 5 };
+    expect(tParts('clients.remaining', { n: node })).toEqual(['باقي ', node, ' حصة']);
+    expect(tParts('home.sessionOf', { n: 8, total: 12 })).toEqual(['الحصة ', '8', ' من ', '12']);
+  });
+  it('keeps unknown placeholders as text', () => {
+    expect(tParts('clients.remaining', {}).join('')).toBe('باقي {n} حصة');
   });
 });
