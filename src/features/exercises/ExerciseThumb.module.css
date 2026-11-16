@@ -1,0 +1,21 @@
+.slot {
+  position: relative;
+  display: grid;
+  place-items: center;
+  overflow: hidden;
+  background: var(--photo);
+}
+
+.img {
+  display: block;
+  inline-size: 100%;
+  block-size: 100%;
+  object-fit: cover;
+}
+
+.thumb {
+  flex: none;
+  inline-size: 64px;
+  block-size: 64px;
+  border-radius: var(--r-md);
+}

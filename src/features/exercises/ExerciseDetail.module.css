@@ -1,0 +1,166 @@
+.round {
+  display: inline-grid;
+  place-items: center;
+  inline-size: var(--tap);
+  block-size: var(--tap);
+  border-radius: var(--r-full);
+  background: var(--surface);
+  color: var(--text-2);
+}
+
+.starOn {
+  color: var(--brand);
+}
+
+.carousel {
+  position: relative;
+  margin: var(--sp-2) var(--gutter) 0;
+}
+
+.track {
+  display: flex;
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  scrollbar-width: none;
+  border-radius: var(--r-lg);
+  background: var(--photo);
+}
+
+.track::-webkit-scrollbar {
+  display: none;
+}
+
+.slide {
+  flex: none;
+  inline-size: 100%;
+  scroll-snap-align: start;
+}
+
+.photo {
+  inline-size: 100%;
+  aspect-ratio: 3 / 2;
+}
+
+.dots {
+  position: absolute;
+  inset-block-end: var(--sp-3);
+  inset-inline: 0;
+  display: flex;
+  justify-content: center;
+  gap: 6px;
+}
+
+.dot {
+  inline-size: 7px;
+  block-size: 7px;
+  border-radius: var(--r-full);
+  background: rgb(255 255 255 / 0.6);
+  box-shadow: 0 0 0 1px rgb(0 0 0 / 0.15);
+}
+
+.dotOn {
+  background: var(--brand);
+}
+
+.head {
+  padding: var(--sp-4) var(--gutter) 0;
+}
+
+.name {
+  font: 800 26px/1.25 var(--font-display);
+  overflow-wrap: anywhere;
+}
+
+.en {
+  margin-block-start: 2px;
+  font: var(--t-sub);
+  color: var(--text-2);
+  text-align: end;
+}
+
+.tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--sp-2);
+  margin-block-start: var(--sp-3);
+}
+
+.tag {
+  display: inline-flex;
+  align-items: center;
+  block-size: 28px;
+  padding-inline: 12px;
+  border-radius: var(--r-full);
+  background: var(--surface);
+  font: 600 13px/1 var(--font-ui);
+}
+
+.tagBrand {
+  background: var(--brand);
+  color: var(--brand-on);
+}
+
+.mapTile {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: var(--sp-4);
+  padding: var(--sp-4);
+}
+
+.facts {
+  flex: 1 1 220px;
+  display: grid;
+  gap: var(--sp-3);
+  margin: 0;
+}
+
+.facts dt {
+  font: var(--t-caption);
+  color: var(--text-2);
+}
+
+.facts dd {
+  margin: 2px 0 0;
+  font: var(--t-headline);
+}
+
+.fileRow {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: var(--sp-3);
+  min-block-size: var(--row-h);
+  padding: var(--sp-3) var(--sp-4);
+  background: var(--surface);
+  cursor: pointer;
+}
+
+.fileRow:active {
+  background: var(--surface-2);
+}
+
+.fileRow:focus-within {
+  box-shadow: inset 0 0 0 3px var(--focus-ring);
+}
+
+.fileText {
+  display: flex;
+  flex-direction: column;
+}
+
+.fileTitle {
+  font: var(--t-headline);
+}
+
+.fileSub {
+  font: var(--t-sub);
+  color: var(--text-2);
+}
+
+.danger {
+  display: flex;
+  justify-content: center;
+  margin-block-start: var(--sp-6);
+}

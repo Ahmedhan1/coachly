@@ -1,0 +1,33 @@
+.nav {
+  display: flex;
+  gap: 2px;
+  margin: var(--sp-4) var(--gutter) 0;
+  padding: 3px;
+  border-radius: var(--r-md);
+  background: var(--surface);
+}
+
+.link {
+  position: relative;
+  flex: 1 1 0;
+  display: grid;
+  place-items: center;
+  min-block-size: 38px;
+  padding-inline: 4px;
+  border-radius: 11px;
+  color: var(--text-2);
+  font: 500 14px/1.2 var(--font-ui);
+  text-align: center;
+  text-decoration: none;
+}
+
+.link::after {
+  content: '';
+  position: absolute;
+  inset: -3px 0;
+}
+
+.active {
+  background: var(--text);
+  color: var(--bg);
+}

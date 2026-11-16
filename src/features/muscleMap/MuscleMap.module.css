@@ -1,0 +1,95 @@
+.body {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-4);
+  padding: var(--sp-3) var(--gutter) 0;
+}
+
+.mapTile {
+  display: flex;
+  justify-content: center;
+  padding: var(--sp-5) var(--sp-3);
+  border-radius: var(--r-lg);
+  background: var(--surface);
+}
+
+/* Dark stage even in light mode is fine for the model (DESIGN.md §5). */
+.stage {
+  position: relative;
+  block-size: min(62dvh, 560px);
+  min-block-size: 360px;
+  border-radius: var(--r-lg);
+  overflow: hidden;
+  background: #151717;
+  touch-action: none;
+}
+
+.canvas {
+  inline-size: 100%;
+  block-size: 100%;
+}
+
+.loading {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  color: #a3a8a6;
+  font: var(--t-callout);
+}
+
+.fallback {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--sp-4);
+  padding: var(--sp-4) var(--sp-3);
+  border-radius: var(--r-lg);
+  background: var(--surface);
+}
+
+.notice {
+  align-self: stretch;
+  padding: var(--sp-3);
+  border-radius: var(--r-md);
+  background: var(--warn-tint);
+  color: var(--warn);
+  font: var(--t-sub);
+}
+
+.selection {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: var(--sp-2);
+}
+
+.selectedName {
+  font: var(--t-title);
+}
+
+.hint {
+  font: var(--t-sub);
+  color: var(--text-2);
+}
+
+.about {
+  padding: var(--sp-3) var(--sp-4);
+  border-radius: var(--r-lg);
+  background: var(--surface);
+  font: var(--t-caption);
+  color: var(--text-2);
+}
+
+.about summary {
+  min-block-size: var(--tap);
+  display: flex;
+  align-items: center;
+  font: var(--t-callout);
+  color: var(--text);
+  cursor: pointer;
+}
+
+.about p + p {
+  margin-block-start: var(--sp-2);
+}

@@ -1,0 +1,29 @@
+.frame {
+  position: relative;
+  display: block;
+  overflow: hidden;
+  border-radius: var(--r-md);
+  background: var(--photo);
+}
+
+.img {
+  display: block;
+  inline-size: 100%;
+  block-size: 100%;
+  object-fit: cover;
+}
+
+.placeholder {
+  display: grid;
+  place-items: center;
+  inline-size: 100%;
+  block-size: 100%;
+  color: var(--photo-ink);
+}
+
+.placeholder svg {
+  inline-size: 40%;
+  block-size: 40%;
+  max-inline-size: 40px;
+  max-block-size: 40px;
+}

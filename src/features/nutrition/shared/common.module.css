@@ -1,0 +1,193 @@
+/* Shared layout for the nutrition / recipes / supplements / progress screens (direction B tiles). */
+
+.page {
+  padding-block-end: var(--sp-8);
+}
+
+.section {
+  margin-block-start: var(--sp-6);
+  padding-inline: var(--gutter);
+}
+
+.sectionTitle {
+  margin-block-end: var(--sp-2);
+  font: var(--t-title);
+}
+
+.tile {
+  --field-bg: var(--surface-2);
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-4);
+  padding: var(--sp-4);
+  border-radius: var(--r-lg);
+  background: var(--surface);
+}
+
+.grid2 {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--sp-3);
+}
+
+.grid3 {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: var(--sp-3);
+}
+
+.muted {
+  color: var(--text-2);
+  font: var(--t-sub);
+}
+
+.caption {
+  color: var(--text-2);
+  font: var(--t-caption);
+}
+
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--sp-2);
+  margin-block-start: var(--sp-4);
+  padding-inline: var(--gutter);
+}
+
+.actions > * {
+  flex: 1 1 auto;
+}
+
+.error {
+  display: flex;
+  gap: var(--sp-2);
+  align-items: flex-start;
+  padding: var(--sp-3) var(--sp-4);
+  border-radius: var(--r-md);
+  background: var(--danger-tint);
+  color: var(--danger);
+  font: var(--t-callout);
+}
+
+.error svg {
+  flex: none;
+  inline-size: 20px;
+  block-size: 20px;
+}
+
+.note {
+  padding: var(--sp-3) var(--sp-4);
+  border-radius: var(--r-md);
+  background: var(--warn-tint);
+  color: var(--warn);
+  font: var(--t-sub);
+}
+
+.disclosure {
+  border-radius: var(--r-lg);
+  background: var(--surface);
+}
+
+.disclosure > summary {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  min-block-size: var(--row-h);
+  padding-inline: var(--sp-4);
+  font: var(--t-headline);
+  cursor: pointer;
+  list-style: none;
+}
+
+.disclosure > summary::-webkit-details-marker {
+  display: none;
+}
+
+.disclosure > summary svg {
+  inline-size: 20px;
+  block-size: 20px;
+  color: var(--text-3);
+  transition: transform var(--dur-2) var(--ease-out);
+}
+
+.disclosure[open] > summary svg {
+  transform: rotate(180deg);
+}
+
+.disclosureBody {
+  --field-bg: var(--surface-2);
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-3);
+  padding: 0 var(--sp-4) var(--sp-4);
+}
+
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-4);
+}
+
+.sheetSave {
+  min-block-size: var(--tap);
+  padding-inline: var(--sp-2);
+  color: var(--brand-ink);
+  font: 600 16px/1 var(--font-ui);
+}
+
+.sheetSave:disabled {
+  opacity: 0.4;
+}
+
+.fileButton {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--sp-2);
+  min-block-size: var(--tap);
+  padding-inline: var(--sp-4);
+  border-radius: var(--r-md);
+  background: var(--surface-2);
+  color: var(--text);
+  font: var(--t-callout);
+  cursor: pointer;
+}
+
+.fileButton svg {
+  inline-size: 20px;
+  block-size: 20px;
+}
+
+.fileButton:has(:focus-visible) {
+  outline: 3px solid var(--brand-ink);
+}
+
+.chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.chip {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  min-block-size: 32px;
+  padding-inline: 14px;
+  border-radius: var(--r-full);
+  background: var(--surface);
+  color: var(--text-2);
+  font: 500 14px/1 var(--font-ui);
+}
+
+.chip::after {
+  content: '';
+  position: absolute;
+  inset: -6px 0;
+}
+
+.chip[aria-pressed='true'] {
+  background: var(--text);
+  color: var(--bg);
+}

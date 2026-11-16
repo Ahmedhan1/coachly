@@ -1,9 +1,12 @@
 import type { RouteObject } from 'react-router-dom';
 import { screen } from '../screen';
 
-const placeholders = () => import('@/features/placeholders/PlaceholderScreens');
-
-// Routes for the schedule feature area (children of '/'). Replace each placeholder with the real screen.
+// Routes for the schedule feature area (children of '/'): schedule, income dashboard, WhatsApp templates.
 export const scheduleRoutes: RouteObject[] = [
-  { path: 'schedule', ...screen(placeholders, 'ScheduleScreen') },
+  { path: 'schedule', ...screen(() => import('@/features/schedule/ScheduleScreen'), 'ScheduleScreen') },
+  { path: 'more/income', ...screen(() => import('@/features/income/IncomeScreen'), 'IncomeScreen') },
+  {
+    path: 'more/whatsapp-templates',
+    ...screen(() => import('@/features/whatsapp/WhatsappTemplatesScreen'), 'WhatsappTemplatesScreen'),
+  },
 ];

@@ -5,7 +5,11 @@ const placeholders = () => import('@/features/placeholders/PlaceholderScreens');
 
 // Routes for the training feature area (children of '/'). Replace each placeholder with the real screen.
 export const trainingRoutes: RouteObject[] = [
-  { path: 'exercises', ...screen(placeholders, 'ExercisesScreen') },
-  { path: 'more/muscle-map', ...screen(placeholders, 'MuscleMapScreen') },
+  { path: 'exercises', ...screen(() => import('@/features/exercises/ExercisesScreen'), 'ExercisesScreen') },
+  {
+    path: 'exercises/:exerciseId',
+    ...screen(() => import('@/features/exercises/ExerciseDetailScreen'), 'ExerciseDetailScreen'),
+  },
+  { path: 'more/muscle-map', ...screen(() => import('@/features/muscleMap/MuscleMapScreen'), 'MuscleMapScreen') },
   { path: 'more/programs', ...screen(placeholders, 'ProgramsScreen') },
 ];
