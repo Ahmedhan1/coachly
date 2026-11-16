@@ -1,0 +1,78 @@
+/* Programs list: built-in template tiles (horizontal), then plain list sections. */
+
+.builtins {
+  margin-block-start: var(--sp-4);
+}
+
+.sectionTitle {
+  padding-inline: var(--gutter);
+  font: var(--t-headline);
+}
+
+.hint {
+  padding-inline: var(--gutter);
+  color: var(--text-2);
+  font: var(--t-caption);
+}
+
+.tplRow {
+  display: flex;
+  gap: var(--sp-3);
+  margin: var(--sp-3) 0 0;
+  padding: 0 var(--gutter);
+  overflow-x: auto;
+  list-style: none;
+  scroll-snap-type: x mandatory;
+  scrollbar-width: none;
+}
+
+.tplRow > li {
+  flex: none;
+  scroll-snap-align: start;
+}
+
+.tpl {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-1);
+  inline-size: 200px;
+  min-block-size: 112px;
+  padding: var(--sp-4);
+  border: 0;
+  border-inline-start: 4px solid var(--brand);
+  border-radius: var(--r-lg);
+  background: var(--surface);
+  color: var(--text);
+  text-align: start;
+}
+
+.tplName {
+  font: var(--t-headline);
+}
+
+.tplSub {
+  color: var(--text-2);
+  font: var(--t-caption);
+}
+
+.tplDays {
+  margin-block-start: auto;
+  color: var(--text-3);
+  font: var(--t-caption);
+}
+
+.search {
+  margin-block-start: var(--sp-5);
+  padding-inline: var(--gutter);
+}
+
+.trailing {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--sp-1);
+}
+
+.showAll {
+  margin-block-start: var(--sp-4);
+  padding-inline: var(--gutter);
+}

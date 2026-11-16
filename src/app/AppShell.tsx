@@ -19,7 +19,10 @@ export function AppShell() {
   const dismissToast = useUiStore((s) => s.dismissToast);
   const openQuickAdd = useUiStore((s) => s.openQuickAdd);
   // Pushed screens hide the tab bar and show their own bottom action bar.
-  const pushed = useMatch('/clients/:clientId') !== null;
+  const client = useMatch('/clients/:clientId') !== null;
+  const program = useMatch('/programs/:programId') !== null;
+  const session = useMatch('/session/:key') !== null;
+  const pushed = client || program || session;
   return (
     <div className={cx(styles.shell, pushed && styles.pushed)}>
       <main className={styles.main}>
