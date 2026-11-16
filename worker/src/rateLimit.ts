@@ -9,6 +9,27 @@ export const RULES = {
   admin: { name: 'admin', limit: 300, windowSeconds: 3600 },
   preflight: { name: 'preflight', limit: 120, windowSeconds: 600 },
   other: { name: 'other', limit: 60, windowSeconds: 600 },
+
+  // ---- phase 9 (per license / device unless noted) ----
+  /** Per IP, memory only: caps signature checks before any D1 write is spent. */
+  cloudIp: { name: 'cloud-ip', limit: 600, windowSeconds: 600 },
+  backupWrite: { name: 'backup-write', limit: 24, windowSeconds: 86_400 },
+  backupPart: { name: 'backup-part', limit: 300, windowSeconds: 86_400 },
+  backupRead: { name: 'backup-read', limit: 120, windowSeconds: 86_400 },
+  pushSubscribe: { name: 'push-sub', limit: 20, windowSeconds: 3600 },
+  pushSchedule: { name: 'push-schedule', limit: 60, windowSeconds: 3600 },
+  shareWrite: { name: 'share-write', limit: 300, windowSeconds: 86_400 },
+  checkinOwner: { name: 'checkin-owner', limit: 600, windowSeconds: 3600 },
+  /** Public client-page reads: per page id and per IP. */
+  shareReadPage: { name: 'share-read', limit: 120, windowSeconds: 3600 },
+  shareReadIp: { name: 'share-read-ip', limit: 300, windowSeconds: 3600 },
+  /** Public check-in posts: strict per IP, plus per page id. */
+  checkinIpHour: { name: 'checkin-ip-h', limit: 6, windowSeconds: 3600 },
+  checkinIpDay: { name: 'checkin-ip-d', limit: 20, windowSeconds: 86_400 },
+  checkinPage: { name: 'checkin-page', limit: 10, windowSeconds: 86_400 },
+  /** Memory only (no D1 write): the static viewer page and the public VAPID key. */
+  viewerPage: { name: 'viewer', limit: 120, windowSeconds: 600 },
+  vapidKey: { name: 'vapid', limit: 60, windowSeconds: 600 },
 } as const satisfies Record<string, RateRule>;
 
 /**

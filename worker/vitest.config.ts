@@ -1,7 +1,16 @@
 import { fileURLToPath } from 'node:url';
 import { cloudflareTest, readD1Migrations } from '@cloudflare/vitest-plugin';
 import { defineConfig } from 'vitest/config';
-import { TEST_ADMIN_PASSWORD, TEST_APP_ORIGIN, TEST_DATA_KEY, TEST_PRIVATE_KEY, TEST_PUBLIC_KEY } from './test/fixtures.ts';
+import {
+  TEST_ADMIN_PASSWORD,
+  TEST_APP_ORIGIN,
+  TEST_DATA_KEY,
+  TEST_PRIVATE_KEY,
+  TEST_PUBLIC_KEY,
+  TEST_VAPID_PRIVATE,
+  TEST_VAPID_PUBLIC,
+  TEST_VAPID_SUBJECT,
+} from './test/fixtures.ts';
 
 export default defineConfig({
   resolve: {
@@ -18,6 +27,9 @@ export default defineConfig({
           ADMIN_PASSWORD: TEST_ADMIN_PASSWORD,
           DATA_KEY: TEST_DATA_KEY,
           APP_ORIGIN: `${TEST_APP_ORIGIN},http://localhost:5173`,
+          VAPID_PRIVATE_KEY: TEST_VAPID_PRIVATE,
+          VAPID_PUBLIC_KEY: TEST_VAPID_PUBLIC,
+          VAPID_SUBJECT: TEST_VAPID_SUBJECT,
         },
       },
     })),

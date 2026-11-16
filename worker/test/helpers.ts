@@ -1,7 +1,8 @@
 import { env } from 'cloudflare:workers';
-import { depsFromEnv } from '../src/deps';
+import { depsFromEnv, type DepsOverrides } from '../src/deps';
 import { handleRequest } from '../src/app';
 import type { Deps } from '../src/ports';
+import { decodeLicenseToken } from '../../shared/license';
 import { TEST_ADMIN_PASSWORD } from './fixtures';
 
 export const BASE = 'https://license.example';
@@ -23,6 +24,12 @@ export interface Harness {
   issueCode(input?: { name?: string; duration?: string; window?: string }): Promise<string>;
   activate(code: string, deviceId: string, ip?: string): Promise<Response>;
   form(path: string, cookie: string, fields: Record<string, string>): Promise<Response>;
+  /** Issues and activates a fresh license on a fresh device; returns the Bearer token. */
+  license(name?: string): Promise<string>;
+  /** Revokes the license that `token` belongs to, through the admin dashboard. */
+  revoke(token: string): Promise<void>;
+  /** Sends with `Authorization: Bearer <token>`. */
+  authed(path: string, token: string, init?: RequestInit & { ip?: string }): Promise<Response>;
 }
 
 let harnessCount = 0;
@@ -31,10 +38,10 @@ let harnessCount = 0;
  * Each harness gets its own clock hour so global (all-clients) rate-limit windows in D1 do not leak
  * between tests in the same file.
  */
-export async function harness(): Promise<Harness> {
+export async function harness(overrides: Omit<DepsOverrides, 'now'> = {}): Promise<Harness> {
   harnessCount += 1;
   const clock = { now: 1_790_000_000 + harnessCount * 7200 };
-  const { deps } = await depsFromEnv(env, { now: () => clock.now });
+  const { deps } = await depsFromEnv(env, { ...overrides, now: () => clock.now });
   const ip = freshIp();
 
   const send: Harness['send'] = (path, init = {}) => {
@@ -82,7 +89,39 @@ export async function harness(): Promise<Harness> {
       ...(otherIp === undefined ? {} : { ip: otherIp }),
     });
 
-  return { deps, clock, ip, send, login, issueCode, activate, form };
+  const license: Harness['license'] = async (name) => {
+    const code = await issueCode(name === undefined ? {} : { name });
+    const res = await activate(code, crypto.randomUUID(), freshIp());
+    const body = (await res.json()) as { license?: string };
+    if (typeof body.license !== 'string') throw new Error(`activation failed: ${res.status}`);
+    return body.license;
+  };
+
+  const revoke: Harness['revoke'] = async (token) => {
+    const lid = decodeLicenseToken(token)?.payload.lid ?? '';
+    const res = await form('/admin/licenses/revoke', await login(), { lid, confirmed: 'yes' });
+    if (res.status !== 303) throw new Error(`revoke failed: ${res.status}`);
+  };
+
+  const authed: Harness['authed'] = (path, token, init = {}) => {
+    const headers = new Headers(init.headers);
+    headers.set('Authorization', `Bearer ${token}`);
+    return send(path, { ...init, headers });
+  };
+
+  return { deps, clock, ip, send, login, issueCode, activate, form, license, revoke, authed };
+}
+
+/** A body that starts with the given 4-byte magic, then `size - 4` filler bytes. */
+export function envelopeBytes(magic: 'PTP1' | 'PTK1', size: number, fill = 7): Uint8Array<ArrayBuffer> {
+  const out = new Uint8Array(size).fill(fill);
+  out.set(new TextEncoder().encode(magic), 0);
+  return out;
+}
+
+export async function storedBytes(): Promise<number> {
+  const row = await env.DB.prepare('SELECT bytes FROM storage_usage WHERE id = 1').first<{ bytes: number }>();
+  return row?.bytes ?? 0;
 }
 
 export function extractCode(html: string): string {

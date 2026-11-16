@@ -3,6 +3,7 @@ import { handleRequest } from './app';
 import { depsFromEnv } from './deps';
 import type { Env } from './env';
 import { json } from './http';
+import { runPushCron } from './push/cron';
 import { MemoryRateLimiter } from './rateLimit';
 
 // Build the Ed25519 base-point table at startup (global scope, outside the per-request CPU budget).
@@ -23,5 +24,21 @@ export default {
     }
     const { deps, d1Limiter } = built;
     return handleRequest(request, deps, { prune: (now) => d1Limiter.prune(now - 2 * 86_400) });
+  },
+
+  /** Cron (wrangler.toml [triggers]): sends due push notifications, one bounded batch per run. */
+  async scheduled(controller: ScheduledController, env: Env): Promise<void> {
+    let built: Awaited<ReturnType<typeof depsFromEnv>>;
+    try {
+      built = await depsFromEnv(env, { memoryLimiter });
+    } catch {
+      return;
+    }
+    const now = Math.floor(controller.scheduledTime / 1000);
+    const report = await runPushCron(built.deps.cloud, now);
+    // Housekeeping once an hour (one D1 query): drop rate-limit windows older than two days.
+    if (now % 3600 < 300) await built.d1Limiter.prune(now - 2 * 86_400);
+    // Counts only: never titles, bodies, endpoints or ids.
+    console.log(JSON.stringify({ cron: 'push', ...report }));
   },
 } satisfies ExportedHandler<Env>;

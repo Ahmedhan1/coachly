@@ -1,7 +1,10 @@
 import { generateShortCode } from '../../shared/license';
 import { D1LicenseStore, D1RateLimiter } from './d1Store';
+import { base64UrlEncode } from '../../shared/license';
+import { cloudConfigFromEnv } from './cloud/config';
 import type { Env } from './env';
-import type { Deps, RateLimiter, ServerCrypto } from './ports';
+import type { CloudConfig, Deps, RateLimiter, ServerCrypto, VapidSource } from './ports';
+import { importVapidKeys, type VapidKeys } from './push/vapid';
 import { LayeredRateLimiter, MemoryRateLimiter } from './rateLimit';
 import { createServerCrypto } from './serverCrypto';
 
@@ -16,6 +19,33 @@ export interface DepsOverrides {
   now?: () => number;
   /** Shared per-isolate memory limiter; a fresh one is made when omitted. */
   memoryLimiter?: RateLimiter;
+  cloudConfig?: Partial<CloudConfig>;
+  pushFetch?: typeof fetch;
+  vapid?: VapidSource;
+}
+
+let cachedVapid: { fingerprint: string; value: Promise<VapidKeys | null> } | null = null;
+
+/**
+ * VAPID keys are optional: without them push is disabled but backup, client page and licenses keep working.
+ * Malformed keys also give null (never an error page that could describe the secret).
+ */
+function vapidFor(env: Env): VapidSource {
+  return {
+    keys: () => {
+      const parts = [env.VAPID_PRIVATE_KEY ?? '', env.VAPID_PUBLIC_KEY ?? '', env.VAPID_SUBJECT ?? ''] as const;
+      if (parts.some((p) => p.trim() === '')) return Promise.resolve(null);
+      const fingerprint = parts.join('|');
+      if (cachedVapid?.fingerprint !== fingerprint) {
+        cachedVapid = { fingerprint, value: importVapidKeys(...parts).catch(() => null) };
+      }
+      return cachedVapid.value;
+    },
+  };
+}
+
+function randomId(): string {
+  return base64UrlEncode(crypto.getRandomValues(new Uint8Array(16)));
 }
 
 let cachedCrypto: { fingerprint: string; value: Promise<ServerCrypto> } | null = null;
@@ -50,6 +80,14 @@ export async function depsFromEnv(env: Env, overrides: DepsOverrides = {}): Prom
     newCode: () => generateShortCode(),
     newId: () => crypto.randomUUID(),
     config: { appOrigins: parseOrigins(env.APP_ORIGIN ?? ''), dataKey: env.DATA_KEY ?? '' },
+    cloud: {
+      db: env.DB,
+      bucket: env.BACKUPS,
+      pushFetch: overrides.pushFetch ?? ((input, init) => fetch(input, init)),
+      vapid: overrides.vapid ?? vapidFor(env),
+      config: cloudConfigFromEnv(env, overrides.cloudConfig),
+      newId: randomId,
+    },
   };
   return { deps, d1Limiter };
 }

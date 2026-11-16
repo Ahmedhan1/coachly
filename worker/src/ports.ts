@@ -1,4 +1,5 @@
 import type { LicensePayload, VerifyResult } from '../../shared/license';
+import type { VapidKeys } from './push/vapid';
 
 export type LicenseStatus = 'issued' | 'active' | 'revoked' | 'replaced';
 
@@ -58,6 +59,40 @@ export interface ServerCrypto {
   passwordMatches(candidate: string): Promise<boolean>;
 }
 
+export interface CloudConfig {
+  /** Largest cloud backup per trainer. */
+  backupMaxBytes: number;
+  /** Largest backup accepted in one `PUT /api/backup` (under the Free plan's 100 MB request body limit). */
+  singlePutMaxBytes: number;
+  /** Multipart part size (R2: every part but the last must be the same size and at least 5 MiB). */
+  backupPartBytes: number;
+  /** Total stored bytes above which an upload that grows storage is refused with `storage_full`. */
+  storageGuardBytes: number;
+  shareMaxBytes: number;
+  checkinMaxBytes: number;
+  maxPendingCheckins: number;
+  maxSharesPerLicense: number;
+  /** Push messages sent per cron invocation (CPU and subrequest budget, see docs/CLOUD.md). */
+  pushBatchSize: number;
+}
+
+export interface VapidSource {
+  /** Imported VAPID keys, or null when the secrets are not set (push is then disabled, everything else works). */
+  keys(): Promise<VapidKeys | null>;
+}
+
+/** Bindings and settings for phase 9 (backup, push, client page). */
+export interface CloudDeps {
+  db: D1Database;
+  bucket: R2Bucket;
+  /** Outgoing fetch for push services; tests pass a fake push service. */
+  pushFetch: typeof fetch;
+  vapid: VapidSource;
+  config: CloudConfig;
+  /** Random 128-bit base64url id. */
+  newId(): string;
+}
+
 export interface Deps {
   store: LicenseStore;
   /** Durable limiter (memory pre-filter + D1). */
@@ -70,4 +105,5 @@ export interface Deps {
   newCode(): string;
   newId(): string;
   config: { appOrigins: readonly string[]; dataKey: string };
+  cloud: CloudDeps;
 }
