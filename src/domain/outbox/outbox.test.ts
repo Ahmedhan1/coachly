@@ -36,6 +36,11 @@ describe('buildOutbox', () => {
     expect(items.find((i) => i.kind === 'payment_due')?.amountMinor).toBe(150000);
   });
 
+  it('renewal by low sessions reports sessions left; demo clients are not welcomed', () => {
+    const items = buildOutbox(base({ clients: [client({ remainingSessions: 1 }), client({ id: 'd', createdOn: '2026-11-16', isDemo: true })], lastCheckIn: new Map([['c1', '2026-11-15'], ['d', '2026-11-15']]) }));
+    expect(items).toEqual([{ id: 'renewal:c1:2026-12-30', kind: 'renewal', clientId: 'c1', sessionsLeft: 1 }]);
+  });
+
   it('drops sent items, disabled kinds and clients without a phone', () => {
     const input = base({ clients: [client({ endDate: '2026-11-17' }), client({ id: 'x', phone: ' ', endDate: '2026-11-17' })] });
     expect(buildOutbox(input).map((i) => i.id)).toEqual(['renewal:c1:2026-11-17']);

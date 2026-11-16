@@ -57,6 +57,7 @@ export async function computeOutbox(services: Pick<AppServices, 'data' | 'meta'>
       remainingSessions: c.remainingSessions,
       hasPackage: c.package !== null && c.package.totalSessions > 0,
       createdOn: toIsoDate(new Date(c.createdAt)),
+      isDemo: c.demo === true,
     })),
     sessions,
     payments: payments.map((p) => ({ id: p.id, clientId: p.clientId, status: p.status, dueOn: p.dueOn, amountMinor: p.amountMinor })),

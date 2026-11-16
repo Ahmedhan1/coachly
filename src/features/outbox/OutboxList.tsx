@@ -43,6 +43,7 @@ export function OutboxList({ items, clients, onChange, limit }: { items: OutboxI
               <p className={styles.reason}>
                 {t(`outbox.kinds.${item.kind}`)}
                 {item.daysLeft !== undefined && <Badge>{t('outbox.daysLeft', { n: item.daysLeft })}</Badge>}
+                {item.sessionsLeft !== undefined && <Badge>{item.sessionsLeft === 1 ? t('outbox.oneSessionLeft') : t('outbox.sessionsLeft', { n: item.sessionsLeft })}</Badge>}
               </p>
             </div>
             <button type="button" className={styles.skip} aria-label={t('outbox.skipLabel', { name: client.name })} onClick={() => void mark(item, client.name)}>

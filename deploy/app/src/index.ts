@@ -38,10 +38,18 @@ async function deploy(request: Request, env: Env, path: string): Promise<Respons
 
 const NO_CACHE = new Set(['/index.html', '/sw.js', '/registerSW.js', '/push-sw.js', '/manifest.webmanifest']);
 
+/** Only content-addressed or never-changing files are cached at the edge; everything else is read fresh. */
+function edgeCacheable(path: string): boolean {
+  return path.startsWith('/assets/') || path.startsWith('/exercise-pack/img/') || path.startsWith('/fonts/');
+}
+
+/** Bump to drop every edge-cached response after a change in caching rules. */
+const CACHE_VERSION = 'v2';
+
 function cacheControl(path: string): string {
   if (NO_CACHE.has(path)) return 'no-cache';
   if (path.startsWith('/assets/') || path.startsWith('/exercise-pack/img/') || path.startsWith('/fonts/')) return 'public, max-age=31536000, immutable';
-  return 'public, max-age=3600';
+  return 'no-cache';
 }
 
 function b64ToBytes(b64: string): Uint8Array {
@@ -64,8 +72,8 @@ export default {
     if (path.endsWith('/')) path += 'index.html';
 
     const cache = caches.default;
-    const cacheKey = new Request(url.origin + path, { method: 'GET' });
-    const cached = NO_CACHE.has(path) ? undefined : await cache.match(cacheKey);
+    const cacheKey = new Request(`${url.origin}${path}?__c=${CACHE_VERSION}`, { method: 'GET' });
+    const cached = edgeCacheable(path) ? await cache.match(cacheKey) : undefined;
     if (cached) return cached;
 
     let row = await lookup(env, path);
@@ -84,7 +92,7 @@ export default {
         'Referrer-Policy': 'no-referrer',
       },
     });
-    if (!NO_CACHE.has(row.path) && request.method === 'GET') ctx.waitUntil(cache.put(cacheKey, response.clone()));
+    if (edgeCacheable(row.path) && request.method === 'GET') ctx.waitUntil(cache.put(cacheKey, response.clone()));
     return response;
   },
 };

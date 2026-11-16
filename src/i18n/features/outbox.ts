@@ -22,6 +22,8 @@ export const outbox = {
     welcome: 'ترحيب',
   },
   daysLeft: 'باقي {n} يوم',
+  oneSessionLeft: 'باقي حصة واحدة',
+  sessionsLeft: 'باقي {n} حصة',
   settings: 'أنواع الرسايل',
   settingsHint: 'اختار الرسايل اللي التطبيق يجهّزها كل يوم.',
   digestTitle: 'رسايل واتساب جاهزة',
