@@ -166,6 +166,7 @@ try {
 
   await step('dark mode renders (screenshot)', async () => {
     await page.emulateMedia({ colorScheme: 'dark' });
+    await page.goto('about:blank');
     await page.goto(`${ORIGIN}/c/${shareId}#k=${b64url(key)}`);
     await page.waitForSelector('body[data-ready="1"]');
     const bg = await page.evaluate(() => getComputedStyle(document.body).backgroundColor);
