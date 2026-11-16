@@ -12,6 +12,7 @@ import { createImageSource, HtmlPdfRenderer, type PdfRenderProgress, type Render
 import { BrowserShareService } from '@/services/share';
 import { useExerciseCatalog } from '@/features/programs/catalog';
 import { buildPdfInput } from './buildPdfInput';
+import { muscleMapRefs } from './muscleMapImage';
 import { BrandingSheet } from './BrandingSheet';
 import { readPdfBranding } from './pdfBranding';
 import styles from './Pdf.module.css';
@@ -104,7 +105,14 @@ export function PdfBuilderScreen() {
       const s = byId.get(row.supplementId);
       return s ? [{ ...s, dose: row.dose, timing: row.timing, notes: row.notes || s.notes }] : [];
     });
+    const used = [...new Set((program?.days ?? []).flatMap((d) => d.items.map((i) => i.exerciseId as string)))];
+    const usedExercises = used.flatMap((id) => {
+      const e = catalog?.byId.get(id);
+      return e ? [e] : [];
+    });
+    const muscleMaps = program && sections.includes('muscle_map') ? await muscleMapRefs(usedExercises, settings.primaryColor) : undefined;
     const input = buildPdfInput({
+      muscleMaps,
       sections: program ? sections : sections.filter((s) => s !== 'program' && s !== 'muscle_map'),
       title: title.trim() || (client ? t('pdf.defaultTitle', { name: client.name }) : t('pdf.defaultTitleNoClient')),
       subtitle: subtitle.trim(),

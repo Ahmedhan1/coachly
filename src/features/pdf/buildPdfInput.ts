@@ -21,6 +21,8 @@ export interface PdfSources {
   recipes: readonly Recipe[];
   supplements: readonly Supplement[];
   progress: readonly ProgressEntry[];
+  /** Muscle map picture per exercise id (only when the muscle_map section is on). */
+  muscleMaps?: ReadonlyMap<string, PdfImageRef>;
 }
 
 const stored = (id: string | null | undefined): PdfImageRef | null => (id ? { kind: 'stored', imageId: id } : null);
@@ -54,7 +56,7 @@ export function buildPdfInput(src: PdfSources): PdfDocumentInput {
   for (const day of src.program?.days ?? []) {
     for (const item of day.items) {
       const e = src.catalog.get(item.exerciseId);
-      if (e && !exercises.has(item.exerciseId)) exercises.set(item.exerciseId, pdfExerciseFromCatalog(e));
+      if (e && !exercises.has(item.exerciseId)) exercises.set(item.exerciseId, pdfExerciseFromCatalog(e, src.muscleMaps?.get(item.exerciseId) ?? null));
     }
   }
   const usedRecipeIds = new Set((src.mealPlan?.meals ?? []).flatMap((m) => m.items.flatMap((i) => (i.recipeId ? [i.recipeId] : []))));

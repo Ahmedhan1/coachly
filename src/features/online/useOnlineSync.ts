@@ -2,6 +2,7 @@ import { useEffect } from 'react';
 import { useServices } from '@/app/services';
 import { useUiStore } from '@/app/uiStore';
 import { t } from '@/i18n';
+import { runWebhooks } from './integrations';
 import { pullCheckins, syncPush } from './sync';
 
 const EVERY_MS = 15 * 60_000;
@@ -22,6 +23,7 @@ export function useOnlineSync(active: boolean): void {
       running = true;
       try {
         await syncPush(services).catch(() => null);
+        await runWebhooks(services).catch(() => 0);
         const n = await pullCheckins(services).catch(() => 0);
         if (n > 0) showToast({ message: t('settings.clientPage.checkinArrived', { n }), duration: 4000 });
       } finally {

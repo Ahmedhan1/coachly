@@ -5,7 +5,7 @@ import { hexToBytes, KEY_LENGTH } from '../../../shared/license';
  * The owner pastes the PUBLIC KEY printed by `node tools/keygen.mjs` here (docs/ACTIVATION.md, step 1).
  * While it is the placeholder, every real code is rejected; dev and build print a loud warning.
  */
-export const LICENSE_PUBLIC_KEY_HEX: string = 'REPLACE_WITH_PUBLIC_KEY_HEX';
+export const LICENSE_PUBLIC_KEY_HEX: string = 'f7b05d930a69c89ddaec69450fbf3e2d03934f222507e3a2d03256def880e301';
 
 let warned = false;
 

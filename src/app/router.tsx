@@ -23,6 +23,7 @@ export const routes: RouteObject[] = [
       { path: 'more/settings/backup', ...screen(() => import('@/features/settings/BackupScreen'), 'BackupScreen') },
       { path: 'more/settings/notifications', ...screen(() => import('@/features/settings/NotificationsScreen'), 'NotificationsScreen') },
       { path: 'more/settings/formulas', ...screen(() => import('@/features/settings/FormulasScreen'), 'FormulasScreen') },
+      { path: 'more/settings/integrations', ...screen(() => import('@/features/settings/IntegrationsScreen'), 'IntegrationsScreen') },
       { path: 'more/settings/about', ...screen(() => import('@/features/settings/AboutScreen'), 'AboutScreen') },
       {
         path: 'more/settings/identity',

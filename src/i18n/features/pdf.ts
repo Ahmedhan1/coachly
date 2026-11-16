@@ -46,7 +46,6 @@ export const pdf = {
   noSections: 'اختار قسم واحد على الأقل.',
   shareFailed: 'المشاركة ما اشتغلتش. نزّل الملف وابعته من Files.',
   noProgram: 'العميل ده ما عندوش برنامج، قسم التمارين هيتشال.',
-  muscleMapNote: 'صورة المجسم جنب كل تمرين لسه في الطريق؛ دلوقتي الملف بيحط صورة التمرين بس.',
   defaultTitle: 'برنامج {name}',
   defaultTitleNoClient: 'برنامج تدريب',
   branding: {

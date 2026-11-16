@@ -16,6 +16,7 @@ export async function handleRequest(request: Request, deps: Deps, hooks: AdminHo
   if (url.pathname === '/admin' || url.pathname.startsWith('/admin/')) return handleAdmin(request, deps, clientKey, hooks);
 
   const viewer = /^\/c\/([^/]+)$/.exec(url.pathname);
+  if (viewer !== null && request.method === 'GET' && !deps.cloud.bucket) return json({ error: 'storage_unavailable' }, 503);
   if (viewer !== null && request.method === 'GET') return viewerPage(deps, clientKey, viewer[1] ?? '');
 
   if (url.pathname.startsWith('/api/')) {
@@ -40,6 +41,9 @@ export async function handleRequest(request: Request, deps: Deps, hooks: AdminHo
 async function routeApi(request: Request, path: string, deps: Deps, clientKey: string): Promise<Response> {
   if (request.method === 'POST' && path === '/api/activate') return handleActivate(request, deps, clientKey);
   if (request.method === 'GET' && path === '/api/license/status') return handleStatus(request, deps, clientKey);
+  const storage = path === '/api/backup' || path.startsWith('/api/backup/') || path === '/api/checkins' || path.startsWith('/api/share/');
+  // R2 not bound yet (owner has not enabled R2): those features answer 503 and the app keeps its local copy.
+  if (storage && !deps.cloud.bucket) return json({ error: 'storage_unavailable' }, 503);
   if (path === '/api/backup' || path.startsWith('/api/backup/')) return (await routeBackup(request, path, deps, clientKey)) ?? notFound(deps, clientKey);
   if (path === '/api/push' || path.startsWith('/api/push/')) return (await routePush(request, path, deps, clientKey)) ?? notFound(deps, clientKey);
   if (path === '/api/checkins' || path.startsWith('/api/share/')) return (await routeShare(request, path, deps, clientKey)) ?? notFound(deps, clientKey);

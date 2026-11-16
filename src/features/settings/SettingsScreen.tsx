@@ -43,6 +43,7 @@ export function SettingsScreen() {
             setVersion((v) => v + 1);
           }}
         />
+        <ListRow to="/more/settings/integrations" leading={<Icon name="key" />} title={t('settings.integrations.title')} subtitle={t('settings.integrations.hint')} />
       </ListSection>
       <ListSection title={t('screens.settings.license')} bare>
         <DeviceIdCard deviceId={deviceId} />

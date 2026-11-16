@@ -191,3 +191,13 @@ it differs.
   readable by the owner/Cloudflare; metadata (sizes, times, number of clients with pages) is visible; the
   Free-plan CPU limit for the cron is designed from a local workerd measurement and must be checked on the
   dashboard after deploy.
+
+## Optional extras (off by default)
+
+- **AI assistant.** The trainer's own Anthropic API key is stored on the phone only (meta key `backup.ai.apiKey`,
+  device-local: never inside a backup file or sent to our Worker). A draft request goes from the phone straight to
+  `api.anthropic.com` and carries the client's goal, sex, age, injuries and measurements and the trainer's notes —
+  never the client's name or phone. Every draft is saved as an editable program/meal day for the trainer to review.
+- **Webhook.** When the trainer turns it on, the phone POSTs JSON to the trainer's own HTTPS address (n8n, Make) for
+  "new client" and "subscription ending". This payload includes the client's name and phone, because that is what such
+  automations need; the setting says so plainly. Nothing goes through our Worker.
