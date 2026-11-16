@@ -1,6 +1,6 @@
 # DESIGN.md — PT Coach visual system
 
-> **Status: PENDING OWNER CHOICE.** Two directions are proposed: **A «الدفتر» (The Ledger)** and
+> **Status: OWNER CHOSE DIRECTION B «الحديد» (Iron) on 2026-11-16.** The app adopts `design/direction-b/tokens.css`; direction A is kept for reference only. Two directions are proposed: **A «الدفتر» (The Ledger)** and
 > **B «الحديد» (Iron)**. The owner picks one from `design/compare.html` / `design/screenshots/compare.png`.
 > Until then, Phase 2 builds components against the shared token *names* below; the chosen direction's
 > `design/direction-*/tokens.css` becomes `src/ui/tokens.css`. Nothing else should need to change.
