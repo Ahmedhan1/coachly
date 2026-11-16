@@ -1,11 +1,9 @@
-import type { ComponentType } from 'react';
 import { createBrowserRouter, Navigate, type RouteObject } from 'react-router-dom';
 import { AppShell, RouteFallback } from './AppShell';
-
-/** Lazy-loads a named screen export so every feature is its own chunk. */
-const screen = <M extends Record<string, unknown>>(load: () => Promise<M>, name: keyof M & string) => ({
-  lazy: async () => ({ Component: (await load())[name] as ComponentType }),
-});
+import { screen } from './screen';
+import { nutritionRoutes } from './routes/nutrition';
+import { scheduleRoutes } from './routes/schedule';
+import { trainingRoutes } from './routes/training';
 
 const placeholders = () => import('@/features/placeholders/PlaceholderScreens');
 
@@ -16,16 +14,12 @@ export const routes: RouteObject[] = [
     hydrateFallbackElement: <RouteFallback />,
     children: [
       { index: true, ...screen(() => import('@/features/home/HomeScreen'), 'HomeScreen') },
+      ...scheduleRoutes,
+      ...trainingRoutes,
+      ...nutritionRoutes,
       { path: 'clients', ...screen(() => import('@/features/clients/ClientsListScreen'), 'ClientsListScreen') },
       { path: 'clients/:clientId', ...screen(() => import('@/features/clients/ClientDetailScreen'), 'ClientDetailScreen') },
-      { path: 'schedule', ...screen(placeholders, 'ScheduleScreen') },
-      { path: 'exercises', ...screen(placeholders, 'ExercisesScreen') },
       { path: 'more', ...screen(() => import('@/features/more/MoreScreen'), 'MoreScreen') },
-      { path: 'more/muscle-map', ...screen(placeholders, 'MuscleMapScreen') },
-      { path: 'more/programs', ...screen(placeholders, 'ProgramsScreen') },
-      { path: 'more/nutrition', ...screen(placeholders, 'NutritionScreen') },
-      { path: 'more/supplements', ...screen(placeholders, 'SupplementsScreen') },
-      { path: 'more/progress', ...screen(placeholders, 'ProgressScreen') },
       { path: 'more/pdf', ...screen(placeholders, 'PdfScreen') },
       { path: 'more/settings', ...screen(() => import('@/features/settings/SettingsScreen'), 'SettingsScreen') },
       {

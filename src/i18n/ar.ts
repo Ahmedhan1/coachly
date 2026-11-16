@@ -1,3 +1,7 @@
+import { nutrition } from './features/nutrition';
+import { schedule } from './features/schedule';
+import { training } from './features/training';
+
 /**
  * Every user-visible string in the app. Egyptian Arabic, Western digits.
  * Placeholders use {name}. Fitness terms come from fitness-terms.ts, never translated here.
@@ -367,6 +371,9 @@ export const ar = {
       notPersisted: 'التخزين الدائم مش مفعّل',
     },
   },
+  schedule,
+  training,
+  nutrition,
   units: {
     mb: '{n} ميجا',
     gb: '{n} جيجا',
