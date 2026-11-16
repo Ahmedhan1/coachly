@@ -16,7 +16,9 @@
 - قاعدة D1 اسمها `pt-coach-licenses` (id: `902382d0-8155-4203-89be-bae9c3f9d908`) والجداول من `worker/migrations`.
 - الأسرار متسجلة في Cloudflare: `LICENSE_PRIVATE_KEY`، `ADMIN_PASSWORD`، `DATA_KEY`، `VAPID_PRIVATE_KEY`،
   `VAPID_PUBLIC_KEY`، `VAPID_SUBJECT`. المفتاح العام موجود في `src/services/license/publicKey.ts` و `worker/wrangler.toml`.
-- التطبيق اترفع كـ Worker ملفات ثابتة اسمه `pt-coach` (الإعداد في `deploy/app/wrangler.toml`).
+- التطبيق Worker اسمه `pt-coach` بيخدم ملفات التطبيق من قاعدة D1 اسمها `pt-coach-app` (الكود في `deploy/app/`).
+  اتعمل كده بدل «Static Assets» لأن رفع الملفات بالطريقة العادية محتاج توكن رفع خاص ما كانش ينفع من بيئة الشغل.
+  التطبيق بيتخزن على الموبايل بعد أول فتح، فالقاعدة بتتقري نادراً.
 
 ## مطلوب منك مرة واحدة: تفعيل R2
 
@@ -40,8 +42,17 @@ VITE_WORKER_URL=https://pt-coach-license.nexus-ahmed.workers.dev npm run build
 ```
 
 ```bash
-cd deploy/app && npx --prefix ../../worker wrangler deploy
+UPLOAD_KEY=<مفتاح الرفع> python3 deploy/app/upload.py
 ```
+
+السكربت بيرفع الملفات اللي اتغيرت بس. مفتاح الرفع (`UPLOAD_KEY`) سر في Worker `pt-coach` واتسلّملك مع باقي المفاتيح.
+لو غيّرت كود `deploy/app/src/index.ts` نفسه: `cd deploy/app && npx --prefix ../../worker wrangler deploy`.
+
+## اتجرّب على السيرفر الحقيقي (16 نوفمبر)
+
+- التطبيق بيفتح وصفحة التثبيت بتظهر، والـ service worker شغال، وبيفتح من غير نت.
+- لوحة الأكواد: تسجيل دخول وإصدار كود اشتغلوا. الكود اتفعّل من التطبيق ووصل لإعداد الهوية، ونفس الكود اترفض على جهاز تاني (`used`). الترخيص التجريبي اتلغى بعدها.
+- مفتاح الإشعارات بيرجع من `/api/push/vapid`، والتطبيق بيكلم السيرفر من غير مشاكل CORS.
 
 ## المفاتيح الخاصة
 

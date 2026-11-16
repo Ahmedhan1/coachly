@@ -1,9 +1,10 @@
-# The installed app (static PWA) served by Workers static assets on the free plan.
-# Its address must never change: trainers' data is tied to this origin.
-# Build first: VITE_WORKER_URL=https://pt-coach-license.nexus-ahmed.workers.dev npm run build
+# The installed app (static PWA). Its address must never change: trainers' data is tied to this origin.
+# Files live in D1 (`pt-coach-app`), uploaded by deploy/app/upload.py after `npm run build`.
 name = "pt-coach"
+main = "src/index.ts"
 compatibility_date = "2026-08-01"
 
-[assets]
-directory = "../../dist"
-not_found_handling = "single-page-application"
+[[d1_databases]]
+binding = "APP"
+database_name = "pt-coach-app"
+database_id = "477aa926-49b7-4bb0-964b-bc5879286839"
