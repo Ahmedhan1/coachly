@@ -1,140 +1,188 @@
 /*
- * Design tokens — the ONLY place visual values live. Re-skin the app by editing this file.
- * --brand-base is set at runtime from trainer settings (see app/useBrandTheme.ts);
- * --brand-on-dark is a lighter variant computed for dark backgrounds.
+ * Design tokens — direction B «الحديد» (Iron), the owner's choice (DESIGN.md §5).
+ * Ported from design/direction-b/tokens.css; token NAMES follow DESIGN.md §3.
+ * This is the ONLY place visual values live.
+ *
+ * Brand: the trainer picks one color; src/domain/branding derives every brand token for light and dark
+ * and app/useBrandTheme writes them as inline custom properties on :root:
+ *   --rt-brand, --rt-brand-on, --rt-brand-ink, --rt-brand-tint, --rt-brand-tint-strong        (light)
+ *   --rt-brand-dark, --rt-brand-on-dark, --rt-brand-ink-dark, --rt-brand-tint-dark, ...       (dark)
+ * The fallbacks below are the derived values for the default signal orange #F25C1F.
  */
+@import './fonts.css';
+
 :root {
   color-scheme: light dark;
 
-  /* Brand (runtime-overridden) */
-  --brand-base: #2f6f5e;
-  --brand-on-dark: #5fb39b;
-  --on-brand-light: #ffffff;
-  --on-brand-dark: #0b0b0c;
-  --brand: var(--brand-base);
-  --on-brand: var(--on-brand-light);
-  --brand-tint: color-mix(in srgb, var(--brand) 12%, transparent);
+  /* Type — Alexandria for display + numbers, Readex Pro for UI */
+  --font-ui: 'Readex Pro', system-ui, -apple-system, 'Geeza Pro', sans-serif;
+  --font-display: 'Alexandria', 'Readex Pro', system-ui, sans-serif;
+  --font-num: 'Alexandria', 'Readex Pro', system-ui, sans-serif;
+  --t-display: 800 30px/1.2 var(--font-display);
+  --t-title: 700 20px/1.3 var(--font-display);
+  --t-headline: 500 17px/1.35 var(--font-ui);
+  --t-body: 400 16px/1.55 var(--font-ui);
+  --t-callout: 500 15px/1.4 var(--font-ui);
+  --t-sub: 400 14px/1.45 var(--font-ui);
+  --t-caption: 400 12.5px/1.35 var(--font-ui);
+  --t-label: 600 13px/1.2 var(--font-ui);
+  --t-num: 700 18px/1 var(--font-num);
+  --t-num-lg: 800 44px/1 var(--font-num);
 
-  /* Neutral greys — light */
-  --gray-50: #f6f6f7;
-  --gray-100: #eeeef0;
-  --gray-200: #e1e1e4;
-  --gray-300: #c9c9ce;
-  --gray-500: #8a8a91;
-  --gray-600: #6c6c73;
-  --gray-700: #4a4a50;
-  --gray-900: #1c1c1e;
-
-  --bg: var(--gray-50);
-  --surface: #ffffff;
-  --surface-raised: #ffffff;
-  --fill: var(--gray-100);
-  --fill-pressed: var(--gray-200);
-  --separator: var(--gray-200);
-  --text: var(--gray-900);
-  --text-secondary: var(--gray-600);
-  --text-tertiary: var(--gray-500);
-  --danger: #c4372f;
-  --on-danger: #ffffff;
-  --warning: #9a5b00;
-  --warning-tint: #fbf1e1;
-  --success: #2e7d4f;
-  --backdrop: rgb(0 0 0 / 0.32);
-  --focus-ring: color-mix(in srgb, var(--brand) 55%, transparent);
-  --toast-bg: var(--gray-900);
-  --toast-text: #ffffff;
-  --toast-action: var(--brand-on-dark);
-
-  /* Typography */
-  --font-body: -apple-system, 'SF Arabic', 'Geeza Pro', 'Noto Sans Arabic', system-ui, sans-serif;
-  --font-heading: var(--font-body);
-  --text-xs: 0.8125rem; /* 13 */
-  --text-sm: 0.9375rem; /* 15 */
-  --text-md: 1.0625rem; /* 17 iOS body */
-  --text-lg: 1.25rem; /* 20 */
-  --text-xl: 1.5rem; /* 24 */
-  --text-2xl: 1.875rem; /* 30 large title */
-  --leading-tight: 1.25;
-  --leading-normal: 1.5;
-  --weight-regular: 400;
-  --weight-medium: 500;
-  --weight-semibold: 600;
-  --weight-bold: 700;
-
-  /* Spacing scale (4pt grid) */
-  --space-1: 4px;
-  --space-2: 8px;
-  --space-3: 12px;
-  --space-4: 16px;
-  --space-5: 20px;
-  --space-6: 24px;
-  --space-8: 32px;
-  --space-10: 40px;
-  --gutter: var(--space-4);
+  /* Space (4pt base) */
+  --sp-1: 4px;
+  --sp-2: 8px;
+  --sp-3: 12px;
+  --sp-4: 16px;
+  --sp-5: 20px;
+  --sp-6: 24px;
+  --sp-7: 32px;
+  --sp-8: 40px;
+  --gutter: 16px;
 
   /* Shape */
-  --radius-sm: 8px;
-  --radius-md: 12px;
-  --radius-lg: 16px;
-  --radius-pill: 999px;
-  --border-width: 1px;
+  --r-xs: 6px;
+  --r-sm: 10px;
+  --r-md: 14px;
+  --r-lg: 18px;
+  --r-sheet: 22px;
+  --r-full: 999px;
+  --hairline: 1px;
+  --icon-stroke: 2;
 
-  /* Sizing */
-  --touch: 44px;
-  --control-height: 48px;
-  --tabbar-height: 56px;
-  --avatar: 40px;
-  --icon: 22px;
+  /* Sizes */
+  --tap: 44px;
+  --row-h: 60px;
+  --tabbar-h: 56px;
+  --field-h: 48px;
+  --icon: 24px;
   --content-max: 640px;
 
-  /* Safe areas */
+  /* Safe areas (real device insets; the mockups simulated 59/34 and 20/0) */
   --safe-top: env(safe-area-inset-top, 0px);
   --safe-bottom: env(safe-area-inset-bottom, 0px);
   --safe-left: env(safe-area-inset-left, 0px);
   --safe-right: env(safe-area-inset-right, 0px);
 
-  /* Elevation — kept minimal on purpose */
-  --shadow-sheet: 0 -1px 0 var(--separator);
-
-  /* Motion — only sheets, toasts and swipe move */
-  --duration-fast: 120ms;
-  --duration: 240ms;
+  /* Motion — only sheets, toasts and swipe move (DESIGN.md §6) */
+  --dur-1: 120ms;
+  --dur-2: 200ms;
+  --dur-3: 300ms;
   --ease-out: cubic-bezier(0.2, 0.8, 0.2, 1);
+  --ease-sheet: cubic-bezier(0.32, 0.72, 0, 1);
+
+  /* Neutrals — cool concrete */
+  --bg: #ededea;
+  --surface: #ffffff;
+  --surface-2: #f3f3f1;
+  --line: #e3e3df;
+  --line-strong: #d2d3cf;
+  --text: #0e0f0f;
+  --text-2: #4a4d4e;
+  --text-3: #5f6364;
+  --muscle-base: #d9dad6;
+  --muscle-off: #c3c5c1;
+  --photo: #dcddd9;
+  --photo-ink: #8e928f;
+  --scrim: rgb(14 15 15 / 0.4);
+
+  /* Brand (derived at runtime) */
+  --brand: var(--rt-brand, #f25c1f);
+  --brand-on: var(--rt-brand-on, #111111);
+  --brand-ink: var(--rt-brand-ink, #ae4216);
+  --brand-tint: var(--rt-brand-tint, #eedfd6);
+  --brand-tint-strong: var(--rt-brand-tint-strong, #eed0c1);
+  --muscle-hit: var(--brand);
+  --muscle-hit-2: color-mix(in oklab, var(--brand) 45%, var(--muscle-off));
+  --focus-ring: var(--brand-tint-strong);
+
+  /* Semantic — fixed, never derived from the brand */
+  --ok: #1b7040;
+  --ok-tint: #dcefe2;
+  --warn: #8f5600;
+  --warn-tint: #f7e7c8;
+  --danger: #b42318;
+  --danger-tint: #f9deda;
+  --on-danger: #ffffff;
+
+  --shadow-sheet: 0 -8px 40px rgb(0 0 0 / 0.18);
+  --shadow-raise: none;
 }
 
+/* Dark: system preference unless the trainer forced light; and the manual data-theme="dark" override. */
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme='light']) {
-    --brand: var(--brand-on-dark);
-    --on-brand: var(--on-brand-dark);
-    --gray-50: #000000;
-    --gray-100: #1c1c1e;
-    --gray-200: #2c2c2e;
-    --gray-300: #3a3a3c;
-    --gray-500: #8e8e93;
-    --gray-600: #aeaeb2;
-    --gray-700: #d1d1d6;
-    --gray-900: #f2f2f7;
-    --bg: #000000;
-    --surface: #1c1c1e;
-    --surface-raised: #2c2c2e;
-    --fill: #2c2c2e;
-    --fill-pressed: #3a3a3c;
-    --separator: #38383a;
-    --text: #f2f2f7;
-    --danger: #ff6b61;
-    --on-danger: #0b0b0c;
-    --warning: #f0b45a;
-    --warning-tint: #2e2414;
-    --success: #5cc98a;
-    --backdrop: rgb(0 0 0 / 0.56);
-    --toast-bg: #3a3a3c;
-    --toast-text: #f2f2f7;
+    --bg: #0b0c0c;
+    --surface: #161818;
+    --surface-2: #1f2222;
+    --line: #252828;
+    --line-strong: #2e3232;
+    --text: #f2f3f1;
+    --text-2: #a3a8a6;
+    --text-3: #868b89;
+    --muscle-base: #262929;
+    --muscle-off: #363a3a;
+    --photo: #222525;
+    --photo-ink: #5a605e;
+    --scrim: rgb(0 0 0 / 0.6);
+
+    --brand: var(--rt-brand-dark, #f25c1f);
+    --brand-on: var(--rt-brand-on-dark, #111111);
+    --brand-ink: var(--rt-brand-ink-dark, #f36328);
+    --brand-tint: var(--rt-brand-tint-dark, #30190f);
+    --brand-tint-strong: var(--rt-brand-tint-strong-dark, #4c2211);
+
+    --ok: #5cc88a;
+    --ok-tint: #14241a;
+    --warn: #f0b04f;
+    --warn-tint: #2b2113;
+    --danger: #ff8a7e;
+    --danger-tint: #2e1614;
+    --on-danger: #111111;
+    --shadow-sheet: 0 -8px 40px rgb(0 0 0 / 0.6);
   }
+}
+
+:root[data-theme='dark'] {
+  --bg: #0b0c0c;
+  --surface: #161818;
+  --surface-2: #1f2222;
+  --line: #252828;
+  --line-strong: #2e3232;
+  --text: #f2f3f1;
+  --text-2: #a3a8a6;
+  --text-3: #868b89;
+  --muscle-base: #262929;
+  --muscle-off: #363a3a;
+  --photo: #222525;
+  --photo-ink: #5a605e;
+  --scrim: rgb(0 0 0 / 0.6);
+
+  --brand: var(--rt-brand-dark, #f25c1f);
+  --brand-on: var(--rt-brand-on-dark, #111111);
+  --brand-ink: var(--rt-brand-ink-dark, #f36328);
+  --brand-tint: var(--rt-brand-tint-dark, #30190f);
+  --brand-tint-strong: var(--rt-brand-tint-strong-dark, #4c2211);
+
+  --ok: #5cc88a;
+  --ok-tint: #14241a;
+  --warn: #f0b04f;
+  --warn-tint: #2b2113;
+  --danger: #ff8a7e;
+  --danger-tint: #2e1614;
+  --on-danger: #111111;
+  --shadow-sheet: 0 -8px 40px rgb(0 0 0 / 0.6);
+  color-scheme: dark;
+}
+
+:root[data-theme='light'] {
+  color-scheme: light;
 }
 
 @media (prefers-reduced-motion: reduce) {
   :root {
-    --duration-fast: 0ms;
-    --duration: 0ms;
+    --dur-1: 0ms;
+    --dur-2: 0ms;
+    --dur-3: 0ms;
   }
 }
