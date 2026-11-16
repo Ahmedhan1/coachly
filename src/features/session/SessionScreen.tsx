@@ -89,10 +89,15 @@ function useTick(active: boolean): number {
   const [now, setNow] = useState(() => Date.now());
   useEffect(() => {
     if (!active) return;
-    const id = window.setInterval(() => setNow(Date.now()), 500);
-    return () => window.clearInterval(id);
+    const tick = () => setNow(Date.now());
+    const first = window.setTimeout(tick, 0);
+    const id = window.setInterval(tick, 500);
+    return () => {
+      window.clearTimeout(first);
+      window.clearInterval(id);
+    };
   }, [active]);
-  return active ? now : Date.now();
+  return now;
 }
 
 function SessionRunner({ client, program, history, logs, unit, saved, routeKey, dayParam, scheduleId }: RunnerProps) {
@@ -134,8 +139,7 @@ function SessionRunner({ client, program, history, logs, unit, saved, routeKey, 
     if (state && phase !== 'saved') void meta.set(ACTIVE_SESSION_KEY, state);
   }, [state, meta, phase]);
 
-  const resting = state ? restRemaining(state, Date.now()) > 0 : false;
-  const now = useTick(resting);
+  const now = useTick(state?.rest != null);
 
   const back = { to: `/clients/${client.id}`, label: client.name };
   if (!state) {
