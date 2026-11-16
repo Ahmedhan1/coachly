@@ -3,7 +3,7 @@ import { useParams } from 'react-router-dom';
 import { useRepos } from '@/app/services';
 import { useUiStore } from '@/app/uiStore';
 import { useLive } from '@/app/useLive';
-import { compareToTarget, dayTotals, duplicateMeals, nextDayNumber, type MacroTotals, type SavedCalculation } from '@/domain/meals';
+import { compareToTarget, dayTotals, duplicateMeals, nextDayNumber, scaleDayToTarget, type MacroTotals, type SavedCalculation } from '@/domain/meals';
 import type { Client, Meal, MealPlan } from '@/domain/models';
 import { t } from '@/i18n';
 import { Button, EmptyState, Icon, PageHeader, TextArea } from '@/ui';
@@ -14,6 +14,8 @@ import { DayTotals } from './DayTotals';
 import { MealCard } from './MealCard';
 import { AddItemSheet, MealSheet, SwapSheet, type SheetState } from './MealSheets';
 import { useRecipesWithNutrition } from './useRecipeLookup';
+import { ShoppingSheet } from './PlanToolsSheets';
+import { ClientPickerSheet } from '@/features/programs/ClientPickerSheet';
 import common from '../shared/common.module.css';
 import styles from './MealPlan.module.css';
 
@@ -63,6 +65,7 @@ function MealPlanView({ client, plans, saved, tolerance, recipes, back }: ViewPr
   const showToast = useUiStore((s) => s.showToast);
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [sheet, setSheet] = useState<SheetState | null>(null);
+  const [tool, setTool] = useState<null | 'shopping' | 'copyTo'>(null);
   const day = plans.find((p) => p.id === selectedId) ?? plans[0];
   const lookup = useMemo(() => new Map<string, MacroTotals>(recipes.map((r) => [r.recipe.id, r.perServing])), [recipes]);
   const names = useMemo(() => new Map(recipes.map((r) => [r.recipe.id, r.recipe.name])), [recipes]);
@@ -98,6 +101,35 @@ function MealPlanView({ client, plans, saved, tolerance, recipes, back }: ViewPr
       onAction: () => void repos.mealPlans.restore(deleted.id).then(() => setSelectedId(deleted.id)),
       duration: 6000,
     });
+  };
+
+  const scaleDay = async () => {
+    if (!day) return;
+    if (!target) return showToast({ message: t('nutrition.tools.scaleNoTarget') });
+    const before = day.meals;
+    const r = scaleDayToTarget(day.meals, lookup, target);
+    if (!r) return showToast({ message: t('nutrition.tools.scaleNothing') });
+    await updateMeals(r.meals);
+    showToast({
+      message: t('nutrition.tools.scaled', { before: Math.round(r.beforeKcal), after: Math.round(r.afterKcal) }),
+      actionLabel: t('common.undo'),
+      onAction: () => void repos.mealPlans.update(day.id, { meals: before }),
+      duration: 6000,
+    });
+  };
+
+  const copyDayTo = async (other: Client) => {
+    if (!day) return;
+    const existing = await repos.mealPlans.listByClient(other.id);
+    const n = nextDayNumber(existing.map((p) => dayNumberOf(p.name)));
+    await repos.mealPlans.create({
+      clientId: other.id,
+      name: t('nutrition.plan.dayName', { n }),
+      targetKcal: null,
+      meals: duplicateMeals(day.meals, newId) as Meal[],
+      notes: day.notes,
+    });
+    showToast({ message: t('nutrition.tools.copiedTo', { name: other.name }), duration: 3000 });
   };
 
   const removeMeal = async (meal: Meal) => {
@@ -177,7 +209,27 @@ function MealPlanView({ client, plans, saved, tolerance, recipes, back }: ViewPr
             <Button variant="secondary" icon="copy" onClick={() => void duplicateDay()}>
               {t('nutrition.plan.duplicateDay')}
             </Button>
+            <Button variant="secondary" icon="target" onClick={() => void scaleDay()}>
+              {t('nutrition.tools.scale')}
+            </Button>
+            <Button variant="secondary" icon="list" onClick={() => setTool('shopping')}>
+              {t('nutrition.tools.shopping')}
+            </Button>
+            <Button variant="secondary" icon="users" onClick={() => setTool('copyTo')}>
+              {t('nutrition.tools.copyDay')}
+            </Button>
           </div>
+          {tool === 'shopping' && <ShoppingSheet client={client} plans={plans} recipes={recipes.map((r) => r.recipe)} onClose={() => setTool(null)} />}
+          <ClientPickerSheet
+            open={tool === 'copyTo'}
+            title={t('nutrition.tools.copyDay')}
+            excludeId={client.id}
+            onClose={() => setTool(null)}
+            onPick={(c) => {
+              setTool(null);
+              void copyDayTo(c);
+            }}
+          />
 
           <section className={common.section}>
             <div className={common.tile}>

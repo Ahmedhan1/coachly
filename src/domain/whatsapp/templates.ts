@@ -9,7 +9,7 @@ export const PLACEHOLDERS = ['الاسم', 'الموعد', 'الباقة', 'ال
 export type Placeholder = (typeof PLACEHOLDERS)[number];
 export type TemplateValues = Partial<Record<Placeholder, string>>;
 
-export const BUILTIN_KINDS = ['session_reminder', 'renewal', 'record'] as const;
+export const BUILTIN_KINDS = ['session_reminder', 'renewal', 'record', 'payment_due', 'missed_session', 'checkin_reminder', 'birthday', 'welcome', 'program_ready', 'shopping_list'] as const;
 export type BuiltinKind = (typeof BUILTIN_KINDS)[number];
 export type TemplateKind = BuiltinKind | 'custom';
 

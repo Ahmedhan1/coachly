@@ -1,0 +1,92 @@
+.list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.row {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-3);
+  min-block-size: var(--row-h);
+  padding: var(--sp-2) var(--sp-4);
+  border-block-end: var(--hairline) solid var(--line);
+}
+
+.text {
+  flex: 1;
+  min-inline-size: 0;
+}
+
+.name {
+  overflow: hidden;
+  font: var(--t-headline);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.reason {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--sp-2);
+  color: var(--text-2);
+  font: var(--t-sub);
+}
+
+.skip {
+  display: grid;
+  flex: none;
+  place-items: center;
+  inline-size: var(--tap);
+  block-size: var(--tap);
+  border: 0;
+  border-radius: var(--r-full);
+  background: none;
+  color: var(--text-3);
+}
+
+.skip svg,
+.send svg {
+  inline-size: 20px;
+  block-size: 20px;
+}
+
+.send {
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  gap: var(--sp-1);
+  min-block-size: 40px;
+  padding-inline: var(--sp-3);
+  border-radius: var(--r-full);
+  background: var(--ok);
+  color: #fff;
+  font: 600 15px/1 var(--font-ui);
+}
+
+.empty {
+  padding: var(--sp-4);
+  color: var(--text-2);
+  font: var(--t-sub);
+}
+
+.kinds {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-3);
+}
+
+.kind {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-3);
+  min-block-size: var(--tap);
+  font: var(--t-body);
+}
+
+.kind input {
+  inline-size: 22px;
+  block-size: 22px;
+  accent-color: var(--brand);
+}

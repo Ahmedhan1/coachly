@@ -2,6 +2,7 @@ import { useNavigate } from 'react-router-dom';
 import { useServices } from '@/app/services';
 import { useUiStore } from '@/app/uiStore';
 import { whatsappUrl } from '@/features/clients/contact';
+import { OutboxCard } from '@/features/outbox/OutboxCard';
 import { t } from '@/i18n';
 import { Avatar, Badge, Button, Icon, IconButton, ListRow, ListSection, Money, Num, PageHeader, SectionLink, Tx, cx } from '@/ui';
 import { formatLongDate, timeParts } from '@/ui/format';
@@ -26,6 +27,7 @@ export function HomeScreen() {
       <PageHeader title={t('home.title')} actions={actions} subtitle={<DateLine home={home} />} />
       {home.hasDemo && <DemoNotice />}
       {home.plan.next ? <Hero next={home.plan.next} /> : <NoNext />}
+      <OutboxCard />
       <RestOfDay items={home.plan.rest} />
       <EndingSoon home={home} />
       <FollowUp home={home} />

@@ -1,4 +1,5 @@
 import { nutrition } from './features/nutrition';
+import { outbox } from './features/outbox';
 import { pdf } from './features/pdf';
 import { settings } from './features/settings';
 import { schedule } from './features/schedule';
@@ -403,6 +404,7 @@ export const ar = {
   schedule,
   training,
   nutrition,
+  outbox,
   pdf,
   settings,
   units: {

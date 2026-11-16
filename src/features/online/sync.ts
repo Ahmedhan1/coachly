@@ -1,5 +1,7 @@
 import type { AppServices } from '@/app/services';
-import { buildPushSchedule } from '@/domain/notifications';
+import { buildPushSchedule, PUSH_MAX_ITEMS } from '@/domain/notifications';
+import { addDays } from '@/domain/schedule';
+import { computeOutbox } from '@/features/outbox/useOutbox';
 import { toIsoDate, type ClientId, type ImageId } from '@/domain/models';
 import { t } from '@/i18n';
 import { deviceZone } from '@/features/schedule/zone';
@@ -27,7 +29,17 @@ export async function syncPush(services: AppServices, now = Date.now()): Promise
       renewal: (n) => ({ title: t('settings.notifications.renewalTitle'), body: t('settings.notifications.renewalBody', { n }) }),
     },
   });
-  const r = await push.sync(items);
+  // Daily digest at 9:00 local when the outbox has messages for that day (today if still before 9, and tomorrow).
+  const clock = deviceZone().clock;
+  const todayIso = clock.toLocal(now).date;
+  for (const date of [todayIso, addDays(todayIso, 1)]) {
+    const at = clock.toEpochMs({ date, minute: 9 * 60 });
+    if (at <= now) continue;
+    const count = (await computeOutbox(services, new Date(at), date).catch(() => [])).length;
+    if (count > 0) items.push({ id: `digest-${date}`, at: Math.floor(at / 1000), title: t('outbox.digestTitle'), body: t('outbox.digestBody', { n: count }) });
+  }
+  items.sort((a, b) => a.at - b.at);
+  const r = await push.sync(items.slice(0, PUSH_MAX_ITEMS));
   if (!r.ok) return null;
   await savePushPrefs(services.meta, { ...prefs, lastSyncAt: now });
   return r.value;

@@ -18,6 +18,7 @@ import {
   tintModel,
   viewerMode,
   type ModelState,
+  type ModelView,
   type MuscleIntensities,
 } from '@/services/model3d';
 import styles from './MuscleMap.module.css';
@@ -29,6 +30,8 @@ export interface MuscleViewer3DProps {
   /** Bumped by the parent to put the camera back to the front view. */
   resetKey?: number;
 }
+
+const VIEWS: readonly ModelView[] = ['front', 'side', 'back'];
 
 /** Pointer travel (px) above which a tap is treated as a drag (rotation), not a selection. */
 const TAP_SLOP = 8;
@@ -42,6 +45,8 @@ export default function MuscleViewer3D(props: MuscleViewer3DProps) {
   const [webgl] = useState(() => detectWebGL());
   const [model, setModel] = useState<Object3D | null>(null);
   const [state, setState] = useState<ModelState>('loading');
+  const [view, setView] = useState<ModelView>('front');
+  const [viewKey, setViewKey] = useState(0);
 
   useEffect(() => {
     if (!webgl) return;
@@ -88,15 +93,33 @@ export default function MuscleViewer3D(props: MuscleViewer3DProps) {
             role="img"
             className={styles.canvas}
           >
-            <Scene model={model} {...props} />
+            <Scene model={model} {...props} view={view} resetKey={(props.resetKey ?? 0) * 1000 + viewKey} />
           </Canvas>
         </CanvasBoundary>
+      )}
+      {model && (
+        <div className={styles.views} role="group" aria-label={t('training.muscles3d.viewsLabel')}>
+          {VIEWS.map((v) => (
+            <button
+              key={v}
+              type="button"
+              className={styles.viewBtn}
+              aria-pressed={view === v}
+              onClick={() => {
+                setView(v);
+                setViewKey((k) => k + 1);
+              }}
+            >
+              {t(`training.muscles3d.views.${v}`)}
+            </button>
+          ))}
+        </div>
       )}
     </div>
   );
 }
 
-function Scene({ model, intensities, selected, onSelect, resetKey = 0 }: MuscleViewer3DProps & { model: Object3D }) {
+function Scene({ model, intensities, selected, onSelect, resetKey = 0, view = 'front' }: MuscleViewer3DProps & { model: Object3D; view?: ModelView }) {
   const camera = useThree((s) => s.camera) as PerspectiveCamera;
   const gl = useThree((s) => s.gl);
   const invalidate = useThree((s) => s.invalidate);
@@ -125,7 +148,7 @@ function Scene({ model, intensities, selected, onSelect, resetKey = 0 }: MuscleV
   useEffect(() => {
     const aspect = size.width / Math.max(1, size.height);
     const { target, distance } = frameModel(model, aspect);
-    placeCamera(camera, target, distance, 'front');
+    placeCamera(camera, target, distance, view);
     const c = controls.current;
     if (c) {
       c.target.copy(target);
@@ -134,7 +157,7 @@ function Scene({ model, intensities, selected, onSelect, resetKey = 0 }: MuscleV
       c.update();
     }
     invalidate();
-  }, [model, camera, size.width, size.height, resetKey, invalidate]);
+  }, [model, camera, size.width, size.height, resetKey, view, invalidate]);
 
   useEffect(() => {
     const dispose = tintModel(model, intensities, palette, selected);

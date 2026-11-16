@@ -279,3 +279,31 @@
   padding-block-start: var(--sp-3);
   border-block-start: 1px solid var(--line);
 }
+
+.shopping {
+  display: flex;
+  flex-direction: column;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.shopping li {
+  display: flex;
+  justify-content: space-between;
+  gap: var(--sp-3);
+  padding-block: var(--sp-2);
+  border-block-end: var(--hairline) solid var(--line);
+  font: var(--t-body);
+}
+
+.waButton {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-block-size: 50px;
+  border-radius: var(--r-md);
+  background: var(--ok);
+  color: #fff;
+  font: 600 16px/1 var(--font-ui);
+}

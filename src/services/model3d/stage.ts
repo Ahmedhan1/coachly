@@ -1,6 +1,6 @@
 import { AmbientLight, Box3, DirectionalLight, HemisphereLight, PerspectiveCamera, Vector3, type Object3D } from 'three';
 
-export type ModelView = 'front' | 'back';
+export type ModelView = 'front' | 'back' | 'side';
 
 export const CAMERA_FOV = 28;
 
@@ -27,7 +27,8 @@ export function frameModel(model: Object3D, aspect: number, fov = CAMERA_FOV): {
 
 /** The model faces +Z: the front view looks from +Z, the back view from -Z. */
 export function placeCamera(camera: PerspectiveCamera, target: Vector3, distance: number, view: ModelView): void {
-  camera.position.set(target.x, target.y, target.z + (view === 'front' ? distance : -distance));
+  if (view === 'side') camera.position.set(target.x + distance, target.y, target.z);
+  else camera.position.set(target.x, target.y, target.z + (view === 'front' ? distance : -distance));
   camera.lookAt(target);
   camera.near = Math.max(0.01, distance / 100);
   camera.far = distance * 10;

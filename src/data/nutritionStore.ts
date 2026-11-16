@@ -24,6 +24,7 @@ export interface KeyValueStore {
 export const NUTRITION_KEYS = {
   settings: 'nutrition.settings',
   ingredients: 'nutrition.ingredients',
+  removedIngredients: 'nutrition.removedIngredients',
   favourites: 'nutrition.favouriteRecipes',
   starterSeeded: 'nutrition.starterSeededAt',
   starterRecipes: 'nutrition.starterRecipeIds',
@@ -148,8 +149,25 @@ export class NutritionStore {
     return run;
   }
 
+  /** Adds food-table rows that newer app versions ship (by id), never touching rows the trainer has. */
+  private async mergeNewIngredients(): Promise<void> {
+    const raw = await this.kv.get(NUTRITION_KEYS.ingredients);
+    if (raw === undefined) return;
+    const current = await this.getIngredients();
+    const ids = new Set(current.map((i) => i.id));
+    const removed = new Set(parseOr(idList, await this.kv.get(NUTRITION_KEYS.removedIngredients), []));
+    const missing = starterIngredients().filter((i) => !ids.has(i.id) && !removed.has(i.id));
+    if (missing.length > 0) await this.saveIngredients([...current, ...missing]);
+  }
+
+  /** Remembers a starter row the trainer deleted, so a later app version does not bring it back. */
+  async forgetIngredient(id: string): Promise<void> {
+    const removed = parseOr(idList, await this.kv.get(NUTRITION_KEYS.removedIngredients), []);
+    if (!removed.includes(id)) await this.kv.set(NUTRITION_KEYS.removedIngredients, [...removed, id]);
+  }
+
   private async seedOnce(): Promise<void> {
-    if (await this.kv.get(NUTRITION_KEYS.starterSeeded)) return;
+    if (await this.kv.get(NUTRITION_KEYS.starterSeeded)) return this.mergeNewIngredients();
     const table = starterIngredients();
     if ((await this.kv.get(NUTRITION_KEYS.ingredients)) === undefined) await this.saveIngredients(table);
     const recipeIds: string[] = [];

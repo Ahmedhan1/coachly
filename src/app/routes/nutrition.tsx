@@ -4,6 +4,7 @@ import { screen } from '../screen';
 // Routes for the nutrition feature area (children of '/').
 export const nutritionRoutes: RouteObject[] = [
   { path: 'more/nutrition', ...screen(() => import('@/features/nutrition/hub/NutritionHubScreen'), 'NutritionHubScreen') },
+  { path: 'more/foods', ...screen(() => import('@/features/nutrition/foods/FoodsScreen'), 'FoodsScreen') },
   { path: 'more/recipes', ...screen(() => import('@/features/nutrition/recipes/RecipesScreen'), 'RecipesScreen') },
   { path: 'more/supplements', ...screen(() => import('@/features/nutrition/supplements/SupplementsScreen'), 'SupplementsScreen') },
   { path: 'more/progress', ...screen(() => import('@/features/nutrition/progress/ProgressHubScreen'), 'ProgressHubScreen') },

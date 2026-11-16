@@ -3,8 +3,11 @@ import { useRepos } from '@/app/services';
 import { useUiStore } from '@/app/uiStore';
 import { storedRecipeNutrition } from '@/domain/meals';
 import type { ImageId, Ingredient, Recipe } from '@/domain/models';
+import type { IngredientEntry } from '@/domain/meals';
+import { searchItems } from '@/data';
+import { useLive } from '@/app/useLive';
 import { t } from '@/i18n';
-import { Icon, IconButton, Num, Sheet, TextArea, TextField } from '@/ui';
+import { Icon, IconButton, Num, SearchField, Sheet, TextArea, TextField } from '@/ui';
 import { fieldText, gramsText, kcalText, parseDecimal } from '../shared/numbers';
 import { PhotoField } from '../shared/PhotoField';
 import { useNutritionStore } from '../shared/useNutritionStore';
@@ -19,6 +22,14 @@ interface Row {
   proteinG: string;
   carbsG: string;
   fatG: string;
+  /** Set when the row came from the food table: macros follow the grams. */
+  per100?: { kcal: number; proteinG: number; carbG: number; fatG: number };
+}
+
+const r1 = (n: number) => String(Math.round(n * 10) / 10);
+function fromTable(name: string, per100: NonNullable<Row['per100']>, grams: number): Row {
+  const k = grams / 100;
+  return { name, quantity: String(grams), unit: 'جم', kcal: r1(per100.kcal * k), proteinG: r1(per100.proteinG * k), carbsG: r1(per100.carbG * k), fatG: r1(per100.fatG * k), per100 };
 }
 
 const emptyRow = (): Row => ({ name: '', quantity: '', unit: 'جم', kcal: '', proteinG: '', carbsG: '', fatG: '' });
@@ -63,7 +74,22 @@ export function RecipeSheet({ recipe, onClose }: { recipe: Recipe | null; onClos
   const servingsN = Math.max(1, Math.round(parseDecimal(servings)) || 1);
   const preview = ingredients ? storedRecipeNutrition({ servings: servingsN, ingredients }) : null;
 
-  const setRow = (i: number, patch: Partial<Row>) => setRows((rs) => rs.map((r, j) => (j === i ? { ...r, ...patch } : r)));
+  const setRow = (i: number, patch: Partial<Row>) =>
+    setRows((rs) =>
+      rs.map((r, j) => {
+        if (j !== i) return r;
+        const next = { ...r, ...patch };
+        // Typing grams on a food-table row recomputes its macros; editing a macro by hand unlinks it.
+        if (next.per100 && 'quantity' in patch) {
+          const g = parseDecimal(next.quantity);
+          return Number.isFinite(g) && g > 0 ? { ...fromTable(next.name, next.per100, g), quantity: next.quantity } : next;
+        }
+        if (['kcal', 'proteinG', 'carbsG', 'fatG', 'unit'].some((k) => k in patch)) delete next.per100;
+        return next;
+      }),
+    );
+  const [picking, setPicking] = useState(false);
+  const foods = useLive(() => store.getIngredients(), [store]);
 
   const submit = async (e: FormEvent) => {
     e.preventDefault();
@@ -124,10 +150,16 @@ export function RecipeSheet({ recipe, onClose }: { recipe: Recipe | null; onClos
               </div>
             </div>
           ))}
-          <button type="button" className={styles.addRow} onClick={() => setRows((rs) => [...rs, emptyRow()])}>
-            <Icon name="plus" />
-            {t('nutrition.book.addIngredient')}
-          </button>
+          <div className={styles.addRows}>
+            <button type="button" className={styles.addRow} onClick={() => setPicking(true)}>
+              <Icon name="list" />
+              {t('nutrition.foods.pick')}
+            </button>
+            <button type="button" className={styles.addRow} onClick={() => setRows((rs) => [...rs, emptyRow()])}>
+              <Icon name="plus" />
+              {t('nutrition.book.addIngredient')}
+            </button>
+          </div>
         </fieldset>
 
         {preview?.ok && (
@@ -145,6 +177,38 @@ export function RecipeSheet({ recipe, onClose }: { recipe: Recipe | null; onClos
           </p>
         )}
       </form>
+      {picking && (
+        <FoodPicker
+          foods={foods ?? []}
+          onClose={() => setPicking(false)}
+          onPick={(f) => {
+            setPicking(false);
+            setRows((rs) => [...rs.filter((r) => r.name.trim() !== ''), fromTable(f.name, f.per100g, 100)]);
+          }}
+        />
+      )}
+    </Sheet>
+  );
+}
+
+function FoodPicker({ foods, onClose, onPick }: { foods: IngredientEntry[]; onClose: () => void; onPick: (f: IngredientEntry) => void }) {
+  const [query, setQuery] = useState('');
+  const shown = searchItems([...foods].sort((a, b) => a.name.localeCompare(b.name, 'ar')), query, (f) => [f.name]).slice(0, 80);
+  return (
+    <Sheet open onClose={onClose} title={t('nutrition.foods.pickTitle')} cancelLabel={t('common.cancel')}>
+      <SearchField value={query} onChange={setQuery} label={t('nutrition.foods.search')} placeholder={t('nutrition.foods.search')} clearLabel={t('common.clearSearch')} />
+      <ul className={styles.foodList}>
+        {shown.map((f) => (
+          <li key={f.id}>
+            <button type="button" className={styles.foodRow} onClick={() => onPick(f)}>
+              <span>{f.name}</span>
+              <small>
+                <Num>{Math.round(f.per100g.kcal)}</Num> {t('nutrition.units.kcal')} / 100 {t('nutrition.units.g')}
+              </small>
+            </button>
+          </li>
+        ))}
+      </ul>
     </Sheet>
   );
 }

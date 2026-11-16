@@ -9,6 +9,7 @@ export function NutritionHubScreen() {
       <PageHeader title={t('nutrition.hub.title')} back={{ to: '/more', label: t('screens.more.title') }} />
       <ListSection>
         <ListRow leading={<Icon name="utensils" />} title={t('nutrition.hub.recipesTitle')} subtitle={t('nutrition.hub.recipesHint')} to="/more/recipes" />
+        <ListRow leading={<Icon name="list" />} title={t('nutrition.foods.title')} subtitle={t('nutrition.foods.hint')} to="/more/foods" />
       </ListSection>
       <ClientChooser path="nutrition" title={t('nutrition.hub.pickClient')} emptyBody={t('nutrition.hub.noClients')} />
     </>

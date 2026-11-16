@@ -14,6 +14,8 @@ import {
 import { t } from '@/i18n';
 import { Button, EmptyState, Icon, ListRow, ListSection, PageHeader, cx } from '@/ui';
 import { intensitiesFromLoad, MuscleMap } from '@/ui/MuscleMap';
+import { alternativesFor } from '@/domain/exercises';
+import { ExerciseThumb } from './ExerciseThumb';
 import { StarIcon } from './icons';
 import { PhotoCarousel } from './PhotoCarousel';
 import { RenameSheet } from './RenameSheet';
@@ -57,6 +59,7 @@ function ExerciseDetail({ exercise, catalog }: { exercise: CatalogExercise; cata
   const hidden = changes.hidden.has(exercise.id);
   const hasOwnPhotos = !exercise.isCustom && exercise.images.some((i) => i.kind === 'stored');
   const toggleFavourite = useFavouriteToggle(catalog);
+  const alternatives = useMemo(() => alternativesFor(exercise, catalog.visible, { limit: 6 }), [exercise, catalog.visible]);
   const intensities = useMemo(() => intensitiesFromLoad(muscleLoadForExercise(exercise)), [exercise]);
 
   const replacePhotos = async (files: FileList | null) => {
@@ -163,6 +166,20 @@ function ExerciseDetail({ exercise, catalog }: { exercise: CatalogExercise; cata
           </dl>
         </div>
       </ListSection>
+
+      {alternatives.length > 0 && (
+        <ListSection title={t('training.library.detail.alternatives')} footer={t('training.library.detail.alternativesHint')}>
+          {alternatives.map((alt) => (
+            <ListRow
+              key={alt.id}
+              leading={<ExerciseThumb exercise={alt} />}
+              title={alt.nameAr}
+              subtitle={EQUIPMENT_LABELS_AR[alt.equipment]}
+              to={`/exercises/${encodeURIComponent(alt.id)}`}
+            />
+          ))}
+        </ListSection>
+      )}
 
       <ListSection title={t('training.library.detail.actions')}>
         <ListRow leading={<Icon name="edit" />} title={t('training.library.detail.rename')} onClick={() => setRenaming(true)} />

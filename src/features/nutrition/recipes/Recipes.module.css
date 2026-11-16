@@ -74,3 +74,35 @@
   color: var(--text);
   font: var(--t-callout);
 }
+
+.addRows {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--sp-4);
+}
+
+.foodList {
+  margin: var(--sp-3) 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.foodRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--sp-3);
+  inline-size: 100%;
+  min-block-size: var(--row-h);
+  border: 0;
+  border-block-end: var(--hairline) solid var(--line);
+  background: none;
+  color: var(--text);
+  font: var(--t-body);
+  text-align: start;
+}
+
+.foodRow small {
+  color: var(--text-2);
+  font: var(--t-caption);
+}

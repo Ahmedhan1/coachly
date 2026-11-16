@@ -6,7 +6,7 @@ import styles from './Progress.module.css';
 const BOX = { width: 340, height: 180, padTop: 12, padBottom: 26, padStart: 36, padEnd: 10, rtl: true } as const;
 
 /** Weight over time as a single line (RTL: oldest on the right). Pure layout comes from domain/charts. */
-export function WeightChart({ series }: { series: readonly DatedValue[] }) {
+export function WeightChart({ series, label }: { series: readonly DatedValue[]; label?: string }) {
   const chart = layoutLineChart(series, BOX);
   const first = chart.points[0];
   const last = chart.points[chart.points.length - 1];
@@ -16,7 +16,7 @@ export function WeightChart({ series }: { series: readonly DatedValue[] }) {
       className={styles.chart}
       viewBox={`0 0 ${BOX.width} ${BOX.height}`}
       role="img"
-      aria-label={t('nutrition.progress.chartLabel', { from: formatIsoDate(first.date), to: formatIsoDate(last.date) })}
+      aria-label={label ?? t('nutrition.progress.chartLabel', { from: formatIsoDate(first.date), to: formatIsoDate(last.date) })}
     >
       {chart.yTicks.map((tick) => (
         <g key={tick.value}>

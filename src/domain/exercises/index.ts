@@ -6,3 +6,4 @@ export * from './search';
 export * from './filter';
 export * from './favourites';
 export * from './muscleLoad';
+export * from './alternatives';

@@ -280,3 +280,24 @@
   margin: 0;
   font: var(--t-num);
 }
+
+.altList {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.altRow {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-3);
+  inline-size: 100%;
+  min-block-size: var(--row-h);
+  padding-block: var(--sp-2);
+  border: 0;
+  border-block-end: var(--hairline) solid var(--line);
+  background: none;
+  color: var(--text);
+  font: var(--t-body);
+  text-align: start;
+}

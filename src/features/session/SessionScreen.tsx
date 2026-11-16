@@ -19,6 +19,7 @@ import {
   reopenSet,
   restRemaining,
   skipExercise,
+  swapExercise,
   summarizeSession,
   toWorkoutLogInput,
   unitToKg,
@@ -26,6 +27,7 @@ import {
   type SessionState,
 } from '@/domain/programs';
 import { lastTime, type LoggedSet } from '@/domain/strength';
+import { alternativesFor } from '@/domain/exercises';
 import { t } from '@/i18n';
 import { Button, EmptyState, Icon, IconButton, Num, PageHeader, Sheet, Tx, cx } from '@/ui';
 import { useExerciseCatalog } from '@/features/programs/catalog';
@@ -110,6 +112,7 @@ function SessionRunner({ client, program, history, logs, unit, saved, routeKey, 
   const [phase, setPhase] = useState<'run' | 'summary' | 'saved'>('run');
   const [saving, setSaving] = useState(false);
   const announcedResume = useRef(false);
+  const [swapping, setSwapping] = useState<number | null>(null);
 
   const [state, setState] = useState<SessionState | null>(() => {
     if (saved && saved.clientId === client.id && (routeKey === 'new' || saved.key === routeKey)) return saved;
@@ -359,6 +362,11 @@ function SessionRunner({ client, program, history, logs, unit, saved, routeKey, 
                       {t('training.session.skip')}
                     </Button>
                   )}
+                  {!finished && catalog && (
+                    <Button size="small" variant="plain" onClick={() => setSwapping(i)}>
+                      {t('training.session.swap')}
+                    </Button>
+                  )}
                 </span>
               </li>
             );
@@ -385,6 +393,32 @@ function SessionRunner({ client, program, history, logs, unit, saved, routeKey, 
             {t('training.session.skipRest')}
           </Button>
         </div>
+      )}
+
+      {swapping !== null && catalog && state.exercises[swapping] && (
+        <Sheet open onClose={() => setSwapping(null)} title={t('training.programs.picker.swapTitle')} cancelLabel={t('common.cancel')}>
+          <ul className={styles.altList}>
+            {(() => {
+              const cur = byId.get(state.exercises[swapping]?.exerciseId ?? '');
+              return cur ? alternativesFor(cur, catalog.list, { limit: 8 }) : [];
+            })().map((alt) => (
+              <li key={alt.id}>
+                <button
+                  type="button"
+                  className={styles.altRow}
+                  onClick={() => {
+                    const index = swapping;
+                    setSwapping(null);
+                    update((s) => swapExercise(s, index, alt.id, history, Date.now()));
+                  }}
+                >
+                  <ExerciseThumb exercise={alt} size="sm" />
+                  <span>{alt.nameAr}</span>
+                </button>
+              </li>
+            ))}
+          </ul>
+        </Sheet>
       )}
 
       {phase === 'summary' && (

@@ -2,11 +2,11 @@ import { useMemo, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { useRepos } from '@/app/services';
 import { useLive } from '@/app/useLive';
-import type { ProgressEntry } from '@/domain/models';
+import type { ProgressEntry, WorkoutLog } from '@/domain/models';
 import { workoutLogsToSets } from '@/domain/programs';
 import { estimateOneRepMax, personalRecordTimeline } from '@/domain/strength';
 import { t } from '@/i18n';
-import { Badge, Button, EmptyState, IconButton, ListRow, ListSection, PageHeader, Tx } from '@/ui';
+import { Badge, Button, EmptyState, IconButton, ListRow, ListSection, PageHeader, Sheet, Tx } from '@/ui';
 import { formatIsoDate, formatNumber } from '@/ui/format';
 import { useExerciseCatalog } from '@/features/programs/catalog';
 import { exerciseName } from '@/features/programs/names';
@@ -17,6 +17,22 @@ import { EntrySheet } from './EntrySheet';
 import { WeightChart } from './WeightChart';
 import common from '../shared/common.module.css';
 import styles from './Progress.module.css';
+
+/** Best estimated 1RM per workout date for one exercise (for the history chart). */
+function exerciseHistory(logs: readonly WorkoutLog[], exerciseId: string): { date: string; value: number }[] {
+  const best = new Map<string, number>();
+  for (const log of logs) {
+    for (const e of log.exercises) {
+      if (e.exerciseId !== exerciseId) continue;
+      for (const set of e.sets) {
+        if (!set.done || set.weightKg <= 0) continue;
+        const v = Math.round(estimateOneRepMax(set.weightKg, set.reps) * 10) / 10;
+        best.set(log.date, Math.max(best.get(log.date) ?? 0, v));
+      }
+    }
+  }
+  return [...best].map(([date, value]) => ({ date, value })).sort((a, b) => a.date.localeCompare(b.date));
+}
 
 function summary(e: ProgressEntry): string {
   const m = e.measurements;
@@ -38,6 +54,7 @@ export function ClientProgressScreen() {
   const logs = useLive(() => repos.workoutLogs.listByClient(clientId), [repos, clientId]);
   const catalog = useExerciseCatalog();
   const [editing, setEditing] = useState<ProgressEntry | 'new' | null>(null);
+  const [historyOf, setHistoryOf] = useState<string | null>(null);
 
   const sorted = useMemo(() => [...(entries ?? [])].sort((a, b) => a.date.localeCompare(b.date)), [entries]);
   const records = useMemo(() => {
@@ -141,6 +158,7 @@ export function ClientProgressScreen() {
           records.map((s) => (
             <ListRow
               key={s.exerciseId}
+              onClick={() => setHistoryOf(s.exerciseId)}
               title={exerciseName(catalog?.byId.get(s.exerciseId), s.exerciseId)}
               subtitle={
                 <Tx
@@ -153,6 +171,21 @@ export function ClientProgressScreen() {
         )}
       </ListSection>
 
+      {historyOf && (
+        <Sheet open onClose={() => setHistoryOf(null)} title={exerciseName(catalog?.byId.get(historyOf), historyOf)} cancelLabel={t('common.close')}>
+          {(() => {
+            const series = exerciseHistory(logs ?? [], historyOf);
+            return series.length > 1 ? (
+              <>
+                <p className={common.caption}>{t('nutrition.progress.historyHint')}</p>
+                <WeightChart series={series} label={t('nutrition.progress.historyHint')} />
+              </>
+            ) : (
+              <p className={common.muted}>{t('nutrition.progress.historyNeedTwo')}</p>
+            );
+          })()}
+        </Sheet>
+      )}
       {editing && <EntrySheet clientId={clientId} entry={editing === 'new' ? null : editing} onClose={() => setEditing(null)} />}
     </div>
   );

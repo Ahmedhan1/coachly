@@ -184,7 +184,7 @@ export const settings = {
   aboutPage: {
     title: 'عن التطبيق',
     version: 'الإصدار {v}',
-    model: 'مجسم العضلات مبني على Z-Anatomy (CC BY-SA 4.0). ملف المجسم المعدّل منشور بنفس الرخصة.',
+    model: 'مجسم العضلات: Z-Anatomy - The libre 3D atlas of anatomy (CC BY-SA 4.0)، مبني على BodyParts3D - The Database Center for Life Science (CC BY-SA 2.1 Japan). اتعدّل (تجميع العضلات وتخفيف المثلثات وتصدير GLB) والملف المعدّل متاح بنفس الرخصة على /models/muscles.glb.',
     exercises: 'بيانات التمارين من free-exercise-db (Unlicense).',
     fonts: 'الخطوط: Readex Pro و Alexandria (SIL Open Font License).',
     licenses: 'كل المكتبات مفتوحة المصدر ورخصها في ملف LICENSES.md مع التطبيق.',

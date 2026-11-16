@@ -93,3 +93,28 @@
 .about p + p {
   margin-block-start: var(--sp-2);
 }
+
+.views {
+  position: absolute;
+  inset-block-end: var(--sp-3);
+  inset-inline: 0;
+  display: flex;
+  justify-content: center;
+  gap: var(--sp-2);
+}
+
+.viewBtn {
+  min-block-size: 36px;
+  padding-inline: var(--sp-4);
+  border: 1px solid rgb(255 255 255 / 0.25);
+  border-radius: var(--r-full);
+  background: rgb(0 0 0 / 0.45);
+  color: #fff;
+  font: var(--t-label);
+}
+
+.viewBtn[aria-pressed='true'] {
+  border-color: var(--brand);
+  background: var(--brand);
+  color: var(--brand-on);
+}

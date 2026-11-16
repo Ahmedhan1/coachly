@@ -43,6 +43,8 @@ export const training = {
       apply: 'اعرض {n} تمرين',
     },
     detail: {
+        alternatives: 'تمارين بديلة',
+        alternativesHint: 'نفس العضلة الأساسية، الأقرب في الحركة والأداة الأول.',
       back: 'رجوع للتمارين',
       notFoundTitle: 'التمرين ده مش موجود',
       notFoundBody: 'يمكن اتمسح. ارجع للمكتبة واختار تمرين تاني.',
@@ -126,6 +128,8 @@ export const training = {
     },
   },
   muscles3d: {
+    viewsLabel: 'زاوية العرض',
+    views: { front: 'قدّام', side: 'جنب', back: 'ورا' },
     canvasLabel: 'مجسم العضلات 3D. اسحب عشان تلفّه، وقرّب بصباعين.',
     loading: 'بنجهّز المجسم…',
     hint: 'اسحب تلفّ، وصباعين تقرّب. اضغط على عضلة تختارها.',
