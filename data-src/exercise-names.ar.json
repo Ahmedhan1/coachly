@@ -1711,7 +1711,7 @@
   {
     "id": "Butt_Lift_Bridge",
     "en": "Butt Lift (Bridge)",
-    "ar": "جلوتس ليفت (بريدج)",
+    "ar": "بات ليفت (بريدج)",
     "primaryMuscles": [
       "جلوتس"
     ],
@@ -3412,7 +3412,7 @@
   {
     "id": "Double_Leg_Butt_Kick",
     "en": "Double Leg Butt Kick",
-    "ar": "دابل ليج جلوتس كيك",
+    "ar": "دابل ليج بات كيك",
     "primaryMuscles": [
       "كوادز"
     ],
@@ -10559,7 +10559,7 @@
   {
     "id": "Single_Leg_Butt_Kick",
     "en": "Single Leg Butt Kick",
-    "ar": "سينجل ليج جلوتس كيك",
+    "ar": "سينجل ليج بات كيك",
     "primaryMuscles": [
       "كوادز"
     ],

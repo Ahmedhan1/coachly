@@ -50,7 +50,7 @@ client-page key. A full dump of D1 + R2 gives an attacker ciphertext only.
 - **Argon2 / scrypt are not in Web Crypto in any browser.** MDN's `deriveKey` lists only PBKDF2, HKDF, ECDH and
   X25519 (<https://developer.mozilla.org/en-US/docs/Web/API/SubtleCrypto/deriveKey>). Argon2 would need a WASM
   library (memory-hungry; risky on old iPhones under memory pressure) → **not used**.
-- **Ed25519** in Web Crypto: Safari/iOS **17.0+** only (caniuse, <https://caniuse.com/mdn-api_subtlecrypto_generatekey_ed25519>);
+- **Ed25519** in Web Crypto: Safari/iOS **17.0+** only (caniuse data as reported in search results on 2026-11-16, <https://caniuse.com/mdn-api_subtlecrypto_generatekey_ed25519>; page not opened directly);
   X25519 enabled in WebKit in 2024. Since we support 16.4, the app verifies licenses with **@noble/ed25519**
   (pure JS, MIT) — no dependency on Web Crypto Ed25519.
 
