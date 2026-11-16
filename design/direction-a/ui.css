@@ -110,6 +110,8 @@ a { text-decoration: none; }
 .actionbar .btn { flex: 1; }
 .actionbar .btn.secondary { flex: 0 0 auto; }
 @media (max-height: 700px) { .actionbar { padding-bottom: var(--sp-2); } }
+.actionbar .btn { white-space: nowrap; }
+@media (max-width: 400px) { .actionbar .btn.secondary .lbl { display: none; } .actionbar .btn.secondary { width: 50px; padding: 0; } } /* SE: secondaries become icon-only, labels stay in aria-label */
 
 /* ---------- Key/value ledger ---------- */
 .kv { display: grid; grid-template-columns: 1fr 1fr; background: var(--surface); border-block: var(--hairline) solid var(--line-strong); }

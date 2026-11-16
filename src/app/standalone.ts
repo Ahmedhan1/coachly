@@ -33,7 +33,7 @@ export function canSkipInstallGate(env: StandaloneEnv, bypassAllowed: boolean): 
 export const bypassAllowedInThisBuild = import.meta.env.DEV || import.meta.env.VITE_E2E === '1';
 
 export function browserStandaloneEnv(): StandaloneEnv {
-  let session: Storage | null = null;
+  let session: Storage | null;
   try {
     session = window.sessionStorage;
   } catch {

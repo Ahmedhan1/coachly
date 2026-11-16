@@ -22,7 +22,6 @@
   .day { display: grid; grid-template-columns: auto 1fr; gap: var(--sp-4); padding: var(--sp-4); align-items: center; }
   .day .maps { display: flex; gap: 4px; }
   .day .maps svg { width: 40px; height: 92px; }
-  @media (max-height: 700px) { .day { padding: var(--sp-3) var(--sp-4); } .day .maps svg { width: 32px; height: 74px; } .day .chips { display: none; } .day .three { margin-top: var(--sp-1); } .toast { display: none; } }
   .day h2 { font: var(--t-title); }
   .day p { font: var(--t-sub); color: var(--text-2); margin-top: 2px; }
   .day .chips { display: flex; flex-wrap: wrap; gap: 6px; margin-top: var(--sp-3); }
@@ -50,6 +49,7 @@
   .ss::before { content: ""; position: absolute; top: 56px; bottom: 56px; inset-inline-start: 5px; width: 3px; border-radius: 2px; background: var(--brand); z-index: 1; }
   .toast { bottom: calc(var(--safe-bottom) + 84px); }
   @media (max-height: 700px) { .toast { bottom: 88px; } }
+@media (max-height: 700px) { .day { padding: var(--sp-3) var(--sp-4); } .day .maps svg { width: 32px; height: 74px; } .day .chips { display: none; } .day .three { margin-top: var(--sp-1); } .toast { display: none; } }
 </style>
 </head>
 <body>

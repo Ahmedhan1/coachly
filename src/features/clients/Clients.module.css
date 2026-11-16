@@ -1,0 +1,62 @@
+.body {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+  padding-inline: var(--gutter);
+}
+
+.sections {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-6);
+  padding-inline: var(--gutter);
+}
+
+.facts {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1px;
+  background: var(--separator);
+}
+
+.fact {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: var(--space-3) var(--gutter);
+  background: var(--surface);
+}
+
+.factLabel {
+  font-size: var(--text-xs);
+  color: var(--text-secondary);
+}
+
+.factValue {
+  font-size: var(--text-md);
+  font-weight: var(--weight-semibold);
+}
+
+.text {
+  padding: var(--space-3) var(--gutter);
+  background: var(--surface);
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+
+.muted {
+  color: var(--text-tertiary);
+}
+
+.phone {
+  direction: ltr;
+  unicode-bidi: isolate;
+}
+
+.danger {
+  align-self: center;
+}
+
+.link {
+  display: block;
+}

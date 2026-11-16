@@ -1,0 +1,20 @@
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-5);
+}
+
+.save {
+  min-block-size: var(--touch);
+  padding-inline: var(--space-3);
+  border: 0;
+  background: transparent;
+  color: var(--brand);
+  font-size: var(--text-md);
+  font-weight: var(--weight-semibold);
+  cursor: pointer;
+}
+
+.save:disabled {
+  opacity: 0.45;
+}

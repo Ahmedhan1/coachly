@@ -1,0 +1,46 @@
+.body {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-6);
+  padding-inline: var(--gutter);
+}
+
+.actions {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--space-3);
+}
+
+.demo {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  padding: var(--space-4);
+  border-radius: var(--radius-md);
+  background: var(--surface);
+  border-inline-start: 3px solid var(--brand);
+}
+
+.demoTitle {
+  font-size: var(--text-md);
+  font-weight: var(--weight-semibold);
+}
+
+.demoBody {
+  font-size: var(--text-sm);
+  color: var(--text-secondary);
+}
+
+.demoButton {
+  align-self: flex-start;
+  margin-inline-start: calc(var(--space-3) * -1);
+  margin-block-end: calc(var(--space-2) * -1);
+}
+
+.time {
+  min-inline-size: 64px;
+  font-size: var(--text-sm);
+  font-weight: var(--weight-semibold);
+  color: var(--brand);
+  text-align: start;
+}

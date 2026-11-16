@@ -1,0 +1,10 @@
+.body {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-6);
+  padding-inline: var(--gutter);
+}
+
+.demo {
+  align-self: center;
+}
