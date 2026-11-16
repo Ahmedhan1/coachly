@@ -109,6 +109,7 @@ describe('buildExercisePack', () => {
       imagesById: new Map([['Barbell_Full_Squat', ['Barbell_Full_Squat-0.webp', 'Barbell_Full_Squat-1.webp']]]),
       image: { format: 'webp', maxSize: 480, quality: 60 },
       source: 'yuhonas/free-exercise-db',
+      imageBytes: 1234,
     });
     expect(pack.version).toBe(1);
     expect(pack.count).toBe(2);
@@ -117,5 +118,6 @@ describe('buildExercisePack', () => {
     expect(pack.exercises[0]?.images).toEqual([]);
     expect(pack.exercises[1]?.images).toHaveLength(2);
     expect(pack.image).toEqual({ format: 'webp', maxSize: 480, quality: 60, base: 'img/' });
+    expect(pack.imageBytes).toBe(1234);
   });
 });

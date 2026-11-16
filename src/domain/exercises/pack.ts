@@ -147,6 +147,8 @@ export interface ExercisePack {
   count: number;
   /** `base` is relative to the folder holding exercises.json. */
   image: PackImageSettings & { base: string };
+  /** Total bytes of all image files, so the app can show the size of "download all for offline". */
+  imageBytes: number;
   exercises: PackExercise[];
 }
 
@@ -229,6 +231,7 @@ export interface BuildExercisePackInput {
   imagesById: ReadonlyMap<string, readonly string[]>;
   image: PackImageSettings;
   source: string;
+  imageBytes?: number;
 }
 
 export function buildExercisePack(input: BuildExercisePackInput): ExercisePack {
@@ -240,6 +243,7 @@ export function buildExercisePack(input: BuildExercisePackInput): ExercisePack {
     source: input.source,
     count: exercises.length,
     image: { ...input.image, base: 'img/' },
+    imageBytes: input.imageBytes ?? 0,
     exercises,
   };
 }

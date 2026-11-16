@@ -22,6 +22,7 @@ const pack: ExercisePack = {
   source: 'test',
   count: 2,
   image: { format: 'webp', maxSize: 480, quality: 60, base: 'img/' },
+  imageBytes: 0,
   exercises: [entry('Hip_Thrust'), entry('Plank', { images: [], primary: ['abs'], secondary: [] })],
 };
 
