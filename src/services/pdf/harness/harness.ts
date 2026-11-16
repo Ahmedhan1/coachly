@@ -38,8 +38,8 @@ async function fixtureImages(): Promise<Map<string, Blob>> {
       c.font = 'bold 380px sans-serif';
       c.fillText('S', 330, 590);
       c.fillStyle = '#8A1C7C';
-      c.font = 'bold 260px sans-serif';
-      c.fillText('COACH', 900, 560);
+      c.font = 'bold 200px sans-serif';
+      c.fillText('COACH', 900, 540, 860);
     }, 'image/png'),
   );
   const photo = (hue: number) => (c: CanvasRenderingContext2D) => {

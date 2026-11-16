@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest';
 import { pdfExerciseFromCatalog, progressSummary } from './blocks';
 import { clampLogoPx, layoutPdfDocument } from './document';
 import { PDF_TEST_CASES, pdfTestCase, syntheticExercises } from './fixtures';
-import { ageOn, formatDate, formatNumber, resolveDisclaimer } from './format';
+import { ageOn, formatDate, formatNumber, resolveDisclaimer, signedLtr } from './format';
 import {
   chunkText,
   CONTENT_HEIGHT_PX,
@@ -56,6 +56,8 @@ describe('text helpers', () => {
     expect(formatDate('2026-11-16')).toBe('16/11/2026');
     expect(ageOn('1995-03-04', '2026-11-16')).toBe(31);
     expect(ageOn('1995-12-04', '2026-11-16')).toBe(30);
+    expect(signedLtr(-3.5, 1)).toBe('\u2066-3.5\u2069');
+    expect(signedLtr(20, 0, '%')).toBe('\u2066+20%\u2069');
     expect(resolveDisclaimer('  ', 'افتراضي')).toBe('افتراضي');
     expect(resolveDisclaimer('نصي', 'افتراضي')).toBe('نصي');
   });

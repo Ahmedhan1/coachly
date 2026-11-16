@@ -241,7 +241,6 @@ export class BackupScheduler {
 
     const seal = this.deps.seal ?? ((p: string, d: Uint8Array) => sealWithPassword(p, d));
     const envelope = await seal(password, new Uint8Array(await archive.blob.arrayBuffer()));
-    archive = null;
     const uploaded = await this.deps.client.upload(token, envelope);
     if (!uploaded.ok) {
       if (uploaded.error === 'storage_full') {

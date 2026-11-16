@@ -30,3 +30,12 @@ export function resolveDisclaimer(custom: string | null | undefined, defaultText
   const t = (custom ?? '').trim();
   return t.length > 0 ? t : defaultText;
 }
+
+/**
+ * A signed number wrapped in Unicode LEFT-TO-RIGHT ISOLATE … POP DIRECTIONAL ISOLATE so the sign stays in
+ * front of the digits inside Arabic (RTL) text: "(-3.5)" instead of "(3.5-)".
+ */
+export function signedLtr(n: number, decimals = 0, suffix = ''): string {
+  const sign = n > 0 ? '+' : n < 0 ? '-' : '';
+  return `\u2066${sign}${formatNumber(Math.abs(n), decimals)}${suffix}\u2069`;
+}

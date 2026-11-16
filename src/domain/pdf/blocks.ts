@@ -2,7 +2,7 @@ import { muscleGroupLabelAr } from '../exercises/labels';
 import type { CatalogExercise } from '../exercises/types';
 import type { Measurements, PdfSection, ProgressEntry, Recipe } from '../models';
 import { chunkText } from './layout';
-import { ageOn, formatDate, formatNumber } from './format';
+import { ageOn, formatDate, formatNumber, signedLtr } from './format';
 import type { KeyValue, PdfBlock, PdfDocumentInput, PdfExercise, PdfImageRef } from './types';
 
 /** Builds the PDF view of a catalog exercise. `packBase` prefixes pack image paths (e.g. 'exercise-pack/img/'). */
@@ -88,7 +88,6 @@ function nutritionBlocks(input: PdfDocumentInput): PdfBlock[] {
   const u = input.labels.units;
   const m = n.macros;
   const [pp, pc, pf] = wholePercents([m.proteinKcal, m.carbKcal, m.fatKcal]);
-  const sign = n.adjustmentPercent > 0 ? '+' : '';
   return [
     {
       type: 'stats',
@@ -112,7 +111,7 @@ function nutritionBlocks(input: PdfDocumentInput): PdfBlock[] {
       { label: L.bmr, value: `${formatNumber(n.bmrKcal)} ${u.kcal}` },
       { label: L.activityFactor, value: `× ${formatNumber(n.activityFactor, 3)}` },
       { label: L.tdee, value: `${formatNumber(n.tdeeKcal)} ${u.kcal}` },
-      { label: L.adjustment, value: `${sign}${formatNumber(n.adjustmentPercent, 1)}${u.percent}` },
+      { label: L.adjustment, value: signedLtr(n.adjustmentPercent, 1, u.percent) },
       ...(n.waterMl !== null ? [{ label: L.water, value: `${formatNumber(n.waterMl)} ${u.ml}` }] : []),
     ]),
   ];
@@ -126,7 +125,7 @@ function programBlocks(input: PdfDocumentInput, withMuscleMaps: boolean): PdfBlo
   let index = 0;
   for (const day of p.days) {
     if (day.items.length === 0) continue;
-    out.push({ type: 'subTitle', text: day.name, meta: `${day.items.length}` });
+    out.push({ type: 'subTitle', text: day.name, meta: '' });
     for (const item of day.items) {
       index += 1;
       const ex = input.exercises.get(item.exerciseId);
@@ -245,7 +244,7 @@ function progressBlocks(input: PdfDocumentInput): PdfBlock[] {
       const unit = measurementUnit(key, input);
       rows.push({
         label: input.labels.client.measurements[key],
-        value: `${formatNumber(va, 1)} ← ${formatNumber(vb, 1)} ${unit} (${d > 0 ? '+' : ''}${formatNumber(d, 1)})`,
+        value: `${formatNumber(va, 1)} ← ${formatNumber(vb, 1)} ${unit} (${signedLtr(d, 1)})`,
       });
     }
     if (rows.length > 0) {

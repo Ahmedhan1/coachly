@@ -63,7 +63,8 @@ export function browserShareEnvironment(): ShareEnvironment {
 export function safeFileName(name: string, fallback = 'file'): string {
   const cleaned = name
     .normalize('NFC')
-    .replace(/[\\/:*?"<>|\u0000-\u001f\u007f]+/g, '-')
+    .replace(/[\\/:*?"<>|]+/g, '-')
+    .replace(/\p{Cc}+/gu, '-')
     .replace(/\s+/g, ' ')
     .trim()
     .replace(/^\.+/, '');
@@ -99,7 +100,7 @@ export class BrowserShareService implements ShareService {
       return { outcome: 'failed', reason: 'error' };
     }
     if (options.prefer !== 'download' && this.env.share && this.env.canShare) {
-      let can = false;
+      let can: boolean;
       try {
         can = this.env.canShare({ files: [file] });
       } catch {
