@@ -237,3 +237,61 @@
 .primary {
   flex: 1;
 }
+
+/* Client page sheet */
+.sheetBody {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-3);
+}
+
+.sheetLead,
+.sheetMeta {
+  color: var(--text-2);
+  font: var(--t-sub);
+}
+
+.sheetMeta {
+  color: var(--text-3);
+  font: var(--t-caption);
+}
+
+.sheetWarn {
+  padding: var(--sp-3) var(--sp-4);
+  border-radius: var(--r-md);
+  background: var(--warn-tint);
+  color: var(--warn);
+  font: var(--t-callout);
+}
+
+.sheetCheck {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--sp-3);
+  font: var(--t-body);
+}
+
+.sheetCheck input {
+  flex: none;
+  inline-size: 22px;
+  block-size: 22px;
+  margin-block-start: 2px;
+  accent-color: var(--brand);
+}
+
+.sheetCheck small {
+  display: block;
+  color: var(--text-2);
+  font: var(--t-caption);
+}
+
+.sheetLink {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-block-size: 50px;
+  border-radius: var(--r-md);
+  background: var(--ok);
+  color: #fff;
+  font: 600 16px/1 var(--font-ui);
+}

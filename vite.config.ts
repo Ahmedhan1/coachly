@@ -57,6 +57,7 @@ export default defineConfig({
         globPatterns: ['**/*.{js,css,html,png,svg,ico,woff2,json,webmanifest,glb}'],
         globIgnores: ['exercise-pack/img/**'],
         maximumFileSizeToCacheInBytes: 15 * 1024 * 1024,
+        importScripts: ['push-sw.js'],
         navigateFallback: '/index.html',
         navigateFallbackDenylist: [/^\/exercise-pack\//],
         cleanupOutdatedCaches: true,

@@ -7,6 +7,7 @@ interface ImportMetaEnv {
   readonly VITE_FAKE_ACTIVATION?: string;
   /** License Worker base URL, e.g. https://pt-coach-license.<account>.workers.dev */
   readonly VITE_WORKER_URL?: string;
+  readonly VITE_APP_VERSION?: string;
 }
 
 interface Navigator {

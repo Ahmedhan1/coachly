@@ -20,6 +20,10 @@ export const routes: RouteObject[] = [
       { path: 'more', ...screen(() => import('@/features/more/MoreScreen'), 'MoreScreen') },
       { path: 'more/pdf', ...screen(() => import('@/features/pdf/PdfBuilderScreen'), 'PdfBuilderScreen') },
       { path: 'more/settings', ...screen(() => import('@/features/settings/SettingsScreen'), 'SettingsScreen') },
+      { path: 'more/settings/backup', ...screen(() => import('@/features/settings/BackupScreen'), 'BackupScreen') },
+      { path: 'more/settings/notifications', ...screen(() => import('@/features/settings/NotificationsScreen'), 'NotificationsScreen') },
+      { path: 'more/settings/formulas', ...screen(() => import('@/features/settings/FormulasScreen'), 'FormulasScreen') },
+      { path: 'more/settings/about', ...screen(() => import('@/features/settings/AboutScreen'), 'AboutScreen') },
       {
         path: 'more/settings/identity',
         ...screen(() => import('@/features/identity/IdentityEditScreen'), 'IdentityEditScreen'),

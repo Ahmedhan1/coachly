@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import { useRepos } from '@/app/services';
+import { useRepos, useServices } from '@/app/services';
+import { clientPagesEnabled } from '@/features/online/prefs';
 import { useLive } from '@/app/useLive';
 import { subscriptionAttention, toIsoDate, type Client, type Payment, type Program, type Session } from '@/domain/models';
 import { t } from '@/i18n';
@@ -8,6 +9,7 @@ import { Badge, Button, EmptyState, Icon, IconButton, ListRow, ListSection, Mone
 import { formatIsoDate, formatNumber, timeParts } from '@/ui/format';
 import { attentionLabel, attentionTone } from './attention';
 import { telUrl, whatsappUrl } from './contact';
+import { ClientPageSheet } from './ClientPageSheet';
 import { EditClientSheet } from './EditClientSheet';
 import { PackageSheet } from './PackageSheet';
 import { PaymentSheet } from './PaymentSheet';
@@ -47,7 +49,7 @@ function nextSessionOf(sessions: Session[], now: number): Session | null {
   );
 }
 
-type SheetName = null | 'edit' | 'package' | { payment: Payment | null };
+type SheetName = null | 'edit' | 'package' | 'page' | { payment: Payment | null };
 
 interface ClientDetailProps {
   client: Client;
@@ -63,6 +65,8 @@ function ClientDetail({ client, payments, sessions, programs, currency }: Client
   const renew = useRenewPackage();
   const deletePayment = useDeletePayment();
   const [sheet, setSheet] = useState<SheetName>(null);
+  const { meta } = useServices();
+  const pagesOn = useLive(() => clientPagesEnabled(meta), [meta]) ?? false;
   const program = [...programs].sort((a, b) => b.updatedAt - a.updatedAt)[0];
   const [now] = useState(() => Date.now());
   const today = toIsoDate(new Date(now));
@@ -134,6 +138,7 @@ function ClientDetail({ client, payments, sessions, programs, currency }: Client
         <ListRow leading={<Icon name="note" />} title={t('clientDetail.meals')} to={`/clients/${client.id}/meals`} />
         <ListRow leading={<Icon name="pill" />} title={t('clientDetail.supplements')} to={`/clients/${client.id}/supplements`} />
         <ListRow leading={<Icon name="chart" />} title={t('clientDetail.progress')} to={`/clients/${client.id}/progress`} />
+        {pagesOn && <ListRow leading={<Icon name="share" />} title={t('settings.clientPage.title')} subtitle={t('settings.clientPage.hint')} onClick={() => setSheet('page')} />}
       </ListSection>
       <MeasurementsSection client={client} />
       <InjuriesSection client={client} />
@@ -170,6 +175,7 @@ function ClientDetail({ client, payments, sessions, programs, currency }: Client
         </Button>
       </nav>
 
+      {sheet === 'page' && <ClientPageSheet client={client} onClose={() => setSheet(null)} />}
       {sheet === 'edit' && <EditClientSheet client={client} onClose={() => setSheet(null)} />}
       {sheet === 'package' && <PackageSheet client={client} currency={currency} onClose={() => setSheet(null)} />}
       {sheet !== null && typeof sheet === 'object' && (

@@ -8,23 +8,50 @@ import { t } from '@/i18n';
 import type { LockReason } from '@/services/activation/types';
 import { dexieMetaStore } from '@/services/license/metaStore';
 import { BrowserStorageService, CanvasImageDownscaler } from '@/services/storage';
-import { createActivationService } from './activationFactory';
+import { createBackupServices } from '@/services/backup';
+import { ClientPageService } from '@/services/clientPage/clientPageService';
+import { BrowserNetworkStatus } from '@/services/cloud/networkStatus';
+import { WorkerApi } from '@/services/cloud/workerApi';
+import { BrowserPushService } from '@/services/push/pushService';
+import { META_KEYS } from '@/services/license/licenseActivationService';
+import { buildEnv, createActivationService } from './activationFactory';
 import { createAppRouter } from './router';
-import { IDENTITY_SETUP_KEY, ServicesProvider, useServices, type AppServices } from './services';
+import { CLOUD_PASSWORD_KEY, IDENTITY_SETUP_KEY, ServicesProvider, useServices, type AppServices } from './services';
+
+const LICENSE_TOKEN_KEY = META_KEYS.token;
+const APP_VERSION = import.meta.env.VITE_APP_VERSION ?? '0.1.0';
 import { browserStandaloneEnv, bypassAllowedInThisBuild, canSkipInstallGate } from './standalone';
 import { useBrandTheme } from './useBrandTheme';
+import { useOnlineSync } from '@/features/online/useOnlineSync';
 import { useLive } from './useLive';
 import styles from './AppShell.module.css';
 
 /** Real services for the browser. Activation: real license service in production (see activationFactory). */
 export function createBrowserServices(): AppServices {
   const db = new AppDatabase();
+  const meta = dexieMetaStore(db);
+  const images = new CanvasImageDownscaler();
+  const text = async (key: string) => {
+    const v = await meta.get(key);
+    return typeof v === 'string' && v ? v : null;
+  };
+  const tokens = { getToken: () => text(LICENSE_TOKEN_KEY) };
+  const api = new WorkerApi({ baseUrl: buildEnv.workerUrl, tokens, network: new BrowserNetworkStatus() });
   return {
+    online: { push: new BrowserPushService(api), clientPage: new ClientPageService(api) },
     data: createDataLayer(db),
     storage: new BrowserStorageService(),
     activation: createActivationService(db),
-    meta: dexieMetaStore(db),
-    images: new CanvasImageDownscaler(),
+    meta,
+    images,
+    backup: createBackupServices({
+      db,
+      appVersion: APP_VERSION,
+      tokens,
+      passwords: { getPassword: () => text(CLOUD_PASSWORD_KEY) },
+      downscaler: images,
+      workerBaseUrl: buildEnv.workerUrl,
+    }),
   };
 }
 
@@ -41,6 +68,7 @@ function Boot() {
   const [router] = useState(createAppRouter);
   const settings = useLive(() => services.data.repos.settings.get(), [services]);
   useBrandTheme(boot.phase === 'ready' ? settings?.primaryColor : undefined);
+  useOnlineSync(boot.phase === 'ready');
 
   useEffect(() => {
     let cancelled = false;
@@ -71,7 +99,9 @@ function Boot() {
   }, [services]);
 
   useEffect(() => {
-    if (boot.phase === 'ready') void services.storage.requestPersistence();
+    if (boot.phase !== 'ready') return;
+    void services.storage.requestPersistence();
+    return services.backup?.start();
   }, [boot.phase, services]);
 
   switch (boot.phase) {
