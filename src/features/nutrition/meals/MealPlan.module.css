@@ -1,0 +1,281 @@
+/* Meal plan: day pills, totals meter, meal cards and the add / swap sheets (direction B). */
+
+.days {
+  display: flex;
+  gap: var(--sp-2);
+  margin-block-start: var(--sp-4);
+  padding-inline: var(--gutter);
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+
+.dayPill,
+.addDay {
+  flex: none;
+  min-block-size: var(--tap);
+  padding-inline: var(--sp-4);
+  border: 1px solid var(--line);
+  border-radius: var(--r-full);
+  background: var(--surface);
+  color: var(--text);
+  font: var(--t-label);
+}
+
+.dayPill[aria-selected='true'] {
+  border-color: var(--text);
+  background: var(--text);
+  color: var(--bg);
+}
+
+.addDay {
+  display: grid;
+  place-items: center;
+  inline-size: var(--tap);
+  padding: 0;
+  color: var(--text-2);
+}
+
+.addDay svg {
+  inline-size: 20px;
+  block-size: 20px;
+}
+
+/* Totals */
+.totals {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-3);
+  padding: var(--sp-4);
+  border-radius: var(--r-lg);
+  background: var(--surface);
+}
+
+.totalsHead {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--sp-3);
+}
+
+.totalsKcal {
+  display: flex;
+  align-items: baseline;
+  gap: var(--sp-1);
+  font: var(--t-num-lg);
+}
+
+.totalsTarget {
+  color: var(--text-3);
+  font: var(--t-num);
+}
+
+.unit {
+  margin-inline-start: var(--sp-1);
+  color: var(--text-2);
+  font: var(--t-caption);
+}
+
+.meter {
+  overflow: hidden;
+  block-size: 6px;
+  border-radius: var(--r-full);
+  background: var(--surface-2);
+}
+
+.meter > span {
+  display: block;
+  block-size: 100%;
+  border-radius: inherit;
+  background: var(--brand);
+}
+
+.meter > span[data-over] {
+  background: var(--warn);
+}
+
+.macroTargets {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: var(--sp-3);
+  margin: 0;
+}
+
+.macroTargets dt {
+  color: var(--text-2);
+  font: var(--t-caption);
+}
+
+.macroTargets dd {
+  margin: 0;
+  font: var(--t-num);
+}
+
+.of {
+  color: var(--text-3);
+}
+
+.uncounted {
+  color: var(--text-2);
+  font: var(--t-caption);
+}
+
+/* Meals */
+.meals {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-3);
+  margin-block-start: var(--sp-4);
+  padding-inline: var(--gutter);
+}
+
+.meal {
+  padding: var(--sp-2) var(--sp-4) var(--sp-3);
+  border-radius: var(--r-lg);
+  background: var(--surface);
+}
+
+.mealHead {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-2);
+}
+
+.mealName {
+  display: flex;
+  flex: 1;
+  align-items: baseline;
+  gap: var(--sp-2);
+  min-block-size: var(--tap);
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--text);
+  text-align: start;
+}
+
+.mealName h3 {
+  margin: 0;
+  font: var(--t-headline);
+}
+
+.mealName bdi {
+  color: var(--text-2);
+  font: var(--t-caption);
+}
+
+.mealKcal {
+  color: var(--text-2);
+  font: var(--t-sub);
+}
+
+.mealEmpty {
+  padding-block: var(--sp-2);
+  color: var(--text-3);
+  font: var(--t-sub);
+}
+
+.items {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.item {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-2);
+  min-block-size: var(--row-h);
+  border-block-start: 1px solid var(--hairline);
+}
+
+.itemText {
+  flex: 1;
+  min-inline-size: 0;
+}
+
+.itemName {
+  overflow: hidden;
+  font: var(--t-body);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.itemSub {
+  color: var(--text-2);
+  font: var(--t-caption);
+}
+
+.swap,
+.addItem {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--sp-1);
+  min-block-size: var(--tap);
+  padding-inline: var(--sp-2);
+  border: 0;
+  background: none;
+  color: var(--brand-ink);
+  font: var(--t-label);
+}
+
+.swap svg,
+.addItem svg {
+  inline-size: 18px;
+  block-size: 18px;
+}
+
+.addItem {
+  padding-inline: 0;
+}
+
+.danger {
+  margin-block-start: var(--sp-6);
+  padding-inline: var(--gutter);
+}
+
+/* Sheets */
+.choices {
+  display: flex;
+  flex-direction: column;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.choice {
+  display: flex;
+  flex-direction: column;
+  inline-size: 100%;
+  min-block-size: var(--row-h);
+  justify-content: center;
+  padding-block: var(--sp-2);
+  border: 0;
+  border-block-end: 1px solid var(--hairline);
+  background: none;
+  color: var(--text);
+  text-align: start;
+}
+
+.choiceName {
+  font: var(--t-body);
+}
+
+.choiceSub {
+  color: var(--text-2);
+  font: var(--t-caption);
+}
+
+.servings {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--sp-2);
+}
+
+.freeText {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-2);
+  padding-block-start: var(--sp-3);
+  border-block-start: 1px solid var(--line);
+}

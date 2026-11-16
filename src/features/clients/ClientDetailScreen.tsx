@@ -152,7 +152,6 @@ function PackageSection({ client, next }: { client: Client; next: Session | null
         <PackageRing
           total={pkg.totalSessions}
           remaining={left}
-          booked={next !== null}
           label={t('clientDetail.ringLabel', { left, total: pkg.totalSessions })}
           caption={t('clientDetail.ringLeft')}
         />

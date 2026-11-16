@@ -159,14 +159,14 @@ function Scene({ model, intensities, selected, onSelect, resetKey = 0 }: MuscleV
 
 /** Context creation can throw inside the canvas; fall back to 2D instead of breaking the screen. */
 class CanvasBoundary extends Component<{ onError: () => void; children: ReactNode }, { failed: boolean }> {
-  state = { failed: false };
+  override state = { failed: false };
   static getDerivedStateFromError() {
     return { failed: true };
   }
-  componentDidCatch() {
+  override componentDidCatch() {
     this.props.onError();
   }
-  render() {
+  override render() {
     return this.state.failed ? null : this.props.children;
   }
 }

@@ -97,12 +97,12 @@ export function SwapSheet({ recipes, meal, index, lookup, onClose, onSwap }: Swa
       <p className={common.muted}>{t('nutrition.plan.swapHint', { kcal: kcalText(current?.kcal ?? 0) })}</p>
       <ul className={styles.choices}>
         {candidates.map((c) => {
-          const r = byId.get(c.recipeId);
+          const r = byId.get(c.recipeId as RecipeId);
           return r ? (
             <RecipeChoice
               key={c.recipeId}
               r={r}
-              onPick={() => onSwap((meals) => replaceItem(meals, meal.id, index, { ...item, recipeId: c.recipeId as RecipeId, text: '' }))}
+              onPick={() => onSwap((meals) => replaceItem<Meal['items'][number], Meal>(meals, meal.id, index, { ...item, recipeId: c.recipeId as RecipeId, text: '' }))}
             />
           ) : null;
         })}

@@ -7,7 +7,7 @@ import {
   type ExerciseOverride,
   type MuscleGroupId,
 } from '@/domain/exercises';
-import type { Exercise } from '@/domain/models';
+import type { Exercise, ImageId } from '@/domain/models';
 import type { Repositories } from './repositories';
 
 /** Minimal key/value store (the app's MetaStore over the Dexie `meta` table fits structurally). */
@@ -90,7 +90,7 @@ export class ExerciseLibraryStore {
       equipment: input.equipment,
       level: input.level,
       instructions: '',
-      imageIds: [...input.imageIds],
+      imageIds: [...input.imageIds] as ImageId[],
       favorite: false,
     });
     return row.id;
@@ -114,7 +114,7 @@ export class ExerciseLibraryStore {
 
   /** Empty list restores the pack photos (built-in) or removes the photos (custom). */
   async setPhotos(catalogId: string, builtin: BuiltinRef | null, imageIds: readonly string[]): Promise<void> {
-    await this.patch(catalogId, builtin, { imageIds: [...imageIds] });
+    await this.patch(catalogId, builtin, { imageIds: [...imageIds] as ImageId[] });
   }
 
   async setHidden(catalogId: string, hidden: boolean): Promise<void> {
