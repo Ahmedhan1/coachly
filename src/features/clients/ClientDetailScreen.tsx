@@ -12,8 +12,6 @@ import type { BuiltinKind } from '@/domain/whatsapp';
 import { t } from '@/i18n';
 import { Badge, Button, EmptyState, Icon, IconButton, PageHeader } from '@/ui';
 import { WhatsappPickerSheet } from '@/features/whatsapp/WhatsappPickerSheet';
-import { useExerciseCatalog } from '@/features/programs/catalog';
-import { exerciseName } from '@/features/programs/names';
 import { useAssignProgram } from '@/features/programs/useAssignProgram';
 import { attentionLabel, attentionTone } from './attention';
 import { telUrl } from './contact';
@@ -38,7 +36,7 @@ import { useHubData, type HubData } from './hub/useHubData';
 import styles from './ClientDetail.module.css';
 import hubStyles from './hub/Hub.module.css';
 
-/** The AI sheet pulls in the Anthropic SDK (~300 kB); load it only when the trainer opens it. */
+/** The AI draft sheet is loaded only when the trainer opens it. */
 const AiDraftSheet = lazy(() => import('./AiDraftSheet').then((m) => ({ default: m.AiDraftSheet })));
 
 const BACK = { to: '/clients', label: t('clientDetail.back') };
@@ -73,7 +71,6 @@ function ClientHub({ client }: { client: Client }) {
   const renew = useRenewPackage();
   const deletePayment = useDeletePayment();
   const assign = useAssignProgram();
-  const catalog = useExerciseCatalog();
   const [params, setParams] = useSearchParams();
   const [sheet, setSheet] = useState<SheetName>(() => (params.get('pay') === '1' ? { payment: null } : null));
   const { meta } = useServices();
@@ -175,7 +172,6 @@ function ClientHub({ client }: { client: Client }) {
           tab={tab}
           client={client}
           hub={hub}
-          catalog={catalog}
           go={go}
           startUrl={startUrl}
           scheduleId={todays?.id ?? null}
@@ -231,7 +227,6 @@ function ClientHub({ client }: { client: Client }) {
       {sheet !== null && typeof sheet === 'object' && 'exercise' in sheet && (
         <ExerciseHistorySheet
           exerciseId={sheet.exercise}
-          name={exerciseName(catalog?.byId.get(sheet.exercise), sheet.exercise)}
           logs={hub.logs}
           unit={hub.unit}
           onClose={() => setSheet(null)}
@@ -261,7 +256,6 @@ interface TabPanelProps {
   tab: ReturnType<typeof useHubTab>[0];
   client: Client;
   hub: HubData;
-  catalog: ReturnType<typeof useExerciseCatalog>;
   go: (to: string) => void;
   startUrl: string;
   scheduleId: string | null;
@@ -299,7 +293,6 @@ function TabPanel(p: TabPanelProps) {
         <TrainingTab
           client={client}
           hub={hub}
-          catalog={p.catalog}
           scheduleId={p.scheduleId}
           go={go}
           onChooseProgram={() => p.onSheet('program')}

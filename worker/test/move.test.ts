@@ -4,7 +4,7 @@
 import { env } from 'cloudflare:workers';
 import { describe, expect, it } from 'vitest';
 import { base64UrlEncode, decodeLicenseToken } from '../../shared/license';
-import { envelopeBytes, extractCode, freshIp, harness, readJson, storedBytes, type Harness } from './helpers';
+import { envelopeBytes, extractCode, followIssued, freshIp, harness, readJson, storedBytes, type Harness } from './helpers';
 
 const OLD_DEVICE_ONLY: Array<[string, string]> = [
   ['GET', '/api/backup'],
@@ -32,9 +32,11 @@ async function download(h: Harness, token: string, which = 'latest'): Promise<Ui
 
 /** Moves the license behind `token` to a new device through the dashboard and activates the new code there. */
 async function move(h: Harness, token: string): Promise<string> {
-  const res = await h.form('/admin/licenses/move', await h.login(), { lid: lidOf(token), confirmed: 'yes', window: '14' });
-  expect(res.status).toBe(200);
-  const activation = await h.activate(extractCode(await res.text()), crypto.randomUUID(), freshIp());
+  const cookie = await h.login();
+  const res = await h.form('/admin/licenses/move', cookie, { lid: lidOf(token), confirmed: 'yes', window: '14' });
+  const page = await followIssued(h.send, res, cookie);
+  expect(page.status).toBe(200);
+  const activation = await h.activate(extractCode(await page.text()), crypto.randomUUID(), freshIp());
   const body = (await activation.json()) as { license?: string };
   if (typeof body.license !== 'string') throw new Error(`activation failed: ${activation.status}`);
   return body.license;

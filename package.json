@@ -14,7 +14,6 @@
     "check": "npm run typecheck && npm run lint && npm run test && npm run check:words"
   },
   "dependencies": {
-    "@anthropic-ai/sdk": "1.9.0",
     "@dnd-kit/core": "6.3.1",
     "@dnd-kit/sortable": "10.0.0",
     "@noble/ed25519": "3.2.0",
