@@ -28,7 +28,7 @@ function toB64url(text: string): string {
 function fromB64url(value: string): string | null {
   try {
     const binary = atob(value.replace(/-/g, '+').replace(/_/g, '/'));
-    return new TextDecoder('utf-8', { fatal: true }).decode(Uint8Array.from(binary, (c) => c.charCodeAt(0)));
+    return new TextDecoder('utf-8', { fatal: true, ignoreBOM: false }).decode(Uint8Array.from(binary, (c) => c.charCodeAt(0)));
   } catch {
     return null;
   }

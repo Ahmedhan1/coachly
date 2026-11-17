@@ -8,7 +8,7 @@ const VERSION = import.meta.env.VITE_APP_VERSION ?? '0.1.0';
 export function AboutScreen() {
   return (
     <>
-      <PageHeader title={t('settings.aboutPage.title')} back={{ to: '/more/settings', label: t('screens.settings.title') }} subtitle={t('settings.aboutPage.version', { v: VERSION })} />
+      <PageHeader title={t('settings.aboutPage.title')} back={{ to: '/more/settings', label: t('screens.settings.title') }} subtitle={`${t('settings.aboutPage.version', { v: VERSION })} · ${t('settings.aboutPage.build', { b: import.meta.env.VITE_BUILD_ID ?? 'dev' })}`} />
       <section className={styles.card}>
         {(['model', 'exercises', 'fonts', 'licenses', 'disclaimer'] as const).map((k) => (
           <p key={k} className={styles.body}>

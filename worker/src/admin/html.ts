@@ -85,7 +85,7 @@ button.danger{background:var(--danger)}button.quiet{background:transparent;color
 .pill{display:inline-block;padding:2px 10px;border-radius:999px;font-size:.85rem;font-weight:600;border:1px solid currentColor;white-space:nowrap}
 .pill.ok{color:var(--ok)}.pill.wait{color:var(--wait)}.pill.off{color:var(--muted)}
 table{width:100%;border-collapse:collapse;font-size:.95rem}th,td{text-align:start;padding:8px;border-block-end:1px solid var(--line);vertical-align:top}
-td form{display:inline-block;margin-inline-end:8px;margin-block-end:4px}
+td.acts{white-space:nowrap}td form{display:inline-block;margin-inline-end:8px;margin-block-end:4px}
 .top{display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap}
 .filters{display:flex;flex-wrap:wrap;gap:8px;align-items:flex-end;margin-block-end:12px}.filters label{margin:0;flex:1 1 180px}
 .pager{display:flex;gap:12px;align-items:center;justify-content:center;margin-block-start:12px}
@@ -215,7 +215,7 @@ export function dashboardPage(view: DashboardView, now: number): string {
     `<div class="top"><h1>لوحة الأكواد</h1><form method="post" action="/admin/logout"><button class="link" type="submit">خروج</button></form></div>
 ${view.notice === null ? '' : `<div class="card notice"><strong>${escapeHtml(view.notice)}</strong></div>`}
 ${generateForm()}
-<div class="card"><h2>العملاء (<span class="ltr">${filtered ? `${view.total} / ${view.all}` : view.all}</span>)</h2>
+<div class="card"><h2>العملاء (${filtered ? `<span class="ltr">${view.total}</span> من <span class="ltr">${view.all}</span>` : `<span class="ltr">${view.all}</span>`})</h2>
 <form class="filters" method="get" action="/admin" role="search">
 <label>بحث بالاسم<input type="search" name="q" value="${escapeHtml(view.q)}" autocomplete="off"></label>
 <label>الحالة<select name="status">${statusOptions}</select></label>

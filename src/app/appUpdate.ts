@@ -5,13 +5,22 @@
  * failing every activation).
  *
  * Policy: switch to the new version immediately while a gate screen is showing (install/activation — nothing
- * to lose), or while the app is in the background; otherwise wait until the trainer comes back to the app,
- * so a reload never interrupts typing or a workout.
+ * to lose). Anywhere else, wait until the trainer comes back after the app sat in the background for a while
+ * (AWAY_MS): a quick hop to WhatsApp and back must never wipe a half-filled form or a running workout. A cold
+ * start always runs the newest version anyway.
+ *
+ * No double reload with vite-plugin-pwa: its `script-defer` registerSW.js only registers the worker and never
+ * reloads, and `controllerchange` fires once per new worker, so the reloaded page (already controlled by the
+ * new worker) sees no further change.
  */
+
+/** How long the app must have been in the background before a pending update reloads it on return. */
+export const AWAY_MS = 3 * 60 * 1000;
 
 let reloadSafe = false;
 let pendingReload = false;
 let started = false;
+let hiddenAt: number | null = null;
 
 /** Gate screens call this while mounted: a new version may then reload the page at once. */
 export function setReloadSafe(value: boolean): void {
@@ -40,13 +49,18 @@ export function startAppUpdates(): void {
       hadController = true;
       return;
     }
-    if (reloadSafe || document.visibilityState === 'hidden') window.location.reload();
+    if (reloadSafe) window.location.reload();
     else pendingReload = true;
   });
 
   document.addEventListener('visibilitychange', () => {
-    if (document.visibilityState !== 'visible') return;
-    if (pendingReload) window.location.reload();
+    if (document.visibilityState === 'hidden') {
+      hiddenAt = Date.now();
+      return;
+    }
+    const away = hiddenAt === null ? 0 : Date.now() - hiddenAt;
+    hiddenAt = null;
+    if (pendingReload && (reloadSafe || away >= AWAY_MS)) window.location.reload();
     else void checkForAppUpdate();
   });
 

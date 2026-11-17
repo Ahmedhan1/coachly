@@ -1,11 +1,14 @@
 import { useNavigate } from 'react-router-dom';
 import { useServices } from '@/app/services';
+import { useLive } from '@/app/useLive';
+import { backupReminder } from '@/domain/backup/reminder';
+import { toIsoDate } from '@/domain/models';
 import { useUiStore } from '@/app/uiStore';
 import { whatsappUrl } from '@/features/clients/contact';
 import { OutboxCard } from '@/features/outbox/OutboxCard';
 import { t } from '@/i18n';
 import { Avatar, Badge, Button, Icon, IconButton, ListRow, ListSection, Money, Num, PageHeader, SectionLink, Tx, cx } from '@/ui';
-import { formatLongDate, timeParts } from '@/ui/format';
+import { formatIsoDate, formatLongDate, formatTime, timeParts } from '@/ui/format';
 import type { AgendaItem, NextSession } from './homeModel';
 import { useHomeData, type HomeData } from './useHomeData';
 import styles from './HomeScreen.module.css';
@@ -31,7 +34,7 @@ export function HomeScreen() {
       <RestOfDay items={home.plan.rest} />
       <EndingSoon home={home} />
       <FollowUp home={home} />
-      <BackupLine />
+      <BackupLine now={home.now} />
     </>
   );
 }
@@ -67,8 +70,20 @@ function DemoNotice() {
   );
 }
 
+/** Session mode for the hero session: the session's program, else the client's latest one, linked to the booking. */
+function useStartSessionUrl(next: NextSession): string {
+  const { data } = useServices();
+  const programs = useLive(() => data.repos.programs.listByClient(next.client.id), [data, next.client.id]);
+  const latest = [...(programs ?? [])].sort((a, b) => b.updatedAt - a.updatedAt)[0];
+  const programId = next.session.programId ?? latest?.id ?? null;
+  const params = new URLSearchParams({ client: next.client.id, schedule: next.session.id });
+  if (programId) params.set('program', programId);
+  return `/session/new?${params.toString()}`;
+}
+
 function Hero({ next }: { next: NextSession }) {
   const navigate = useNavigate();
+  const startUrl = useStartSessionUrl(next);
   const { clock, period } = timeParts(next.session.startsAt);
   const wa = whatsappUrl(next.client.phone);
   const when =
@@ -89,7 +104,9 @@ function Hero({ next }: { next: NextSession }) {
         <Num>{clock}</Num>
         <small>{period}</small>
       </p>
-      <p className={styles.heroWho}>{next.client.name}</p>
+      <button type="button" className={styles.heroWho} onClick={() => navigate(`/clients/${next.client.id}`)}>
+        {next.client.name}
+      </button>
       <p className={styles.heroWhat}>
         {t(`goals.${next.client.goal}`)}
         {next.packageIndex && (
@@ -100,7 +117,7 @@ function Hero({ next }: { next: NextSession }) {
         )}
       </p>
       <div className={styles.heroActions}>
-        <Button variant="onBrand" icon="timer" className={styles.heroStart} onClick={() => navigate(`/clients/${next.client.id}`)}>
+        <Button variant="onBrand" icon="timer" className={styles.heroStart} onClick={() => navigate(startUrl)}>
           {t('home.start')}
         </Button>
         {wa && (
@@ -252,15 +269,32 @@ function FollowUp({ home }: { home: HomeData }) {
   );
 }
 
-function BackupLine() {
+function BackupLine({ now }: { now: Date }) {
+  const { backup } = useServices();
+  const status = useLive(async () => (backup ? backup.local.status() : null), [backup]);
+  if (status === undefined) return null;
+  const local = status?.lastLocalAt ?? null;
+  const cloud = status?.lastCloudAt ?? null;
+  const latest = Math.max(local ?? 0, cloud ?? 0) || null;
+  const reminder = backupReminder({ lastBackupAt: latest, firstUseAt: null, now });
+  const when = (ms: number) => `${formatIsoDate(toIsoDate(new Date(ms)))} ${formatTime(ms)}`;
   return (
-    <section className={styles.backup} aria-label={t('home.lastBackup')}>
-      <Icon name="cloudOk" />
-      <p>
-        <b>{t('home.noBackupYet')}</b>
-        <br />
-        {t('home.backupHint')}
-      </p>
-    </section>
+    <ListSection title={t('home.lastBackup')}>
+      <ListRow
+        to="/more/settings/backup"
+        className={cx(styles.backupRow, reminder.due && styles.backupDue)}
+        leading={<Icon name={reminder.due ? 'alert' : 'cloudOk'} />}
+        title={latest === null ? t('home.noBackupYet') : when(latest)}
+        subtitle={
+          latest === null
+            ? t('home.backupHint')
+            : reminder.due
+              ? t('home.backupDue', { n: reminder.daysSince ?? 0 })
+              : cloud !== null && cloud === latest
+                ? t('home.backupCloud')
+                : t('home.backupLocal')
+        }
+      />
+    </ListSection>
   );
 }
