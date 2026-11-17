@@ -3,7 +3,7 @@ import { layoutPdfDocument } from '@/domain/pdf';
 import { pdfTestCase, syntheticExercises } from '@/domain/pdf/fixtures';
 import { FakePdfRenderer } from './fakePdfRenderer';
 import { collectImageRefs, createImageSource, imageRefKey } from './images';
-import { blockHtml, esc, pageHtml } from './pageHtml';
+import { bdi, blockHtml, esc, pageHtml } from './pageHtml';
 
 describe('page HTML', () => {
   it('escapes all text', () => {
@@ -24,6 +24,15 @@ describe('page HTML', () => {
     expect(content).toContain(`2 / ${doc.pages.length}`);
     expect(content).toContain('class="ptpdf-bg"');
     expect(content).toContain('opacity:1');
+  });
+
+  it('numbers without Arabic letters are forced LTR so signs and % stay in place ("-20%", "31%")', () => {
+    expect(bdi('31%')).toBe('<bdi dir="ltr">31%</bdi>');
+    expect(bdi('\u2066-20%\u2069')).toBe('<bdi dir="ltr">\u2066-20%\u2069</bdi>');
+    expect(bdi('× 1.55')).toBe('<bdi dir="ltr">× 1.55</bdi>');
+    expect(bdi('1,800 سعرة')).toBe('<bdi>1,800 سعرة</bdi>');
+    const kv = blockHtml({ type: 'keyValues', rows: [{ label: 'نسبة الدهون', value: '31%' }] }, () => null, '#000000');
+    expect(kv).toContain('<bdi dir="ltr">31%</bdi>');
   });
 
   it('chart draws earliest point on the right (RTL)', () => {

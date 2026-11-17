@@ -2,6 +2,7 @@ import { useState, type FormEvent } from 'react';
 import { useRepos } from '@/app/services';
 import { useUiStore } from '@/app/uiStore';
 import { clientGoalSchema, type Client, type ClientGoal } from '@/domain/models';
+import { cleanPhoneInput, phoneProblem } from '@/domain/whatsapp';
 import { t } from '@/i18n';
 import { Select, SegmentedControl, Sheet, TextArea, TextField } from '@/ui';
 import styles from './AddClientSheet.module.css';
@@ -32,10 +33,13 @@ export function EditClientSheet({ client, onClose }: { client: Client; onClose: 
   const [waist, setWaist] = useState(text(client.measurements.waistCm));
   const [notes, setNotes] = useState(client.notes);
   const [error, setError] = useState<string | null>(null);
+  const [phoneError, setPhoneError] = useState<string | null>(null);
 
   const submit = async (e: FormEvent) => {
     e.preventDefault();
     if (!name.trim()) return setError(t('addClient.nameRequired'));
+    const problem = phoneProblem(phone);
+    if (problem) return setPhoneError(t(`addClient.phoneErrors.${problem}`));
     try {
       await repos.clients.update(client.id, {
         name: name.trim(),
@@ -72,7 +76,9 @@ export function EditClientSheet({ client, onClose }: { client: Client; onClose: 
     >
       <form id={FORM_ID} className={styles.form} onSubmit={(e) => void submit(e)} noValidate>
         <TextField label={t('addClient.name')} value={name} error={error} maxLength={120} onChange={(e) => (setName(e.target.value), setError(null))} autoComplete="off" />
-        <TextField label={t('addClient.phone')} type="tel" inputMode="tel" maxLength={20} value={phone} onChange={(e) => setPhone(e.target.value.replace(/[^0-9+\s-]/g, ''))} ltr />
+        <TextField label={t('addClient.phone')} type="tel" inputMode="tel" maxLength={20} value={phone} onChange={(e) => (setPhone(cleanPhoneInput(e.target.value)), setPhoneError(null))}
+          error={phoneError}
+          hint={t('addClient.phoneHint')} ltr />
         <SegmentedControl
           label={t('clientDetail.gender')}
           value={gender}

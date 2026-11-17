@@ -91,7 +91,7 @@ export interface BackupSchedulerDeps {
   config?: Partial<BackupSchedulerConfig>;
 }
 
-const TRANSIENT: ReadonlySet<SchedulerError> = new Set(['offline', 'timeout', 'network', 'server', 'rate_limited', 'unexpected']);
+const TRANSIENT: ReadonlySet<SchedulerError> = new Set(['offline', 'timeout', 'network', 'server', 'rate_limited', 'storage_unavailable', 'unexpected']);
 
 /**
  * Automatic encrypted cloud backup. After changes it waits for quiet (debounce), for the network and for the

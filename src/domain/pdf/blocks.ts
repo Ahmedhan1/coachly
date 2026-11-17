@@ -37,7 +37,10 @@ function measurementRows(m: Measurements, input: PdfDocumentInput): KeyValue[] {
   const rows: KeyValue[] = [];
   for (const key of MEASUREMENT_KEYS) {
     const v = m[key];
-    if (v !== undefined) rows.push({ label: input.labels.client.measurements[key], value: `${formatNumber(v, 1)} ${measurementUnit(key, input)}` });
+    if (v === undefined) continue;
+    const unit = measurementUnit(key, input);
+    // "31%" (no space) like the adjustment row; "80 كجم" keeps its space.
+    rows.push({ label: input.labels.client.measurements[key], value: key === 'bodyFatPercent' ? `${formatNumber(v, 1)}${unit}` : `${formatNumber(v, 1)} ${unit}` });
   }
   return rows;
 }

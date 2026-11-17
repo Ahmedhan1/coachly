@@ -34,6 +34,8 @@ export function transferTimeoutMs(bytes: number, o: HttpCloudBackupClientOptions
 /** Maps an HTTP status and the Worker's `{ error }` code to a CloudError. */
 export function errorFromResponse(status: number, code: string | null): CloudError {
   if (code === 'storage_full' || status === 507) return 'storage_full';
+  // R2 not enabled on the Worker yet. HEAD answers have no body, so a bare 503 means the same.
+  if (code === 'storage_unavailable' || (status === 503 && code === null)) return 'storage_unavailable';
   if (status === 401 || status === 403) return 'unauthorized';
   if (status === 404) return 'not_found';
   if (status === 413 || code === 'too_large') return 'too_large';
@@ -50,13 +52,37 @@ async function errorCode(res: Response): Promise<string | null> {
   }
 }
 
-function infoFrom(res: Response, fallbackBytes: number | null): CloudBackupInfo {
-  const len = Number(res.headers.get('content-length'));
+function headerNumber(res: Response, name: string): number | null {
+  const raw = res.headers.get(name);
+  if (raw === null || raw.trim() === '') return null;
+  const n = Number(raw);
+  return Number.isFinite(n) && n >= 0 ? n : null;
+}
+
+/**
+ * Size and time of the stored backup from the Worker's headers (worker/src/backup/routes.ts):
+ * `X-Backup-Size` (bytes) and `X-Backup-Uploaded-At` (unix seconds). `Content-Length`/`Last-Modified`
+ * are only a fallback for other servers.
+ */
+export function infoFromHeaders(res: Response, fallbackBytes: number | null): CloudBackupInfo {
+  const size = headerNumber(res, 'x-backup-size') ?? headerNumber(res, 'content-length');
+  const seconds = headerNumber(res, 'x-backup-uploaded-at');
   const modified = Date.parse(res.headers.get('last-modified') ?? '');
   return {
-    bytes: Number.isFinite(len) && res.headers.has('content-length') ? len : fallbackBytes,
-    updatedAt: Number.isFinite(modified) ? modified : null,
+    bytes: size ?? fallbackBytes,
+    updatedAt: seconds !== null && seconds > 0 ? seconds * 1000 : Number.isFinite(modified) ? modified : null,
   };
+}
+
+/** PUT answers `201 { size, uploadedAt }` (uploadedAt in unix seconds). */
+async function uploadInfo(res: Response, bytes: number): Promise<CloudBackupInfo> {
+  try {
+    const body = (await res.json()) as { uploadedAt?: unknown };
+    const at = typeof body.uploadedAt === 'number' && body.uploadedAt > 0 ? body.uploadedAt * 1000 : null;
+    return { bytes, updatedAt: at };
+  } catch {
+    return { bytes, updatedAt: null };
+  }
 }
 
 /** Browser implementation over fetch with AbortController timeouts. Never throws. */
@@ -111,7 +137,7 @@ export class HttpCloudBackupClient implements CloudBackupClient {
       'PUT',
       token,
       transferTimeoutMs(envelope.length, this.options),
-      async (res) => (res.ok ? ok({ ...infoFrom(res, envelope.length), bytes: envelope.length }) : err(errorFromResponse(res.status, await errorCode(res)))),
+      async (res) => (res.ok ? ok(await uploadInfo(res, envelope.length)) : err(errorFromResponse(res.status, await errorCode(res)))),
       envelope,
     );
   }
@@ -119,7 +145,7 @@ export class HttpCloudBackupClient implements CloudBackupClient {
   async head(token: string): Promise<Result<CloudBackupInfo | null, CloudError>> {
     return this.request('HEAD', token, this.options.shortTimeoutMs ?? DEFAULTS.shortTimeoutMs, async (res) => {
       if (res.status === 404) return ok(null);
-      return res.ok ? ok(infoFrom(res, null)) : err(errorFromResponse(res.status, null));
+      return res.ok ? ok(infoFromHeaders(res, null)) : err(errorFromResponse(res.status, null));
     });
   }
 

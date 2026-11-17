@@ -18,8 +18,14 @@ function img(url: string | null, cls: string, alt = ''): string {
   return u ? `<img class="${cls}" src="${esc(u)}" alt="${esc(alt)}">` : `<div class="${cls}"></div>`;
 }
 
-/** Isolates a value so numbers/Latin inside Arabic keep their order. */
-const bdi = (t: string) => `<bdi>${esc(t)}</bdi>`;
+const ARABIC_LETTER = /[\u0600-\u06FF\u0750-\u077F\u08A0-\u08FF\uFB50-\uFDFF\uFE70-\uFEFF]/;
+
+/**
+ * Isolates a value so numbers/Latin inside Arabic keep their order. A value with no Arabic letter
+ * ("31%", "-20%", "× 1.55", "8-10") is forced left-to-right: with `dir=auto` such a value has no strong
+ * character and took the page's RTL direction, printing "% 31" and "20%-".
+ */
+export const bdi = (t: string) => (ARABIC_LETTER.test(t) ? `<bdi>${esc(t)}</bdi>` : `<bdi dir="ltr">${esc(t)}</bdi>`);
 
 function chartSvg(points: { date: string; kg: number }[], color: string): string {
   const W = 700;

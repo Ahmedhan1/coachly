@@ -8,6 +8,7 @@ import type { Result } from '@/domain/nutrition/result';
  * - network: fetch failed (DNS, TLS, connection reset, CORS)
  * - unauthorized: license token rejected or revoked (401/403)
  * - not_found: no cloud backup stored yet (GET)
+ * - storage_unavailable: the Worker has no cloud storage (R2) enabled yet (503); the local file is the copy
  * - storage_full: the server refused because of the per-license or global storage cap
  * - too_large: body over the request size limit (413)
  * - rate_limited: too many uploads today (429)
@@ -20,13 +21,14 @@ export type CloudError =
   | 'unauthorized'
   | 'not_found'
   | 'storage_full'
+  | 'storage_unavailable'
   | 'too_large'
   | 'rate_limited'
   | 'server';
 
 export interface CloudBackupInfo {
   bytes: number | null;
-  /** epoch ms from Last-Modified, when the server sends it */
+  /** epoch ms, from `X-Backup-Uploaded-At` (unix seconds) or the PUT answer's `uploadedAt` */
   updatedAt: number | null;
 }
 

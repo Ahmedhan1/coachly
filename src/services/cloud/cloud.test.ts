@@ -73,6 +73,28 @@ describe('HttpCloudBackupClient', () => {
     expect(d.ok && Array.from(d.value)).toEqual([7, 8, 9]);
   });
 
+  it('reads the live Worker headers: X-Backup-Size and X-Backup-Uploaded-At (unix seconds)', async () => {
+    const client = new HttpCloudBackupClient({
+      fetchFn: async () =>
+        new Response(null, { status: 200, headers: { 'X-Backup-Size': '2048', 'X-Backup-Uploaded-At': '1795000000', 'Cache-Control': 'no-store' } }),
+    });
+    expect(await client.head('t')).toEqual({ ok: true, value: { bytes: 2048, updatedAt: 1_795_000_000_000 } });
+  });
+
+  it('PUT 201 { size, uploadedAt } gives the server time in ms', async () => {
+    const client = new HttpCloudBackupClient({ fetchFn: async () => json(201, { size: 3, uploadedAt: 1_795_000_000, previousKept: true }) });
+    expect(await client.upload('t', new Uint8Array(3))).toEqual({ ok: true, value: { bytes: 3, updatedAt: 1_795_000_000_000 } });
+  });
+
+  it('503 storage_unavailable (R2 not enabled yet) is its own error, also on a body-less HEAD', async () => {
+    const put = new HttpCloudBackupClient({ fetchFn: async () => json(503, { error: 'storage_unavailable' }) });
+    expect(await put.upload('t', new Uint8Array(1))).toEqual({ ok: false, error: 'storage_unavailable' });
+    const head = new HttpCloudBackupClient({ fetchFn: async () => new Response(null, { status: 503 }) });
+    expect(await head.head('t')).toEqual({ ok: false, error: 'storage_unavailable' });
+    expect(await head.download('t')).toEqual({ ok: false, error: 'storage_unavailable' });
+    expect(errorFromResponse(503, 'server_not_configured')).toBe('server');
+  });
+
   it('transfer timeout scales with size and is capped', () => {
     expect(transferTimeoutMs(0)).toBe(15_000);
     expect(transferTimeoutMs(1_500_000)).toBe(25_000);
