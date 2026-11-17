@@ -117,3 +117,18 @@ describe('tinting', () => {
     dispose();
   });
 });
+
+describe('region framing', () => {
+  it('fills the frame with the region but keeps a minimum window of the body', async () => {
+    const { regionView, distanceForHeight } = await import('./framing');
+    // a small muscle (10% of a 1.8 m body) still shows 42% of the body
+    const small = regionView({ center: { x: 0, y: 0.9 }, size: { w: 0.3, h: 0.18 } }, 1.8, 0.67, 0.65, 0.42);
+    expect(small.visibleHeight).toBeCloseTo(1.8 * 0.42, 5);
+    // a big region is zoomed to fill 65%
+    const big = regionView({ center: { x: 0, y: 1.2 }, size: { w: 0.4, h: 0.9 } }, 1.8, 0.67, 0.65, 0.42);
+    expect(big.visibleHeight).toBeCloseTo(0.9 / 0.65, 5);
+    // never zoomed out past the whole body
+    expect(regionView({ center: { x: 0, y: 1 }, size: { w: 1, h: 5 } }, 1.8, 0.67, 0.65, 0.42).visibleHeight).toBeLessThanOrEqual(1.8 * 1.12 + 1e-9);
+    expect(distanceForHeight(1, 28, 0)).toBeGreaterThan(distanceForHeight(0.5, 28, 0));
+  });
+});

@@ -49,7 +49,6 @@ export function PhotoArchiveSheet({ onClose, onDone, saver: saverProp }: { onClo
 
   useEffect(() => {
     let live = true;
-    setPlan(null);
     void backup?.archive.plan(months).then((p) => live && setPlan(p));
     void meta.get(FILE_PASSWORD_KEY).then((v) => live && typeof v === 'string' && setPassword((cur) => cur || v));
     return () => {
@@ -114,7 +113,7 @@ export function PhotoArchiveSheet({ onClose, onDone, saver: saverProp }: { onClo
               label={t('storage.archive.olderThan')}
               options={ARCHIVE_MONTH_CHOICES.map((n) => ({ value: String(n), label: monthLabel(n) }))}
               value={String(months)}
-              onChange={(v) => setMonths(Number(v))}
+              onChange={(v) => (setPlan(null), setMonths(Number(v)))}
             />
             <p className={styles.strong}>
               {plan === null ? '…' : plan.ids.length === 0 ? t('storage.archive.none') : t('storage.archive.found', { n: plan.ids.length, size: formatBytes(plan.bytes) })}

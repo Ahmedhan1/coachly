@@ -135,6 +135,9 @@ export const settings = {
     unavailable: 'صفحة العميل محتاجة السيرفر يتجهز الأول (docs/CLOUD.md).',
     failed: 'ما قدرناش نوصل للسيرفر. جرّب تاني لما يكون فيه نت.',
     checkinArrived: 'وصلت {n} متابعة من العملاء',
+    checkinSleep: 'النوم: {n} ساعة',
+    checkinEnergy: 'الطاقة: {n} من 5',
+    checkinAdherence: 'الالتزام بالخطة: {n}%',
   },
   formulas: {
     title: 'المعادلات والمعاملات',

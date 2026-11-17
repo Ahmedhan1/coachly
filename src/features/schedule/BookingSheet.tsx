@@ -3,7 +3,7 @@ import { useServices } from '@/app/services';
 import { useUiStore } from '@/app/uiStore';
 import { useLive } from '@/app/useLive';
 import { bookingConflicts, type BookingRepeat } from '@/domain/attendance';
-import { addDays, type Client, type ClientId, type IsoDate, type Session } from '@/domain/models';
+import { addDays, type Client, type ClientId, type IsoDate, type ProgramId, type Session } from '@/domain/models';
 import { weekdayOf, type RecurrenceError, type Weekday } from '@/domain/schedule';
 import { sessionWhen } from '@/features/whatsapp/values';
 import { t, type TKey } from '@/i18n';
@@ -11,6 +11,9 @@ import { Button, Icon, SegmentedControl, Select, Sheet, TextArea, TextField, Tx,
 import { googleCalendarUrl } from '@/services/calendar';
 import { addSessionToCalendar, calendarEventFor } from './calendarExport';
 import { ClientPicker } from './ClientPicker';
+import { useActiveProgram } from '@/features/programs/activePrograms';
+import { programDayName } from '@/features/programs/names';
+import { attachSessionDay, readSessionDays } from './sessionDays';
 import { useScheduleWriter } from './hooks';
 import { futureOfSeries } from './scheduleWriter';
 import type { SchedulePrefs } from './prefs';
@@ -124,7 +127,7 @@ function BookingForm({
   future,
   clientSessions,
 }: BookingSheetProps & { head: Session | null; future: Session[]; clientSessions: Session[] }) {
-  const { data } = useServices();
+  const { data, meta } = useServices();
   const writer = useScheduleWriter();
   const showToast = useUiStore((s) => s.showToast);
   const session = target.mode === 'edit' ? target.session : null;
@@ -134,6 +137,13 @@ function BookingForm({
   const [error, setError] = useState<string | null>(null);
   const [clientError, setClientError] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
+  const program = useActiveProgram(form.clientId);
+  const attachedDay = useLive(async () => (session ? ((await readSessionDays(meta))[session.id] ?? null) : null), [meta, session]);
+  // 'auto' = next day in rotation when the session starts; '' = no program; else a day id.
+  const [dayChoice, setDayChoice] = useState<string | null>(null);
+  const editingOtherProgram = session !== null && session.programId !== null && program !== undefined && session.programId !== (program?.id ?? null);
+  const rawDay = dayChoice ?? (session ? (session.programId === null ? '' : (attachedDay ?? 'auto')) : 'auto');
+  const dayValue = rawDay === '' || rawDay === 'auto' || program?.days.some((d) => d.id === rawDay) ? rawDay : 'auto';
   const set = (patch: Partial<FormState>) => {
     setForm((f) => ({ ...f, ...patch }));
     setError(null);
@@ -179,7 +189,9 @@ function BookingForm({
       return;
     }
     setSaving(true);
-    const req = { clientId: form.clientId as ClientId, notes: form.notes, date: form.date, startMinute, durationMinutes: form.duration, repeat };
+    const linkProgram = program && !editingOtherProgram;
+    const programId: ProgramId | null | undefined = linkProgram ? (dayValue === '' ? null : program.id) : undefined;
+    const req = { clientId: form.clientId as ClientId, notes: form.notes, date: form.date, startMinute, durationMinutes: form.duration, repeat, programId };
     const name = nameOf(form.clientId);
     const result = session ? await writer.edit(session, req, inSeries ? scope : 'one') : await writer.book(req);
     if (!result.ok) {
@@ -188,6 +200,10 @@ function BookingForm({
       return;
     }
     const n = result.value.sessions.length;
+    if (linkProgram) {
+      const day = dayValue === '' || dayValue === 'auto' ? null : dayValue;
+      await attachSessionDay(meta, result.value.sessions.map((x) => x.id), day).catch(() => undefined);
+    }
     showToast({
       message: session
         ? n > 1
@@ -266,6 +282,7 @@ function BookingForm({
               ...(target.mode === 'new' && picked?.endDate && picked.endDate > form.date ? { until: picked.endDate } : {}),
             });
             setClientError(null);
+            setDayChoice(null);
           }}
         />
         {inSeries && (
@@ -371,6 +388,18 @@ function BookingForm({
               </p>
             )}
           </div>
+        )}
+        {program && !editingOtherProgram && (
+          <Select
+            label={t('hub.booking.dayHint', { program: program.name })}
+            options={[
+              { value: 'auto', label: t('hub.booking.dayAuto') },
+              ...program.days.map((d) => ({ value: d.id, label: programDayName(program.days, d.id) })),
+              { value: '', label: t('hub.booking.dayNone') },
+            ]}
+            value={dayValue}
+            onChange={(v) => setDayChoice(v)}
+          />
         )}
         {first && (
           <div className={styles.conflict} role="status" data-testid="conflict-warning">

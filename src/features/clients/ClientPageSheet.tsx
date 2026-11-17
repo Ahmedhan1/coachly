@@ -2,22 +2,19 @@ import { useState } from 'react';
 import { useServices } from '@/app/services';
 import { useUiStore } from '@/app/uiStore';
 import { useLive } from '@/app/useLive';
-import { NutritionStore } from '@/data/nutritionStore';
-import { buildShareDocument } from '@/domain/clientPage';
 import { toIsoDate, type Client } from '@/domain/models';
 import { t } from '@/i18n';
 import { Button, Sheet } from '@/ui';
 import { formatIsoDate, formatTime } from '@/ui/format';
-import { newClientShare } from '@/services/clientPage/clientPageService';
-import { loadBuiltinCatalog } from '@/features/programs/catalog';
-import { readShare, saveShare, type ShareRecord } from '@/features/online/prefs';
+import { readShare, saveShare } from '@/features/online/prefs';
+import { publishClientPage } from '@/features/online/clientPagePublish';
 import { whatsappLink } from '@/domain/whatsapp';
 import styles from './ClientDetail.module.css';
 
 /** Create / refresh / send / revoke the client's private page (encrypted on the phone, key in the link). */
 export function ClientPageSheet({ client, onClose }: { client: Client; onClose: () => void }) {
   const services = useServices();
-  const { meta, data } = services;
+  const { meta } = services;
   const page = services.online?.clientPage;
   const showToast = useUiStore((s) => s.showToast);
   const [version, setVersion] = useState(0);
@@ -30,46 +27,8 @@ export function ClientPageSheet({ client, onClose }: { client: Client; onClose: 
     if (!page) return;
     setBusy(true);
     try {
-      const repos = data.repos;
-      const store = new NutritionStore(meta, repos);
-      const [settings, programs, plans, recipes, rows, supplements, catalog] = await Promise.all([
-        repos.settings.get(),
-        repos.programs.listByClient(client.id),
-        repos.mealPlans.listByClient(client.id),
-        repos.recipes.list(),
-        store.getClientSupplements(client.id),
-        repos.supplements.list(),
-        loadBuiltinCatalog(),
-      ]);
-      const program = [...programs].sort((a, b) => b.updatedAt - a.updatedAt)[0] ?? null;
-      const byEx = new Map((catalog ?? []).map((e) => [e.id, e]));
-      const recipeName = new Map(recipes.map((r) => [r.id as string, r.name]));
-      const supp = new Map(supplements.map((s) => [s.id as string, s]));
-      const record: ShareRecord = share ?? { ...newClientShare(), checkinsEnabled: checkinsOn, publishedAt: null };
-      const doc = buildShareDocument({
-        now: Date.now(),
-        trainerName: settings.name,
-        color: settings.primaryColor,
-        client,
-        program,
-        exercise: (id) => {
-          const e = byEx.get(id);
-          const img = e?.images[0];
-          return { name: e?.nameAr ?? id.replace(/_/g, ' '), imageFile: img?.kind === 'pack' ? (img.path.split('/').pop() ?? null) : null };
-        },
-        dayTitle: (i, name) => `${t('training.programs.builder.dayDefault', { n: i + 1 })}${name ? ` — ${name}` : ''}`,
-        mealPlan: [...plans].sort((a, b) => a.createdAt - b.createdAt)[0] ?? null,
-        mealItem: (item) => `${item.recipeId ? (recipeName.get(item.recipeId) ?? '') : item.text}${item.servings !== 1 ? ` × ${item.servings}` : ''}`,
-        supplements: rows.flatMap((r) => {
-          const s = supp.get(r.supplementId);
-          return s ? [{ name: s.name, dose: r.dose, timing: r.timing, notes: r.notes }] : [];
-        }),
-        notes: program?.notes ?? '',
-        checkinsEnabled: checkinsOn,
-      });
-      const r = await page.publish(record, doc);
-      if (!r.ok) return showToast({ message: t('settings.clientPage.failed') });
-      await saveShare(meta, client.id, { ...record, checkinsEnabled: checkinsOn, publishedAt: Date.now() });
+      const r = await publishClientPage(services, client, { checkinsEnabled: checkinsOn, force: true });
+      if (r !== 'published') return showToast({ message: t('settings.clientPage.failed') });
       setVersion((v) => v + 1);
       showToast({ message: t('settings.clientPage.updated'), duration: 2500 });
     } finally {

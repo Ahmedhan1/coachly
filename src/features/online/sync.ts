@@ -79,31 +79,39 @@ export async function pullCheckins(services: AppServices): Promise<number> {
       continue;
     }
     const photoIds: ImageId[] = [];
-    let thumbId: string | null = null;
-    if (c.doc.photo) {
-      const blob = await dataUrlToBlob(c.doc.photo);
-      if (blob) {
-        try {
-          const saved = await storePhoto(services, blob);
-          photoIds.push(saved.imageId as ImageId);
-          thumbId = saved.thumbId;
-        } catch {
-          // keep the numbers even if the photo cannot be read
-        }
+    const photos: { imageId: string; thumbId: string; pose: 'front' | 'side' | 'back' }[] = [];
+    const poses = ['front', 'side', 'back'] as const;
+    const urls = [c.doc.photo, ...(c.doc.photos ?? [])].filter((u): u is string => typeof u === 'string').slice(0, 3);
+    for (const [i, url] of urls.entries()) {
+      const blob = await dataUrlToBlob(url);
+      if (!blob) continue;
+      try {
+        const saved = await storePhoto(services, blob);
+        photoIds.push(saved.imageId as ImageId);
+        photos.push({ imageId: saved.imageId, thumbId: saved.thumbId, pose: poses[i] ?? 'front' });
+      } catch {
+        // keep the numbers even if a photo cannot be read
       }
     }
-    const measurements: { weightKg?: number; waistCm?: number } = {};
-    if (c.doc.weightKg !== undefined) measurements.weightKg = c.doc.weightKg;
-    if (c.doc.waistCm !== undefined) measurements.waistCm = c.doc.waistCm;
+    const d = c.doc;
+    const measurements: Partial<Record<'weightKg' | 'waistCm' | 'hipCm' | 'chestCm' | 'armCm' | 'thighCm', number>> = {};
+    for (const k of ['weightKg', 'waistCm', 'hipCm', 'chestCm', 'armCm', 'thighCm'] as const) if (d[k] !== undefined) measurements[k] = d[k];
+    // Sleep, energy and adherence have no field of their own: they go first in the entry's notes.
+    const week = [
+      d.sleepHours !== undefined ? t('settings.clientPage.checkinSleep', { n: d.sleepHours }) : '',
+      d.energy !== undefined ? t('settings.clientPage.checkinEnergy', { n: d.energy }) : '',
+      d.adherence !== undefined ? t('settings.clientPage.checkinAdherence', { n: d.adherence }) : '',
+    ].filter(Boolean);
+    const notes = [week.join(' · '), d.notes ?? ''].filter(Boolean).join('\n');
     const entry = await repos.progress.create({
       clientId,
       date: toIsoDate(new Date(c.doc.createdAt * 1000)),
       measurements,
       photoIds,
-      notes: c.doc.notes ?? '',
+      notes: notes.slice(0, 4000),
       source: 'client',
     });
-    if (thumbId && photoIds[0]) await store.setEntryPhotos(entry.id, [{ imageId: photoIds[0], thumbId, pose: 'front' }]).catch(() => undefined);
+    if (photos.length > 0) await store.setEntryPhotos(entry.id, photos).catch(() => undefined);
     imported.push(c.id);
     await services.meta.set(IMPORTED_CHECKINS_KEY, imported.slice(-200));
     await page.acknowledge(c);

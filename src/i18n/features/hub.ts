@@ -169,7 +169,7 @@ export const hub = {
     programDay: 'يوم البرنامج',
     dayAuto: 'اللي عليه الدور',
     dayNone: 'من غير برنامج',
-    dayHint: 'من {program}',
+    dayHint: 'يوم البرنامج ({program})',
   },
   session: {
     suggestAddWeight: 'جرّب {w}',

@@ -268,6 +268,8 @@ export interface WeekOptions {
   style?: DietStyle;
   vegetarian?: boolean;
   exclude?: ReadonlySet<string>;
+  /** Different seeds give different (equally valid) weeks. */
+  seed?: number;
 }
 
 /** Plans consecutive days; each day avoids the previous day's main dishes. */
@@ -276,7 +278,7 @@ export function planWeek(book: readonly DietRecipe[], target: MacroTargets, opts
   const out: DietDay[] = [];
   let recent: ReadonlySet<string> = new Set();
   for (let d = 0; d < opts.days; d++) {
-    const day = planDay(book, target, { goal: opts.goal, slots, dayIndex: d, recent, exclude: opts.exclude, vegetarian: opts.vegetarian, style: opts.style }, ds);
+    const day = planDay(book, target, { goal: opts.goal, slots, dayIndex: d + (opts.seed ?? 0) * 7, recent, exclude: opts.exclude, vegetarian: opts.vegetarian, style: opts.style }, ds);
     out.push(day);
     recent = new Set(day.meals.flatMap((m) => (m.items[0] ? [m.items[0].recipeId] : [])));
   }

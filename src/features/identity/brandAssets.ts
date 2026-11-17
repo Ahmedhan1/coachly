@@ -112,6 +112,14 @@ export async function buildBrandCache(colorInput: string, logo: Blob | undefined
 /** Last identity the cache was built from, so the work runs only when the logo or colour changes. */
 const SOURCE_KEY = 'pt.brandAssets.source';
 
+function readSource(): string | null {
+  try {
+    return window.localStorage.getItem(SOURCE_KEY);
+  } catch {
+    return null;
+  }
+}
+
 /**
  * Refreshes the splash and home-screen icons from settings when the logo or colour changed. Returns true
  * when the logo changed (the caller may show the one-time "re-add to home screen" hint).
@@ -119,12 +127,7 @@ const SOURCE_KEY = 'pt.brandAssets.source';
 export async function refreshBrandAssets(services: Pick<AppServices, 'data'>): Promise<boolean> {
   const s = await services.data.repos.settings.get();
   const source = `${s.logoImageId ?? ''}|${s.primaryColor}`;
-  let previous: string | null = null;
-  try {
-    previous = window.localStorage.getItem(SOURCE_KEY);
-  } catch {
-    previous = null;
-  }
+  const previous = readSource();
   if (previous === source && readBrandCache()) return false;
   const blob = s.logoImageId ? await services.data.repos.images.getBlob(s.logoImageId) : undefined;
   const cache = await buildBrandCache(s.primaryColor, blob);

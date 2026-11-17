@@ -4,6 +4,13 @@ import { useServices } from '@/app/services';
 import { useUiStore } from '@/app/uiStore';
 import { useLive } from '@/app/useLive';
 import { toIsoDate, type Client, type Program, type WorkoutLog } from '@/domain/models';
+import { overloadHint, plannedDay, splitClientPrograms } from '@/domain/clientHub';
+import { useGo } from '@/app/nav';
+import { readActivePrograms } from '@/features/programs/activePrograms';
+import { readSessionDays } from '@/features/schedule/sessionDays';
+import { useScheduleWriter } from '@/features/schedule/hooks';
+import { deviceZone } from '@/features/schedule/zone';
+import { saveWorkout } from './saveWorkout';
 import {
   addSet,
   adjustRest,
@@ -47,6 +54,8 @@ export { ACTIVE_SESSION_KEY };
 interface Loaded {
   client: Client;
   program: Program | null;
+  /** The program day this session runs (resolved from the URL, the booking, or the rotation). */
+  dayId: string | null;
   history: LoggedSet[];
   logs: WorkoutLog[];
   unit: 'kg' | 'lb';
@@ -62,19 +71,31 @@ export function SessionScreen() {
   const [params] = useSearchParams();
   const { data, meta } = useServices();
   const clientId = params.get('client') ?? '';
-  const programId = params.get('program');
+  const programParam = params.get('program');
+  const scheduleId = params.get('schedule');
+  const dayParam = params.get('day');
 
   const loaded = useLive<Loaded | null>(async () => {
     const client = await data.repos.clients.get(clientId);
     if (!client) return null;
-    const program = programId ? ((await data.repos.programs.get(programId)) ?? null) : null;
+    // Program: the one asked for, else the booking's, else the client's active program.
+    const booking = scheduleId ? await data.repos.sessions.get(scheduleId) : undefined;
+    let program = programParam ? ((await data.repos.programs.get(programParam)) ?? null) : null;
+    if (!program && booking?.programId) program = (await data.repos.programs.get(booking.programId)) ?? null;
+    if (!program && !programParam) {
+      const own = await data.repos.programs.listByClient(clientId);
+      program = splitClientPrograms(own, clientId, (await readActivePrograms(meta))[clientId]).active;
+    }
     const logs = await data.repos.workoutLogs.listByClient(clientId);
+    // Day: the one asked for, else the one attached to the booking, else the next in rotation.
+    const attached = dayParam ?? (scheduleId ? ((await readSessionDays(meta))[scheduleId] ?? null) : null);
+    const dayId = program ? (plannedDay({ days: program.days, attachedDayId: attached, logs, programId: program.id })?.day.id ?? null) : null;
     const settings = await data.repos.settings.get();
     const saved = parseSessionState(await meta.get(ACTIVE_SESSION_KEY));
     const savedClient = saved && saved.clientId !== client.id ? await data.repos.clients.get(saved.clientId) : null;
     const savedClientName = savedClient ? savedClient.name : saved ? client.name : null;
-    return { client, program, history: workoutLogsToSets(logs), unit: settings.units.weight, saved, savedClientName, logs };
-  }, [data, meta, clientId, programId]);
+    return { client, program, dayId, history: workoutLogsToSets(logs), unit: settings.units.weight, saved, savedClientName, logs };
+  }, [data, meta, clientId, programParam, scheduleId, dayParam]);
 
   if (loaded === undefined) return <PageHeader title={t('training.session.loading')} back={{ to: '/', label: t('training.session.backHome') }} />;
   if (loaded === null) {
@@ -85,7 +106,7 @@ export function SessionScreen() {
       </>
     );
   }
-  return <SessionRunner key={key} routeKey={key} dayParam={params.get('day')} scheduleId={params.get('schedule')} {...loaded} />;
+  return <SessionRunner key={key} routeKey={key} dayParam={dayParam} scheduleId={scheduleId} {...loaded} />;
 }
 
 interface RunnerProps extends Loaded {
@@ -109,12 +130,15 @@ function useTick(active: boolean): number {
   return now;
 }
 
-function SessionRunner({ client, program, history, logs, unit, saved, savedClientName, routeKey, dayParam, scheduleId }: RunnerProps) {
+function SessionRunner({ client, program, dayId: resolvedDayId, history, unit, saved, savedClientName, routeKey, dayParam, scheduleId }: RunnerProps) {
   const { data, meta } = useServices();
   const navigate = useNavigate();
   const showToast = useUiStore((s) => s.showToast);
   const catalog = useExerciseCatalog();
   const prLink = useWhatsappLinkBuilder('record');
+  const writer = useScheduleWriter();
+  const go = useGo();
+  const [attendance, setAttendance] = useState<{ left: number; total: number } | null | 'none'>(null);
   const byId = catalog?.byId ?? new Map();
   const [phase, setPhase] = useState<'run' | 'summary' | 'saved'>('run');
   const [saving, setSaving] = useState(false);
@@ -123,7 +147,7 @@ function SessionRunner({ client, program, history, logs, unit, saved, savedClien
 
   const fresh = (): SessionState | null => {
     if (!program) return null;
-    const dayId = dayParam ?? nextProgramDayId(program.days, logs, program.id);
+    const dayId = resolvedDayId;
     const day = program.days.find((d) => d.id === dayId) ?? program.days[0] ?? null;
     return createSession({
       key: routeKey === 'new' ? crypto.randomUUID() : routeKey,
@@ -246,6 +270,7 @@ function SessionRunner({ client, program, history, logs, unit, saved, savedClien
   const exercise = ex ? byId.get(ex.exerciseId) : undefined;
   const name = ex ? exerciseName(exercise, ex.exerciseId) : '';
   const prev = ex ? lastTime(history, ex.exerciseId, state.key, state.startedAt) : null;
+  const hint = ex && prev ? overloadHint(prev.sets, ex.targetReps, unitToKg(unit === 'kg' ? 2.5 : 5, unit)) : null;
   const left = restRemaining(state, now);
   const upNext = cur ? nextPosition(state, cur) : null;
   const upNextEx = upNext ? state.exercises[upNext.exercise] : undefined;
@@ -263,8 +288,10 @@ function SessionRunner({ client, program, history, logs, unit, saved, savedClien
   const save = async () => {
     setSaving(true);
     try {
-      await data.repos.workoutLogs.create(toWorkoutLogInput(state, toIsoDate(new Date())));
+      const result = await saveWorkout({ repos: data.repos, writer, clock: deviceZone().clock }, state, toIsoDate(new Date()), new Date());
       await meta.set(ACTIVE_SESSION_KEY, null);
+      const pkg = result.client?.package;
+      setAttendance(pkg && pkg.totalSessions > 0 && result.client ? { left: result.client.remainingSessions, total: pkg.totalSessions } : 'none');
       setPhase('saved');
     } catch {
       showToast({ message: t('training.session.saveError') });
@@ -279,14 +306,25 @@ function SessionRunner({ client, program, history, logs, unit, saved, savedClien
         <Icon name="check" />
         <h1>{t('training.session.savedTitle')}</h1>
         <p>{t('training.session.savedBody')}</p>
+        {attendance !== null && (
+          <p data-testid="attendance-saved">
+            {t('hub.session.attendanceSaved', { name: client.name })}
+            {attendance !== 'none' && (
+              <>
+                {' · '}
+                <Tx k="hub.session.leftOf" params={{ left: attendance.left, total: attendance.total }} />
+              </>
+            )}
+          </p>
+        )}
         {summary.records > 0 && client.phone && (
           <a className={styles.waLink} href={prLink(client)} target="_blank" rel="noreferrer">
             <Icon name="chat" />
             {t('training.session.whatsappPr')}
           </a>
         )}
-        <Button block onClick={() => navigate(`/clients/${client.id}`, { replace: true })}>
-          {client.name}
+        <Button block onClick={() => navigate(`/clients/${client.id}?tab=training`, { replace: true })}>
+          {t('hub.session.openClient', { name: client.name })}
         </Button>
         <Button block variant="plain" onClick={() => navigate('/', { replace: true })}>
           {t('training.session.backHome')}
@@ -300,7 +338,9 @@ function SessionRunner({ client, program, history, logs, unit, saved, savedClien
       <header className={styles.top}>
         <IconButton icon="close" label={t('training.session.close')} onClick={() => navigate(back.to)} />
         <div className={styles.topText}>
-          <p className={styles.client}>{client.name}</p>
+          <button type="button" className={styles.client} onClick={() => go(`/clients/${client.id}`)}>
+            {client.name}
+          </button>
           <p className={styles.progress}>
             <Tx k="training.session.summarySets" params={{ done: summary.doneSets, total: summary.totalSets }} />
           </p>
@@ -345,6 +385,16 @@ function SessionRunner({ client, program, history, logs, unit, saved, savedClien
               t('training.session.firstTime')
             )}
           </p>
+          {hint && (
+            <p className={styles.last} data-testid="overload-hint">
+              {t('hub.session.suggestion')}:{' '}
+              <Num>
+                {hint.kind === 'add_weight'
+                  ? t('hub.session.suggestAddWeight', { w: kgToUnit(hint.weightKg, unit) })
+                  : t('hub.session.suggestAddReps', { w: kgToUnit(hint.weightKg, unit), r: hint.reps })}
+              </Num>
+            </p>
+          )}
 
           <div className={styles.steppers}>
             <Stepper
