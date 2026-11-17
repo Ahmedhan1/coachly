@@ -32,6 +32,8 @@ export interface HtmlPdfRendererOptions {
    * the second pass; set to 1 on Safari if images come out blank (MANUAL_QA).
    */
   warmupPasses?: number;
+  /** Width in px of the small JPEG preview kept per page (0 = none). Default 360. */
+  previewWidth?: number;
   /** Keep page nodes visible for debugging/screenshots instead of removing them. */
   keepPages?: boolean;
   /** Called with each page node right before it is snapshotted (harness screenshots). */
@@ -61,6 +63,24 @@ async function imagesReady(node: HTMLElement): Promise<void> {
   await Promise.all(
     [...node.querySelectorAll('img')].map((i) => (i.complete ? Promise.resolve() : i.decode().catch(() => undefined))),
   );
+}
+
+/** A small copy of a page for the in-app preview (an <iframe> PDF shows nothing on Android Chrome). */
+async function previewOf(canvas: HTMLCanvasElement, width: number): Promise<Blob | null> {
+  try {
+    const small = document.createElement('canvas');
+    small.width = width;
+    small.height = Math.round((canvas.height / canvas.width) * width);
+    const ctx = small.getContext('2d');
+    if (!ctx) return null;
+    ctx.drawImage(canvas, 0, 0, small.width, small.height);
+    const blob = await new Promise<Blob | null>((resolve) => small.toBlob(resolve, 'image/jpeg', 0.7));
+    small.width = 0;
+    small.height = 0;
+    return blob;
+  } catch {
+    return null;
+  }
 }
 
 function canvasToJpeg(canvas: HTMLCanvasElement, quality: number): Promise<Uint8Array> {
@@ -125,6 +145,8 @@ export class HtmlPdfRenderer implements PdfRenderer {
       const pdf = new jsPDF({ unit: 'mm', format: 'a4', orientation: 'portrait', compress: true });
       const ratio = this.o.pixelRatio ?? 1.75;
       const quality = this.o.jpegQuality ?? 0.8;
+      const previewWidth = this.o.previewWidth ?? 360;
+      const previews: Blob[] = [];
       for (let i = 0; i < doc.pages.length; i++) {
         if (cancelled()) return err('cancelled');
         const page = doc.pages[i]!;
@@ -150,6 +172,10 @@ export class HtmlPdfRenderer implements PdfRenderer {
         }
         const canvas = await toCanvas(node, snap);
         const jpeg = await canvasToJpeg(canvas, quality);
+        if (previewWidth > 0) {
+          const preview = await previewOf(canvas, previewWidth);
+          if (preview) previews.push(preview);
+        }
         // Free the bitmap now: iOS caps total canvas memory, and 50-exercise PDFs have many pages.
         canvas.width = 0;
         canvas.height = 0;
@@ -162,7 +188,7 @@ export class HtmlPdfRenderer implements PdfRenderer {
       const blob = pdf.output('blob');
       progress?.({ phase: 'finalize', done: 1, total: 1 });
       const base = [input.title, input.client?.name].filter(Boolean).join(' - ');
-      return ok({ blob, pageCount: doc.pages.length, fileName: `${safeFileName(base, 'program')}.pdf` });
+      return ok({ blob, pageCount: doc.pages.length, fileName: `${safeFileName(base, 'program')}.pdf`, previews });
     } catch {
       return err('render_failed');
     } finally {

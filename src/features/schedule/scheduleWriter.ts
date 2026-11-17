@@ -10,10 +10,10 @@ import {
   type PlannedOccurrence,
 } from '@/domain/attendance';
 import { addDays, type Client, type ClientId, type Session } from '@/domain/models';
-import type { RecurrenceError, ZonedClock } from '@/domain/schedule';
+import type { AttendanceStatus, RecurrenceError, ZonedClock } from '@/domain/schedule';
 import { ok, type Result } from '@/domain/nutrition/result';
 import type { MetaStore } from '@/services/license/metaStore';
-import { LATE_CANCEL_KEY, parseIdList, setLateCancel } from './prefs';
+import { consumingStatuses, LATE_CANCEL_KEY, parseIdList, readPrefs, setLateCancel } from './prefs';
 
 /**
  * Every schedule write (book, edit, delete, attendance) in one place, over the repositories and the meta
@@ -50,11 +50,16 @@ async function lateCancelIds(meta: MetaStore): Promise<Set<string>> {
 }
 
 /** Adjusts the client's remaining sessions for status changes of their sessions. */
-async function applyUsage(repos: Repositories, clientId: string, changes: ReadonlyArray<{ before: ReturnType<typeof statusOf>; after: ReturnType<typeof statusOf> }>) {
+async function applyUsage(
+  repos: Repositories,
+  clientId: string,
+  changes: ReadonlyArray<{ before: ReturnType<typeof statusOf>; after: ReturnType<typeof statusOf> }>,
+  consuming?: readonly AttendanceStatus[],
+) {
   const client = await repos.clients.get(clientId);
   if (!client?.package) return;
   let stored = client.remainingSessions;
-  for (const c of changes) stored = remainingAfterChange({ stored, before: c.before, after: c.after });
+  for (const c of changes) stored = remainingAfterChange({ stored, before: c.before, after: c.after, consuming });
   if (stored !== client.remainingSessions) await repos.clients.update(client.id, { remainingSessions: stored });
 }
 
@@ -175,32 +180,35 @@ export function createScheduleWriter({ repos, meta, clock }: ScheduleWriterDeps)
     /** Soft-deletes sessions; sessions that had used up a package session give it back. */
     async remove(sessions: readonly Session[]): Promise<Undo> {
       const late = await lateCancelIds(meta);
+      const consuming = consumingStatuses(await readPrefs(meta));
       const changes = sessions.map((s) => ({ s, before: statusOf(s.attendance, late.has(s.id)) }));
       for (const s of sessions) await repos.sessions.softDelete(s.id);
       const byClient = new Map<string, typeof changes>();
       for (const c of changes) byClient.set(c.s.clientId, [...(byClient.get(c.s.clientId) ?? []), c]);
-      for (const [clientId, list] of byClient) await applyUsage(repos, clientId, list.map((c) => ({ before: c.before, after: null })));
+      for (const [clientId, list] of byClient) await applyUsage(repos, clientId, list.map((c) => ({ before: c.before, after: null })), consuming);
       return async () => {
         for (const s of sessions) await repos.sessions.restore(s.id);
-        for (const [clientId, list] of byClient) await applyUsage(repos, clientId, list.map((c) => ({ before: null, after: c.before })));
+        for (const [clientId, list] of byClient) await applyUsage(repos, clientId, list.map((c) => ({ before: null, after: c.before })), consuming);
       };
     },
 
     /** Records حضر / غاب / اعتذر متأخر (or clears it) and updates the client's remaining sessions. */
     async mark(session: Session, mark: MarkStatus | null): Promise<{ client: Client | null; undo: Undo }> {
       const late = await lateCancelIds(meta);
+      // The policy at the time of the tap is used for the change and for its undo, so they cancel out.
+      const consuming = consumingStatuses(await readPrefs(meta));
       const wasLate = late.has(session.id);
       const before = statusOf(session.attendance, wasLate);
       const prevAttendance = session.attendance;
       await repos.sessions.update(session.id, { attendance: storedAttendanceFor(mark) });
       await setLateCancel(meta, session.id, mark === 'lateCancel');
-      await applyUsage(repos, session.clientId, [{ before, after: mark }]);
+      await applyUsage(repos, session.clientId, [{ before, after: mark }], consuming);
       return {
         client: (await repos.clients.get(session.clientId)) ?? null,
         undo: async () => {
           await repos.sessions.update(session.id, { attendance: prevAttendance });
           await setLateCancel(meta, session.id, wasLate);
-          await applyUsage(repos, session.clientId, [{ before: mark, after: before }]);
+          await applyUsage(repos, session.clientId, [{ before: mark, after: before }], consuming);
         },
       };
     },

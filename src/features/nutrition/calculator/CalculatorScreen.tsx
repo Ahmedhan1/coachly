@@ -16,7 +16,7 @@ import { kcalText, oneDecimal, parseDecimal } from '../shared/numbers';
 import { Slider } from '../shared/Slider';
 import { useBackTo, useClient } from '../shared/useClient';
 import { useNutritionStore } from '../shared/useNutritionStore';
-import { clampGoalPercent, draftToInput, initialDraft, type CalcDraft, type Prefill } from './calculatorModel';
+import { clampGoalPercent, draftToInput, fieldOfError, initialDraft, missingField, type BodyField, type CalcDraft, type Prefill } from './calculatorModel';
 import { NavyHelper } from './NavyHelper';
 import { StepsDisclosure } from './StepsDisclosure';
 import common from '../shared/common.module.css';
@@ -87,6 +87,20 @@ function Calculator({ client, settings: s, saved, latest, back }: CalculatorProp
   };
 
   const goalRange = draft.goal === 'maintain' ? null : s.goalRanges[draft.goal];
+  // Friendly validation: an empty field asks for it; an out-of-range one says the accepted range, on the field itself.
+  const missing = missingField(draft);
+  const L = s.limits;
+  const errorText = (() => {
+    if (missing) return t(`nutrition.calc.missing.${missing}`);
+    if (result.ok) return null;
+    const e = result.error;
+    if (e === 'invalid_age') return t('nutrition.calc.range.age', { min: L.minAgeYears, max: L.maxAgeYears });
+    if (e === 'invalid_height') return t('nutrition.calc.range.height', { min: L.minHeightCm, max: L.maxHeightCm });
+    if (e === 'invalid_weight') return t('nutrition.calc.range.weight', { min: L.minWeightKg, max: L.maxWeightKg });
+    return calcErrorText(e);
+  })();
+  const errorField: BodyField | null = missing ?? (result.ok ? null : fieldOfError(result.error));
+  const fieldError = (f: BodyField) => (errorField === f && draft[f].trim() !== '' ? errorText : null);
   const hasBodyFat = input.bodyFatPercent !== null;
 
   return (
@@ -116,15 +130,16 @@ function Calculator({ client, settings: s, saved, latest, back }: CalculatorProp
             ]}
           />
           <div className={common.grid2}>
-            <TextField label={t('nutrition.calc.age')} inputMode="numeric" ltr value={draft.age} onChange={(e) => set('age', e.target.value)} />
-            <TextField label={t('nutrition.calc.height')} inputMode="decimal" ltr value={draft.height} onChange={(e) => set('height', e.target.value)} />
-            <TextField label={t('nutrition.calc.weight')} inputMode="decimal" ltr value={draft.weight} onChange={(e) => set('weight', e.target.value)} />
+            <TextField label={t('nutrition.calc.age')} inputMode="numeric" ltr value={draft.age} error={fieldError('age')} onChange={(e) => set('age', e.target.value)} />
+            <TextField label={t('nutrition.calc.height')} inputMode="decimal" ltr value={draft.height} error={fieldError('height')} onChange={(e) => set('height', e.target.value)} />
+            <TextField label={t('nutrition.calc.weight')} inputMode="decimal" ltr value={draft.weight} error={fieldError('weight')} onChange={(e) => set('weight', e.target.value)} />
             <TextField
               label={t('nutrition.calc.bodyFat')}
               hint={t('common.optional')}
               inputMode="decimal"
               ltr
               value={draft.bodyFat}
+              error={fieldError('bodyFat')}
               onChange={(e) => {
                 const text = e.target.value;
                 setDraft((d) => ({ ...d, bodyFat: text, formula: text.trim() === '' && d.formula === 'katch-mcardle' ? 'mifflin-st-jeor' : d.formula }));
@@ -212,10 +227,10 @@ function Calculator({ client, settings: s, saved, latest, back }: CalculatorProp
         <h2 id="calc-result" className={common.sectionTitle}>
           {t('nutrition.calc.result')}
         </h2>
-        {!result.ok ? (
-          <p className={common.error} role="alert">
+        {errorText !== null || !result.ok ? (
+          <p className={missing ? common.note : common.error} role="alert">
             <Icon name="alert" />
-            {calcErrorText(result.error)}
+            {errorText}
           </p>
         ) : (
           <div className={common.tile} data-testid="calc-result">
@@ -271,14 +286,14 @@ function Calculator({ client, settings: s, saved, latest, back }: CalculatorProp
         )}
       </section>
 
-      {result.ok && (
+      {result.ok && !missing && (
         <section className={common.section}>
           <StepsDisclosure steps={steps} />
         </section>
       )}
 
       <div className={common.actions}>
-        <Button size="large" icon="check" disabled={!result.ok || saving} onClick={() => void save()}>
+        <Button size="large" icon="check" disabled={!result.ok || missing !== null || saving} onClick={() => void save()}>
           {t('nutrition.calc.save')}
         </Button>
       </div>

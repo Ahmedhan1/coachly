@@ -53,3 +53,9 @@
   gap: var(--sp-2);
   margin-block-start: var(--sp-3);
 }
+
+.hint {
+  margin-block-start: calc(-1 * var(--sp-3));
+  font: var(--t-sub);
+  color: var(--warn);
+}

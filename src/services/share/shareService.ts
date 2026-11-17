@@ -6,7 +6,15 @@ export type ShareOutcome = 'shared' | 'cancelled' | 'downloaded' | 'failed';
  */
 export type ShareFailure = 'not_allowed' | 'unsupported' | 'error';
 
-export type ShareResult = { outcome: 'shared' | 'cancelled' | 'downloaded' } | { outcome: 'failed'; reason: ShareFailure };
+/**
+ * `downloaded` with `fallback: true`: the trainer asked to share, but this browser cannot share this file
+ * (common on Android Chrome for PDFs, and on desktop), so it was saved to Downloads instead. The UI must
+ * say so and explain how to attach it in WhatsApp.
+ */
+export type ShareResult =
+  | { outcome: 'shared' | 'cancelled' }
+  | { outcome: 'downloaded'; fallback?: true }
+  | { outcome: 'failed'; reason: ShareFailure };
 
 export interface ShareFileRequest {
   data: Blob;
@@ -118,15 +126,15 @@ export class BrowserShareService implements ShareService {
         }
       }
     }
-    return this.download(file);
+    return this.download(file, options.prefer !== 'download');
   }
 
-  private download(file: File): ShareResult {
+  private download(file: File, fallback: boolean): ShareResult {
     try {
       const url = this.env.createObjectURL(file);
       this.env.clickDownload(url, file.name);
       this.env.defer(() => this.env.revokeObjectURL(url), 60_000);
-      return { outcome: 'downloaded' };
+      return fallback ? { outcome: 'downloaded', fallback: true } : { outcome: 'downloaded' };
     } catch {
       return { outcome: 'failed', reason: 'unsupported' };
     }

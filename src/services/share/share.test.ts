@@ -42,12 +42,12 @@ describe('BrowserShareService', () => {
 
   it('downloads when files cannot be shared, or when asked to', async () => {
     const noFiles = env({ canShare: () => false });
-    expect(await new BrowserShareService(noFiles.e).shareFile(req)).toEqual({ outcome: 'downloaded' });
+    expect(await new BrowserShareService(noFiles.e).shareFile(req)).toEqual({ outcome: 'downloaded', fallback: true });
     expect(noFiles.log).toEqual(['download blob:x برنامج سارة.pdf', 'revoke blob:x']);
     const noApi = env({ share: undefined, canShare: undefined });
     const s = new BrowserShareService(noApi.e);
     expect(s.canShareFiles()).toBe(false);
-    expect(await s.shareFile(req)).toEqual({ outcome: 'downloaded' });
+    expect(await s.shareFile(req)).toEqual({ outcome: 'downloaded', fallback: true });
     const prefer = env();
     expect(await new BrowserShareService(prefer.e).shareFile(req, { prefer: 'download' })).toEqual({ outcome: 'downloaded' });
     expect(prefer.shared).toHaveLength(0);
@@ -55,7 +55,7 @@ describe('BrowserShareService', () => {
 
   it('falls back to download on other share errors, and fails quietly when nothing works', async () => {
     const typeErr = env({ share: async () => Promise.reject(new TypeError('bad')) });
-    expect(await new BrowserShareService(typeErr.e).shareFile(req)).toEqual({ outcome: 'downloaded' });
+    expect(await new BrowserShareService(typeErr.e).shareFile(req)).toEqual({ outcome: 'downloaded', fallback: true });
     const broken = env({ canShare: () => false, createObjectURL: () => { throw new Error('no'); } });
     expect(await new BrowserShareService(broken.e).shareFile(req)).toEqual({ outcome: 'failed', reason: 'unsupported' });
   });

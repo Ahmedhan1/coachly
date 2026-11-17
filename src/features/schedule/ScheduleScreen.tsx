@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useDeferredValue, useEffect, useRef, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { useServices } from '@/app/services';
 import { useUiStore } from '@/app/uiStore';
@@ -23,6 +23,10 @@ import styles from './Schedule.module.css';
 
 type View = 'day' | 'week';
 const SEARCH_DAYS = 120;
+/** Matches the booking toast duration in BookingSheet. */
+const BOOKING_TOAST_MS = 6000;
+/** Search shows the soonest matches; typing more narrows them. */
+const MAX_RESULTS = 40;
 
 const weekdayName = (date: IsoDate) => t(`schedule.weekdays.${weekdayOf(date)}` as TKey);
 const weekdayShort = (date: IsoDate) => t(`schedule.weekdaysShort.${weekdayOf(date)}` as TKey);
@@ -42,13 +46,22 @@ export function ScheduleScreen() {
   const [selected, setSelected] = useState<IsoDate>(() => (paramDate && isIsoDate(paramDate) ? paramDate : today));
   const [view, setView] = useState<View>('day');
   const [query, setQuery] = useState('');
-  const [target, setTarget] = useState<BookingTarget | null>(() =>
-    params.get('book') ? { mode: 'new', date: selected, clientId: params.get('client') } : null,
-  );
+  const [target, setTarget] = useState<BookingTarget | null>(null);
   const [prefsOpen, setPrefsOpen] = useState(false);
   const [remindersOpen, setRemindersOpen] = useState(false);
 
-  // "?book=1&client=…" (from client detail / quick add) opens the sheet once; drop it from the URL.
+  // "?book=1&client=…" (from client detail / quick add) opens the sheet once, also when the schedule is
+  // already open (state adjusted during render, React's pattern for reacting to a changed input); the
+  // effect then drops it from the URL.
+  const bookKey = params.has('book') ? params.toString() : null;
+  const [handledBook, setHandledBook] = useState<string | null>(null);
+  if (bookKey !== handledBook) {
+    setHandledBook(bookKey);
+    if (bookKey) {
+      const date = params.get('date');
+      setTarget({ mode: 'new', date: date && isIsoDate(date) && date > today ? date : today, clientId: params.get('client') });
+    }
+  }
   useEffect(() => {
     if (params.has('book')) setParams({}, { replace: true });
   }, [params, setParams]);
@@ -60,6 +73,8 @@ export function ScheduleScreen() {
   const week = useLive(() => repos.sessions.listBetween(rangeStart, rangeEnd), [repos, rangeStart, rangeEnd]);
   const clients = useLive(() => repos.clients.list(), [repos]);
   const nowMs = now.getTime();
+  // Typing stays responsive with thousands of sessions: the result list follows a deferred copy.
+  const deferredQuery = useDeferredValue(query);
   const searching = query.trim().length > 0;
   const upcoming = useLive(
     () => (searching ? repos.sessions.listBetween(nowMs - 3600_000, nowMs + SEARCH_DAYS * 86_400_000) : Promise.resolve([])),
@@ -94,8 +109,17 @@ export function ScheduleScreen() {
     });
   };
 
-  const onBooked = async () => {
-    if (await shouldShowRemindersPrompt(meta, new Date())) setRemindersOpen(true);
+  // The one-time reminders explanation waits until the booking toast (with its undo) is gone, so the
+  // sheet never covers «تراجع».
+  const remindersTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  useEffect(() => () => {
+    if (remindersTimer.current) clearTimeout(remindersTimer.current);
+  }, []);
+  const onBooked = () => {
+    if (remindersTimer.current) clearTimeout(remindersTimer.current);
+    remindersTimer.current = setTimeout(() => {
+      void shouldShowRemindersPrompt(meta, new Date()).then((show) => show && setRemindersOpen(true));
+    }, BOOKING_TOAST_MS + 500);
   };
 
   const subtitle =
@@ -154,7 +178,7 @@ export function ScheduleScreen() {
       </div>
 
       {searching ? (
-        <SearchResults query={query} sessions={upcoming ?? []} byId={byId} lateIds={lateIds} dateOf={dateOf} onOpen={(s) => setTarget({ mode: 'edit', session: s })} onMark={mark} />
+        <SearchResults query={deferredQuery} sessions={upcoming ?? []} byId={byId} lateIds={lateIds} dateOf={dateOf} onOpen={(s) => setTarget({ mode: 'edit', session: s })} onMark={mark} />
       ) : noClients ? (
         <div className={styles.emptyWrap}>
           <EmptyState
@@ -211,7 +235,7 @@ export function ScheduleScreen() {
       )}
 
       {target && clients && (
-        <BookingSheet target={target} clients={clients} prefs={prefs} today={today} onClose={() => setTarget(null)} onBooked={() => void onBooked()} />
+        <BookingSheet target={target} clients={clients} prefs={prefs} today={today} onClose={() => setTarget(null)} onBooked={onBooked} />
       )}
       {prefsOpen && <PrefsSheet prefs={prefs} onClose={() => setPrefsOpen(false)} />}
       {remindersOpen && <RemindersSheet onClose={() => setRemindersOpen(false)} />}
@@ -319,7 +343,8 @@ interface SearchResultsProps {
 }
 
 function SearchResults({ query, sessions, byId, lateIds, dateOf, onOpen, onMark }: SearchResultsProps) {
-  const hits = sessions.filter((s) => s.attendance !== 'cancelled' && matchesQuery([byId.get(s.clientId)?.name ?? '', s.notes], query));
+  const all = sessions.filter((s) => s.attendance !== 'cancelled' && matchesQuery([byId.get(s.clientId)?.name ?? '', s.notes], query));
+  const hits = all.slice(0, MAX_RESULTS);
   if (hits.length === 0) {
     return (
       <div className={styles.emptyWrap}>
@@ -328,7 +353,12 @@ function SearchResults({ query, sessions, byId, lateIds, dateOf, onOpen, onMark 
     );
   }
   return (
-    <ListSection title={t('schedule.searchResults')} count={hits.length} className={styles.dayList}>
+    <ListSection
+      title={t('schedule.searchResults')}
+      count={all.length}
+      className={styles.dayList}
+      footer={all.length > hits.length ? t('schedule.moreResults', { n: all.length - hits.length }) : undefined}
+    >
       {hits.map((s) => (
         <SessionRow
           key={s.id}

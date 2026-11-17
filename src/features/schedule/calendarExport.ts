@@ -78,12 +78,14 @@ export function icsOptions(req: Pick<CalendarRequest, 'clock' | 'timeZone' | 'no
 }
 
 /** Builds and shares/downloads the file. Must be called straight from a tap (iOS user activation). */
-export async function addSessionToCalendar(req: CalendarRequest): Promise<'shared' | 'downloaded' | 'cancelled' | 'failed'> {
+export async function addSessionToCalendar(req: CalendarRequest, prefer?: 'share' | 'download'): Promise<'shared' | 'downloaded' | 'cancelled' | 'failed'> {
   const result = await calendarService().addToCalendar(
     [calendarEventFor(req)],
     icsOptions(req),
-    t('schedule.calendar.fileName', { name: req.clientName }),
-    { title: t('schedule.calendar.summary', { name: req.clientName }) },
+    // ASCII on purpose: Chromium (Android) drops a non-Latin download name and saves "download" with no
+    // .ics extension, which no calendar opens. The Arabic title stays inside the file.
+    `pt-session-${req.clock.toLocal(req.session.startsAt).date}`,
+    { title: t('schedule.calendar.summary', { name: req.clientName }), prefer },
   );
   if (!result.ok) return 'failed';
   return result.value.share.outcome;

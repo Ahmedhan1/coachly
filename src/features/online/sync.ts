@@ -5,7 +5,8 @@ import { computeOutbox } from '@/features/outbox/useOutbox';
 import { toIsoDate, type ClientId, type ImageId } from '@/domain/models';
 import { t } from '@/i18n';
 import { deviceZone } from '@/features/schedule/zone';
-import { PHOTO_MAX_SIDE } from '@/features/nutrition/shared/photos';
+import { storePhoto } from '@/features/nutrition/shared/photos';
+import { NutritionStore } from '@/data/nutritionStore';
 import { readPushPrefs, readShare, savePushPrefs } from './prefs';
 
 /** Rebuilds this device's push schedule from the next 40 days of sessions and subscription ends. */
@@ -66,17 +67,26 @@ export async function pullCheckins(services: AppServices): Promise<number> {
   const pending = await page.pending(shares.map((s) => s.share));
   if (!pending.ok) return 0;
   const clientOf = new Map(shares.map((s) => [s.share.shareId, s.clientId]));
+  const store = new NutritionStore(services.meta, repos);
+  const imported = await readImportedCheckins(services);
   let stored = 0;
   for (const c of pending.value) {
     const clientId = clientOf.get(c.shareId);
     if (!clientId) continue;
+    // Already stored on an earlier pull whose delete did not reach the server: only retry the delete.
+    if (imported.includes(c.id)) {
+      await page.acknowledge(c);
+      continue;
+    }
     const photoIds: ImageId[] = [];
+    let thumbId: string | null = null;
     if (c.doc.photo) {
       const blob = await dataUrlToBlob(c.doc.photo);
       if (blob) {
         try {
-          const small = await services.images.downscale(blob, PHOTO_MAX_SIDE);
-          photoIds.push((await repos.images.save(small)).id);
+          const saved = await storePhoto(services, blob);
+          photoIds.push(saved.imageId as ImageId);
+          thumbId = saved.thumbId;
         } catch {
           // keep the numbers even if the photo cannot be read
         }
@@ -85,7 +95,7 @@ export async function pullCheckins(services: AppServices): Promise<number> {
     const measurements: { weightKg?: number; waistCm?: number } = {};
     if (c.doc.weightKg !== undefined) measurements.weightKg = c.doc.weightKg;
     if (c.doc.waistCm !== undefined) measurements.waistCm = c.doc.waistCm;
-    await repos.progress.create({
+    const entry = await repos.progress.create({
       clientId,
       date: toIsoDate(new Date(c.doc.createdAt * 1000)),
       measurements,
@@ -93,8 +103,19 @@ export async function pullCheckins(services: AppServices): Promise<number> {
       notes: c.doc.notes ?? '',
       source: 'client',
     });
+    if (thumbId && photoIds[0]) await store.setEntryPhotos(entry.id, [{ imageId: photoIds[0], thumbId, pose: 'front' }]).catch(() => undefined);
+    imported.push(c.id);
+    await services.meta.set(IMPORTED_CHECKINS_KEY, imported.slice(-200));
     await page.acknowledge(c);
     stored++;
   }
   return stored;
+}
+
+/** Ids of check-ins already turned into progress entries (last 200), so a failed delete never duplicates one. */
+export const IMPORTED_CHECKINS_KEY = 'clientPage.importedCheckins';
+
+async function readImportedCheckins(services: AppServices): Promise<string[]> {
+  const raw = await services.meta.get(IMPORTED_CHECKINS_KEY);
+  return Array.isArray(raw) ? raw.filter((x): x is string => typeof x === 'string') : [];
 }

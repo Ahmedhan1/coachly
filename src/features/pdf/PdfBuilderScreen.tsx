@@ -6,7 +6,9 @@ import { useLive } from '@/app/useLive';
 import { NutritionStore } from '@/data/nutritionStore';
 import { pdfSectionSchema, toIsoDate, type PdfSection } from '@/domain/models';
 import { normalizeSections, PDF_PRESET_IDS, PDF_PRESETS, presetTemplate, type PdfPresetId } from '@/domain/pdf';
+import { whatsappLink } from '@/domain/whatsapp';
 import { t } from '@/i18n';
+import { formatBytes } from '@/ui/format';
 import { Button, Icon, IconButton, PageHeader, Select, Sheet, TextArea, TextField, cx } from '@/ui';
 import { createImageSource, HtmlPdfRenderer, type PdfRenderProgress, type RenderedPdf } from '@/services/pdf';
 import { BrowserShareService } from '@/services/share';
@@ -20,7 +22,14 @@ import styles from './Pdf.module.css';
 const ALL_SECTIONS = pdfSectionSchema.options;
 const NONE = '__none__';
 
-type Status = { kind: 'idle' } | { kind: 'working'; progress: PdfRenderProgress | null } | { kind: 'ready'; pdf: RenderedPdf; url: string } | { kind: 'failed' };
+type Status =
+  | { kind: 'idle' }
+  | { kind: 'working'; progress: PdfRenderProgress | null }
+  | { kind: 'ready'; pdf: RenderedPdf; url: string; previews: string[] }
+  | { kind: 'failed' };
+
+/** What happened after "send": a download the trainer has to attach in WhatsApp themselves. */
+type Sent = null | { kind: 'fallback' | 'downloaded'; fileName: string };
 
 /** More → منشئ الـ PDF (or ?client= from the client screen). Rendered on the phone, shared via the share sheet. */
 export function PdfBuilderScreen() {
@@ -52,9 +61,17 @@ export function PdfBuilderScreen() {
   const program = [...(programs ?? [])].sort((a, b) => b.updatedAt - a.updatedAt)[0] ?? null;
 
   const statusUrl = status.kind === 'ready' ? status.url : null;
+  const statusPreviews = status.kind === 'ready' ? status.previews : null;
   useEffect(() => () => void (statusUrl && URL.revokeObjectURL(statusUrl)), [statusUrl]);
+  useEffect(() => () => statusPreviews?.forEach((u) => URL.revokeObjectURL(u)), [statusPreviews]);
+  const [sent, setSent] = useState<Sent>(null);
 
   const share = useMemo(() => new BrowserShareService(), []);
+  // Android Chrome (and desktop browsers) often cannot hand a PDF to the share sheet: say so up front.
+  const canSharePdf = useMemo(
+    () => share.canShareFiles({ data: new Blob(['%PDF-1.4'], { type: 'application/pdf' }), fileName: 'probe.pdf', mimeType: 'application/pdf' }),
+    [share],
+  );
 
   const applySections = (sections: readonly PdfSection[]) => {
     const list = normalizeSections(sections, ALL_SECTIONS);
@@ -133,15 +150,25 @@ export function PdfBuilderScreen() {
     const result = await renderer.render(input, { signal: ctrl.signal, onProgress: (p) => setStatus({ kind: 'working', progress: p }) });
     if (ctrl.signal.aborted) return setStatus({ kind: 'idle' });
     if (!result.ok) return setStatus({ kind: 'failed' });
-    setStatus({ kind: 'ready', pdf: result.value, url: URL.createObjectURL(result.value.blob) });
+    setSent(null);
+    setStatus({
+      kind: 'ready',
+      pdf: result.value,
+      url: URL.createObjectURL(result.value.blob),
+      previews: (result.value.previews ?? []).map((b) => URL.createObjectURL(b)),
+    });
   };
 
   const send = async (prefer: 'share' | 'download') => {
     if (status.kind !== 'ready') return;
     const r = await share.shareFile({ data: status.pdf.blob, fileName: status.pdf.fileName, mimeType: 'application/pdf', title: title || status.pdf.fileName }, { prefer });
-    if (r.outcome === 'shared') showToast({ message: t('pdf.shared'), duration: 2500 });
-    else if (r.outcome === 'downloaded') showToast({ message: t('pdf.downloaded'), duration: 2500 });
-    else if (r.outcome === 'failed') showToast({ message: t('pdf.shareFailed') });
+    if (r.outcome === 'shared') {
+      setSent(null);
+      showToast({ message: t('pdf.shared'), duration: 2500 });
+    } else if (r.outcome === 'downloaded') {
+      setSent({ kind: r.fallback ? 'fallback' : 'downloaded', fileName: status.pdf.fileName });
+      showToast({ message: t('pdf.downloaded'), duration: 2500 });
+    } else if (r.outcome === 'failed') showToast({ message: t('pdf.shareFailed') });
   };
 
   const back = client && params.get('client') ? { to: `/clients/${client.id}`, label: client.name } : { to: '/more', label: t('screens.more.title') };
@@ -212,8 +239,32 @@ export function PdfBuilderScreen() {
           <p className={styles.ready}>
             <Icon name="check" />
             {t('pdf.ready', { n: status.pdf.pageCount })}
+            <span className={styles.size}>{t('pdf.readySize', { size: formatBytes(status.pdf.blob.size) })}</span>
           </p>
-          <iframe className={styles.preview} src={status.url} title={t('pdf.preview')} />
+          {status.previews.length > 0 ? (
+            <ol className={styles.pages} aria-label={t('pdf.preview')}>
+              {status.previews.map((u, i) => (
+                <li key={u}>
+                  <img src={u} alt={t('pdf.previewPage', { n: i + 1 })} loading="lazy" decoding="async" />
+                </li>
+              ))}
+            </ol>
+          ) : (
+            <a className={styles.openLink} href={status.url} target="_blank" rel="noopener">
+              {t('pdf.open')}
+            </a>
+          )}
+          {sent && (
+            <div className={styles.help} role="status">
+              <p className={styles.helpTitle}>{sent.kind === 'fallback' ? t('pdf.fallbackTitle') : t('pdf.downloaded')}</p>
+              <p>{sent.kind === 'fallback' ? t('pdf.fallbackBody', { name: sent.fileName }) : t('pdf.downloadedBody', { name: sent.fileName })}</p>
+              <p>{t('pdf.fallbackSteps')}</p>
+              <a className={styles.whatsapp} href={whatsappLink(client?.phone ?? '', client ? t('pdf.whatsappText', { name: client.name.split(/\s+/)[0] ?? '' }) : '')} target="_blank" rel="noopener">
+                <Icon name="share" />
+                {client ? t('pdf.openWhatsapp', { name: client.name }) : t('pdf.openWhatsappNoClient')}
+              </a>
+            </div>
+          )}
         </section>
       )}
       {status.kind === 'failed' && <p className={styles.warn}>{t('pdf.failed')}</p>}
@@ -239,7 +290,7 @@ export function PdfBuilderScreen() {
               {t('pdf.download')}
             </Button>
             <Button size="large" icon="share" className={styles.primary} onClick={() => void send('share')}>
-              {t('pdf.share')}
+              {canSharePdf ? t('pdf.share') : t('pdf.downloadAndSend')}
             </Button>
           </>
         ) : (

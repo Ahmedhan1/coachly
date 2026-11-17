@@ -7,6 +7,7 @@ import { t } from '@/i18n';
 import { Badge, Button, PageHeader, Select } from '@/ui';
 import { formatIsoDate, formatTime } from '@/ui/format';
 import { readPushPrefs, savePushPrefs, type PushPrefs } from '@/features/online/prefs';
+import { enablePushNotifications } from '@/features/online/enablePush';
 import { syncPush } from '@/features/online/sync';
 import styles from './Settings.module.css';
 
@@ -30,6 +31,8 @@ export function NotificationsScreen() {
   const update = async (next: PushPrefs) => {
     await savePushPrefs(meta, next);
     setVersion((v) => v + 1);
+    // A new lead time or renewal day changes every reminder: resend the schedule (quietly) when push is on.
+    if (next.enabled) void syncPush(services).then(() => setVersion((v) => v + 1));
   };
   const sync = async () => {
     setBusy(true);
@@ -42,8 +45,9 @@ export function NotificationsScreen() {
   const enable = async () => {
     if (!push) return;
     setBusy(true);
-    const r = await push.enable();
+    const r = await enablePushNotifications(services);
     setBusy(false);
+    setVersion((v) => v + 1);
     if (!r.ok) {
       const key =
         r.error === 'denied'
@@ -55,8 +59,7 @@ export function NotificationsScreen() {
               : 'settings.notifications.failed';
       return showToast({ message: t(key) });
     }
-    await update({ ...prefs, enabled: true });
-    await sync();
+    showToast({ message: r.scheduled === null ? t('settings.notifications.failed') : t('settings.notifications.syncedOk', { n: r.scheduled }), duration: 2500 });
   };
 
   return (

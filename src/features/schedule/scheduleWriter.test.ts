@@ -3,7 +3,7 @@ import { createTestData } from '@/data/testing';
 import type { ClientId } from '@/domain/models';
 import { fixedOffsetClock } from '@/domain/schedule';
 import { memoryMetaStore } from '@/services/license/metaStore';
-import { LATE_CANCEL_KEY } from './prefs';
+import { DEFAULT_SCHEDULE_PREFS, LATE_CANCEL_KEY, parsePrefs, savePrefs } from './prefs';
 import { createScheduleWriter } from './scheduleWriter';
 
 async function setup() {
@@ -93,5 +93,27 @@ describe('schedule writer', () => {
     const moved = await repos.sessions.get(second.id);
     expect(moved?.seriesId).toBeNull();
     expect(await repos.sessions.listByClient(clientId)).toHaveLength(3);
+  });
+
+  it('follows the trainer policy: a no-show or late cancel can be set not to use a session', async () => {
+    const { repos, meta, writer, clientId } = await setup();
+    await savePrefs(meta, { ...DEFAULT_SCHEDULE_PREFS, noShowUsesSession: false, lateCancelUsesSession: false });
+    const r = await writer.book({ clientId, notes: '', date: '2026-11-21', startMinute: 540, durationMinutes: 60, repeat: null });
+    if (!r.ok) throw new Error(r.error);
+    const s = r.value.sessions[0]!;
+    expect((await writer.mark(s, 'noShow')).client?.remainingSessions).toBe(5);
+    expect((await writer.mark((await repos.sessions.get(s.id))!, 'lateCancel')).client?.remainingSessions).toBe(5);
+    expect((await writer.mark((await repos.sessions.get(s.id))!, 'attended')).client?.remainingSessions).toBe(4);
+  });
+});
+
+describe('schedule prefs', () => {
+  it('old stored prefs without the policy fields read as "both use a session"', () => {
+    expect(parsePrefs({ defaultDurationMin: 45, alarmMinutesBefore: null })).toEqual({
+      defaultDurationMin: 45,
+      alarmMinutesBefore: null,
+      noShowUsesSession: true,
+      lateCancelUsesSession: true,
+    });
   });
 });

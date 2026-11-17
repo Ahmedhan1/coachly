@@ -18,6 +18,7 @@ import {
   parseSessionState,
   reopenSet,
   restRemaining,
+  resumeDecision,
   skipExercise,
   swapExercise,
   summarizeSession,
@@ -36,10 +37,12 @@ import { exerciseName } from '@/features/programs/names';
 import { Stepper } from '@/features/programs/Stepper';
 import { usePushedScreen } from '@/features/programs/usePushedScreen';
 import { useWhatsappLinkBuilder } from '@/features/whatsapp/useWhatsappLink';
+import { useRestEndCue, useScreenWakeLock } from './useSessionDevice';
 import styles from './Session.module.css';
 
-/** Meta key of the running session: one at a time, survives the app being killed. */
-export const ACTIVE_SESSION_KEY = 'session.active';
+import { ACTIVE_SESSION_KEY } from './sessionKey';
+
+export { ACTIVE_SESSION_KEY };
 
 interface Loaded {
   client: Client;
@@ -48,6 +51,8 @@ interface Loaded {
   logs: WorkoutLog[];
   unit: 'kg' | 'lb';
   saved: SessionState | null;
+  /** Name of the client of the saved session (when it is someone else). */
+  savedClientName: string | null;
 }
 
 /** وضع الحصة: /session/:key?client=&program=&day= (key "new" starts a fresh session). */
@@ -66,7 +71,9 @@ export function SessionScreen() {
     const logs = await data.repos.workoutLogs.listByClient(clientId);
     const settings = await data.repos.settings.get();
     const saved = parseSessionState(await meta.get(ACTIVE_SESSION_KEY));
-    return { client, program, history: workoutLogsToSets(logs), unit: settings.units.weight, saved, logs };
+    const savedClient = saved && saved.clientId !== client.id ? await data.repos.clients.get(saved.clientId) : null;
+    const savedClientName = savedClient ? savedClient.name : saved ? client.name : null;
+    return { client, program, history: workoutLogsToSets(logs), unit: settings.units.weight, saved, savedClientName, logs };
   }, [data, meta, clientId, programId]);
 
   if (loaded === undefined) return <PageHeader title={t('training.session.loading')} back={{ to: '/', label: t('training.session.backHome') }} />;
@@ -102,7 +109,7 @@ function useTick(active: boolean): number {
   return now;
 }
 
-function SessionRunner({ client, program, history, logs, unit, saved, routeKey, dayParam, scheduleId }: RunnerProps) {
+function SessionRunner({ client, program, history, logs, unit, saved, savedClientName, routeKey, dayParam, scheduleId }: RunnerProps) {
   const { data, meta } = useServices();
   const navigate = useNavigate();
   const showToast = useUiStore((s) => s.showToast);
@@ -114,8 +121,7 @@ function SessionRunner({ client, program, history, logs, unit, saved, routeKey, 
   const announcedResume = useRef(false);
   const [swapping, setSwapping] = useState<number | null>(null);
 
-  const [state, setState] = useState<SessionState | null>(() => {
-    if (saved && saved.clientId === client.id && (routeKey === 'new' || saved.key === routeKey)) return saved;
+  const fresh = (): SessionState | null => {
     if (!program) return null;
     const dayId = dayParam ?? nextProgramDayId(program.days, logs, program.id);
     const day = program.days.find((d) => d.id === dayId) ?? program.days[0] ?? null;
@@ -128,7 +134,11 @@ function SessionRunner({ client, program, history, logs, unit, saved, routeKey, 
       history,
       now: Date.now(),
     });
-  });
+  };
+  const [decision] = useState(() => resumeDecision(saved, { routeKey, clientId: client.id, dayId: dayParam }, Date.now()));
+  // An unsaved session with work in it is never overwritten silently.
+  const [pending, setPending] = useState<SessionState | null>(() => (decision === 'ask' ? saved : null));
+  const [state, setState] = useState<SessionState | null>(() => (decision === 'resume' ? saved : decision === 'ask' ? null : fresh()));
 
   useEffect(() => {
     if (saved && state === saved && !announcedResume.current) {
@@ -143,8 +153,65 @@ function SessionRunner({ client, program, history, logs, unit, saved, routeKey, 
   }, [state, meta, phase]);
 
   const now = useTick(state?.rest != null);
+  const restLeft = state ? restRemaining(state, now) : 0;
+  useScreenWakeLock(state !== null && phase === 'run');
+  useRestEndCue(restLeft);
 
   const back = { to: `/clients/${client.id}`, label: client.name };
+  if (pending) {
+    const done = pending.exercises.reduce((n, e) => n + e.sets.filter((x) => x.done).length, 0);
+    const startNew = () => {
+      setPending(null);
+      setState(fresh());
+    };
+    return (
+      <>
+        <PageHeader title={t('training.session.title')} back={back} />
+        <EmptyState
+          icon="timer"
+          title={t('training.session.pendingTitle', { name: savedClientName ?? '' })}
+          body={t('training.session.pendingBody', { n: done })}
+          action={
+            <div className={styles.pendingActions}>
+              <Button
+                block
+                onClick={() =>
+                  navigate(
+                    `/session/${encodeURIComponent(pending.key)}?client=${pending.clientId}${pending.programId ? `&program=${pending.programId}` : ''}`,
+                    { replace: true },
+                  )
+                }
+              >
+                {t('training.session.pendingResume')}
+              </Button>
+              <Button
+                block
+                variant="secondary"
+                disabled={saving}
+                onClick={async () => {
+                  setSaving(true);
+                  try {
+                    await data.repos.workoutLogs.create(toWorkoutLogInput(pending, toIsoDate(new Date(pending.startedAt))));
+                    showToast({ message: t('training.session.pendingSaved'), duration: 2500 });
+                    startNew();
+                  } catch {
+                    showToast({ message: t('training.session.saveError') });
+                  } finally {
+                    setSaving(false);
+                  }
+                }}
+              >
+                {t('training.session.pendingSaveAndNew')}
+              </Button>
+              <Button block variant="plain" onClick={startNew}>
+                {t('training.session.pendingDiscard')}
+              </Button>
+            </div>
+          }
+        />
+      </>
+    );
+  }
   if (!state) {
     return (
       <>

@@ -1,8 +1,9 @@
 import type { Object3D } from 'three';
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
 import { glbNeedsDraco } from './glb';
+import { revealCoveredGroups } from './reveal';
 
-/** Served from public/models/ (placeholder until the Blender export lands, docs/3D_MODEL.md). */
+/** Served from public/models/ (Z-Anatomy export, docs/3D_MODEL.md); precached by the service worker. */
 export const MODEL_URL = '/models/muscles.glb';
 /** Local copy of three's glTF Draco decoder (no CDN): public/draco/. */
 export const DRACO_DECODER_PATH = '/draco/';
@@ -38,6 +39,7 @@ export async function parseModel(buffer: ArrayBuffer): Promise<Object3D> {
   try {
     // parse() may detach nothing, but give it its own copy so the cached buffer stays reusable.
     const gltf = await loader.parseAsync(buffer.slice(0), '');
+    revealCoveredGroups(gltf.scene);
     return gltf.scene;
   } finally {
     dispose();

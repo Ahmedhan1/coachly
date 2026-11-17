@@ -1,6 +1,7 @@
 import { z } from 'zod';
 import { useServices } from '@/app/services';
 import { useLive } from '@/app/useLive';
+import type { AttendanceStatus } from '@/domain/schedule';
 import type { MetaStore } from '@/services/license/metaStore';
 
 /**
@@ -19,10 +20,18 @@ export const schedulePrefsSchema = z.object({
   defaultDurationMin: z.number().int().min(5).max(480),
   /** Minutes before the session for the calendar alarm; null = no alarm. */
   alarmMinutesBefore: z.number().int().min(0).max(24 * 60).nullable(),
+  /** Package policy (trainer's rule): does غاب / اعتذر متأخر use up a session? Attended always does. */
+  noShowUsesSession: z.boolean().default(true),
+  lateCancelUsesSession: z.boolean().default(true),
 });
 export type SchedulePrefs = z.infer<typeof schedulePrefsSchema>;
 
-export const DEFAULT_SCHEDULE_PREFS: SchedulePrefs = { defaultDurationMin: 60, alarmMinutesBefore: 60 };
+export const DEFAULT_SCHEDULE_PREFS: SchedulePrefs = { defaultDurationMin: 60, alarmMinutesBefore: 60, noShowUsesSession: true, lateCancelUsesSession: true };
+
+/** The statuses that use up a package session under the trainer's policy. */
+export function consumingStatuses(prefs: Pick<SchedulePrefs, 'noShowUsesSession' | 'lateCancelUsesSession'>): AttendanceStatus[] {
+  return ['attended', ...(prefs.noShowUsesSession ? (['noShow'] as const) : []), ...(prefs.lateCancelUsesSession ? (['lateCancel'] as const) : [])];
+}
 
 export function parsePrefs(raw: unknown): SchedulePrefs {
   const parsed = schedulePrefsSchema.safeParse(raw);

@@ -90,3 +90,21 @@
   block-size: 22px;
   accent-color: var(--brand);
 }
+
+/* What will be sent, word for word (two lines; the full text opens in WhatsApp). */
+.preview {
+  display: -webkit-box;
+  margin-block-start: var(--sp-1);
+  overflow: hidden;
+  color: var(--text-2);
+  font: var(--t-sub);
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow-wrap: anywhere;
+}
+
+.how {
+  margin: 0 var(--gutter, 16px) var(--sp-4);
+  color: var(--text-2);
+  font: var(--t-sub);
+}

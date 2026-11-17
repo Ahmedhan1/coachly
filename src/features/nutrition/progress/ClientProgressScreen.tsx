@@ -6,7 +6,7 @@ import type { ProgressEntry, WorkoutLog } from '@/domain/models';
 import { workoutLogsToSets } from '@/domain/programs';
 import { estimateOneRepMax, personalRecordTimeline } from '@/domain/strength';
 import { t } from '@/i18n';
-import { Badge, Button, EmptyState, IconButton, ListRow, ListSection, PageHeader, Sheet, Tx } from '@/ui';
+import { Badge, Button, EmptyState, IconButton, ListRow, ListSection, Num, PageHeader, SegmentedControl, Sheet, Tx } from '@/ui';
 import { formatIsoDate, formatNumber } from '@/ui/format';
 import { useExerciseCatalog } from '@/features/programs/catalog';
 import { exerciseName } from '@/features/programs/names';
@@ -14,6 +14,7 @@ import { ClientNav } from '../shared/ClientNav';
 import { StoredImage } from '../shared/StoredImage';
 import { useBackTo, useClient } from '../shared/useClient';
 import { EntrySheet } from './EntrySheet';
+import { useThumbs } from './useThumbs';
 import { WeightChart } from './WeightChart';
 import common from '../shared/common.module.css';
 import styles from './Progress.module.css';
@@ -33,6 +34,12 @@ function exerciseHistory(logs: readonly WorkoutLog[], exerciseId: string): { dat
   }
   return [...best].map(([date, value]) => ({ date, value })).sort((a, b) => a.date.localeCompare(b.date));
 }
+
+const METRICS = ['weightKg', 'bodyFatPercent', 'waistCm', 'hipCm', 'chestCm', 'armCm', 'thighCm'] as const;
+type Metric = (typeof METRICS)[number];
+
+const metricUnit = (m: Metric) =>
+  m === 'weightKg' ? t('nutrition.progress.metricUnits.weightKg') : m === 'bodyFatPercent' ? t('nutrition.progress.metricUnits.bodyFatPercent') : t('nutrition.progress.metricUnits.cm');
 
 function summary(e: ProgressEntry): string {
   const m = e.measurements;
@@ -55,6 +62,10 @@ export function ClientProgressScreen() {
   const catalog = useExerciseCatalog();
   const [editing, setEditing] = useState<ProgressEntry | 'new' | null>(null);
   const [historyOf, setHistoryOf] = useState<string | null>(null);
+  const [metric, setMetric] = useState<Metric>('weightKg');
+  const [picked, setPicked] = useState<{ before?: string; after?: string }>({});
+  const [picking, setPicking] = useState<'before' | 'after' | null>(null);
+  const thumbs = useThumbs(entries);
 
   const sorted = useMemo(() => [...(entries ?? [])].sort((a, b) => a.date.localeCompare(b.date)), [entries]);
   const records = useMemo(() => {
@@ -67,13 +78,19 @@ export function ClientProgressScreen() {
   if (client === undefined || entries === undefined) return <PageHeader title="" back={{ to: back, label: t('common.back') }} />;
   if (client === null) return <EmptyState icon="user" title={t('clients.notFoundTitle')} body={t('clients.notFoundBody')} />;
 
-  const weights = sorted.flatMap((e) => (e.measurements.weightKg !== undefined ? [{ date: e.date, value: e.measurements.weightKg }] : []));
-  const firstW = weights[0];
-  const lastW = weights[weights.length - 1];
-  const delta = firstW && lastW && weights.length > 1 ? Math.round((lastW.value - firstW.value) * 10) / 10 : null;
+  const available = METRICS.filter((m) => sorted.some((e) => e.measurements[m] !== undefined));
+  const shown: Metric = available.includes(metric) ? metric : (available[0] ?? 'weightKg');
+  const series = sorted.flatMap((e) => {
+    const v = e.measurements[shown];
+    return v !== undefined ? [{ date: e.date, value: v }] : [];
+  });
+  const firstV = series[0];
+  const lastV = series[series.length - 1];
+  const delta = firstV && lastV && series.length > 1 ? Math.round((lastV.value - firstV.value) * 10) / 10 : null;
   const withPhotos = sorted.filter((e) => e.photoIds.length > 0);
-  const before = withPhotos[0];
-  const after = withPhotos.length > 1 ? withPhotos[withPhotos.length - 1] : undefined;
+  const before = withPhotos.find((e) => e.id === picked.before) ?? withPhotos[0];
+  const after = withPhotos.find((e) => e.id === picked.after) ?? (withPhotos.length > 1 ? withPhotos[withPhotos.length - 1] : undefined);
+  const thumbOf = (id: string | undefined) => (id ? (thumbs.get(id) ?? id) : id);
 
   return (
     <div className={common.page}>
@@ -101,15 +118,31 @@ export function ClientProgressScreen() {
             <div className={common.tile}>
               <div className={styles.chartHead}>
                 <h2 id="w-title" className={common.sectionTitle}>
-                  {t('nutrition.progress.weightChart')}
+                  {t('nutrition.progress.chartTitle')}
                 </h2>
                 {delta !== null && (
                   <Badge tone={delta === 0 ? 'neutral' : 'brand'}>
-                    {t('nutrition.progress.changeValue', { sign: delta > 0 ? '+' : '', n: formatNumber(delta) })}
+                    <Tx k="nutrition.progress.metricChange" params={{ n: <Num>{`${delta > 0 ? '+' : ''}${formatNumber(delta)}`}</Num>, unit: metricUnit(shown) }} />
                   </Badge>
                 )}
               </div>
-              {weights.length > 1 ? <WeightChart series={weights} /> : <p className={common.muted}>{t('nutrition.progress.needTwo')}</p>}
+              {available.length > 1 && (
+                <SegmentedControl
+                  label={t('nutrition.progress.metricPick')}
+                  value={shown}
+                  onChange={setMetric}
+                  wrap
+                  options={available.map((m) => ({ value: m, label: t(`nutrition.progress.metrics.${m}`) }))}
+                />
+              )}
+              {series.length > 1 && firstV && lastV ? (
+                <WeightChart
+                  series={series}
+                  label={t('nutrition.progress.metricChartLabel', { metric: t(`nutrition.progress.metrics.${shown}`), from: formatIsoDate(firstV.date), to: formatIsoDate(lastV.date) })}
+                />
+              ) : (
+                <p className={common.muted}>{t('nutrition.progress.needTwo')}</p>
+              )}
             </div>
           </section>
 
@@ -118,19 +151,28 @@ export function ClientProgressScreen() {
               {t('nutrition.progress.beforeAfter')}
             </h2>
             {before && after ? (
-              <div className={styles.compare}>
-                {[
-                  { e: before, label: t('nutrition.progress.before') },
-                  { e: after, label: t('nutrition.progress.after') },
-                ].map(({ e, label }) => (
-                  <figure key={e.id} className={styles.compareCell}>
-                    <StoredImage imageId={e.photoIds[0]} alt={`${label} ${formatIsoDate(e.date)}`} className={styles.comparePhoto} />
-                    <figcaption>
-                      {label} · {formatIsoDate(e.date)}
-                    </figcaption>
-                  </figure>
-                ))}
-              </div>
+              <>
+                <div className={styles.compare}>
+                  {[
+                    { e: before, label: t('nutrition.progress.before'), side: 'before' as const },
+                    { e: after, label: t('nutrition.progress.after'), side: 'after' as const },
+                  ].map(({ e, label, side }) => (
+                    <button
+                      key={side}
+                      type="button"
+                      className={styles.compareCell}
+                      onClick={() => setPicking(side)}
+                      aria-label={t('nutrition.progress.pickPhotoLabel', { label })}
+                    >
+                      <StoredImage imageId={e.photoIds[0]} alt={`${label} ${formatIsoDate(e.date)}`} className={styles.comparePhoto} />
+                      <span className={styles.compareCaption}>
+                        {label} · {formatIsoDate(e.date)}
+                      </span>
+                    </button>
+                  ))}
+                </div>
+                {withPhotos.length > 2 && <p className={common.caption}>{t('nutrition.progress.compareHint')}</p>}
+              </>
             ) : (
               <p className={common.muted}>{t('nutrition.progress.needPhotos')}</p>
             )}
@@ -140,7 +182,7 @@ export function ClientProgressScreen() {
             {[...sorted].reverse().map((e) => (
               <ListRow
                 key={e.id}
-                leading={e.photoIds[0] ? <StoredImage imageId={e.photoIds[0]} alt="" className={styles.rowThumb} lazy /> : undefined}
+                leading={e.photoIds[0] ? <StoredImage imageId={thumbOf(e.photoIds[0])} alt="" className={styles.rowThumb} lazy /> : undefined}
                 title={formatIsoDate(e.date)}
                 subtitle={summary(e) || e.notes}
                 trailing={e.source === 'client' ? <Badge>{t('nutrition.progress.fromClient')}</Badge> : undefined}
@@ -184,6 +226,32 @@ export function ClientProgressScreen() {
               <p className={common.muted}>{t('nutrition.progress.historyNeedTwo')}</p>
             );
           })()}
+        </Sheet>
+      )}
+      {picking && (
+        <Sheet
+          open
+          onClose={() => setPicking(null)}
+          title={picking === 'before' ? t('nutrition.progress.pickBefore') : t('nutrition.progress.pickAfter')}
+          cancelLabel={t('common.close')}
+        >
+          <div className={styles.pickGrid}>
+            {[...withPhotos].reverse().map((e) => (
+              <button
+                key={e.id}
+                type="button"
+                className={styles.pickCell}
+                aria-pressed={(picking === 'before' ? before : after)?.id === e.id}
+                onClick={() => {
+                  setPicked((p) => ({ ...p, [picking]: e.id }));
+                  setPicking(null);
+                }}
+              >
+                <StoredImage imageId={thumbOf(e.photoIds[0])} alt={formatIsoDate(e.date)} className={styles.pickPhoto} lazy />
+                <span className={styles.compareCaption}>{formatIsoDate(e.date)}</span>
+              </button>
+            ))}
+          </div>
         </Sheet>
       )}
       {editing && <EntrySheet clientId={clientId} entry={editing === 'new' ? null : editing} onClose={() => setEditing(null)} />}

@@ -1,4 +1,4 @@
-import { Canvas, useThree, type ThreeEvent } from '@react-three/fiber';
+import { Canvas, useThree } from '@react-three/fiber';
 import { Component, useEffect, useMemo, useRef, useState, type ReactNode } from 'react';
 import { Group, type Object3D, type PerspectiveCamera } from 'three';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
@@ -12,8 +12,8 @@ import {
   disposeModel,
   frameModel,
   loadMuscleModel,
+  pickMuscleAt,
   placeCamera,
-  roleOfObject,
   themePalette,
   tintModel,
   viewerMode,
@@ -32,6 +32,9 @@ export interface MuscleViewer3DProps {
 }
 
 const VIEWS: readonly ModelView[] = ['front', 'side', 'back'];
+
+/** The stage is dark in both themes, so the body keeps the light-theme greys; only the brand follows the theme. */
+const STAGE_BODY = { base: '#d9dad6', off: '#c3c5c1' } as const;
 
 /** Pointer travel (px) above which a tap is treated as a drag (rotation), not a selection. */
 const TAP_SLOP = 8;
@@ -93,7 +96,13 @@ export default function MuscleViewer3D(props: MuscleViewer3DProps) {
             role="img"
             className={styles.canvas}
           >
-            <Scene model={model} {...props} view={view} resetKey={(props.resetKey ?? 0) * 1000 + viewKey} />
+            <Scene
+              model={model}
+              {...props}
+              view={view}
+              resetKey={(props.resetKey ?? 0) * 1000 + viewKey}
+              onContextLost={() => setState('error')}
+            />
           </Canvas>
         </CanvasBoundary>
       )}
@@ -119,7 +128,13 @@ export default function MuscleViewer3D(props: MuscleViewer3DProps) {
   );
 }
 
-function Scene({ model, intensities, selected, onSelect, resetKey = 0, view = 'front' }: MuscleViewer3DProps & { model: Object3D; view?: ModelView }) {
+interface SceneProps extends MuscleViewer3DProps {
+  model: Object3D;
+  view?: ModelView;
+  onContextLost: () => void;
+}
+
+function Scene({ model, intensities, selected, onSelect, resetKey = 0, view = 'front', onContextLost }: SceneProps) {
   const camera = useThree((s) => s.camera) as PerspectiveCamera;
   const gl = useThree((s) => s.gl);
   const invalidate = useThree((s) => s.invalidate);
@@ -129,7 +144,7 @@ function Scene({ model, intensities, selected, onSelect, resetKey = 0, view = 'f
     g.add(...createLights());
     return g;
   }, []);
-  const palette = useMemo(() => themePalette(), []);
+  const palette = useMemo(() => ({ ...themePalette(), ...STAGE_BODY }), []);
   const controls = useRef<OrbitControls | null>(null);
 
   useEffect(() => {
@@ -165,17 +180,53 @@ function Scene({ model, intensities, selected, onSelect, resetKey = 0, view = 'f
     return dispose;
   }, [model, intensities, palette, selected, invalidate]);
 
-  const onClick = (e: ThreeEvent<MouseEvent>) => {
-    e.stopPropagation();
-    if (e.delta > TAP_SLOP) return;
-    const role = roleOfObject(e.object);
-    if (role.kind === 'muscle') onSelect(role.group);
-  };
+  // Tap (not drag) → the nearest muscle under a finger-sized ring of rays. Listening on the canvas keeps
+  // OrbitControls in charge of drags and pinches.
+  const handlers = useRef({ onSelect, onContextLost });
+  useEffect(() => {
+    handlers.current = { onSelect, onContextLost };
+  }, [onSelect, onContextLost]);
+  useEffect(() => {
+    const el = gl.domElement;
+    let down: { x: number; y: number; id: number } | null = null;
+    let pointers = 0;
+    const onDown = (e: PointerEvent) => {
+      pointers += 1;
+      down = pointers === 1 ? { x: e.clientX, y: e.clientY, id: e.pointerId } : null;
+    };
+    const onUp = (e: PointerEvent) => {
+      pointers = Math.max(0, pointers - 1);
+      const start = down;
+      down = null;
+      if (!start || start.id !== e.pointerId || Math.hypot(e.clientX - start.x, e.clientY - start.y) > TAP_SLOP) return;
+      const rect = el.getBoundingClientRect();
+      const group = pickMuscleAt(model, camera, { x: e.clientX - rect.left, y: e.clientY - rect.top }, rect);
+      if (group) handlers.current.onSelect(group);
+    };
+    const onCancel = () => {
+      pointers = 0;
+      down = null;
+    };
+    const onLost = (e: Event) => {
+      e.preventDefault();
+      handlers.current.onContextLost();
+    };
+    el.addEventListener('pointerdown', onDown);
+    el.addEventListener('pointerup', onUp);
+    el.addEventListener('pointercancel', onCancel);
+    el.addEventListener('webglcontextlost', onLost);
+    return () => {
+      el.removeEventListener('pointerdown', onDown);
+      el.removeEventListener('pointerup', onUp);
+      el.removeEventListener('pointercancel', onCancel);
+      el.removeEventListener('webglcontextlost', onLost);
+    };
+  }, [gl, camera, model]);
 
   return (
     <>
       <primitive object={lights} />
-      <primitive object={model} onClick={onClick} />
+      <primitive object={model} />
     </>
   );
 }

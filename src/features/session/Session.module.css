@@ -301,3 +301,34 @@
   font: var(--t-body);
   text-align: start;
 }
+
+.pendingActions {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-2);
+  inline-size: 100%;
+}
+
+.banner {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-3);
+  min-block-size: 56px;
+  padding: var(--sp-3) var(--sp-4);
+  border-radius: var(--r-lg);
+  background: var(--brand);
+  color: var(--brand-on);
+  text-decoration: none;
+}
+
+.bannerText {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  font: var(--t-caption);
+}
+
+.bannerText strong {
+  font: var(--t-headline);
+}

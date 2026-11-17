@@ -21,6 +21,8 @@ export interface RenderedPdf {
   pageCount: number;
   /** Suggested file name (no path), `.pdf`. */
   fileName: string;
+  /** Small JPEG per page, in order, for the in-app preview (may be empty). */
+  previews?: Blob[];
 }
 
 /** Builds a PDF from the domain input. Never throws. */

@@ -4,7 +4,8 @@ import { useUiStore } from '@/app/uiStore';
 import { toIsoDate, type Client, type IsoDate, type Payment, type PaymentMethod } from '@/domain/models';
 import { t } from '@/i18n';
 import { Button, SegmentedControl, Sheet, TextField } from '@/ui';
-import { currencyLabel } from '@/ui/format';
+import { settleCharge } from '@/domain/finance';
+import { currencyLabel, formatMoney } from '@/ui/format';
 import { moneyInputValue, parseMoneyInput } from './moneyInput';
 import styles from './Money.module.css';
 
@@ -18,20 +19,31 @@ export interface PaymentSheetProps {
   currency: string;
   onClose: () => void;
   onDelete: (p: Payment) => void;
+  /** Opened to record money received (quick add): an unpaid charge starts as "paid today". */
+  receiving?: boolean;
+}
+
+/** An unpaid charge being marked paid with less than its amount leaves the rest owed (domain settleCharge). */
+function partialRemainder(payment: Payment | null, status: 'paid' | 'due', paidMinor: number): number {
+  if (!payment || payment.status !== 'due' || status !== 'paid') return 0;
+  const r = settleCharge(payment.amountMinor, paidMinor);
+  return r.ok ? r.value.remainderMinor : 0;
 }
 
 /** Record a payment: amount, كاش / إنستاباي / فودافون كاش / تحويل, paid or pending, and the date. */
-export function PaymentSheet({ client, payment, currency, onClose, onDelete }: PaymentSheetProps) {
+export function PaymentSheet({ client, payment, currency, onClose, onDelete, receiving = false }: PaymentSheetProps) {
   const repos = useRepos();
   const showToast = useUiStore((s) => s.showToast);
   const today = toIsoDate(new Date());
   const cur = payment?.currency ?? client.package?.currency ?? currency;
   const [amount, setAmount] = useState(moneyInputValue(payment?.amountMinor ?? client.package?.priceMinor ?? 0));
   const [method, setMethod] = useState<PaymentMethod>(payment?.method ?? 'cash');
-  const [status, setStatus] = useState<'paid' | 'due'>(payment?.status ?? 'paid');
-  const [date, setDate] = useState<IsoDate>((payment?.status === 'due' ? payment.dueOn : payment?.paidOn) ?? today);
+  const [status, setStatus] = useState<'paid' | 'due'>(receiving ? 'paid' : (payment?.status ?? 'paid'));
+  const [date, setDate] = useState<IsoDate>((receiving ? today : payment?.status === 'due' ? payment.dueOn : payment?.paidOn) ?? today);
   const [note, setNote] = useState(payment?.note ?? '');
   const [error, setError] = useState<string | null>(null);
+  const typed = parseMoneyInput(amount);
+  const partialPreview = typed === null ? 0 : partialRemainder(payment, status, typed);
 
   const submit = async (e: FormEvent) => {
     e.preventDefault();
@@ -49,14 +61,29 @@ export function PaymentSheet({ client, payment, currency, onClose, onDelete }: P
       dueOn: status === 'due' ? date : (payment?.dueOn ?? null),
       note: note.trim(),
     };
+    const remainder = partialRemainder(payment, status, minor);
     try {
       if (payment) await repos.payments.update(payment.id, fields);
       else await repos.payments.create({ clientId: client.id, ...fields });
+      if (payment && remainder > 0) {
+        await repos.payments.create({
+          clientId: client.id,
+          amountMinor: remainder,
+          currency: cur,
+          method: payment.method,
+          status: 'due',
+          paidOn: null,
+          dueOn: payment.dueOn ?? date,
+          note: payment.note,
+        });
+      }
     } catch {
       setError(t('schedule.pay.saveFailed'));
       return;
     }
-    showToast({ message: t('schedule.pay.saved') });
+    showToast({
+      message: remainder > 0 ? t('schedule.pay.savedPartial', { paid: formatMoney(minor, cur), rest: formatMoney(remainder, cur) }) : t('schedule.pay.saved'),
+    });
     onClose();
   };
 
@@ -84,6 +111,7 @@ export function PaymentSheet({ client, payment, currency, onClose, onDelete }: P
           }}
           ltr
         />
+        {partialPreview > 0 && <p className={styles.hint}>{t('schedule.pay.partialHint', { amount: formatMoney(partialPreview, cur) })}</p>}
         <SegmentedControl
           label={t('schedule.pay.method')}
           options={METHODS.map((m) => ({ value: m, label: t(`schedule.pay.methods.${m}`) }))}
