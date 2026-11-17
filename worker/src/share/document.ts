@@ -129,6 +129,12 @@ export interface ShareDocumentV1 {
   attended?: number;
   /** Index (0-based) of the program day the client should do next. */
   nextDay?: number;
+  /** Weeks in a row with at least one attended session. */
+  streakWeeks?: number;
+  /** The client's own check-ins as the trainer stored them, newest first. */
+  checkins?: Array<{ d: string; weightKg?: number; waistCm?: number }>;
+  /** Date of the first measurement (YYYY-MM-DD), for "since you started". */
+  startDate?: string;
 }
 
 export type ShareDocument = ShareDocumentV1;
@@ -151,6 +157,12 @@ export interface CheckinDocumentV1 {
   chestCm?: number;
   armCm?: number;
   thighCm?: number;
+  /** Average sleep last week, hours. */
+  sleepHours?: number;
+  /** 1 (very tired) … 5 (great), whole numbers. */
+  energy?: number;
+  /** How much of the plan was followed this week, 0–100 %. */
+  adherence?: number;
 }
 
 export const LIMITS = {
@@ -174,6 +186,7 @@ export const LIMITS = {
   records: 12,
   sessions: 5,
   photos: 2,
+  checkins: 12,
 } as const;
 
 export const COLOR_PATTERN = /^#[0-9A-Fa-f]{6}$/;
@@ -254,7 +267,10 @@ function isOptionalExtras(value: Obj): boolean {
     optArray(value.sessions, LIMITS.sessions, (x) => isObj(x) && optNum(x.at, 0, 1e11) && x.at !== undefined && optNum(x.durationMin, 5, 480) && x.durationMin !== undefined) &&
     (pkg === undefined || (isObj(pkg) && optNum(pkg.left, 0, 1000) && pkg.left !== undefined && optNum(pkg.total, 0, 1000) && pkg.total !== undefined && (pkg.endDate === undefined || isDate(pkg.endDate)))) &&
     optNum(value.attended, 0, 100_000) &&
-    optNum(value.nextDay, 0, LIMITS.days - 1)
+    optNum(value.nextDay, 0, LIMITS.days - 1) &&
+    optNum(value.streakWeeks, 0, 520) &&
+    optArray(value.checkins, LIMITS.checkins, (c) => isObj(c) && isDate(c.d) && optNum(c.weightKg, 20, 400) && optNum(c.waistCm, 30, 300)) &&
+    (value.startDate === undefined || isDate(value.startDate))
   );
 }
 
@@ -336,6 +352,9 @@ export function parseCheckinDocument(value: unknown): CheckinDocumentV1 | null {
     optNum(value.hipCm, 30, 300) &&
     optNum(value.chestCm, 30, 300) &&
     optNum(value.armCm, 10, 150) &&
-    optNum(value.thighCm, 20, 200);
+    optNum(value.thighCm, 20, 200) &&
+    optNum(value.sleepHours, 0, 24) &&
+    (value.energy === undefined || (Number.isInteger(value.energy) && optNum(value.energy, 1, 5))) &&
+    optNum(value.adherence, 0, 100);
   return ok ? (value as unknown as CheckinDocumentV1) : null;
 }

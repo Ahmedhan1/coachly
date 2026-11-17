@@ -1,4 +1,4 @@
-import type { BackupManifest, ImageVariant } from '@/domain/backup';
+import type { BackupKind, BackupManifest, ImageVariant } from '@/domain/backup';
 import type { Result } from '@/domain/nutrition/result';
 import type { BackupStatus } from '@/data/backupMeta';
 
@@ -27,7 +27,11 @@ export type ImportError =
   | 'newer_schema'
   | 'migration_failed'
   | 'write_failed'
-  | 'cancelled';
+  | 'cancelled'
+  /** A photo archive was given to the full restore (it would replace all data with photos only). */
+  | 'photo_archive'
+  /** A full backup was given to the photo-archive restore. */
+  | 'not_a_photo_archive';
 
 export interface ExportedArchive {
   blob: Blob;
@@ -45,6 +49,9 @@ export interface BackupFile {
 }
 
 export interface ImportSummary {
+  kind: BackupKind;
+  /** Photo archives only. */
+  archiveId: string | null;
   /** Rows restored per table (images = photos restored). */
   counts: Record<string, number>;
   schemaVersion: number;
@@ -78,9 +85,14 @@ export interface BackupService {
   verifyFile(file: Blob, password: string | null): Promise<Result<ImportSummary, ImportError>>;
   /** Replaces ALL data with the backup's (all-or-nothing). Ask the trainer to confirm first. */
   importFile(file: Blob, options?: ImportOptions): Promise<Result<ImportSummary, ImportError>>;
-  /** Call after the share sheet / download reported success, so the weekly reminder resets. */
-  recordSaved(at: number): Promise<void>;
+  /**
+   * Call only after the share sheet / save picker finished, or the trainer confirmed a download landed
+   * (`shouldRecordSave`), so the weekly reminder resets.
+   */
+  recordSaved(at: number, details?: { bytes?: number; how?: 'shared' | 'saved' | 'downloaded' }): Promise<void>;
   status(): Promise<BackupStatus>;
+  snooze(until: number): Promise<void>;
+  setFileEncrypted(encrypted: boolean): Promise<void>;
 }
 
 export const MIN_BACKUP_PASSWORD_LENGTH = 8;

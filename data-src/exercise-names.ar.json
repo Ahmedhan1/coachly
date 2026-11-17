@@ -49,7 +49,7 @@
   {
     "id": "Ab_Roller",
     "en": "Ab Roller",
-    "ar": "أب رولر (عجلة البطن)",
+    "ar": "أب رولر",
     "primaryMuscles": [
       "أبس"
     ],
@@ -96,7 +96,7 @@
   {
     "id": "Advanced_Kettlebell_Windmill",
     "en": "Advanced Kettlebell Windmill",
-    "ar": "أدفانسد ويندميل بالكيتل بل",
+    "ar": "أدفانسد ويندميل بالكيتل بيل",
     "primaryMuscles": [
       "أبس"
     ],
@@ -105,7 +105,7 @@
       "هامسترينج",
       "شولدرز"
     ],
-    "equipment": "كيتل بل",
+    "equipment": "كيتل بيل",
     "level": "متوسط",
     "category": "سترينث",
     "source": "auto",
@@ -172,9 +172,9 @@
     "equipment": "بودي ويت",
     "level": "مبتدئ",
     "category": "سترينث",
-    "source": "auto",
+    "source": "curated",
     "popular": false,
-    "reviewed": false
+    "reviewed": true
   },
   {
     "id": "Alternate_Incline_Dumbbell_Curl",
@@ -258,7 +258,7 @@
       "شولدرز",
       "ترايسبس"
     ],
-    "equipment": "كيتل بل",
+    "equipment": "كيتل بيل",
     "level": "مبتدئ",
     "category": "سترينث",
     "source": "auto",
@@ -280,7 +280,7 @@
       "لوور باك",
       "ترابس"
     ],
-    "equipment": "كيتل بل",
+    "equipment": "كيتل بيل",
     "level": "متوسط",
     "category": "سترينث",
     "source": "auto",
@@ -290,14 +290,14 @@
   {
     "id": "Alternating_Kettlebell_Press",
     "en": "Alternating Kettlebell Press",
-    "ar": "برس بالكيتل بل بالتبادل",
+    "ar": "برس بالكيتل بيل بالتبادل",
     "primaryMuscles": [
       "شولدرز"
     ],
     "secondaryMuscles": [
       "ترايسبس"
     ],
-    "equipment": "كيتل بل",
+    "equipment": "كيتل بيل",
     "level": "متوسط",
     "category": "سترينث",
     "source": "auto",
@@ -307,7 +307,7 @@
   {
     "id": "Alternating_Kettlebell_Row",
     "en": "Alternating Kettlebell Row",
-    "ar": "رو بالكيتل بل بالتبادل",
+    "ar": "رو بالكيتل بيل بالتبادل",
     "primaryMuscles": [
       "ميدل باك"
     ],
@@ -315,7 +315,7 @@
       "بايسبس",
       "لاتس"
     ],
-    "equipment": "كيتل بل",
+    "equipment": "كيتل بيل",
     "level": "متوسط",
     "category": "سترينث",
     "source": "auto",
@@ -336,7 +336,7 @@
       "لاتس",
       "ترايسبس"
     ],
-    "equipment": "كيتل بل",
+    "equipment": "كيتل بيل",
     "level": "متقدم",
     "category": "سترينث",
     "source": "auto",
@@ -361,7 +361,7 @@
   {
     "id": "Ankle_On_The_Knee",
     "en": "Ankle On The Knee",
-    "ar": "أنكل على ني",
+    "ar": "جلوت ستريتش - رجل على رجل",
     "primaryMuscles": [
       "جلوتس"
     ],
@@ -369,9 +369,9 @@
     "equipment": null,
     "level": "مبتدئ",
     "category": "ستريتشينج",
-    "source": "auto",
+    "source": "curated",
     "popular": false,
-    "reviewed": false
+    "reviewed": true
   },
   {
     "id": "Anterior_Tibialis-SMR",
@@ -461,7 +461,7 @@
   {
     "id": "Atlas_Stone_Trainer",
     "en": "Atlas Stone Trainer",
-    "ar": "أطلس ستون",
+    "ar": "أطلس ستون (تدريب)",
     "primaryMuscles": [
       "لوور باك"
     ],
@@ -475,9 +475,9 @@
     "equipment": "أخرى",
     "level": "متوسط",
     "category": "سترونج مان",
-    "source": "auto",
+    "source": "curated",
     "popular": false,
-    "reviewed": false
+    "reviewed": true
   },
   {
     "id": "Atlas_Stones",
@@ -530,7 +530,7 @@
   {
     "id": "Back_Flyes_-_With_Bands",
     "en": "Back Flyes - With Bands",
-    "ar": "باك فلاي بالباند",
+    "ar": "رير ديلت فلاي بالباند",
     "primaryMuscles": [
       "شولدرز"
     ],
@@ -541,9 +541,9 @@
     "equipment": "باندز",
     "level": "مبتدئ",
     "category": "سترينث",
-    "source": "auto",
+    "source": "curated",
     "popular": false,
-    "reviewed": false
+    "reviewed": true
   },
   {
     "id": "Backward_Drag",
@@ -620,7 +620,7 @@
   {
     "id": "Band_Assisted_Pull-Up",
     "en": "Band Assisted Pull-Up",
-    "ar": "عقلة بالباند (بول أب مساعد)",
+    "ar": "بول أب بالباند (مساعد)",
     "primaryMuscles": [
       "لاتس"
     ],
@@ -794,7 +794,7 @@
   {
     "id": "Barbell_Curls_Lying_Against_An_Incline",
     "en": "Barbell Curls Lying Against An Incline",
-    "ar": "كيرل على بالبار نايم عالي (إنكلاين)",
+    "ar": "بايسبس كيرل بالبار على بنش إنكلاين",
     "primaryMuscles": [
       "بايسبس"
     ],
@@ -802,9 +802,9 @@
     "equipment": "بار",
     "level": "مبتدئ",
     "category": "سترينث",
-    "source": "auto",
+    "source": "curated",
     "popular": false,
-    "reviewed": false
+    "reviewed": true
   },
   {
     "id": "Barbell_Deadlift",
@@ -833,7 +833,7 @@
   {
     "id": "Barbell_Full_Squat",
     "en": "Barbell Full Squat",
-    "ar": "سكوات بالبار - نزول كامل",
+    "ar": "فول سكوات بالبار",
     "primaryMuscles": [
       "كوادز"
     ],
@@ -926,7 +926,7 @@
   {
     "id": "Barbell_Incline_Bench_Press_-_Medium_Grip",
     "en": "Barbell Incline Bench Press - Medium Grip",
-    "ar": "بنش برس بالبار عالي (إنكلاين)",
+    "ar": "بنش برس إنكلاين بالبار",
     "primaryMuscles": [
       "تشيست"
     ],
@@ -944,7 +944,7 @@
   {
     "id": "Barbell_Incline_Shoulder_Raise",
     "en": "Barbell Incline Shoulder Raise",
-    "ar": "شولدر رايز بالبار عالي (إنكلاين)",
+    "ar": "شولدر رايز إنكلاين بالبار",
     "primaryMuscles": [
       "شولدرز"
     ],
@@ -999,7 +999,7 @@
   {
     "id": "Barbell_Rollout_from_Bench",
     "en": "Barbell Rollout from Bench",
-    "ar": "رول أوت من بنش بالبار",
+    "ar": "أب رول أوت بالبار من البنش",
     "primaryMuscles": [
       "أبس"
     ],
@@ -1012,9 +1012,9 @@
     "equipment": "بار",
     "level": "متوسط",
     "category": "سترينث",
-    "source": "auto",
+    "source": "curated",
     "popular": false,
-    "reviewed": false
+    "reviewed": true
   },
   {
     "id": "Barbell_Seated_Calf_Raise",
@@ -1237,7 +1237,7 @@
   {
     "id": "Behind_Head_Chest_Stretch",
     "en": "Behind Head Chest Stretch",
-    "ar": "ورا الراس تشيست ستريتش",
+    "ar": "تشيست ستريتش وإيدك ورا راسك",
     "primaryMuscles": [
       "تشيست"
     ],
@@ -1247,9 +1247,9 @@
     "equipment": "أخرى",
     "level": "متقدم",
     "category": "ستريتشينج",
-    "source": "auto",
+    "source": "curated",
     "popular": false,
-    "reviewed": false
+    "reviewed": true
   },
   {
     "id": "Bench_Dips",
@@ -1507,7 +1507,7 @@
       "شولدرز",
       "ترايسبس"
     ],
-    "equipment": "كيتل بل",
+    "equipment": "كيتل بيل",
     "level": "متقدم",
     "category": "سترينث",
     "source": "auto",
@@ -1556,7 +1556,7 @@
   {
     "id": "Bent-Knee_Hip_Raise",
     "en": "Bent-Knee Hip Raise",
-    "ar": "بنت ني هيب رايز",
+    "ar": "ني رايز نايم على ضهرك",
     "primaryMuscles": [
       "أبس"
     ],
@@ -1564,14 +1564,14 @@
     "equipment": "بودي ويت",
     "level": "مبتدئ",
     "category": "سترينث",
-    "source": "auto",
+    "source": "curated",
     "popular": false,
-    "reviewed": false
+    "reviewed": true
   },
   {
     "id": "Bicycling",
     "en": "Bicycling",
-    "ar": "بايسكلينج",
+    "ar": "ركوب عجلة",
     "primaryMuscles": [
       "كوادز"
     ],
@@ -1583,9 +1583,9 @@
     "equipment": "أخرى",
     "level": "مبتدئ",
     "category": "كارديو",
-    "source": "auto",
+    "source": "curated",
     "popular": false,
-    "reviewed": false
+    "reviewed": true
   },
   {
     "id": "Bicycling_Stationary",
@@ -1629,7 +1629,7 @@
   {
     "id": "Body_Tricep_Press",
     "en": "Body Tricep Press",
-    "ar": "بودي ترايسبس برس",
+    "ar": "ترايسبس برس بوزن الجسم",
     "primaryMuscles": [
       "ترايسبس"
     ],
@@ -1637,9 +1637,9 @@
     "equipment": "بودي ويت",
     "level": "مبتدئ",
     "category": "سترينث",
-    "source": "auto",
+    "source": "curated",
     "popular": false,
-    "reviewed": false
+    "reviewed": true
   },
   {
     "id": "Body-Up",
@@ -1662,7 +1662,7 @@
   {
     "id": "Bodyweight_Flyes",
     "en": "Bodyweight Flyes",
-    "ar": "بودي ويت فلاي",
+    "ar": "فلاي بوزن الجسم",
     "primaryMuscles": [
       "تشيست"
     ],
@@ -1674,14 +1674,14 @@
     "equipment": "إي زد بار",
     "level": "متوسط",
     "category": "سترينث",
-    "source": "auto",
+    "source": "curated",
     "popular": false,
-    "reviewed": false
+    "reviewed": true
   },
   {
     "id": "Bodyweight_Mid_Row",
     "en": "Bodyweight Mid Row",
-    "ar": "بودي ويت ميد رو",
+    "ar": "رو بوزن الجسم",
     "primaryMuscles": [
       "ميدل باك"
     ],
@@ -1692,9 +1692,9 @@
     "equipment": "أخرى",
     "level": "متوسط",
     "category": "سترينث",
-    "source": "auto",
+    "source": "curated",
     "popular": false,
-    "reviewed": false
+    "reviewed": true
   },
   {
     "id": "Bodyweight_Squat",
@@ -1736,7 +1736,7 @@
   {
     "id": "Bosu_Ball_Cable_Crunch_With_Side_Bends",
     "en": "Bosu Ball Cable Crunch With Side Bends",
-    "ar": "بوسو بول كرانش مع سايد بيند على الكابل",
+    "ar": "كابل كرانش مع سايد بيند على البوسو",
     "primaryMuscles": [
       "أبس"
     ],
@@ -1744,9 +1744,9 @@
     "equipment": "كابل",
     "level": "مبتدئ",
     "category": "سترينث",
-    "source": "auto",
+    "source": "curated",
     "popular": false,
-    "reviewed": false
+    "reviewed": true
   },
   {
     "id": "Bottoms_Up",
@@ -1774,7 +1774,7 @@
       "بايسبس",
       "شولدرز"
     ],
-    "equipment": "كيتل بل",
+    "equipment": "كيتل بيل",
     "level": "متوسط",
     "category": "سترينث",
     "source": "auto",
@@ -1784,7 +1784,7 @@
   {
     "id": "Box_Jump_Multiple_Response",
     "en": "Box Jump (Multiple Response)",
-    "ar": "بوكس جامب (مالتيبل ريسبونس)",
+    "ar": "بوكس جامب متتالي",
     "primaryMuscles": [
       "هامسترينج"
     ],
@@ -1798,9 +1798,9 @@
     "equipment": "أخرى",
     "level": "مبتدئ",
     "category": "بلايومتركس",
-    "source": "auto",
+    "source": "curated",
     "popular": false,
-    "reviewed": false
+    "reviewed": true
   },
   {
     "id": "Box_Skip",
@@ -1955,7 +1955,7 @@
   {
     "id": "Butterfly",
     "en": "Butterfly",
-    "ar": "بيك دك (بترفلاي)",
+    "ar": "بيك دك",
     "primaryMuscles": [
       "تشيست"
     ],
@@ -2005,7 +2005,7 @@
   {
     "id": "Cable_Crunch",
     "en": "Cable Crunch",
-    "ar": "كابل كرانش (وانت راكع)",
+    "ar": "كابل كرانش",
     "primaryMuscles": [
       "أبس"
     ],
@@ -2070,7 +2070,7 @@
   {
     "id": "Cable_Incline_Pushdown",
     "en": "Cable Incline Pushdown",
-    "ar": "بوش داون على الكابل عالي (إنكلاين)",
+    "ar": "بوش داون إنكلاين على الكابل",
     "primaryMuscles": [
       "لاتس"
     ],
@@ -2085,7 +2085,7 @@
   {
     "id": "Cable_Incline_Triceps_Extension",
     "en": "Cable Incline Triceps Extension",
-    "ar": "ترايسبس إكستنشن على الكابل عالي (إنكلاين)",
+    "ar": "ترايسبس إكستنشن إنكلاين على الكابل",
     "primaryMuscles": [
       "ترايسبس"
     ],
@@ -2201,7 +2201,7 @@
     "level": "مبتدئ",
     "category": "سترينث",
     "source": "curated",
-    "popular": false,
+    "popular": true,
     "reviewed": true
   },
   {
@@ -2285,7 +2285,7 @@
   {
     "id": "Cable_Seated_Lateral_Raise",
     "en": "Cable Seated Lateral Raise",
-    "ar": "لاتيرال رايز على الكابل",
+    "ar": "لاتيرال رايز على الكابل قاعد",
     "primaryMuscles": [
       "شولدرز"
     ],
@@ -2380,7 +2380,7 @@
   {
     "id": "Calf_Raise_On_A_Dumbbell",
     "en": "Calf Raise On A Dumbbell",
-    "ar": "كالف رايز على بالدامبل",
+    "ar": "كالف رايز بالدامبل على ستيب",
     "primaryMuscles": [
       "كالفز"
     ],
@@ -2388,9 +2388,9 @@
     "equipment": "دامبل",
     "level": "متوسط",
     "category": "سترينث",
-    "source": "auto",
+    "source": "curated",
     "popular": false,
-    "reviewed": false
+    "reviewed": true
   },
   {
     "id": "Calf_Raises_-_With_Bands",
@@ -2410,7 +2410,7 @@
   {
     "id": "Calf_Stretch_Elbows_Against_Wall",
     "en": "Calf Stretch Elbows Against Wall",
-    "ar": "كالف ستريتش إلبوز على الحيطة",
+    "ar": "كالف ستريتش على الحيطة (بالكوع)",
     "primaryMuscles": [
       "كالفز"
     ],
@@ -2418,14 +2418,14 @@
     "equipment": null,
     "level": "مبتدئ",
     "category": "ستريتشينج",
-    "source": "auto",
+    "source": "curated",
     "popular": false,
-    "reviewed": false
+    "reviewed": true
   },
   {
     "id": "Calf_Stretch_Hands_Against_Wall",
     "en": "Calf Stretch Hands Against Wall",
-    "ar": "كالف ستريتش هاندز على الحيطة",
+    "ar": "كالف ستريتش على الحيطة (بالإيد)",
     "primaryMuscles": [
       "كالفز"
     ],
@@ -2433,14 +2433,14 @@
     "equipment": null,
     "level": "مبتدئ",
     "category": "ستريتشينج",
-    "source": "auto",
+    "source": "curated",
     "popular": false,
-    "reviewed": false
+    "reviewed": true
   },
   {
     "id": "Calf-Machine_Shoulder_Shrug",
     "en": "Calf-Machine Shoulder Shrug",
-    "ar": "كالف شولدر شراج على الماشين",
+    "ar": "شراج على ماشين الكالف",
     "primaryMuscles": [
       "ترابس"
     ],
@@ -2448,9 +2448,9 @@
     "equipment": "ماشين",
     "level": "مبتدئ",
     "category": "سترينث",
-    "source": "auto",
+    "source": "curated",
     "popular": false,
-    "reviewed": false
+    "reviewed": true
   },
   {
     "id": "Calves-SMR",
@@ -2530,7 +2530,7 @@
   {
     "id": "Cat_Stretch",
     "en": "Cat Stretch",
-    "ar": "كات ستريتش",
+    "ar": "كات كاو ستريتش",
     "primaryMuscles": [
       "لوور باك"
     ],
@@ -2541,9 +2541,9 @@
     "equipment": null,
     "level": "مبتدئ",
     "category": "ستريتشينج",
-    "source": "auto",
+    "source": "curated",
     "popular": false,
-    "reviewed": false
+    "reviewed": true
   },
   {
     "id": "Catch_and_Overhead_Throw",
@@ -2600,7 +2600,7 @@
   {
     "id": "Chair_Leg_Extended_Stretch",
     "en": "Chair Leg Extended Stretch",
-    "ar": "كرسي ليج إكستندد ستريتش",
+    "ar": "ليج ستريتش على الكرسي",
     "primaryMuscles": [
       "هامسترينج"
     ],
@@ -2610,14 +2610,14 @@
     "equipment": "أخرى",
     "level": "مبتدئ",
     "category": "ستريتشينج",
-    "source": "auto",
+    "source": "curated",
     "popular": false,
-    "reviewed": false
+    "reviewed": true
   },
   {
     "id": "Chair_Lower_Back_Stretch",
     "en": "Chair Lower Back Stretch",
-    "ar": "كرسي لوور باك ستريتش",
+    "ar": "لوور باك ستريتش على الكرسي",
     "primaryMuscles": [
       "لاتس"
     ],
@@ -2627,14 +2627,14 @@
     "equipment": null,
     "level": "مبتدئ",
     "category": "ستريتشينج",
-    "source": "auto",
+    "source": "curated",
     "popular": false,
-    "reviewed": false
+    "reviewed": true
   },
   {
     "id": "Chair_Squat",
     "en": "Chair Squat",
-    "ar": "كرسي سكوات",
+    "ar": "سكوات على الكرسي",
     "primaryMuscles": [
       "كوادز"
     ],
@@ -2646,14 +2646,14 @@
     "equipment": "ماشين",
     "level": "مبتدئ",
     "category": "سترينث",
-    "source": "auto",
+    "source": "curated",
     "popular": false,
-    "reviewed": false
+    "reviewed": true
   },
   {
     "id": "Chair_Upper_Body_Stretch",
     "en": "Chair Upper Body Stretch",
-    "ar": "كرسي أبر بودي ستريتش",
+    "ar": "أبر بودي ستريتش على الكرسي",
     "primaryMuscles": [
       "شولدرز"
     ],
@@ -2664,9 +2664,9 @@
     "equipment": "أخرى",
     "level": "مبتدئ",
     "category": "ستريتشينج",
-    "source": "auto",
+    "source": "curated",
     "popular": false,
-    "reviewed": false
+    "reviewed": true
   },
   {
     "id": "Chest_And_Front_Of_Shoulder_Stretch",
@@ -2779,7 +2779,7 @@
   {
     "id": "Childs_Pose",
     "en": "Child's Pose",
-    "ar": "تشايلدز بوز",
+    "ar": "تشايلد بوز",
     "primaryMuscles": [
       "لوور باك"
     ],
@@ -2790,14 +2790,14 @@
     "equipment": null,
     "level": "مبتدئ",
     "category": "ستريتشينج",
-    "source": "auto",
+    "source": "curated",
     "popular": false,
-    "reviewed": false
+    "reviewed": true
   },
   {
     "id": "Chin_To_Chest_Stretch",
     "en": "Chin To Chest Stretch",
-    "ar": "تشين لحد تشيست ستريتش",
+    "ar": "نيك ستريتش (دقنك لصدرك)",
     "primaryMuscles": [
       "نيك"
     ],
@@ -2807,14 +2807,14 @@
     "equipment": null,
     "level": "مبتدئ",
     "category": "ستريتشينج",
-    "source": "auto",
+    "source": "curated",
     "popular": false,
-    "reviewed": false
+    "reviewed": true
   },
   {
     "id": "Chin-Up",
     "en": "Chin-Up",
-    "ar": "عقلة - قبضة معكوسة (تشين أب)",
+    "ar": "تشين أب",
     "primaryMuscles": [
       "لاتس"
     ],
@@ -3027,7 +3027,7 @@
   {
     "id": "Close-Grip_Barbell_Bench_Press",
     "en": "Close-Grip Barbell Bench Press",
-    "ar": "بنش برس بالبار - قبضة ضيقة (ترايسبس)",
+    "ar": "كلوز جريب بنش برس بالبار",
     "primaryMuscles": [
       "ترايسبس"
     ],
@@ -3063,7 +3063,7 @@
   {
     "id": "Close-Grip_EZ_Bar_Curl",
     "en": "Close-Grip EZ Bar Curl",
-    "ar": "بايسبس كيرل بالبار الزجزاج - قبضة ضيقة",
+    "ar": "بايسبس كيرل بالإيزي بار - قبضة ضيقة",
     "primaryMuscles": [
       "بايسبس"
     ],
@@ -3080,7 +3080,7 @@
   {
     "id": "Close-Grip_EZ-Bar_Curl_with_Band",
     "en": "Close-Grip EZ-Bar Curl with Band",
-    "ar": "كيرل بالبار الزجزاج بالباند - قبضة ضيقة",
+    "ar": "كيرل بالإيزي بار بالباند - قبضة ضيقة",
     "primaryMuscles": [
       "بايسبس"
     ],
@@ -3097,7 +3097,7 @@
   {
     "id": "Close-Grip_EZ-Bar_Press",
     "en": "Close-Grip EZ-Bar Press",
-    "ar": "كلوز جريب برس بالبار الزجزاج",
+    "ar": "كلوز جريب برس بالإيزي بار",
     "primaryMuscles": [
       "ترايسبس"
     ],
@@ -3260,7 +3260,7 @@
   {
     "id": "Cross-Body_Crunch",
     "en": "Cross-Body Crunch",
-    "ar": "كرانش كروس (كوع لركبة)",
+    "ar": "كرانش كروس بودي",
     "primaryMuscles": [
       "أبس"
     ],
@@ -3313,7 +3313,7 @@
   {
     "id": "Crunch_-_Hands_Overhead",
     "en": "Crunch - Hands Overhead",
-    "ar": "كرانش هاندز أوفرهيد",
+    "ar": "كرانش وإيدك فوق راسك",
     "primaryMuscles": [
       "أبس"
     ],
@@ -3321,14 +3321,14 @@
     "equipment": "بودي ويت",
     "level": "مبتدئ",
     "category": "سترينث",
-    "source": "auto",
+    "source": "curated",
     "popular": false,
-    "reviewed": false
+    "reviewed": true
   },
   {
     "id": "Crunch_-_Legs_On_Exercise_Ball",
     "en": "Crunch - Legs On Exercise Ball",
-    "ar": "كرانش ليجز على الجيم بول",
+    "ar": "كرانش ورجلك على الجيم بول",
     "primaryMuscles": [
       "أبس"
     ],
@@ -3336,9 +3336,9 @@
     "equipment": "بودي ويت",
     "level": "مبتدئ",
     "category": "سترينث",
-    "source": "auto",
+    "source": "curated",
     "popular": false,
-    "reviewed": false
+    "reviewed": true
   },
   {
     "id": "Crunches",
@@ -3402,7 +3402,7 @@
     "level": "مبتدئ",
     "category": "سترينث",
     "source": "curated",
-    "popular": false,
+    "popular": true,
     "reviewed": true
   },
   {
@@ -3452,7 +3452,7 @@
   {
     "id": "Decline_Barbell_Bench_Press",
     "en": "Decline Barbell Bench Press",
-    "ar": "بنش برس بالبار واطي (ديكلاين)",
+    "ar": "بنش برس ديكلاين بالبار",
     "primaryMuscles": [
       "تشيست"
     ],
@@ -3470,7 +3470,7 @@
   {
     "id": "Decline_Close-Grip_Bench_To_Skull_Crusher",
     "en": "Decline Close-Grip Bench To Skull Crusher",
-    "ar": "بنش لحد سكال كراشر واطي (ديكلاين) - قبضة ضيقة",
+    "ar": "كلوز جريب بنش لحد سكال كراشر ديكلاين",
     "primaryMuscles": [
       "ترايسبس"
     ],
@@ -3481,14 +3481,14 @@
     "equipment": "بار",
     "level": "متوسط",
     "category": "سترينث",
-    "source": "auto",
+    "source": "curated",
     "popular": false,
-    "reviewed": false
+    "reviewed": true
   },
   {
     "id": "Decline_Crunch",
     "en": "Decline Crunch",
-    "ar": "كرانش على بنش واطي (ديكلاين)",
+    "ar": "كرانش ديكلاين",
     "primaryMuscles": [
       "أبس"
     ],
@@ -3503,7 +3503,7 @@
   {
     "id": "Decline_Dumbbell_Bench_Press",
     "en": "Decline Dumbbell Bench Press",
-    "ar": "بنش برس بالدامبل واطي (ديكلاين)",
+    "ar": "بنش برس ديكلاين بالدامبل",
     "primaryMuscles": [
       "تشيست"
     ],
@@ -3521,7 +3521,7 @@
   {
     "id": "Decline_Dumbbell_Flyes",
     "en": "Decline Dumbbell Flyes",
-    "ar": "فلاي بالدامبل واطي (ديكلاين)",
+    "ar": "فلاي ديكلاين بالدامبل",
     "primaryMuscles": [
       "تشيست"
     ],
@@ -3536,7 +3536,7 @@
   {
     "id": "Decline_Dumbbell_Triceps_Extension",
     "en": "Decline Dumbbell Triceps Extension",
-    "ar": "ترايسبس إكستنشن بالدامبل واطي (ديكلاين)",
+    "ar": "ترايسبس إكستنشن ديكلاين بالدامبل",
     "primaryMuscles": [
       "ترايسبس"
     ],
@@ -3551,7 +3551,7 @@
   {
     "id": "Decline_EZ_Bar_Triceps_Extension",
     "en": "Decline EZ Bar Triceps Extension",
-    "ar": "سكال كراشر بالبار الزجزاج واطي (ديكلاين)",
+    "ar": "سكال كراشر ديكلاين بالإيزي بار",
     "primaryMuscles": [
       "ترايسبس"
     ],
@@ -3566,7 +3566,7 @@
   {
     "id": "Decline_Oblique_Crunch",
     "en": "Decline Oblique Crunch",
-    "ar": "أوبليك كرانش واطي (ديكلاين)",
+    "ar": "أوبليك كرانش ديكلاين",
     "primaryMuscles": [
       "أبس"
     ],
@@ -3581,7 +3581,7 @@
   {
     "id": "Decline_Push-Up",
     "en": "Decline Push-Up",
-    "ar": "بوش أب واطي (ديكلاين)",
+    "ar": "بوش أب ديكلاين",
     "primaryMuscles": [
       "تشيست"
     ],
@@ -3599,7 +3599,7 @@
   {
     "id": "Decline_Reverse_Crunch",
     "en": "Decline Reverse Crunch",
-    "ar": "ريفيرس كرانش على بنش واطي",
+    "ar": "ريفيرس كرانش على بنش ديكلاين",
     "primaryMuscles": [
       "أبس"
     ],
@@ -3614,7 +3614,7 @@
   {
     "id": "Decline_Smith_Press",
     "en": "Decline Smith Press",
-    "ar": "برس على السميث واطي (ديكلاين)",
+    "ar": "ديكلاين برس على السميث",
     "primaryMuscles": [
       "تشيست"
     ],
@@ -3744,7 +3744,7 @@
   {
     "id": "Double_Kettlebell_Alternating_Hang_Clean",
     "en": "Double Kettlebell Alternating Hang Clean",
-    "ar": "دابل هانج كلين بالكيتل بل بالتبادل",
+    "ar": "دابل هانج كلين بالكيتل بيل بالتبادل",
     "primaryMuscles": [
       "هامسترينج"
     ],
@@ -3757,7 +3757,7 @@
       "كوادز",
       "ترابس"
     ],
-    "equipment": "كيتل بل",
+    "equipment": "كيتل بيل",
     "level": "متوسط",
     "category": "سترينث",
     "source": "auto",
@@ -3767,7 +3767,7 @@
   {
     "id": "Double_Kettlebell_Jerk",
     "en": "Double Kettlebell Jerk",
-    "ar": "دابل جيرك بالكيتل بل",
+    "ar": "دابل جيرك بالكيتل بيل",
     "primaryMuscles": [
       "شولدرز"
     ],
@@ -3776,7 +3776,7 @@
       "كوادز",
       "ترايسبس"
     ],
-    "equipment": "كيتل بل",
+    "equipment": "كيتل بيل",
     "level": "متوسط",
     "category": "سترينث",
     "source": "auto",
@@ -3786,7 +3786,7 @@
   {
     "id": "Double_Kettlebell_Push_Press",
     "en": "Double Kettlebell Push Press",
-    "ar": "دابل بوش برس بالكيتل بل",
+    "ar": "دابل بوش برس بالكيتل بيل",
     "primaryMuscles": [
       "شولدرز"
     ],
@@ -3795,7 +3795,7 @@
       "كوادز",
       "ترايسبس"
     ],
-    "equipment": "كيتل بل",
+    "equipment": "كيتل بيل",
     "level": "متوسط",
     "category": "سترينث",
     "source": "auto",
@@ -3805,7 +3805,7 @@
   {
     "id": "Double_Kettlebell_Snatch",
     "en": "Double Kettlebell Snatch",
-    "ar": "دابل سناتش بالكيتل بل",
+    "ar": "دابل سناتش بالكيتل بيل",
     "primaryMuscles": [
       "شولدرز"
     ],
@@ -3814,7 +3814,7 @@
       "هامسترينج",
       "كوادز"
     ],
-    "equipment": "كيتل بل",
+    "equipment": "كيتل بيل",
     "level": "متقدم",
     "category": "سترينث",
     "source": "auto",
@@ -3824,7 +3824,7 @@
   {
     "id": "Double_Kettlebell_Windmill",
     "en": "Double Kettlebell Windmill",
-    "ar": "دابل ويندميل بالكيتل بل",
+    "ar": "دابل ويندميل بالكيتل بيل",
     "primaryMuscles": [
       "أبس"
     ],
@@ -3834,7 +3834,7 @@
       "شولدرز",
       "ترايسبس"
     ],
-    "equipment": "كيتل بل",
+    "equipment": "كيتل بيل",
     "level": "متوسط",
     "category": "سترينث",
     "source": "auto",
@@ -4044,7 +4044,7 @@
   {
     "id": "Dumbbell_Incline_Row",
     "en": "Dumbbell Incline Row",
-    "ar": "رو بالدامبل على بنش عالي (تشيست سابورتد)",
+    "ar": "تشيست سابورتد رو بالدامبل",
     "primaryMuscles": [
       "ميدل باك"
     ],
@@ -4064,7 +4064,7 @@
   {
     "id": "Dumbbell_Incline_Shoulder_Raise",
     "en": "Dumbbell Incline Shoulder Raise",
-    "ar": "شولدر رايز بالدامبل عالي (إنكلاين)",
+    "ar": "شولدر رايز إنكلاين بالدامبل",
     "primaryMuscles": [
       "شولدرز"
     ],
@@ -4212,7 +4212,7 @@
   {
     "id": "Dumbbell_Prone_Incline_Curl",
     "en": "Dumbbell Prone Incline Curl",
-    "ar": "برون كيرل بالدامبل عالي (إنكلاين)",
+    "ar": "برون كيرل إنكلاين بالدامبل",
     "primaryMuscles": [
       "بايسبس"
     ],
@@ -4381,7 +4381,7 @@
   {
     "id": "Dumbbell_Squat_To_A_Bench",
     "en": "Dumbbell Squat To A Bench",
-    "ar": "سكوات لحد بنش بالدامبل",
+    "ar": "سكوات بالدامبل لحد البنش",
     "primaryMuscles": [
       "كوادز"
     ],
@@ -4394,9 +4394,9 @@
     "equipment": "دامبل",
     "level": "متوسط",
     "category": "سترينث",
-    "source": "auto",
+    "source": "curated",
     "popular": false,
-    "reviewed": false
+    "reviewed": true
   },
   {
     "id": "Dumbbell_Step_Ups",
@@ -4484,7 +4484,7 @@
   {
     "id": "Elbow_to_Knee",
     "en": "Elbow to Knee",
-    "ar": "إلبو لحد ني",
+    "ar": "كوع لركبة",
     "primaryMuscles": [
       "أبس"
     ],
@@ -4492,14 +4492,14 @@
     "equipment": "بودي ويت",
     "level": "مبتدئ",
     "category": "سترينث",
-    "source": "auto",
+    "source": "curated",
     "popular": false,
-    "reviewed": false
+    "reviewed": true
   },
   {
     "id": "Elbows_Back",
     "en": "Elbows Back",
-    "ar": "إلبوز باك",
+    "ar": "تشيست ستريتش بالكوعين لورا",
     "primaryMuscles": [
       "تشيست"
     ],
@@ -4509,9 +4509,9 @@
     "equipment": null,
     "level": "مبتدئ",
     "category": "ستريتشينج",
-    "source": "auto",
+    "source": "curated",
     "popular": false,
-    "reviewed": false
+    "reviewed": true
   },
   {
     "id": "Elevated_Back_Lunge",
@@ -4534,7 +4534,7 @@
   {
     "id": "Elevated_Cable_Rows",
     "en": "Elevated Cable Rows",
-    "ar": "سيتد رو على الكابل - قاعد عالي",
+    "ar": "رو على الكابل من فوق قاعد",
     "primaryMuscles": [
       "لاتس"
     ],
@@ -4552,7 +4552,7 @@
   {
     "id": "Elliptical_Trainer",
     "en": "Elliptical Trainer",
-    "ar": "إليبتيكال (أوربتراك)",
+    "ar": "إليبتيكال",
     "primaryMuscles": [
       "كوادز"
     ],
@@ -4601,7 +4601,7 @@
   {
     "id": "Extended_Range_One-Arm_Kettlebell_Floor_Press",
     "en": "Extended Range One-Arm Kettlebell Floor Press",
-    "ar": "إكستندد رينج فلور برس بالكيتل بل بإيد واحدة",
+    "ar": "إكستندد رينج فلور برس بالكيتل بيل بإيد واحدة",
     "primaryMuscles": [
       "تشيست"
     ],
@@ -4609,7 +4609,7 @@
       "شولدرز",
       "ترايسبس"
     ],
-    "equipment": "كيتل بل",
+    "equipment": "كيتل بيل",
     "level": "مبتدئ",
     "category": "سترينث",
     "source": "auto",
@@ -4664,7 +4664,7 @@
   {
     "id": "EZ-Bar_Curl",
     "en": "EZ-Bar Curl",
-    "ar": "بايسبس كيرل بالبار الزجزاج",
+    "ar": "بايسبس كيرل بالإيزي بار",
     "primaryMuscles": [
       "بايسبس"
     ],
@@ -4679,7 +4679,7 @@
   {
     "id": "EZ-Bar_Skullcrusher",
     "en": "EZ-Bar Skullcrusher",
-    "ar": "سكال كراشر بالبار الزجزاج",
+    "ar": "سكال كراشر بالإيزي بار",
     "primaryMuscles": [
       "ترايسبس"
     ],
@@ -4786,7 +4786,7 @@
   {
     "id": "Flat_Bench_Leg_Pull-In",
     "en": "Flat Bench Leg Pull-In",
-    "ar": "ني أب على البنش",
+    "ar": "ني تاك نايم على البنش",
     "primaryMuscles": [
       "أبس"
     ],
@@ -4816,7 +4816,7 @@
   {
     "id": "Flexor_Incline_Dumbbell_Curls",
     "en": "Flexor Incline Dumbbell Curls",
-    "ar": "فليكسور كيرل بالدامبل عالي (إنكلاين)",
+    "ar": "فليكسور كيرل إنكلاين بالدامبل",
     "primaryMuscles": [
       "بايسبس"
     ],
@@ -5086,7 +5086,7 @@
   {
     "id": "Front_Cone_Hops_or_hurdle_hops",
     "en": "Front Cone Hops (or hurdle hops)",
-    "ar": "فرونت كون هوب (أو هيردل هوب)",
+    "ar": "فرونت كون هوب",
     "primaryMuscles": [
       "كوادز"
     ],
@@ -5100,9 +5100,9 @@
     "equipment": "أخرى",
     "level": "مبتدئ",
     "category": "بلايومتركس",
-    "source": "auto",
+    "source": "curated",
     "popular": false,
-    "reviewed": false
+    "reviewed": true
   },
   {
     "id": "Front_Dumbbell_Raise",
@@ -5122,7 +5122,7 @@
   {
     "id": "Front_Incline_Dumbbell_Raise",
     "en": "Front Incline Dumbbell Raise",
-    "ar": "فرونت رايز بالدامبل عالي (إنكلاين)",
+    "ar": "فرونت رايز إنكلاين بالدامبل",
     "primaryMuscles": [
       "شولدرز"
     ],
@@ -5205,7 +5205,7 @@
   {
     "id": "Front_Squats_With_Two_Kettlebells",
     "en": "Front Squats With Two Kettlebells",
-    "ar": "فرونت سكوات مع تو بالكيتل بل",
+    "ar": "فرونت سكوات بكيتل بيل في كل إيد",
     "primaryMuscles": [
       "كوادز"
     ],
@@ -5213,12 +5213,12 @@
       "كالفز",
       "جلوتس"
     ],
-    "equipment": "كيتل بل",
+    "equipment": "كيتل بيل",
     "level": "متوسط",
     "category": "سترينث",
-    "source": "auto",
+    "source": "curated",
     "popular": false,
-    "reviewed": false
+    "reviewed": true
   },
   {
     "id": "Front_Two-Dumbbell_Raise",
@@ -5275,7 +5275,7 @@
   {
     "id": "Glute_Ham_Raise",
     "en": "Glute Ham Raise",
-    "ar": "جلوت هام رايز (GHR)",
+    "ar": "جلوت هام رايز",
     "primaryMuscles": [
       "هامسترينج"
     ],
@@ -5293,7 +5293,7 @@
   {
     "id": "Glute_Kickback",
     "en": "Glute Kickback",
-    "ar": "جلوت كيك باك على الأرض",
+    "ar": "جلوت كيك باك على أربع",
     "primaryMuscles": [
       "جلوتس"
     ],
@@ -5320,7 +5320,7 @@
       "هامسترينج",
       "شولدرز"
     ],
-    "equipment": "كيتل بل",
+    "equipment": "كيتل بيل",
     "level": "مبتدئ",
     "category": "سترينث",
     "source": "curated",
@@ -5368,7 +5368,7 @@
   {
     "id": "Gorilla_Chin_Crunch",
     "en": "Gorilla Chin/Crunch",
-    "ar": "جوريلا تشين / كرانش",
+    "ar": "جوريلا كرانش",
     "primaryMuscles": [
       "أبس"
     ],
@@ -5379,9 +5379,9 @@
     "equipment": "بودي ويت",
     "level": "متوسط",
     "category": "سترينث",
-    "source": "auto",
+    "source": "curated",
     "popular": false,
-    "reviewed": false
+    "reviewed": true
   },
   {
     "id": "Groin_and_Back_Stretch",
@@ -5450,7 +5450,7 @@
   {
     "id": "Hammer_Grip_Incline_DB_Bench_Press",
     "en": "Hammer Grip Incline DB Bench Press",
-    "ar": "بنش برس بالدامبل عالي (إنكلاين) - قبضة هامر",
+    "ar": "بنش برس إنكلاين بالدامبل - قبضة هامر",
     "primaryMuscles": [
       "تشيست"
     ],
@@ -5628,7 +5628,7 @@
   {
     "id": "Hanging_Leg_Raise",
     "en": "Hanging Leg Raise",
-    "ar": "هانجينج ليج رايز (رفع رجل متعلق)",
+    "ar": "هانجينج ليج رايز",
     "primaryMuscles": [
       "أبس"
     ],
@@ -5714,7 +5714,7 @@
   {
     "id": "Hip_Circles_prone",
     "en": "Hip Circles (prone)",
-    "ar": "هيب سيركلز (برون)",
+    "ar": "هيب سيركلز نايم على بطنك",
     "primaryMuscles": [
       "أبداكتورز"
     ],
@@ -5724,9 +5724,9 @@
     "equipment": "بودي ويت",
     "level": "مبتدئ",
     "category": "ستريتشينج",
-    "source": "auto",
+    "source": "curated",
     "popular": false,
-    "reviewed": false
+    "reviewed": true
   },
   {
     "id": "Hip_Extension_with_Bands",
@@ -5799,7 +5799,7 @@
   {
     "id": "Hug_Knees_To_Chest",
     "en": "Hug Knees To Chest",
-    "ar": "هاج نيز لحد تشيست",
+    "ar": "ني تو تشيست ستريتش",
     "primaryMuscles": [
       "لوور باك"
     ],
@@ -5809,9 +5809,9 @@
     "equipment": null,
     "level": "مبتدئ",
     "category": "ستريتشينج",
-    "source": "auto",
+    "source": "curated",
     "popular": false,
-    "reviewed": false
+    "reviewed": true
   },
   {
     "id": "Hurdle_Hops",
@@ -5837,7 +5837,7 @@
   {
     "id": "Hyperextensions_Back_Extensions",
     "en": "Hyperextensions (Back Extensions)",
-    "ar": "هايبر إكستنشن (باك إكستنشن)",
+    "ar": "هايبر إكستنشن",
     "primaryMuscles": [
       "لوور باك"
     ],
@@ -5848,14 +5848,14 @@
     "equipment": "أخرى",
     "level": "مبتدئ",
     "category": "سترينث",
-    "source": "auto",
-    "popular": false,
-    "reviewed": false
+    "source": "curated",
+    "popular": true,
+    "reviewed": true
   },
   {
     "id": "Hyperextensions_With_No_Hyperextension_Bench",
     "en": "Hyperextensions With No Hyperextension Bench",
-    "ar": "باك إكستنشن (هايبر)",
+    "ar": "باك إكستنشن على البنش",
     "primaryMuscles": [
       "لوور باك"
     ],
@@ -5867,7 +5867,7 @@
     "level": "متوسط",
     "category": "سترينث",
     "source": "curated",
-    "popular": true,
+    "popular": false,
     "reviewed": true
   },
   {
@@ -5903,7 +5903,7 @@
   {
     "id": "Incline_Barbell_Triceps_Extension",
     "en": "Incline Barbell Triceps Extension",
-    "ar": "ترايسبس إكستنشن بالبار عالي (إنكلاين)",
+    "ar": "ترايسبس إكستنشن إنكلاين بالبار",
     "primaryMuscles": [
       "ترايسبس"
     ],
@@ -5920,7 +5920,7 @@
   {
     "id": "Incline_Bench_Pull",
     "en": "Incline Bench Pull",
-    "ar": "بنش بول عالي (إنكلاين)",
+    "ar": "بنش بول إنكلاين",
     "primaryMuscles": [
       "ميدل باك"
     ],
@@ -5938,7 +5938,7 @@
   {
     "id": "Incline_Cable_Chest_Press",
     "en": "Incline Cable Chest Press",
-    "ar": "تشيست برس على الكابل عالي (إنكلاين)",
+    "ar": "تشيست برس إنكلاين على الكابل",
     "primaryMuscles": [
       "تشيست"
     ],
@@ -5956,7 +5956,7 @@
   {
     "id": "Incline_Cable_Flye",
     "en": "Incline Cable Flye",
-    "ar": "فلاي على الكابل عالي (إنكلاين)",
+    "ar": "فلاي إنكلاين على الكابل",
     "primaryMuscles": [
       "تشيست"
     ],
@@ -5973,7 +5973,7 @@
   {
     "id": "Incline_Dumbbell_Bench_With_Palms_Facing_In",
     "en": "Incline Dumbbell Bench With Palms Facing In",
-    "ar": "بنش برس بالدامبل عالي (إنكلاين) - الكفوف لجوه",
+    "ar": "بنش برس إنكلاين بالدامبل - كفوف لجوه",
     "primaryMuscles": [
       "تشيست"
     ],
@@ -5991,7 +5991,7 @@
   {
     "id": "Incline_Dumbbell_Curl",
     "en": "Incline Dumbbell Curl",
-    "ar": "بايسبس كيرل بالدامبل على بنش عالي (إنكلاين)",
+    "ar": "بايسبس كيرل إنكلاين بالدامبل",
     "primaryMuscles": [
       "بايسبس"
     ],
@@ -6006,7 +6006,7 @@
   {
     "id": "Incline_Dumbbell_Flyes",
     "en": "Incline Dumbbell Flyes",
-    "ar": "فلاي بالدامبل عالي (إنكلاين)",
+    "ar": "فلاي إنكلاين بالدامبل",
     "primaryMuscles": [
       "تشيست"
     ],
@@ -6023,7 +6023,7 @@
   {
     "id": "Incline_Dumbbell_Flyes_-_With_A_Twist",
     "en": "Incline Dumbbell Flyes - With A Twist",
-    "ar": "فلاي مع تويست بالدامبل عالي (إنكلاين)",
+    "ar": "فلاي مع تويست إنكلاين بالدامبل",
     "primaryMuscles": [
       "تشيست"
     ],
@@ -6040,7 +6040,7 @@
   {
     "id": "Incline_Dumbbell_Press",
     "en": "Incline Dumbbell Press",
-    "ar": "بنش برس بالدامبل عالي (إنكلاين)",
+    "ar": "بنش برس إنكلاين بالدامبل",
     "primaryMuscles": [
       "تشيست"
     ],
@@ -6058,7 +6058,7 @@
   {
     "id": "Incline_Hammer_Curls",
     "en": "Incline Hammer Curls",
-    "ar": "هامر كيرل على بنش عالي (إنكلاين)",
+    "ar": "هامر كيرل إنكلاين",
     "primaryMuscles": [
       "بايسبس"
     ],
@@ -6073,7 +6073,7 @@
   {
     "id": "Incline_Inner_Biceps_Curl",
     "en": "Incline Inner Biceps Curl",
-    "ar": "إنر بايسبس كيرل عالي (إنكلاين)",
+    "ar": "إنر بايسبس كيرل إنكلاين",
     "primaryMuscles": [
       "بايسبس"
     ],
@@ -6088,7 +6088,7 @@
   {
     "id": "Incline_Push-Up",
     "en": "Incline Push-Up",
-    "ar": "بوش أب وإيدك عالية (إنكلاين)",
+    "ar": "بوش أب إنكلاين",
     "primaryMuscles": [
       "تشيست"
     ],
@@ -6106,7 +6106,7 @@
   {
     "id": "Incline_Push-Up_Close-Grip",
     "en": "Incline Push-Up Close-Grip",
-    "ar": "بوش أب عالي (إنكلاين) - قبضة ضيقة",
+    "ar": "بوش أب إنكلاين - قبضة ضيقة",
     "primaryMuscles": [
       "ترايسبس"
     ],
@@ -6124,7 +6124,7 @@
   {
     "id": "Incline_Push-Up_Depth_Jump",
     "en": "Incline Push-Up Depth Jump",
-    "ar": "بوش أب ديبث جامب عالي (إنكلاين)",
+    "ar": "بوش أب ديبث جامب إنكلاين",
     "primaryMuscles": [
       "تشيست"
     ],
@@ -6142,7 +6142,7 @@
   {
     "id": "Incline_Push-Up_Medium",
     "en": "Incline Push-Up Medium",
-    "ar": "بوش أب ميديم عالي (إنكلاين)",
+    "ar": "بوش أب ميديم إنكلاين",
     "primaryMuscles": [
       "تشيست"
     ],
@@ -6161,7 +6161,7 @@
   {
     "id": "Incline_Push-Up_Reverse_Grip",
     "en": "Incline Push-Up Reverse Grip",
-    "ar": "بوش أب عالي (إنكلاين) - قبضة معكوسة",
+    "ar": "بوش أب إنكلاين - قبضة معكوسة",
     "primaryMuscles": [
       "تشيست"
     ],
@@ -6180,7 +6180,7 @@
   {
     "id": "Incline_Push-Up_Wide",
     "en": "Incline Push-Up Wide",
-    "ar": "بوش أب وايد عالي (إنكلاين)",
+    "ar": "بوش أب وايد إنكلاين",
     "primaryMuscles": [
       "تشيست"
     ],
@@ -6316,7 +6316,7 @@
   {
     "id": "Isometric_Chest_Squeezes",
     "en": "Isometric Chest Squeezes",
-    "ar": "أيزومتريك تشيست سكويز",
+    "ar": "تشيست سكويز أيزومتريك",
     "primaryMuscles": [
       "تشيست"
     ],
@@ -6327,14 +6327,14 @@
     "equipment": "بودي ويت",
     "level": "مبتدئ",
     "category": "بلايومتركس",
-    "source": "auto",
+    "source": "curated",
     "popular": false,
-    "reviewed": false
+    "reviewed": true
   },
   {
     "id": "Isometric_Neck_Exercise_-_Front_And_Back",
     "en": "Isometric Neck Exercise - Front And Back",
-    "ar": "أيزومتريك نيك إكسرسايز فرونت وباك",
+    "ar": "نيك أيزومتريك (قدام وورا)",
     "primaryMuscles": [
       "نيك"
     ],
@@ -6342,14 +6342,14 @@
     "equipment": "بودي ويت",
     "level": "مبتدئ",
     "category": "سترينث",
-    "source": "auto",
+    "source": "curated",
     "popular": false,
-    "reviewed": false
+    "reviewed": true
   },
   {
     "id": "Isometric_Neck_Exercise_-_Sides",
     "en": "Isometric Neck Exercise - Sides",
-    "ar": "أيزومتريك نيك إكسرسايز سايدز",
+    "ar": "نيك أيزومتريك (من الجنب)",
     "primaryMuscles": [
       "نيك"
     ],
@@ -6357,9 +6357,9 @@
     "equipment": "بودي ويت",
     "level": "مبتدئ",
     "category": "سترينث",
-    "source": "auto",
+    "source": "curated",
     "popular": false,
-    "reviewed": false
+    "reviewed": true
   },
   {
     "id": "Isometric_Wipers",
@@ -6383,7 +6383,7 @@
   {
     "id": "IT_Band_and_Glute_Stretch",
     "en": "IT Band and Glute Stretch",
-    "ar": "وجلوت ستريتش بالباند",
+    "ar": "آي تي باند وجلوت ستريتش",
     "primaryMuscles": [
       "أبداكتورز"
     ],
@@ -6391,14 +6391,14 @@
     "equipment": "أخرى",
     "level": "متوسط",
     "category": "ستريتشينج",
-    "source": "auto",
+    "source": "curated",
     "popular": false,
-    "reviewed": false
+    "reviewed": true
   },
   {
     "id": "Jackknife_Sit-Up",
     "en": "Jackknife Sit-Up",
-    "ar": "جاك نايف (V أب)",
+    "ar": "جاك نايف سيت أب",
     "primaryMuscles": [
       "أبس"
     ],
@@ -6549,14 +6549,14 @@
   {
     "id": "Kettlebell_Arnold_Press",
     "en": "Kettlebell Arnold Press",
-    "ar": "أرنولد برس بالكيتل بل",
+    "ar": "أرنولد برس بالكيتل بيل",
     "primaryMuscles": [
       "شولدرز"
     ],
     "secondaryMuscles": [
       "ترايسبس"
     ],
-    "equipment": "كيتل بل",
+    "equipment": "كيتل بيل",
     "level": "متوسط",
     "category": "سترينث",
     "source": "curated",
@@ -6566,7 +6566,7 @@
   {
     "id": "Kettlebell_Dead_Clean",
     "en": "Kettlebell Dead Clean",
-    "ar": "ديد كلين بالكيتل بل",
+    "ar": "ديد كلين بالكيتل بيل",
     "primaryMuscles": [
       "هامسترينج"
     ],
@@ -6577,7 +6577,7 @@
       "كوادز",
       "ترابس"
     ],
-    "equipment": "كيتل بل",
+    "equipment": "كيتل بيل",
     "level": "متوسط",
     "category": "سترينث",
     "source": "auto",
@@ -6587,7 +6587,7 @@
   {
     "id": "Kettlebell_Figure_8",
     "en": "Kettlebell Figure 8",
-    "ar": "فيجر 8 بالكيتل بل",
+    "ar": "فيجر 8 بالكيتل بيل",
     "primaryMuscles": [
       "أبس"
     ],
@@ -6595,7 +6595,7 @@
       "هامسترينج",
       "شولدرز"
     ],
-    "equipment": "كيتل بل",
+    "equipment": "كيتل بيل",
     "level": "متوسط",
     "category": "سترينث",
     "source": "auto",
@@ -6605,7 +6605,7 @@
   {
     "id": "Kettlebell_Halo",
     "en": "Kettlebell Halo",
-    "ar": "هيلو بالكيتل بل",
+    "ar": "هيلو بالكيتل بيل",
     "primaryMuscles": [
       "شولدرز"
     ],
@@ -6615,7 +6615,7 @@
       "أبس",
       "ترايسبس"
     ],
-    "equipment": "كيتل بل",
+    "equipment": "كيتل بيل",
     "level": "مبتدئ",
     "category": "سترينث",
     "source": "auto",
@@ -6625,7 +6625,7 @@
   {
     "id": "Kettlebell_Halo_With_Overhead_Extension",
     "en": "Kettlebell Halo with Overhead Extension",
-    "ar": "هيلو مع أوفرهيد إكستنشن بالكيتل بل",
+    "ar": "هيلو مع أوفرهيد إكستنشن بالكيتل بيل",
     "primaryMuscles": [
       "شولدرز",
       "ترايسبس"
@@ -6635,7 +6635,7 @@
       "ميدل باك",
       "أبس"
     ],
-    "equipment": "كيتل بل",
+    "equipment": "كيتل بيل",
     "level": "متوسط",
     "category": "سترينث",
     "source": "auto",
@@ -6645,7 +6645,7 @@
   {
     "id": "Kettlebell_Hang_Clean",
     "en": "Kettlebell Hang Clean",
-    "ar": "هانج كلين بالكيتل بل",
+    "ar": "هانج كلين بالكيتل بيل",
     "primaryMuscles": [
       "هامسترينج"
     ],
@@ -6656,7 +6656,7 @@
       "شولدرز",
       "ترابس"
     ],
-    "equipment": "كيتل بل",
+    "equipment": "كيتل بيل",
     "level": "متوسط",
     "category": "سترينث",
     "source": "auto",
@@ -6666,7 +6666,7 @@
   {
     "id": "Kettlebell_One-Legged_Deadlift",
     "en": "Kettlebell One-Legged Deadlift",
-    "ar": "سينجل ليج ديدليفت بالكيتل بل",
+    "ar": "سينجل ليج ديدليفت بالكيتل بيل",
     "primaryMuscles": [
       "هامسترينج"
     ],
@@ -6674,7 +6674,7 @@
       "جلوتس",
       "لوور باك"
     ],
-    "equipment": "كيتل بل",
+    "equipment": "كيتل بيل",
     "level": "متوسط",
     "category": "سترينث",
     "source": "curated",
@@ -6684,7 +6684,7 @@
   {
     "id": "Kettlebell_Overhead_Triceps_Extension",
     "en": "Kettlebell Overhead Triceps Extension",
-    "ar": "أوفرهيد ترايسبس إكستنشن بالكيتل بل",
+    "ar": "أوفرهيد ترايسبس إكستنشن بالكيتل بيل",
     "primaryMuscles": [
       "ترايسبس"
     ],
@@ -6692,7 +6692,7 @@
       "شولدرز",
       "أبس"
     ],
-    "equipment": "كيتل بل",
+    "equipment": "كيتل بيل",
     "level": "مبتدئ",
     "category": "سترينث",
     "source": "auto",
@@ -6702,7 +6702,7 @@
   {
     "id": "Kettlebell_Pass_Between_The_Legs",
     "en": "Kettlebell Pass Between The Legs",
-    "ar": "باس بيتوين ليجز بالكيتل بل",
+    "ar": "باس بيتوين ليجز بالكيتل بيل",
     "primaryMuscles": [
       "أبس"
     ],
@@ -6711,7 +6711,7 @@
       "هامسترينج",
       "شولدرز"
     ],
-    "equipment": "كيتل بل",
+    "equipment": "كيتل بيل",
     "level": "متوسط",
     "category": "سترينث",
     "source": "auto",
@@ -6721,14 +6721,14 @@
   {
     "id": "Kettlebell_Pirate_Ships",
     "en": "Kettlebell Pirate Ships",
-    "ar": "بايرت شيبس بالكيتل بل",
+    "ar": "بايرت شيبس بالكيتل بيل",
     "primaryMuscles": [
       "شولدرز"
     ],
     "secondaryMuscles": [
       "أبس"
     ],
-    "equipment": "كيتل بل",
+    "equipment": "كيتل بيل",
     "level": "مبتدئ",
     "category": "سترينث",
     "source": "auto",
@@ -6738,7 +6738,7 @@
   {
     "id": "Kettlebell_Pistol_Squat",
     "en": "Kettlebell Pistol Squat",
-    "ar": "بيستول سكوات بالكيتل بل",
+    "ar": "بيستول سكوات بالكيتل بيل",
     "primaryMuscles": [
       "كوادز"
     ],
@@ -6748,7 +6748,7 @@
       "هامسترينج",
       "شولدرز"
     ],
-    "equipment": "كيتل بل",
+    "equipment": "كيتل بيل",
     "level": "متقدم",
     "category": "سترينث",
     "source": "auto",
@@ -6758,14 +6758,14 @@
   {
     "id": "Kettlebell_Seated_Press",
     "en": "Kettlebell Seated Press",
-    "ar": "برس بالكيتل بل قاعد",
+    "ar": "برس بالكيتل بيل قاعد",
     "primaryMuscles": [
       "شولدرز"
     ],
     "secondaryMuscles": [
       "ترايسبس"
     ],
-    "equipment": "كيتل بل",
+    "equipment": "كيتل بيل",
     "level": "متوسط",
     "category": "سترينث",
     "source": "auto",
@@ -6775,14 +6775,14 @@
   {
     "id": "Kettlebell_Seesaw_Press",
     "en": "Kettlebell Seesaw Press",
-    "ar": "سي سو برس بالكيتل بل",
+    "ar": "سي سو برس بالكيتل بيل",
     "primaryMuscles": [
       "شولدرز"
     ],
     "secondaryMuscles": [
       "ترايسبس"
     ],
-    "equipment": "كيتل بل",
+    "equipment": "كيتل بيل",
     "level": "متوسط",
     "category": "سترينث",
     "source": "auto",
@@ -6792,7 +6792,7 @@
   {
     "id": "Kettlebell_Sumo_High_Pull",
     "en": "Kettlebell Sumo High Pull",
-    "ar": "سومو هاي بول بالكيتل بل",
+    "ar": "سومو هاي بول بالكيتل بيل",
     "primaryMuscles": [
       "ترابس"
     ],
@@ -6803,7 +6803,7 @@
       "كوادز",
       "شولدرز"
     ],
-    "equipment": "كيتل بل",
+    "equipment": "كيتل بيل",
     "level": "متوسط",
     "category": "سترينث",
     "source": "auto",
@@ -6813,7 +6813,7 @@
   {
     "id": "Kettlebell_Thruster",
     "en": "Kettlebell Thruster",
-    "ar": "ثراستر بالكيتل بل",
+    "ar": "ثراستر بالكيتل بيل",
     "primaryMuscles": [
       "شولدرز"
     ],
@@ -6821,7 +6821,7 @@
       "كوادز",
       "ترايسبس"
     ],
-    "equipment": "كيتل بل",
+    "equipment": "كيتل بيل",
     "level": "متوسط",
     "category": "سترينث",
     "source": "auto",
@@ -6831,7 +6831,7 @@
   {
     "id": "Kettlebell_Turkish_Get-Up_Lunge_style",
     "en": "Kettlebell Turkish Get-Up (Lunge style)",
-    "ar": "تركيش جت أب (لانج ستايل) بالكيتل بل",
+    "ar": "تركيش جت أب (لانج ستايل) بالكيتل بيل",
     "primaryMuscles": [
       "شولدرز"
     ],
@@ -6841,7 +6841,7 @@
       "كوادز",
       "ترايسبس"
     ],
-    "equipment": "كيتل بل",
+    "equipment": "كيتل بيل",
     "level": "متوسط",
     "category": "سترينث",
     "source": "auto",
@@ -6851,7 +6851,7 @@
   {
     "id": "Kettlebell_Turkish_Get-Up_Squat_style",
     "en": "Kettlebell Turkish Get-Up (Squat style)",
-    "ar": "تركيش جت أب (سكوات ستايل) بالكيتل بل",
+    "ar": "تركيش جت أب (سكوات ستايل) بالكيتل بيل",
     "primaryMuscles": [
       "شولدرز"
     ],
@@ -6862,7 +6862,7 @@
       "كوادز",
       "ترايسبس"
     ],
-    "equipment": "كيتل بل",
+    "equipment": "كيتل بيل",
     "level": "متوسط",
     "category": "سترينث",
     "source": "auto",
@@ -6872,7 +6872,7 @@
   {
     "id": "Kettlebell_Windmill",
     "en": "Kettlebell Windmill",
-    "ar": "ويندميل بالكيتل بل",
+    "ar": "ويندميل بالكيتل بيل",
     "primaryMuscles": [
       "أبس"
     ],
@@ -6882,7 +6882,7 @@
       "شولدرز",
       "ترايسبس"
     ],
-    "equipment": "كيتل بل",
+    "equipment": "كيتل بيل",
     "level": "متوسط",
     "category": "سترينث",
     "source": "auto",
@@ -6915,7 +6915,7 @@
   {
     "id": "Knee_Across_The_Body",
     "en": "Knee Across The Body",
-    "ar": "ني أكروس بودي",
+    "ar": "جلوت ستريتش (الركبة على الجسم)",
     "primaryMuscles": [
       "جلوتس"
     ],
@@ -6926,9 +6926,9 @@
     "equipment": null,
     "level": "مبتدئ",
     "category": "ستريتشينج",
-    "source": "auto",
+    "source": "curated",
     "popular": false,
-    "reviewed": false
+    "reviewed": true
   },
   {
     "id": "Knee_Circles",
@@ -7004,7 +7004,7 @@
   {
     "id": "Kneeling_Cable_Crunch_With_Alternating_Oblique_Twists",
     "en": "Kneeling Cable Crunch With Alternating Oblique Twists",
-    "ar": "كرانش مع أوبليك تويست على الكابل على ركبك بالتبادل",
+    "ar": "كابل كرانش بتويست وانت راكع",
     "primaryMuscles": [
       "أبس"
     ],
@@ -7012,9 +7012,9 @@
     "equipment": "كابل",
     "level": "مبتدئ",
     "category": "سترينث",
-    "source": "auto",
+    "source": "curated",
     "popular": false,
-    "reviewed": false
+    "reviewed": true
   },
   {
     "id": "Kneeling_Cable_Triceps_Extension",
@@ -7140,7 +7140,7 @@
   {
     "id": "Landmine_180s",
     "en": "Landmine 180's",
-    "ar": "لاندماين 180",
+    "ar": "لاندماين 180 (تويست)",
     "primaryMuscles": [
       "أبس"
     ],
@@ -7152,9 +7152,9 @@
     "equipment": "بار",
     "level": "مبتدئ",
     "category": "سترينث",
-    "source": "auto",
+    "source": "curated",
     "popular": false,
-    "reviewed": false
+    "reviewed": true
   },
   {
     "id": "Landmine_Linear_Jammer",
@@ -7348,7 +7348,7 @@
       "شولدرز",
       "ترايسبس"
     ],
-    "equipment": "كيتل بل",
+    "equipment": "كيتل بيل",
     "level": "متوسط",
     "category": "سترينث",
     "source": "auto",
@@ -7409,7 +7409,7 @@
   {
     "id": "Leverage_Decline_Chest_Press",
     "en": "Leverage Decline Chest Press",
-    "ar": "تشيست برس على الماشين واطي (ديكلاين)",
+    "ar": "تشيست برس ديكلاين على الماشين",
     "primaryMuscles": [
       "تشيست"
     ],
@@ -7444,7 +7444,7 @@
   {
     "id": "Leverage_Incline_Chest_Press",
     "en": "Leverage Incline Chest Press",
-    "ar": "تشيست برس على الماشين عالي (إنكلاين)",
+    "ar": "تشيست برس إنكلاين على الماشين",
     "primaryMuscles": [
       "تشيست"
     ],
@@ -7719,7 +7719,7 @@
       "جلوتس",
       "كوادز"
     ],
-    "equipment": "كيتل بل",
+    "equipment": "كيتل بيل",
     "level": "متوسط",
     "category": "سترينث",
     "source": "auto",
@@ -7748,7 +7748,7 @@
   {
     "id": "Lying_Bent_Leg_Groin",
     "en": "Lying Bent Leg Groin",
-    "ar": "بنت ليج جروين نايم",
+    "ar": "جروين ستريتش نايم",
     "primaryMuscles": [
       "أداكتورز"
     ],
@@ -7756,9 +7756,9 @@
     "equipment": "أخرى",
     "level": "متقدم",
     "category": "ستريتشينج",
-    "source": "auto",
+    "source": "curated",
     "popular": false,
-    "reviewed": false
+    "reviewed": true
   },
   {
     "id": "Lying_Cable_Curl",
@@ -7842,7 +7842,7 @@
   {
     "id": "Lying_Crossover",
     "en": "Lying Crossover",
-    "ar": "كروس أوفر نايم",
+    "ar": "كروس أوفر على الكابل نايم",
     "primaryMuscles": [
       "أبداكتورز"
     ],
@@ -7850,9 +7850,9 @@
     "equipment": "بودي ويت",
     "level": "متقدم",
     "category": "ستريتشينج",
-    "source": "auto",
+    "source": "curated",
     "popular": false,
-    "reviewed": false
+    "reviewed": true
   },
   {
     "id": "Lying_Dumbbell_Tricep_Extension",
@@ -7875,7 +7875,7 @@
   {
     "id": "Lying_Face_Down_Plate_Neck_Resistance",
     "en": "Lying Face Down Plate Neck Resistance",
-    "ar": "فيس داون بليت نيك ريزيستانس نايم",
+    "ar": "نيك بالبليت نايم على بطنك",
     "primaryMuscles": [
       "نيك"
     ],
@@ -7883,14 +7883,14 @@
     "equipment": "أخرى",
     "level": "متوسط",
     "category": "سترينث",
-    "source": "auto",
+    "source": "curated",
     "popular": false,
-    "reviewed": false
+    "reviewed": true
   },
   {
     "id": "Lying_Face_Up_Plate_Neck_Resistance",
     "en": "Lying Face Up Plate Neck Resistance",
-    "ar": "فيس أب بليت نيك ريزيستانس نايم",
+    "ar": "نيك بالبليت نايم على ضهرك",
     "primaryMuscles": [
       "نيك"
     ],
@@ -7898,14 +7898,14 @@
     "equipment": "أخرى",
     "level": "متوسط",
     "category": "سترينث",
-    "source": "auto",
+    "source": "curated",
     "popular": false,
-    "reviewed": false
+    "reviewed": true
   },
   {
     "id": "Lying_Glute",
     "en": "Lying Glute",
-    "ar": "جلوت نايم",
+    "ar": "جلوت ستريتش نايم",
     "primaryMuscles": [
       "جلوتس"
     ],
@@ -7915,14 +7915,14 @@
     "equipment": "بودي ويت",
     "level": "متقدم",
     "category": "ستريتشينج",
-    "source": "auto",
+    "source": "curated",
     "popular": false,
-    "reviewed": false
+    "reviewed": true
   },
   {
     "id": "Lying_Hamstring",
     "en": "Lying Hamstring",
-    "ar": "هامسترينج نايم",
+    "ar": "هامسترينج ستريتش نايم",
     "primaryMuscles": [
       "هامسترينج"
     ],
@@ -7932,9 +7932,9 @@
     "equipment": "أخرى",
     "level": "متقدم",
     "category": "ستريتشينج",
-    "source": "auto",
+    "source": "curated",
     "popular": false,
-    "reviewed": false
+    "reviewed": true
   },
   {
     "id": "Lying_High_Bench_Barbell_Curl",
@@ -8003,7 +8003,7 @@
   {
     "id": "Lying_Prone_Quadriceps",
     "en": "Lying Prone Quadriceps",
-    "ar": "برون كوادز نايم",
+    "ar": "كواد ستريتش نايم على بطنك",
     "primaryMuscles": [
       "كوادز"
     ],
@@ -8011,9 +8011,9 @@
     "equipment": "بودي ويت",
     "level": "متقدم",
     "category": "ستريتشينج",
-    "source": "auto",
+    "source": "curated",
     "popular": false,
-    "reviewed": false
+    "reviewed": true
   },
   {
     "id": "Lying_Rear_Delt_Raise",
@@ -8033,7 +8033,7 @@
   {
     "id": "Lying_Supine_Dumbbell_Curl",
     "en": "Lying Supine Dumbbell Curl",
-    "ar": "سوباين كيرل بالدامبل نايم",
+    "ar": "بايسبس كيرل بالدامبل نايم على ضهرك",
     "primaryMuscles": [
       "بايسبس"
     ],
@@ -8041,9 +8041,9 @@
     "equipment": "دامبل",
     "level": "مبتدئ",
     "category": "سترينث",
-    "source": "auto",
+    "source": "curated",
     "popular": false,
-    "reviewed": false
+    "reviewed": true
   },
   {
     "id": "Lying_T-Bar_Row",
@@ -8522,7 +8522,7 @@
   {
     "id": "On_Your_Side_Quad_Stretch",
     "en": "On Your Side Quad Stretch",
-    "ar": "على سايد كواد ستريتش",
+    "ar": "كواد ستريتش نايم على جنبك",
     "primaryMuscles": [
       "كوادز"
     ],
@@ -8530,14 +8530,14 @@
     "equipment": null,
     "level": "مبتدئ",
     "category": "ستريتشينج",
-    "source": "auto",
+    "source": "curated",
     "popular": false,
-    "reviewed": false
+    "reviewed": true
   },
   {
     "id": "On-Your-Back_Quad_Stretch",
     "en": "On-Your-Back Quad Stretch",
-    "ar": "على باك كواد ستريتش",
+    "ar": "كواد ستريتش نايم على ضهرك",
     "primaryMuscles": [
       "كوادز"
     ],
@@ -8545,14 +8545,14 @@
     "equipment": "أخرى",
     "level": "مبتدئ",
     "category": "ستريتشينج",
-    "source": "auto",
+    "source": "curated",
     "popular": false,
-    "reviewed": false
+    "reviewed": true
   },
   {
     "id": "One_Arm_Against_Wall",
     "en": "One Arm Against Wall",
-    "ar": "على الحيطة بإيد واحدة",
+    "ar": "تشيست ستريتش على الحيطة بإيد واحدة",
     "primaryMuscles": [
       "لاتس"
     ],
@@ -8560,9 +8560,9 @@
     "equipment": null,
     "level": "مبتدئ",
     "category": "ستريتشينج",
-    "source": "auto",
+    "source": "curated",
     "popular": false,
-    "reviewed": false
+    "reviewed": true
   },
   {
     "id": "One_Arm_Chin-Up",
@@ -8721,7 +8721,7 @@
   {
     "id": "One_Knee_To_Chest",
     "en": "One Knee To Chest",
-    "ar": "ون ني لحد تشيست",
+    "ar": "ني تو تشيست ستريتش برجل واحدة",
     "primaryMuscles": [
       "جلوتس"
     ],
@@ -8732,9 +8732,9 @@
     "equipment": null,
     "level": "مبتدئ",
     "category": "ستريتشينج",
-    "source": "auto",
+    "source": "curated",
     "popular": false,
-    "reviewed": false
+    "reviewed": true
   },
   {
     "id": "One_Leg_Barbell_Squat",
@@ -8807,7 +8807,7 @@
   {
     "id": "One-Arm_Incline_Lateral_Raise",
     "en": "One-Arm Incline Lateral Raise",
-    "ar": "لاتيرال رايز بالدامبل على بنش عالي",
+    "ar": "لاتيرال رايز بالدامبل على بنش إنكلاين",
     "primaryMuscles": [
       "شولدرز"
     ],
@@ -8822,7 +8822,7 @@
   {
     "id": "One-Arm_Kettlebell_Clean",
     "en": "One-Arm Kettlebell Clean",
-    "ar": "كلين بالكيتل بل بإيد واحدة",
+    "ar": "كلين بالكيتل بيل بإيد واحدة",
     "primaryMuscles": [
       "هامسترينج"
     ],
@@ -8832,7 +8832,7 @@
       "شولدرز",
       "ترابس"
     ],
-    "equipment": "كيتل بل",
+    "equipment": "كيتل بيل",
     "level": "متوسط",
     "category": "سترينث",
     "source": "auto",
@@ -8842,12 +8842,12 @@
   {
     "id": "One-Arm_Kettlebell_Clean_and_Jerk",
     "en": "One-Arm Kettlebell Clean and Jerk",
-    "ar": "كلين آند جيرك بالكيتل بل بإيد واحدة",
+    "ar": "كلين آند جيرك بالكيتل بيل بإيد واحدة",
     "primaryMuscles": [
       "شولدرز"
     ],
     "secondaryMuscles": [],
-    "equipment": "كيتل بل",
+    "equipment": "كيتل بيل",
     "level": "متوسط",
     "category": "سترينث",
     "source": "auto",
@@ -8857,14 +8857,14 @@
   {
     "id": "One-Arm_Kettlebell_Floor_Press",
     "en": "One-Arm Kettlebell Floor Press",
-    "ar": "فلور برس بالكيتل بل بإيد واحدة",
+    "ar": "فلور برس بالكيتل بيل بإيد واحدة",
     "primaryMuscles": [
       "تشيست"
     ],
     "secondaryMuscles": [
       "ترايسبس"
     ],
-    "equipment": "كيتل بل",
+    "equipment": "كيتل بيل",
     "level": "متوسط",
     "category": "سترينث",
     "source": "auto",
@@ -8874,7 +8874,7 @@
   {
     "id": "One-Arm_Kettlebell_Jerk",
     "en": "One-Arm Kettlebell Jerk",
-    "ar": "جيرك بالكيتل بل بإيد واحدة",
+    "ar": "جيرك بالكيتل بيل بإيد واحدة",
     "primaryMuscles": [
       "شولدرز"
     ],
@@ -8883,7 +8883,7 @@
       "كوادز",
       "ترايسبس"
     ],
-    "equipment": "كيتل بل",
+    "equipment": "كيتل بيل",
     "level": "متوسط",
     "category": "سترينث",
     "source": "auto",
@@ -8893,14 +8893,14 @@
   {
     "id": "One-Arm_Kettlebell_Military_Press_To_The_Side",
     "en": "One-Arm Kettlebell Military Press To The Side",
-    "ar": "ميليتري برس لحد سايد بالكيتل بل بإيد واحدة",
+    "ar": "ميليتري برس لحد سايد بالكيتل بيل بإيد واحدة",
     "primaryMuscles": [
       "شولدرز"
     ],
     "secondaryMuscles": [
       "ترايسبس"
     ],
-    "equipment": "كيتل بل",
+    "equipment": "كيتل بيل",
     "level": "متوسط",
     "category": "سترينث",
     "source": "auto",
@@ -8910,14 +8910,14 @@
   {
     "id": "One-Arm_Kettlebell_Para_Press",
     "en": "One-Arm Kettlebell Para Press",
-    "ar": "بارا برس بالكيتل بل بإيد واحدة",
+    "ar": "بارا برس بالكيتل بيل بإيد واحدة",
     "primaryMuscles": [
       "شولدرز"
     ],
     "secondaryMuscles": [
       "ترايسبس"
     ],
-    "equipment": "كيتل بل",
+    "equipment": "كيتل بيل",
     "level": "متوسط",
     "category": "سترينث",
     "source": "auto",
@@ -8927,7 +8927,7 @@
   {
     "id": "One-Arm_Kettlebell_Push_Press",
     "en": "One-Arm Kettlebell Push Press",
-    "ar": "بوش برس بالكيتل بل بإيد واحدة",
+    "ar": "بوش برس بالكيتل بيل بإيد واحدة",
     "primaryMuscles": [
       "شولدرز"
     ],
@@ -8936,7 +8936,7 @@
       "كوادز",
       "ترايسبس"
     ],
-    "equipment": "كيتل بل",
+    "equipment": "كيتل بيل",
     "level": "متوسط",
     "category": "سترينث",
     "source": "auto",
@@ -8946,7 +8946,7 @@
   {
     "id": "One-Arm_Kettlebell_Row",
     "en": "One-Arm Kettlebell Row",
-    "ar": "رو بالكيتل بل بإيد واحدة",
+    "ar": "رو بالكيتل بيل بإيد واحدة",
     "primaryMuscles": [
       "ميدل باك"
     ],
@@ -8954,7 +8954,7 @@
       "بايسبس",
       "لاتس"
     ],
-    "equipment": "كيتل بل",
+    "equipment": "كيتل بيل",
     "level": "متوسط",
     "category": "سترينث",
     "source": "auto",
@@ -8964,7 +8964,7 @@
   {
     "id": "One-Arm_Kettlebell_Snatch",
     "en": "One-Arm Kettlebell Snatch",
-    "ar": "سناتش بالكيتل بل بإيد واحدة",
+    "ar": "سناتش بالكيتل بيل بإيد واحدة",
     "primaryMuscles": [
       "شولدرز"
     ],
@@ -8976,7 +8976,7 @@
       "ترابس",
       "ترايسبس"
     ],
-    "equipment": "كيتل بل",
+    "equipment": "كيتل بيل",
     "level": "متقدم",
     "category": "سترينث",
     "source": "auto",
@@ -8986,7 +8986,7 @@
   {
     "id": "One-Arm_Kettlebell_Split_Jerk",
     "en": "One-Arm Kettlebell Split Jerk",
-    "ar": "سبليت جيرك بالكيتل بل بإيد واحدة",
+    "ar": "سبليت جيرك بالكيتل بيل بإيد واحدة",
     "primaryMuscles": [
       "شولدرز"
     ],
@@ -8996,7 +8996,7 @@
       "كوادز",
       "ترايسبس"
     ],
-    "equipment": "كيتل بل",
+    "equipment": "كيتل بيل",
     "level": "متوسط",
     "category": "سترينث",
     "source": "auto",
@@ -9006,7 +9006,7 @@
   {
     "id": "One-Arm_Kettlebell_Split_Snatch",
     "en": "One-Arm Kettlebell Split Snatch",
-    "ar": "سبليت سناتش بالكيتل بل بإيد واحدة",
+    "ar": "سبليت سناتش بالكيتل بيل بإيد واحدة",
     "primaryMuscles": [
       "شولدرز"
     ],
@@ -9014,7 +9014,7 @@
       "هامسترينج",
       "كوادز"
     ],
-    "equipment": "كيتل بل",
+    "equipment": "كيتل بيل",
     "level": "متقدم",
     "category": "سترينث",
     "source": "auto",
@@ -9024,7 +9024,7 @@
   {
     "id": "One-Arm_Kettlebell_Swings",
     "en": "One-Arm Kettlebell Swings",
-    "ar": "كيتل بل سوينج بإيد واحدة",
+    "ar": "كيتل بيل سوينج بإيد واحدة",
     "primaryMuscles": [
       "هامسترينج"
     ],
@@ -9034,7 +9034,7 @@
       "لوور باك",
       "شولدرز"
     ],
-    "equipment": "كيتل بل",
+    "equipment": "كيتل بيل",
     "level": "متوسط",
     "category": "سترينث",
     "source": "curated",
@@ -9080,7 +9080,7 @@
   {
     "id": "One-Arm_Open_Palm_Kettlebell_Clean",
     "en": "One-Arm Open Palm Kettlebell Clean",
-    "ar": "أوبن بالم كلين بالكيتل بل بإيد واحدة",
+    "ar": "أوبن بالم كلين بالكيتل بيل بإيد واحدة",
     "primaryMuscles": [
       "هامسترينج"
     ],
@@ -9091,7 +9091,7 @@
       "كوادز",
       "شولدرز"
     ],
-    "equipment": "كيتل بل",
+    "equipment": "كيتل بيل",
     "level": "متوسط",
     "category": "سترينث",
     "source": "auto",
@@ -9101,7 +9101,7 @@
   {
     "id": "One-Arm_Overhead_Kettlebell_Squats",
     "en": "One-Arm Overhead Kettlebell Squats",
-    "ar": "أوفرهيد سكوات بالكيتل بل بإيد واحدة",
+    "ar": "أوفرهيد سكوات بالكيتل بيل بإيد واحدة",
     "primaryMuscles": [
       "كوادز"
     ],
@@ -9111,7 +9111,7 @@
       "هامسترينج",
       "شولدرز"
     ],
-    "equipment": "كيتل بل",
+    "equipment": "كيتل بيل",
     "level": "متقدم",
     "category": "سترينث",
     "source": "auto",
@@ -9175,7 +9175,7 @@
   {
     "id": "Open_Palm_Kettlebell_Clean",
     "en": "Open Palm Kettlebell Clean",
-    "ar": "أوبن بالم كلين بالكيتل بل",
+    "ar": "أوبن بالم كلين بالكيتل بيل",
     "primaryMuscles": [
       "هامسترينج"
     ],
@@ -9185,7 +9185,7 @@
       "كوادز",
       "شولدرز"
     ],
-    "equipment": "كيتل بل",
+    "equipment": "كيتل بيل",
     "level": "متقدم",
     "category": "سترينث",
     "source": "auto",
@@ -9334,7 +9334,7 @@
     "level": "مبتدئ",
     "category": "سترينث",
     "source": "curated",
-    "popular": false,
+    "popular": true,
     "reviewed": true
   },
   {
@@ -9359,7 +9359,7 @@
   {
     "id": "Palms-Down_Dumbbell_Wrist_Curl_Over_A_Bench",
     "en": "Palms-Down Dumbbell Wrist Curl Over A Bench",
-    "ar": "الكفوف لتحت ريست كيرل أوفر بنش بالدامبل",
+    "ar": "ريست كيرل أوفر بنش بالدامبل - كفوف لتحت",
     "primaryMuscles": [
       "فورآرمز"
     ],
@@ -9404,7 +9404,7 @@
   {
     "id": "Palms-Up_Dumbbell_Wrist_Curl_Over_A_Bench",
     "en": "Palms-Up Dumbbell Wrist Curl Over A Bench",
-    "ar": "الكفوف لفوق ريست كيرل أوفر بنش بالدامبل",
+    "ar": "ريست كيرل أوفر بنش بالدامبل - كفوف لفوق",
     "primaryMuscles": [
       "فورآرمز"
     ],
@@ -9437,7 +9437,7 @@
   {
     "id": "Pelvic_Tilt_Into_Bridge",
     "en": "Pelvic Tilt Into Bridge",
-    "ar": "بيلفيك تيلت إنتو بريدج",
+    "ar": "بيلفيك تيلت لحد بريدج",
     "primaryMuscles": [
       "لوور باك"
     ],
@@ -9445,9 +9445,9 @@
     "equipment": null,
     "level": "متوسط",
     "category": "ستريتشينج",
-    "source": "auto",
+    "source": "curated",
     "popular": false,
-    "reviewed": false
+    "reviewed": true
   },
   {
     "id": "Peroneals_Stretch",
@@ -9617,7 +9617,7 @@
   {
     "id": "Plyo_Kettlebell_Pushups",
     "en": "Plyo Kettlebell Pushups",
-    "ar": "بلايو بوش أب بالكيتل بل",
+    "ar": "بلايو بوش أب بالكيتل بيل",
     "primaryMuscles": [
       "تشيست"
     ],
@@ -9625,7 +9625,7 @@
       "شولدرز",
       "ترايسبس"
     ],
-    "equipment": "كيتل بل",
+    "equipment": "كيتل بيل",
     "level": "متقدم",
     "category": "سترينث",
     "source": "auto",
@@ -9817,7 +9817,7 @@
   {
     "id": "Preacher_Curl",
     "en": "Preacher Curl",
-    "ar": "بريتشر كيرل بالبار الزجزاج",
+    "ar": "بريتشر كيرل بالإيزي بار",
     "primaryMuscles": [
       "بايسبس"
     ],
@@ -9916,13 +9916,13 @@
     "level": "مبتدئ",
     "category": "سترينث",
     "source": "curated",
-    "popular": false,
+    "popular": true,
     "reviewed": true
   },
   {
     "id": "Pullups",
     "en": "Pullups",
-    "ar": "عقلة (بول أب)",
+    "ar": "بول أب (عقلة)",
     "primaryMuscles": [
       "لاتس"
     ],
@@ -9977,7 +9977,7 @@
   {
     "id": "Push_Up_to_Side_Plank",
     "en": "Push Up to Side Plank",
-    "ar": "بوش أب لحد سايد بلانك",
+    "ar": "بوش أب مع سايد بلانك",
     "primaryMuscles": [
       "تشيست"
     ],
@@ -9989,9 +9989,9 @@
     "equipment": "بودي ويت",
     "level": "مبتدئ",
     "category": "سترينث",
-    "source": "auto",
+    "source": "curated",
     "popular": false,
-    "reviewed": false
+    "reviewed": true
   },
   {
     "id": "Push-Up_Wide",
@@ -10033,7 +10033,7 @@
   {
     "id": "Push-Ups_With_Feet_Elevated",
     "en": "Push-Ups With Feet Elevated",
-    "ar": "بوش أب ورجلك عالية (ديكلاين)",
+    "ar": "بوش أب ورجلك على بنش",
     "primaryMuscles": [
       "تشيست"
     ],
@@ -10051,7 +10051,7 @@
   {
     "id": "Push-Ups_With_Feet_On_An_Exercise_Ball",
     "en": "Push-Ups With Feet On An Exercise Ball",
-    "ar": "بوش أب مع فييت على الجيم بول",
+    "ar": "بوش أب ورجلك على الجيم بول",
     "primaryMuscles": [
       "تشيست"
     ],
@@ -10062,9 +10062,9 @@
     "equipment": "جيم بول",
     "level": "متوسط",
     "category": "سترينث",
-    "source": "auto",
+    "source": "curated",
     "popular": false,
-    "reviewed": false
+    "reviewed": true
   },
   {
     "id": "Pushups",
@@ -10087,7 +10087,7 @@
   {
     "id": "Pushups_Close_and_Wide_Hand_Positions",
     "en": "Pushups (Close and Wide Hand Positions)",
-    "ar": "بوش أب (كلوز ووايد هاند بوزيشنز)",
+    "ar": "بوش أب بإيد ضيقة وواسعة",
     "primaryMuscles": [
       "تشيست"
     ],
@@ -10098,9 +10098,9 @@
     "equipment": "بودي ويت",
     "level": "مبتدئ",
     "category": "سترينث",
-    "source": "auto",
+    "source": "curated",
     "popular": false,
-    "reviewed": false
+    "reviewed": true
   },
   {
     "id": "Pyramid",
@@ -10244,7 +10244,7 @@
   {
     "id": "Recumbent_Bike",
     "en": "Recumbent Bike",
-    "ar": "عجلة ثابتة بضهر (ريكمبنت)",
+    "ar": "عجلة ريكمبنت (بضهر)",
     "primaryMuscles": [
       "كوادز"
     ],
@@ -10721,7 +10721,7 @@
   {
     "id": "Romanian_Deadlift",
     "en": "Romanian Deadlift",
-    "ar": "رومانيان ديدليفت (RDL) بالبار",
+    "ar": "رومانيان ديدليفت بالبار",
     "primaryMuscles": [
       "هامسترينج"
     ],
@@ -11060,7 +11060,7 @@
   {
     "id": "Seated_Bent-Over_Rear_Delt_Raise",
     "en": "Seated Bent-Over Rear Delt Raise",
-    "ar": "رير ديلت فلاي بالدامبل قاعد ومايل",
+    "ar": "رير ديلت فلاي بالدامبل قاعد",
     "primaryMuscles": [
       "شولدرز"
     ],
@@ -11090,7 +11090,7 @@
   {
     "id": "Seated_Biceps",
     "en": "Seated Biceps",
-    "ar": "بايسبس قاعد",
+    "ar": "بايسبس ستريتش قاعد",
     "primaryMuscles": [
       "بايسبس"
     ],
@@ -11101,14 +11101,14 @@
     "equipment": "بودي ويت",
     "level": "متقدم",
     "category": "ستريتشينج",
-    "source": "auto",
+    "source": "curated",
     "popular": false,
-    "reviewed": false
+    "reviewed": true
   },
   {
     "id": "Seated_Cable_Rows",
     "en": "Seated Cable Rows",
-    "ar": "سيتد رو على الكابل (رو أرضي)",
+    "ar": "سيتد رو على الكابل",
     "primaryMuscles": [
       "ميدل باك"
     ],
@@ -11222,7 +11222,7 @@
   {
     "id": "Seated_Dumbbell_Palms-Down_Wrist_Curl",
     "en": "Seated Dumbbell Palms-Down Wrist Curl",
-    "ar": "الكفوف لتحت ريست كيرل بالدامبل قاعد",
+    "ar": "ريست كيرل بالدامبل قاعد - كفوف لتحت",
     "primaryMuscles": [
       "فورآرمز"
     ],
@@ -11237,7 +11237,7 @@
   {
     "id": "Seated_Dumbbell_Palms-Up_Wrist_Curl",
     "en": "Seated Dumbbell Palms-Up Wrist Curl",
-    "ar": "الكفوف لفوق ريست كيرل بالدامبل قاعد",
+    "ar": "ريست كيرل بالدامبل قاعد - كفوف لفوق",
     "primaryMuscles": [
       "فورآرمز"
     ],
@@ -11269,7 +11269,7 @@
   {
     "id": "Seated_Flat_Bench_Leg_Pull-In",
     "en": "Seated Flat Bench Leg Pull-In",
-    "ar": "ني أب قاعد على البنش",
+    "ar": "ني تاك قاعد على البنش",
     "primaryMuscles": [
       "أبس"
     ],
@@ -11284,7 +11284,7 @@
   {
     "id": "Seated_Floor_Hamstring_Stretch",
     "en": "Seated Floor Hamstring Stretch",
-    "ar": "فلور هامسترينج ستريتش قاعد",
+    "ar": "هامسترينج ستريتش قاعد على الأرض",
     "primaryMuscles": [
       "هامسترينج"
     ],
@@ -11294,14 +11294,14 @@
     "equipment": null,
     "level": "مبتدئ",
     "category": "ستريتشينج",
-    "source": "auto",
+    "source": "curated",
     "popular": false,
-    "reviewed": false
+    "reviewed": true
   },
   {
     "id": "Seated_Front_Deltoid",
     "en": "Seated Front Deltoid",
-    "ar": "فرونت ديلت قاعد",
+    "ar": "فرونت ديلت ستريتش قاعد",
     "primaryMuscles": [
       "شولدرز"
     ],
@@ -11311,14 +11311,14 @@
     "equipment": "بودي ويت",
     "level": "متقدم",
     "category": "ستريتشينج",
-    "source": "auto",
+    "source": "curated",
     "popular": false,
-    "reviewed": false
+    "reviewed": true
   },
   {
     "id": "Seated_Glute",
     "en": "Seated Glute",
-    "ar": "جلوت قاعد",
+    "ar": "جلوت ستريتش قاعد",
     "primaryMuscles": [
       "جلوتس"
     ],
@@ -11328,9 +11328,9 @@
     "equipment": "بودي ويت",
     "level": "متقدم",
     "category": "ستريتشينج",
-    "source": "auto",
+    "source": "curated",
     "popular": false,
-    "reviewed": false
+    "reviewed": true
   },
   {
     "id": "Seated_Good_Mornings",
@@ -11352,7 +11352,7 @@
   {
     "id": "Seated_Hamstring",
     "en": "Seated Hamstring",
-    "ar": "هامسترينج قاعد",
+    "ar": "هامسترينج ستريتش قاعد",
     "primaryMuscles": [
       "هامسترينج"
     ],
@@ -11362,9 +11362,9 @@
     "equipment": null,
     "level": "متقدم",
     "category": "ستريتشينج",
-    "source": "auto",
+    "source": "curated",
     "popular": false,
-    "reviewed": false
+    "reviewed": true
   },
   {
     "id": "Seated_Hamstring_and_Calf_Stretch",
@@ -11416,7 +11416,7 @@
   {
     "id": "Seated_Leg_Tucks",
     "en": "Seated Leg Tucks",
-    "ar": "ليج تاك قاعد",
+    "ar": "ني تاك قاعد",
     "primaryMuscles": [
       "أبس"
     ],
@@ -11424,9 +11424,9 @@
     "equipment": "بودي ويت",
     "level": "مبتدئ",
     "category": "سترينث",
-    "source": "auto",
+    "source": "curated",
     "popular": false,
-    "reviewed": false
+    "reviewed": true
   },
   {
     "id": "Seated_One-arm_Cable_Pulley_Rows",
@@ -11450,7 +11450,7 @@
   {
     "id": "Seated_One-Arm_Dumbbell_Palms-Down_Wrist_Curl",
     "en": "Seated One-Arm Dumbbell Palms-Down Wrist Curl",
-    "ar": "الكفوف لتحت ريست كيرل بالدامبل قاعد بإيد واحدة",
+    "ar": "ريست كيرل بالدامبل قاعد بإيد واحدة - كفوف لتحت",
     "primaryMuscles": [
       "فورآرمز"
     ],
@@ -11465,7 +11465,7 @@
   {
     "id": "Seated_One-Arm_Dumbbell_Palms-Up_Wrist_Curl",
     "en": "Seated One-Arm Dumbbell Palms-Up Wrist Curl",
-    "ar": "الكفوف لفوق ريست كيرل بالدامبل قاعد بإيد واحدة",
+    "ar": "ريست كيرل بالدامبل قاعد بإيد واحدة - كفوف لفوق",
     "primaryMuscles": [
       "فورآرمز"
     ],
@@ -11495,7 +11495,7 @@
   {
     "id": "Seated_Palm-Up_Barbell_Wrist_Curl",
     "en": "Seated Palm-Up Barbell Wrist Curl",
-    "ar": "بالم أب ريست كيرل بالبار قاعد",
+    "ar": "ريست كيرل بالبار قاعد - كفوف لفوق",
     "primaryMuscles": [
       "فورآرمز"
     ],
@@ -11510,7 +11510,7 @@
   {
     "id": "Seated_Palms-Down_Barbell_Wrist_Curl",
     "en": "Seated Palms-Down Barbell Wrist Curl",
-    "ar": "الكفوف لتحت ريست كيرل بالبار قاعد",
+    "ar": "ريست كيرل بالبار قاعد - كفوف لتحت",
     "primaryMuscles": [
       "فورآرمز"
     ],
@@ -11555,7 +11555,7 @@
   {
     "id": "Seated_Two-Arm_Palms-Up_Low-Pulley_Wrist_Curl",
     "en": "Seated Two-Arm Palms-Up Low-Pulley Wrist Curl",
-    "ar": "الكفوف لفوق ريست كيرل على الكابل من تحت قاعد",
+    "ar": "ريست كيرل على الكابل من تحت قاعد - كفوف لفوق",
     "primaryMuscles": [
       "فورآرمز"
     ],
@@ -11683,7 +11683,7 @@
     "level": "مبتدئ",
     "category": "سترينث",
     "source": "curated",
-    "popular": false,
+    "popular": true,
     "reviewed": true
   },
   {
@@ -11862,7 +11862,7 @@
   {
     "id": "Side_Wrist_Pull",
     "en": "Side Wrist Pull",
-    "ar": "سايد ريست بول",
+    "ar": "ريست ستريتش",
     "primaryMuscles": [
       "شولدرز"
     ],
@@ -11873,14 +11873,14 @@
     "equipment": null,
     "level": "مبتدئ",
     "category": "ستريتشينج",
-    "source": "auto",
+    "source": "curated",
     "popular": false,
-    "reviewed": false
+    "reviewed": true
   },
   {
     "id": "Side-Lying_Floor_Stretch",
     "en": "Side-Lying Floor Stretch",
-    "ar": "سايد فلور ستريتش نايم",
+    "ar": "سايد ستريتش نايم على جنبك",
     "primaryMuscles": [
       "لاتس"
     ],
@@ -11888,9 +11888,9 @@
     "equipment": null,
     "level": "مبتدئ",
     "category": "ستريتشينج",
-    "source": "auto",
+    "source": "curated",
     "popular": false,
-    "reviewed": false
+    "reviewed": true
   },
   {
     "id": "Single_Dumbbell_Raise",
@@ -12312,7 +12312,7 @@
   {
     "id": "Smith_Incline_Shoulder_Raise",
     "en": "Smith Incline Shoulder Raise",
-    "ar": "شولدر رايز على السميث عالي (إنكلاين)",
+    "ar": "شولدر رايز إنكلاين على السميث",
     "primaryMuscles": [
       "شولدرز"
     ],
@@ -12416,7 +12416,7 @@
   {
     "id": "Smith_Machine_Decline_Press",
     "en": "Smith Machine Decline Press",
-    "ar": "بنش برس على السميث واطي (ديكلاين)",
+    "ar": "بنش برس ديكلاين على السميث",
     "primaryMuscles": [
       "تشيست"
     ],
@@ -12455,7 +12455,7 @@
   {
     "id": "Smith_Machine_Hip_Raise",
     "en": "Smith Machine Hip Raise",
-    "ar": "هيب ثرست على السميث",
+    "ar": "هيب ثرست على السميث (من الأرض)",
     "primaryMuscles": [
       "أبس"
     ],
@@ -12470,7 +12470,7 @@
   {
     "id": "Smith_Machine_Incline_Bench_Press",
     "en": "Smith Machine Incline Bench Press",
-    "ar": "بنش برس على السميث عالي (إنكلاين)",
+    "ar": "بنش برس إنكلاين على السميث",
     "primaryMuscles": [
       "تشيست"
     ],
@@ -13115,7 +13115,7 @@
   {
     "id": "Squats_-_With_Bands",
     "en": "Squats - With Bands",
-    "ar": "سكوات بالباند",
+    "ar": "سكوات بالباند (واقف على الباند)",
     "primaryMuscles": [
       "كوادز"
     ],
@@ -13128,14 +13128,14 @@
     "equipment": "باندز",
     "level": "مبتدئ",
     "category": "سترينث",
-    "source": "auto",
+    "source": "curated",
     "popular": false,
-    "reviewed": false
+    "reviewed": true
   },
   {
     "id": "Stairmaster",
     "en": "Stairmaster",
-    "ar": "ستير ماستر (سلم)",
+    "ar": "ستير ماستر",
     "primaryMuscles": [
       "كوادز"
     ],
@@ -13466,7 +13466,7 @@
   {
     "id": "Standing_Elevated_Quad_Stretch",
     "en": "Standing Elevated Quad Stretch",
-    "ar": "إليفيتد كواد ستريتش واقف",
+    "ar": "كواد ستريتش واقف (رجلك على كرسي)",
     "primaryMuscles": [
       "كوادز"
     ],
@@ -13474,9 +13474,9 @@
     "equipment": "أخرى",
     "level": "مبتدئ",
     "category": "ستريتشينج",
-    "source": "auto",
+    "source": "curated",
     "popular": false,
-    "reviewed": false
+    "reviewed": true
   },
   {
     "id": "Standing_Front_Barbell_Raise_Over_Head",
@@ -13545,7 +13545,7 @@
   {
     "id": "Standing_Hip_Flexors",
     "en": "Standing Hip Flexors",
-    "ar": "هيب فليكسورز واقف",
+    "ar": "هيب فليكسور ستريتش واقف",
     "primaryMuscles": [
       "كوادز"
     ],
@@ -13553,9 +13553,9 @@
     "equipment": null,
     "level": "مبتدئ",
     "category": "ستريتشينج",
-    "source": "auto",
+    "source": "curated",
     "popular": false,
-    "reviewed": false
+    "reviewed": true
   },
   {
     "id": "Standing_Inner-Biceps_Curl",
@@ -13624,7 +13624,7 @@
   {
     "id": "Standing_Low-Pulley_Deltoid_Raise",
     "en": "Standing Low-Pulley Deltoid Raise",
-    "ar": "لاتيرال رايز على الكابل بإيد واحدة",
+    "ar": "لاتيرال رايز على الكابل من تحت بإيد واحدة",
     "primaryMuscles": [
       "شولدرز"
     ],
@@ -13659,7 +13659,7 @@
   {
     "id": "Standing_Military_Press",
     "en": "Standing Military Press",
-    "ar": "ميليتري برس بالبار واقف (أوفرهيد برس)",
+    "ar": "ميليتري برس بالبار واقف",
     "primaryMuscles": [
       "شولدرز"
     ],
@@ -13708,7 +13708,7 @@
   {
     "id": "Standing_One-Arm_Dumbbell_Curl_Over_Incline_Bench",
     "en": "Standing One-Arm Dumbbell Curl Over Incline Bench",
-    "ar": "كيرل أوفر بنش بالدامبل واقف عالي (إنكلاين) بإيد واحدة",
+    "ar": "كيرل أوفر بنش إنكلاين بالدامبل واقف بإيد واحدة",
     "primaryMuscles": [
       "بايسبس"
     ],
@@ -13792,7 +13792,7 @@
   {
     "id": "Standing_Palms-Up_Barbell_Behind_The_Back_Wrist_Curl",
     "en": "Standing Palms-Up Barbell Behind The Back Wrist Curl",
-    "ar": "الكفوف لفوق ورا الضهر ريست كيرل بالبار واقف",
+    "ar": "ريست كيرل بالبار ورا الضهر واقف - كفوف لفوق",
     "primaryMuscles": [
       "فورآرمز"
     ],
@@ -13800,9 +13800,9 @@
     "equipment": "بار",
     "level": "مبتدئ",
     "category": "سترينث",
-    "source": "auto",
+    "source": "curated",
     "popular": false,
-    "reviewed": false
+    "reviewed": true
   },
   {
     "id": "Standing_Pelvic_Tilt",
@@ -13871,7 +13871,7 @@
   {
     "id": "Standing_Towel_Triceps_Extension",
     "en": "Standing Towel Triceps Extension",
-    "ar": "تاول ترايسبس إكستنشن واقف",
+    "ar": "ترايسبس إكستنشن بالفوطة واقف",
     "primaryMuscles": [
       "ترايسبس"
     ],
@@ -13879,9 +13879,9 @@
     "equipment": "بودي ويت",
     "level": "مبتدئ",
     "category": "سترينث",
-    "source": "auto",
+    "source": "curated",
     "popular": false,
-    "reviewed": false
+    "reviewed": true
   },
   {
     "id": "Standing_Two-Arm_Overhead_Throw",
@@ -13936,9 +13936,9 @@
     "equipment": "ماشين",
     "level": "متوسط",
     "category": "كارديو",
-    "source": "auto",
+    "source": "curated",
     "popular": false,
-    "reviewed": false
+    "reviewed": true
   },
   {
     "id": "Step-up_with_Knee_Raise",
@@ -13997,7 +13997,7 @@
   {
     "id": "Stiff-Legged_Dumbbell_Deadlift",
     "en": "Stiff-Legged Dumbbell Deadlift",
-    "ar": "رومانيان ديدليفت (RDL) بالدامبل",
+    "ar": "رومانيان ديدليفت بالدامبل",
     "primaryMuscles": [
       "هامسترينج"
     ],
@@ -14048,7 +14048,7 @@
   {
     "id": "Straight_Raises_on_Incline_Bench",
     "en": "Straight Raises on Incline Bench",
-    "ar": "ستريت رايز على بنش عالي (إنكلاين)",
+    "ar": "ستريت رايز على بنش إنكلاين",
     "primaryMuscles": [
       "شولدرز"
     ],
@@ -14631,7 +14631,7 @@
   {
     "id": "Triceps_Pushdown_-_V-Bar_Attachment",
     "en": "Triceps Pushdown - V-Bar Attachment",
-    "ar": "ترايسبس بوش داون بالمثلث (في بار)",
+    "ar": "ترايسبس بوش داون بالمثلث",
     "primaryMuscles": [
       "ترايسبس"
     ],
@@ -14693,7 +14693,7 @@
   {
     "id": "Two-Arm_Kettlebell_Clean",
     "en": "Two-Arm Kettlebell Clean",
-    "ar": "كلين بالكيتل بل",
+    "ar": "كلين بالكيتل بيل",
     "primaryMuscles": [
       "شولدرز"
     ],
@@ -14704,7 +14704,7 @@
       "لوور باك",
       "ترابس"
     ],
-    "equipment": "كيتل بل",
+    "equipment": "كيتل بيل",
     "level": "متوسط",
     "category": "سترينث",
     "source": "auto",
@@ -14714,7 +14714,7 @@
   {
     "id": "Two-Arm_Kettlebell_Jerk",
     "en": "Two-Arm Kettlebell Jerk",
-    "ar": "جيرك بالكيتل بل",
+    "ar": "جيرك بالكيتل بيل",
     "primaryMuscles": [
       "شولدرز"
     ],
@@ -14723,7 +14723,7 @@
       "كوادز",
       "ترايسبس"
     ],
-    "equipment": "كيتل بل",
+    "equipment": "كيتل بيل",
     "level": "متوسط",
     "category": "سترينث",
     "source": "auto",
@@ -14733,14 +14733,14 @@
   {
     "id": "Two-Arm_Kettlebell_Military_Press",
     "en": "Two-Arm Kettlebell Military Press",
-    "ar": "ميليتري برس بالكيتل بل",
+    "ar": "ميليتري برس بالكيتل بيل",
     "primaryMuscles": [
       "شولدرز"
     ],
     "secondaryMuscles": [
       "ترايسبس"
     ],
-    "equipment": "كيتل بل",
+    "equipment": "كيتل بيل",
     "level": "متوسط",
     "category": "سترينث",
     "source": "auto",
@@ -14750,7 +14750,7 @@
   {
     "id": "Two-Arm_Kettlebell_Row",
     "en": "Two-Arm Kettlebell Row",
-    "ar": "رو بالكيتل بل",
+    "ar": "رو بالكيتل بيل",
     "primaryMuscles": [
       "ميدل باك"
     ],
@@ -14758,7 +14758,7 @@
       "بايسبس",
       "لاتس"
     ],
-    "equipment": "كيتل بل",
+    "equipment": "كيتل بيل",
     "level": "متوسط",
     "category": "سترينث",
     "source": "auto",
@@ -14873,7 +14873,7 @@
   {
     "id": "Upward_Stretch",
     "en": "Upward Stretch",
-    "ar": "أبوارد ستريتش",
+    "ar": "ستريتش لفوق",
     "primaryMuscles": [
       "شولدرز"
     ],
@@ -14884,14 +14884,14 @@
     "equipment": null,
     "level": "مبتدئ",
     "category": "ستريتشينج",
-    "source": "auto",
+    "source": "curated",
     "popular": false,
-    "reviewed": false
+    "reviewed": true
   },
   {
     "id": "V-Bar_Pulldown",
     "en": "V-Bar Pulldown",
-    "ar": "لات بول داون بالمثلث (في بار)",
+    "ar": "لات بول داون بالمثلث",
     "primaryMuscles": [
       "لاتس"
     ],
@@ -14910,7 +14910,7 @@
   {
     "id": "V-Bar_Pullup",
     "en": "V-Bar Pullup",
-    "ar": "عقلة بالمثلث (في بار)",
+    "ar": "بول أب بالمثلث",
     "primaryMuscles": [
       "لاتس"
     ],
@@ -15054,7 +15054,7 @@
   {
     "id": "Weighted_Pull_Ups",
     "en": "Weighted Pull Ups",
-    "ar": "عقلة بوزن (بول أب)",
+    "ar": "بول أب بوزن",
     "primaryMuscles": [
       "لاتس"
     ],
@@ -15182,7 +15182,7 @@
   {
     "id": "Wide-Grip_Decline_Barbell_Bench_Press",
     "en": "Wide-Grip Decline Barbell Bench Press",
-    "ar": "بنش برس بالبار واطي (ديكلاين) - قبضة واسعة",
+    "ar": "بنش برس ديكلاين بالبار - قبضة واسعة",
     "primaryMuscles": [
       "تشيست"
     ],
@@ -15200,7 +15200,7 @@
   {
     "id": "Wide-Grip_Decline_Barbell_Pullover",
     "en": "Wide-Grip Decline Barbell Pullover",
-    "ar": "بول أوفر بالبار واطي (ديكلاين) - قبضة واسعة",
+    "ar": "بول أوفر ديكلاين بالبار - قبضة واسعة",
     "primaryMuscles": [
       "تشيست"
     ],

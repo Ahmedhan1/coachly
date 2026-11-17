@@ -76,6 +76,12 @@ export interface PdfLabels {
     /** Column head over "4 × 8-12". */
     setsReps: string;
     exerciseCount: string;
+    /** Column head over the exercise name. */
+    exercise: string;
+    /** Added to the repeated header on a page that continues a day, e.g. "تابع". */
+    continued: string;
+    /** Column head over tempo / RPE / notes. */
+    details: string;
   };
   meals: {
     servings: string;
@@ -89,17 +95,19 @@ export interface PdfLabels {
     water: string;
   };
   supplements: { dose: string; timing: string };
-  progress: { weightChart: string; before: string; after: string; first: string; latest: string; change: string };
+  progress: { weightChart: string; before: string; after: string; first: string; latest: string; change: string; measurement: string };
   notes: { contact: string; closing: string };
   units: { kg: string; cm: string; kcal: string; g: string; ml: string; sec: string; years: string; percent: string };
 }
+
+export type PdfLogoSize = 'small' | 'medium' | 'large';
 
 export interface PdfBranding {
   trainerName: string;
   logo: PdfImageRef | null;
   logoPlacement: 'start' | 'center' | 'end';
-  /** Logo height on the cover in CSS px; clamped to [MIN_LOGO_PX, MAX_LOGO_PX]. */
-  logoHeightPx: number;
+  /** Trainer's logo size setting (cover and page headers). Default 'large'. */
+  logoSize: PdfLogoSize;
   primaryColor: string;
   secondaryColor: string;
   /** CSS font-family name, e.g. 'Readex Pro'. */
@@ -158,6 +166,14 @@ export type PdfBlock =
   | { type: 'macroBar'; parts: { label: string; percent: number; tone: 'protein' | 'carbs' | 'fat' }[] }
   | { type: 'paragraph'; text: string; muted: boolean }
   | {
+      /** Column header of a day's exercise table; `continued` = "day name · تابع" on a follow-on page. */
+      type: 'exerciseHead';
+      columns: { exercise: string; setsReps: string; rest: string; details: string };
+      withMap: boolean;
+      continued: string | null;
+    }
+  | {
+      /** One row of the exercise table. */
       type: 'exercise';
       index: number;
       name: string;
@@ -172,6 +188,10 @@ export type PdfBlock =
       image: PdfImageRef | null;
       muscleMap: PdfImageRef | null;
       superset: string | null;
+      /** Same table as the head (muscle-map column on/off). */
+      withMap: boolean;
+      /** Last row of its day (draws the closing edge of the table). */
+      last: boolean;
     }
   | { type: 'clientCard'; name: string; chips: string[]; tiles: StatItem[] }
   | { type: 'mealItem'; text: string; detail: string }
@@ -179,7 +199,7 @@ export type PdfBlock =
       type: 'mealCard';
       name: string;
       time: string;
-      items: { text: string; detail: string; kcal: string }[];
+      items: { text: string; detail: string; grams: string; kcal: string }[];
       /** Macros of the items that have them; null when none has. */
       totals: StatItem[] | null;
     }
@@ -193,6 +213,11 @@ export type PdfBlock =
     }
   | { type: 'supplement'; name: string; rows: KeyValue[]; notes: string; image: PdfImageRef | null }
   | { type: 'weightChart'; title: string; points: { date: string; kg: number }[]; unit: string }
+  | {
+      type: 'measureTable';
+      head: [string, string, string, string];
+      rows: { label: string; first: string; latest: string; change: string; unit: string }[];
+    }
   | { type: 'photoPair'; before: { image: PdfImageRef; caption: string }; after: { image: PdfImageRef; caption: string } }
   | { type: 'contact'; title: string; lines: string[]; closing: string };
 
@@ -220,7 +245,7 @@ export interface PdfTheme {
   trainerName: string;
   logo: PdfImageRef | null;
   logoPlacement: PdfBranding['logoPlacement'];
-  coverLogoPx: number;
+  logoSize: PdfLogoSize;
   /** Box the cover logo is fitted into (object-fit: contain), CSS px. */
   coverLogoBox: { width: number; height: number };
   headerLogoPx: number;

@@ -28,3 +28,22 @@ export { CloudRestoreService, type CloudRestoreError } from './cloudRestore';
 export { watchDataChanges } from './changeHooks';
 export { FakeBackupService } from './fakeBackupService';
 export { createBackupServices, estimateCloudSize, type BackupServices, type BackupServicesOptions } from './createBackupServices';
+export {
+  PhotoArchiveService,
+  photoArchiveFileName,
+  type ArchivePlan,
+  type CommitError,
+  type PhotoArchiveFile,
+  type VerifiedPhotoArchive,
+  type VerifyArchiveError,
+} from './photoArchive';
+export {
+  BrowserDeviceFileSaver,
+  FakeDeviceFileSaver,
+  browserSavePicker,
+  type DeviceFileSaver,
+  type SaveFileRequest,
+  type SaveResult,
+} from './deviceFileSaver';
+export { sealChunked, openChunked, isChunkedEnvelope, DEFAULT_CHUNK_BYTES } from './chunkedEnvelope';
+export { readVerifiedArchive } from './importer';

@@ -11,6 +11,8 @@ const starterRecipeSchema = z.object({
   tags: z.array(z.string()),
   items: z.array(z.object({ ingredient: z.string(), grams: z.number().positive() })).min(1),
   instructions: z.string(),
+  /** Data version that introduced the recipe (absent = the first release). Lets updates add only new recipes. */
+  since: z.number().int().min(1).optional(),
 });
 
 export type StarterRecipeSource = z.infer<typeof starterRecipeSchema>;
@@ -22,9 +24,14 @@ export interface StarterRecipe {
   tags: string[];
   instructions: string;
   ingredients: RecipeIngredientRow[];
+  since: number;
 }
 
-/** The starter ingredient table (per 100 g, approximate — see data-src/recipes/README.md). */
+/** Version of the shipped food table and recipe book. Bumping it makes existing installs merge in what is new. */
+export const STARTER_FOOD_VERSION: number = ingredientsJson.version;
+export const STARTER_RECIPE_VERSION: number = recipesJson.version;
+
+/** The starter ingredient table (per 100 g, approximate — see README.md next to this file). */
 export function starterIngredients(): IngredientEntry[] {
   return z.array(ingredientEntrySchema).parse(ingredientsJson.ingredients);
 }
@@ -41,7 +48,7 @@ export function starterRecipes(table: readonly IngredientEntry[] = starterIngred
       table,
     );
     if (!rows.ok) throw new Error(`starter recipe ${r.id}: ${rows.error}`);
-    return { key: r.id, name: r.name, servings: r.servings, tags: r.tags, instructions: r.instructions, ingredients: rows.value };
+    return { key: r.id, name: r.name, servings: r.servings, tags: r.tags, instructions: r.instructions, ingredients: rows.value, since: r.since ?? 1 };
   });
 }
 

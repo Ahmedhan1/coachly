@@ -12,7 +12,7 @@ import {
   type StorageCategory,
   type StoredImageInfo,
 } from './storage';
-import { latestBackup, sortNewestFirst, versionsToPrune } from './versions';
+import { latestBackup } from './versions';
 
 const MB = 1024 * 1024;
 const now = new Date('2026-11-17T10:00:00Z');
@@ -108,21 +108,10 @@ describe('capacity', () => {
   });
 });
 
-describe('drive versions', () => {
-  const v = (id: string, createdAt: number) => ({ id, createdAt });
-
-  it('keeps the newest N and never prunes the copy just uploaded', () => {
-    const list = [v('a', 1), v('b', 5), v('c', 3), v('d', 4), v('e', 2)];
-    expect(sortNewestFirst(list).map((x) => x.id)).toEqual(['b', 'd', 'c', 'e', 'a']);
-    expect(versionsToPrune(list, 3).map((x) => x.id)).toEqual(['e', 'a']);
-    // The fresh upload has an older timestamp (phone clock behind) but must survive.
-    expect(versionsToPrune(list, 2, 'a').map((x) => x.id)).toEqual(['d', 'c', 'e']);
-    expect(versionsToPrune(list, 0).length).toBe(4);
-  });
-
+describe('latest backup', () => {
   it('picks the latest backup of any kind', () => {
     expect(latestBackup({ lastLocalAt: null, lastCloudAt: null })).toBeNull();
-    expect(latestBackup({ lastLocalAt: 5, lastCloudAt: 9, lastDriveAt: 7 })).toEqual({ at: 9, place: 'cloud' });
-    expect(latestBackup({ lastLocalAt: 5, lastCloudAt: null, lastDriveAt: 70 })).toEqual({ at: 70, place: 'drive' });
+    expect(latestBackup({ lastLocalAt: 5, lastCloudAt: 9 })).toEqual({ at: 9, place: 'cloud' });
+    expect(latestBackup({ lastLocalAt: 70, lastCloudAt: null })).toEqual({ at: 70, place: 'local' });
   });
 });

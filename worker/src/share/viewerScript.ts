@@ -83,7 +83,28 @@ var T = {
   am: 'ص',
   pm: 'م',
   today: 'النهارده',
-  tomorrow: 'بكرة'
+  tomorrow: 'بكرة',
+  todayWorkout: 'ده تمرينك الجاي',
+  streak: 'التزامك',
+  weeksInRow: ' أسابيع ورا بعض',
+  weekInRow: ' أسبوع',
+  milestones: 'إنجازاتك',
+  nextMilestone: 'الهدف الجاي: ',
+  lostKg: 'نزلت ',
+  gainedKg: 'زوّدت ',
+  kgSuffix: ' كجم',
+  waistDown: 'وسطك قلّ ',
+  cmSuffix: ' سم',
+  sessionsDone: ' حصة خلّصتها',
+  weeksStreak: ' أسابيع التزام ورا بعض',
+  checkinsDone: ' متابعات بعتها',
+  since: 'بدأت معانا ',
+  history: 'متابعاتك اللي فاتت',
+  sleep: 'نومك (ساعات في الليلة)',
+  energy: 'طاقتك الأسبوع ده',
+  energyLabels: ['تعبان جداً', 'تعبان', 'عادي', 'كويس', 'ممتاز'],
+  adherence: 'التزامك بالخطة (%)',
+  howWeek: 'أسبوعك كان عامل إزاي؟'
 };
 
 var cfg = document.getElementById('cfg');
@@ -260,6 +281,9 @@ function summary(doc) {
     box.appendChild(stat(T.packageLabel, T.packageLeft + p.left + T.of + p.total + T.sessions, isStr(p.endDate, 10) ? T.until + isoDay(p.endDate) : ''));
   }
   if (doc.goal && isStr(doc.goal.title, 80) && doc.goal.title) box.appendChild(stat(T.goal, doc.goal.title, ''));
+  if (isNum(doc.streakWeeks) && doc.streakWeeks > 0) {
+    box.appendChild(stat(T.streak, doc.streakWeeks + (doc.streakWeeks > 1 ? T.weeksInRow : T.weekInRow), isNum(doc.attended) && doc.attended > 0 ? T.attended + doc.attended + T.sessions : ''));
+  }
   return box.childNodes.length ? box : null;
 }
 
@@ -325,8 +349,9 @@ function exerciseCard(x, n) {
   li.appendChild(body);
   return li;
 }
-function dayView(day) {
+function dayView(day, isNext) {
   var box = el('div');
+  if (isNext) box.appendChild(el('p', 'next-flag', T.todayWorkout));
   var exs = arr(day.exercises).filter(Boolean);
   var head = el('div', 'day-head');
   head.appendChild(el('h2', '', isStr(day.title, 80) ? day.title : ''));
@@ -348,7 +373,8 @@ function programSection(doc) {
     var days = doc.days.filter(function (d) { return d && Array.isArray(d.exercises); });
     var first = nextDayIndex(doc);
     var holder = el('div');
-    var showDay = function (i) { holder.textContent = ''; if (days[i]) holder.appendChild(dayView(days[i])); };
+    var marked = isNum(doc.nextDay) ? first : -1;
+    var showDay = function (i) { holder.textContent = ''; if (days[i]) holder.appendChild(dayView(days[i], i === marked)); };
     if (days.length > 1) {
       s.appendChild(pills(days.map(function (d, i) { return isStr(d.title, 80) && d.title ? d.title.split(' — ')[0] + (d.title.indexOf(' — ') > 0 ? ' · ' + d.title.split(' — ')[1] : '') : String(i + 1); }), first, isNum(doc.nextDay) ? first : -1, showDay));
     }
@@ -495,6 +521,63 @@ function seriesCard(series) {
   }
   return card;
 }
+function seriesOf(doc, key) {
+  var found = arr(doc.progress).filter(function (x) { return x && x.key === key; })[0];
+  return found ? arr(found.points).filter(function (p) { return p && isNum(p.v) && isStr(p.d, 10); }) : [];
+}
+/** Achieved milestones and the next one, computed from what the trainer published (nothing is invented). */
+function milestones(doc) {
+  var done = [], next = [];
+  var w = seriesOf(doc, 'weight');
+  var lossGoal = !(doc.goal && /تضخيم|زيادة/.test(String(doc.goal.title)));
+  if (w.length > 1) {
+    var diff = Math.round((w[w.length - 1].v - w[0].v) * 10) / 10;
+    var lost = lossGoal ? -diff : diff;
+    var wk = [2, 5, 10, 15, 20, 30];
+    wk.forEach(function (k) { if (lost >= k) done.push((lossGoal ? T.lostKg : T.gainedKg) + k + T.kgSuffix); });
+    var nw = wk.filter(function (k) { return lost < k; })[0];
+    if (lost > 0 && nw) next.push((lossGoal ? T.lostKg : T.gainedKg) + nw + T.kgSuffix);
+  }
+  var waist = seriesOf(doc, 'waist');
+  if (waist.length > 1) {
+    var wd = Math.round((waist[0].v - waist[waist.length - 1].v) * 10) / 10;
+    if (wd >= 2) done.push(T.waistDown + fmt(wd) + T.cmSuffix);
+  }
+  if (isNum(doc.attended)) {
+    var sk = [10, 25, 50, 100, 200];
+    sk.forEach(function (k) { if (doc.attended >= k) done.push(k + T.sessionsDone); });
+    var ns = sk.filter(function (k) { return doc.attended < k; })[0];
+    if (doc.attended > 0 && ns) next.push(ns + T.sessionsDone);
+  }
+  if (isNum(doc.streakWeeks) && doc.streakWeeks >= 2) done.push(doc.streakWeeks + T.weeksStreak);
+  var ck = arr(doc.checkins).length;
+  if (ck >= 4) done.push(ck + T.checkinsDone);
+  if (!done.length && !next.length) return null;
+  var card = el('div', 'card');
+  card.appendChild(el('h3', '', T.milestones));
+  var list = el('ul', 'badges');
+  done.slice(-6).forEach(function (t) { list.appendChild(el('li', 'badge done', t)); });
+  card.appendChild(list);
+  if (next.length) card.appendChild(el('p', 'sub', T.nextMilestone + next.join(' · ')));
+  if (isStr(doc.startDate, 10)) card.appendChild(el('p', 'sub', T.since + isoDay(doc.startDate)));
+  return card;
+}
+function historyCard(doc) {
+  var list = arr(doc.checkins).filter(function (c) { return c && isStr(c.d, 10); });
+  if (!list.length) return null;
+  var card = el('div', 'card');
+  card.appendChild(el('h3', '', T.history));
+  list.forEach(function (c) {
+    var row = el('div', 'rec');
+    row.appendChild(el('span', '', isoDay(c.d)));
+    var v = el('span', 'hist');
+    if (isNum(c.weightKg)) { v.appendChild(el('strong', 'num', fmt(c.weightKg))); v.appendChild(document.createTextNode(' ' + T.units.weight + '  ')); }
+    if (isNum(c.waistCm)) { v.appendChild(el('strong', 'num', fmt(c.waistCm))); v.appendChild(document.createTextNode(' ' + T.units.waist)); }
+    row.appendChild(v);
+    card.appendChild(row);
+  });
+  return card;
+}
 function progressSection(doc) {
   var s = el('section', 'panel');
   s.id = 'p-progress';
@@ -505,6 +588,8 @@ function progressSection(doc) {
     s.appendChild(g);
   }
   var any = false;
+  var ms = milestones(doc);
+  if (ms) { s.appendChild(ms); any = true; }
   arr(doc.progress).forEach(function (series) {
     var c = series ? seriesCard(series) : null;
     if (c) { s.appendChild(c); any = true; }
@@ -522,6 +607,8 @@ function progressSection(doc) {
     });
     s.appendChild(rc);
   }
+  var hc = historyCard(doc);
+  if (hc) { s.appendChild(hc); any = true; }
   if (isNum(doc.attended) && doc.attended > 0) {
     any = true;
     s.appendChild(el('p', 'card', T.attended + doc.attended + T.attendedSuffix));
@@ -573,8 +660,26 @@ function downscale(file) {
   });
 }
 
-var RANGES = { weight: [20, 400], waist: [30, 300], hip: [30, 300], chest: [30, 300], arm: [10, 150], thigh: [20, 200] };
-var DOC_KEYS = { weight: 'weightKg', waist: 'waistCm', hip: 'hipCm', chest: 'chestCm', arm: 'armCm', thigh: 'thighCm' };
+var RANGES = { weight: [20, 400], waist: [30, 300], hip: [30, 300], chest: [30, 300], arm: [10, 150], thigh: [20, 200], sleep: [0, 24], adherence: [0, 100] };
+var DOC_KEYS = { weight: 'weightKg', waist: 'waistCm', hip: 'hipCm', chest: 'chestCm', arm: 'armCm', thigh: 'thighCm', sleep: 'sleepHours', adherence: 'adherence' };
+
+function energyPicker() {
+  var box = el('fieldset', 'energy');
+  box.appendChild(el('legend', 'label', T.energy));
+  var row = el('div', 'seg');
+  T.energyLabels.forEach(function (label, i) {
+    var l = el('label', 'seg-opt');
+    var r = el('input'); r.type = 'radio'; r.name = 'energy'; r.value = String(i + 1);
+    l.appendChild(r);
+    var face = el('span', 'seg-face');
+    face.appendChild(el('span', 'num seg-n', i + 1));
+    face.appendChild(el('span', 'seg-l', label));
+    l.appendChild(face);
+    row.appendChild(l);
+  });
+  box.appendChild(row);
+  return box;
+}
 
 function checkinSection(raw) {
   var s = el('section', 'panel');
@@ -598,6 +703,15 @@ function checkinSection(raw) {
   row2.appendChild(field(T.thigh, inputs.thigh));
   more.appendChild(row2);
   card.appendChild(more);
+  var week = el('div', 'week');
+  week.appendChild(el('h3', '', T.howWeek));
+  var energy = energyPicker();
+  week.appendChild(energy);
+  var row3 = el('div', 'row2');
+  row3.appendChild(field(T.sleep, inputs.sleep));
+  row3.appendChild(field(T.adherence, inputs.adherence));
+  week.appendChild(row3);
+  card.appendChild(week);
   var notes = el('textarea'); notes.name = 'notes'; notes.maxLength = 1000; notes.rows = 3;
   var photo = el('input'); photo.name = 'photo'; photo.type = 'file'; photo.accept = 'image/*'; photo.multiple = true;
   var thumbs = el('div', 'thumbs');
@@ -633,6 +747,8 @@ function checkinSection(raw) {
       anyNumber = true;
     });
     if (bad) { say(T.badNumber, 'err'); return; }
+    var picked = card.querySelector('input[name=energy]:checked');
+    if (picked) { doc.energy = Number(picked.value); anyNumber = true; }
     var n = notes.value.trim();
     var files = Array.prototype.slice.call(photo.files || [], 0, 3);
     if (!anyNumber && !n && !files.length) { say(T.empty, 'err'); return; }

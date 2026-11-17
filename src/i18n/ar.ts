@@ -1,8 +1,11 @@
 import { assistant } from './features/assistant';
+import { exercises } from './features/exercises';
+import { hub } from './features/hub';
 import { nutrition } from './features/nutrition';
 import { outbox } from './features/outbox';
 import { pdf } from './features/pdf';
 import { settings } from './features/settings';
+import { storage } from './features/storage';
 import { schedule } from './features/schedule';
 import { training } from './features/training';
 
@@ -440,11 +443,14 @@ export const ar = {
   },
   schedule,
   training,
+  exercises,
   nutrition,
   outbox,
   pdf,
   settings,
+  storage,
   assistant,
+  hub,
   units: {
     mb: '{n} ميجا',
     gb: '{n} جيجا',

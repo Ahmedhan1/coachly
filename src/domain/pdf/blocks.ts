@@ -112,6 +112,12 @@ function nutritionBlocks(input: PdfDocumentInput): PdfBlock[] {
   ];
 }
 
+/** The column header of the exercise table (`continued` set on a page that carries a day on). */
+export function exerciseHead(input: PdfDocumentInput, withMap: boolean, continued: string | null): PdfBlock {
+  const L = input.labels.program;
+  return { type: 'exerciseHead', columns: { exercise: L.exercise, setsReps: L.setsReps, rest: L.rest, details: L.details }, withMap, continued };
+}
+
 function programBlocks(input: PdfDocumentInput, withMuscleMaps: boolean): PdfBlock[] {
   const p = input.program;
   if (!p) return [];
@@ -121,7 +127,8 @@ function programBlocks(input: PdfDocumentInput, withMuscleMaps: boolean): PdfBlo
   for (const day of p.days) {
     if (day.items.length === 0) continue;
     out.push({ type: 'subTitle', text: day.name, meta: `${L.exerciseCount}: ${day.items.length}` });
-    for (const item of day.items) {
+    out.push(exerciseHead(input, withMuscleMaps, null));
+    day.items.forEach((item, k) => {
       index += 1;
       const ex = input.exercises.get(item.exerciseId);
       const extras: KeyValue[] = [];
@@ -141,10 +148,31 @@ function programBlocks(input: PdfDocumentInput, withMuscleMaps: boolean): PdfBlo
         image: ex?.image ?? null,
         muscleMap: withMuscleMaps ? (ex?.muscleMap ?? null) : null,
         superset: item.supersetGroup ? `${L.superset} ${item.supersetGroup}` : null,
+        withMap: withMuscleMaps,
+        last: k === day.items.length - 1,
       });
-    }
+    });
   }
   return out;
+}
+
+/** Day title of the exercise row at `i` (for the "continued" header), or ''. */
+export function dayTitleBefore(blocks: readonly PdfBlock[], i: number): string {
+  for (let j = i - 1; j >= 0; j--) {
+    const b = blocks[j]!;
+    if (b.type === 'subTitle') return b.text;
+    if (b.type === 'sectionTitle') return '';
+  }
+  return '';
+}
+
+const GRAM_UNITS = new Set(['جم', 'جرام', 'g', 'gm', 'gr', 'gram', 'grams', 'مل', 'ml']);
+
+/** Grams (and ml, counted 1:1) of one serving of a recipe; null when no ingredient is weighed. */
+export function recipeGramsPerServing(r: Recipe): number | null {
+  const weighed = r.ingredients.filter((i) => GRAM_UNITS.has(i.unit.trim().toLowerCase()));
+  if (weighed.length === 0) return null;
+  return weighed.reduce((n, i) => n + i.quantity, 0) / r.servings;
 }
 
 function recipeTotals(r: Recipe): MacroSum | null {
@@ -209,9 +237,11 @@ function mealBlocks(input: PdfDocumentInput): PdfBlock[] {
         sum = addMacros(sum, t, item.servings);
         known = true;
       } else partial = true;
+      const grams = recipe ? recipeGramsPerServing(recipe) : null;
       return {
         text: `${name}${extra}`,
         detail: `${formatNumber(item.servings, 2)} ${L.servings}`,
+        grams: grams !== null ? `${formatNumber(grams * item.servings)} ${u.g}` : '',
         kcal: t ? `${formatNumber(t.kcal * item.servings)} ${u.kcal}` : '',
       };
     });
@@ -285,23 +315,26 @@ function progressBlocks(input: PdfDocumentInput): PdfBlock[] {
   const out: PdfBlock[] = [];
   if (s.weights.length >= 2) out.push({ type: 'weightChart', title: L.weightChart, points: s.weights, unit: input.labels.units.kg });
   if (s.first && s.last) {
-    const rows: KeyValue[] = [];
+    const rows: Extract<PdfBlock, { type: 'measureTable' }>['rows'] = [];
     const a = s.first.measurements;
     const b = s.last.measurements;
     for (const key of MEASUREMENT_KEYS) {
       const va = a[key];
       const vb = b[key];
       if (va === undefined || vb === undefined) continue;
-      const d = vb - va;
-      const unit = measurementUnit(key, input);
       rows.push({
         label: input.labels.client.measurements[key],
-        value: `${formatNumber(va, 1)} ← ${formatNumber(vb, 1)} ${unit} (${signedLtr(d, 1)})`,
+        first: formatNumber(va, 1),
+        latest: formatNumber(vb, 1),
+        change: signedLtr(vb - va, 1),
+        unit: measurementUnit(key, input),
       });
     }
     if (rows.length > 0) {
       out.push({ type: 'subTitle', text: `${L.first} ${formatDate(s.first.date)} · ${L.latest} ${formatDate(s.last.date)}`, meta: '' });
-      out.push(...keyValueBlocks(rows));
+      for (let i = 0; i < rows.length; i += 8) {
+        out.push({ type: 'measureTable', head: [L.measurement, L.first, L.latest, L.change], rows: rows.slice(i, i + 8) });
+      }
     }
   }
   if (s.before && s.after) {

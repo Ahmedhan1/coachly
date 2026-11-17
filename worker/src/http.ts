@@ -53,8 +53,8 @@ export function corsHeaders(origin: string): Record<string, string> {
   return {
     'Access-Control-Allow-Origin': origin,
     'Access-Control-Allow-Methods': 'GET, HEAD, POST, PUT, DELETE, OPTIONS',
-    'Access-Control-Allow-Headers': 'Content-Type, Authorization, X-Checkin-Key, X-Checkin-Token, If-None-Match',
-    'Access-Control-Expose-Headers': 'Content-Length, ETag, X-Backup-Size, X-Backup-Uploaded-At, X-Backup-Previous-Size, X-Backup-Previous-At, X-Created-At',
+    'Access-Control-Allow-Headers': 'Content-Type, Authorization, X-Checkin-Key, X-Checkin-Token, If-None-Match, X-Groq-Key',
+    'Access-Control-Expose-Headers': 'Content-Length, ETag, X-Backup-Size, X-Backup-Uploaded-At, X-Backup-Previous-Size, X-Backup-Previous-At, X-Created-At, Retry-After',
     'Access-Control-Max-Age': '86400',
     Vary: 'Origin',
   };

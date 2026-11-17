@@ -20,16 +20,13 @@ export interface BackupStatus {
   reminderSnoozedUntil: number | null;
   /** Remind after this many days without any backup (Settings choice, default 7). */
   reminderDays: number;
-  /** Last successful Google Drive upload (verified before upload). */
-  lastDriveAt: number | null;
-  lastDriveBytes: number | null;
-  lastDriveError: string | null;
-  /** Data changed since the last Drive copy; the Drive auto-backup picks it up. */
-  driveDirtySince: number | null;
-  /** The trainer connected Google Drive on this device (the access token itself is never stored). */
-  driveConnected: boolean;
-  /** How many Drive copies to keep. */
-  driveKeep: number;
+  /** First time this install looked at its backup status: the weekly nudge waits a week after it. */
+  firstUseAt: number | null;
+  /** Size and route of the last device file (shown in Settings). */
+  lastLocalBytes: number | null;
+  lastLocalHow: 'shared' | 'saved' | 'downloaded' | null;
+  /** The trainer's choice for the one-tap device file: encrypted (password kept in `backup.filePassword`) or not. null = not chosen yet. */
+  fileEncrypted: boolean | null;
 }
 
 export const EMPTY_BACKUP_STATUS: BackupStatus = {
@@ -43,12 +40,10 @@ export const EMPTY_BACKUP_STATUS: BackupStatus = {
   cloudCeiling: 'full',
   reminderSnoozedUntil: null,
   reminderDays: 7,
-  lastDriveAt: null,
-  lastDriveBytes: null,
-  lastDriveError: null,
-  driveDirtySince: null,
-  driveConnected: false,
-  driveKeep: 5,
+  firstUseAt: null,
+  lastLocalBytes: null,
+  lastLocalHow: null,
+  fileEncrypted: null,
 };
 
 export interface BackupMetaStore {
@@ -56,13 +51,23 @@ export interface BackupMetaStore {
   update(patch: Partial<BackupStatus>): Promise<BackupStatus>;
 }
 
+/** Known fields only, so fields of removed features (e.g. the dropped Google Drive copy) fall away. */
+function pickKnown(stored: Partial<BackupStatus>): BackupStatus {
+  const out: Record<string, unknown> = { ...EMPTY_BACKUP_STATUS };
+  for (const key of Object.keys(EMPTY_BACKUP_STATUS)) if (key in stored) out[key] = (stored as Record<string, unknown>)[key];
+  return out as unknown as BackupStatus;
+}
+
+/** Device-local (never inside a backup): password for the one-tap encrypted device file, if the trainer chose to keep it. */
+export const FILE_PASSWORD_KEY = 'backup.filePassword';
+
 /** Device-local: the `backup.` prefix keeps it out of backups and untouched by restores. */
 export const BACKUP_STATUS_KEY = 'backup.status';
 
 export function dexieBackupMetaStore(db: AppDatabase): BackupMetaStore {
   const get = async (): Promise<BackupStatus> => {
     const value = (await db.meta.get(BACKUP_STATUS_KEY))?.value;
-    return { ...EMPTY_BACKUP_STATUS, ...(typeof value === 'object' && value !== null ? (value as Partial<BackupStatus>) : {}) };
+    return pickKnown(typeof value === 'object' && value !== null ? (value as Partial<BackupStatus>) : {});
   };
   return {
     get,

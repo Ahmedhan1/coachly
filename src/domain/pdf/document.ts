@@ -1,29 +1,18 @@
-import { buildContentBlocks } from './blocks';
+import { buildContentBlocks, dayTitleBefore, exerciseHead } from './blocks';
 import { formatDate } from './format';
 import { contrastRatio, deriveBrand, mixHex, normalizeHex, type Surfaces } from '../branding';
-import {
-  CONTENT_HEIGHT_PX,
-  COVER_LOGO_MAX,
-  COVER_LOGO_MIN,
-  estimateBlockHeight,
-  HEADER_LOGO_MAX_PX,
-  keepsWithNext,
-  MAX_LOGO_PX,
-  MIN_LOGO_PX,
-  paginate,
-} from './layout';
-import type { PdfBlock, PdfCover, PdfDocument, PdfDocumentInput, PdfFooter, PdfPage, PdfTheme } from './types';
+import { CONTENT_HEIGHT_PX, estimateBlockHeight, keepsWithNext, LOGO_BOXES, paginate } from './layout';
+import type { PdfBlock, PdfCover, PdfDocument, PdfDocumentInput, PdfFooter, PdfLogoSize, PdfPage, PdfTheme } from './types';
 
-export function clampLogoPx(px: number): number {
-  if (!Number.isFinite(px)) return MIN_LOGO_PX;
-  return Math.min(MAX_LOGO_PX, Math.max(MIN_LOGO_PX, Math.round(px)));
+/** Any stored value → a valid logo size; 'large' is the default. */
+export function normalizeLogoSize(value: unknown): PdfLogoSize {
+  return value === 'small' || value === 'medium' || value === 'large' ? value : 'large';
 }
 
-/** Cover logo box for a size setting: scales linearly from COVER_LOGO_MIN to COVER_LOGO_MAX. */
-export function coverLogoBox(px: number): { width: number; height: number } {
-  const t = (clampLogoPx(px) - MIN_LOGO_PX) / (MAX_LOGO_PX - MIN_LOGO_PX);
-  const lerp = (a: number, b: number) => Math.round(a + (b - a) * t);
-  return { width: lerp(COVER_LOGO_MIN.width, COVER_LOGO_MAX.width), height: lerp(COVER_LOGO_MIN.height, COVER_LOGO_MAX.height) };
+/** Cover box and header height for a logo size setting. */
+export function logoBoxes(size: PdfLogoSize): { cover: { width: number; height: number }; headerPx: number } {
+  const b = LOGO_BOXES[normalizeLogoSize(size)];
+  return { cover: { ...b.cover }, headerPx: b.headerPx };
 }
 
 const FALLBACK_PRIMARY = '#2F6F5E';
@@ -57,7 +46,8 @@ export function pdfColors(primary: string): Pick<PdfTheme, 'primaryColor' | 'onP
 
 export function pdfTheme(input: PdfDocumentInput): PdfTheme {
   const b = input.branding;
-  const cover = clampLogoPx(b.logoHeightPx);
+  const size = normalizeLogoSize(b.logoSize);
+  const boxes = logoBoxes(size);
   return {
     ...pdfColors(b.primaryColor),
     secondaryColor: b.secondaryColor,
@@ -65,9 +55,9 @@ export function pdfTheme(input: PdfDocumentInput): PdfTheme {
     trainerName: b.trainerName,
     logo: b.logo,
     logoPlacement: b.logoPlacement,
-    coverLogoPx: cover,
-    coverLogoBox: coverLogoBox(cover),
-    headerLogoPx: HEADER_LOGO_MAX_PX,
+    logoSize: size,
+    coverLogoBox: boxes.cover,
+    headerLogoPx: boxes.headerPx,
     background: b.background ? { image: b.background.image, opacity: Math.min(1, Math.max(0, b.background.opacity)) } : null,
     coverImage: b.coverImage,
   };
@@ -102,6 +92,8 @@ export interface LayoutOptions {
   /** Measured outer heights per content block (same order as `buildContentBlocks`); estimates otherwise. */
   heights?: readonly number[];
   contentHeightPx?: number;
+  /** Measured outer height of a repeated ("continued") table header. */
+  headHeightPx?: number;
 }
 
 /**
@@ -111,7 +103,23 @@ export interface LayoutOptions {
 export function layoutPdfDocument(input: PdfDocumentInput, options: LayoutOptions = {}): PdfDocument {
   const blocks: PdfBlock[] = buildContentBlocks(input);
   const heights = options.heights ?? blocks.map(estimateBlockHeight);
-  const groups = paginate(blocks, heights, options.contentHeightPx ?? CONTENT_HEIGHT_PX, keepsWithNext);
+  // A table row that opens a page gets the column header again, marked "day · continued".
+  const continuedHead = (i: number): PdfBlock | null => {
+    const b = blocks[i];
+    if (b?.type !== 'exercise') return null;
+    const day = dayTitleBefore(blocks, i);
+    return exerciseHead(input, b.withMap, [day, input.labels.program.continued].filter(Boolean).join(' · '));
+  };
+  const groups = paginate(blocks, heights, options.contentHeightPx ?? CONTENT_HEIGHT_PX, keepsWithNext, (_b, i) => {
+    const head = continuedHead(i);
+    return head ? (options.headHeightPx ?? estimateBlockHeight(head)) : 0;
+  });
+  groups.forEach((g) => {
+    const first = g[0];
+    if (first?.type !== 'exercise') return;
+    const head = continuedHead(blocks.indexOf(first));
+    if (head) g.unshift(head);
+  });
   const hasCover = input.sections.includes('cover');
   const total = groups.length + (hasCover ? 1 : 0);
   const pages: PdfPage[] = [];

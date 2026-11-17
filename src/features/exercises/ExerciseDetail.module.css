@@ -164,3 +164,60 @@
   justify-content: center;
   margin-block-start: var(--sp-6);
 }
+
+.pictureSlide {
+  position: relative;
+  display: grid;
+  place-items: center;
+  overflow: hidden;
+  background: var(--surface);
+}
+
+.pictureBadge {
+  position: absolute;
+  inset-block-start: var(--sp-2);
+  inset-inline-start: var(--sp-2);
+  padding: 2px var(--sp-2);
+  border-radius: var(--r-full);
+  background: var(--bg);
+  color: var(--text-2);
+  font: var(--t-caption);
+}
+
+.cues {
+  margin: 0;
+  padding: var(--sp-3) var(--gutter);
+  display: grid;
+  gap: var(--sp-2);
+  list-style: none;
+  counter-reset: cue;
+}
+
+.cues li {
+  position: relative;
+  padding-inline-start: 34px;
+  font: var(--t-body);
+  line-height: 1.5;
+  counter-increment: cue;
+}
+
+.cues li::before {
+  content: counter(cue);
+  position: absolute;
+  inset-inline-start: 0;
+  inset-block-start: 1px;
+  display: grid;
+  place-items: center;
+  inline-size: 24px;
+  block-size: 24px;
+  border-radius: var(--r-full);
+  background: var(--brand);
+  color: #fff;
+  font: 700 13px/1 var(--font-ui);
+}
+
+.legend {
+  padding: var(--sp-2) var(--gutter) 0;
+  font: var(--t-caption);
+  color: var(--text-2);
+}

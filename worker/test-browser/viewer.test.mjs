@@ -99,12 +99,15 @@ try {
     const text = await page.textContent('#app');
     // nextDay = 1 opens day 2 first; day 1 is one tap away.
     assert.ok(text.includes('هيب ثرست'), 'next day not shown first');
+    assert.ok(text.includes('ده تمرينك الجاي'), 'next workout not flagged');
     await page.click('.pills .pill >> nth=0');
     const day1 = await page.textContent('#app');
     for (const s of ['برنامج 3 أيام', 'بنش برس', 'سيتات 4', 'عدّات 8-10', 'راحة 90 ث', 'تمبو 3-1-1', 'RPE 8', 'سوبر سيت A', 'التزم بالنوم', 'الحصة الجاية', 'فاضل 5 من 12 حصة', 'خسارة دهون']) {
       assert.ok(day1.includes(s), `missing "${s}"`);
     }
     assert.ok((await page.textContent('#brand')).includes('أهلاً نورهان'));
+    assert.ok((await page.textContent('#app')).includes('4 أسابيع ورا بعض'), 'streak card');
+    assert.equal(await page.locator('#brand img.logo').count(), 1, 'trainer logo');
     assert.equal(await page.textContent('.brand-name'), 'كابتن سارة فيتنس');
     assert.equal(await page.title(), 'كابتن سارة فيتنس');
     const brand = await page.evaluate(() => getComputedStyle(document.getElementById('brand')).backgroundColor);
@@ -130,6 +133,10 @@ try {
     await page.click('#t-p-progress');
     const text = await page.textContent('#p-progress');
     assert.ok(text.includes('الوزن') && text.includes('73.6') && text.includes('−4.4') && text.includes('هيب ثرست'));
+    // Milestones come only from published numbers: 4.4 kg lost → "نزلت 2 كجم" done, 5 kg next; streak; history.
+    assert.ok(text.includes('إنجازاتك') && text.includes('نزلت 2 كجم') && text.includes('الهدف الجاي: نزلت 5 كجم'), 'milestones');
+    assert.ok(text.includes('4 أسابيع التزام ورا بعض') && text.includes('4 متابعات بعتها') && text.includes('بدأت معانا 1/8/2026'));
+    assert.ok(text.includes('متابعاتك اللي فاتت') && text.includes('15/9/2026'), 'check-in history');
     assert.equal(await page.locator('#p-progress svg.chart').count(), 2);
     await page.screenshot({ path: join(shotDir, 'viewer-progress-light.png'), fullPage: true });
   });
@@ -141,6 +148,11 @@ try {
     await page.fill('textarea[name=notes]', 'الأسبوع ده كان كويس');
     await page.click('#p-checkin summary');
     await page.fill('input[name=arm]', '33');
+    await page.fill('input[name=sleep]', '7.5');
+    await page.fill('input[name=adherence]', '٨٠');
+    await page.click('.seg-opt >> nth=3');
+    const seg = await page.locator('.seg-face').first().boundingBox();
+    assert.ok(seg && seg.height >= 44, `energy option height ${seg?.height}`);
     await page.setInputFiles('input[name=photo]', { name: 'me.png', mimeType: 'image/png', buffer: bigPhoto });
     await page.screenshot({ path: join(shotDir, 'viewer-checkin-light.png'), fullPage: true });
     await page.click('#p-checkin .btn');
@@ -155,6 +167,9 @@ try {
     assert.equal(doc.waistCm, 80);
     assert.equal(doc.notes, 'الأسبوع ده كان كويس');
     assert.equal(doc.armCm, 33);
+    assert.equal(doc.sleepHours, 7.5);
+    assert.equal(doc.adherence, 80);
+    assert.equal(doc.energy, 4);
     assert.ok(doc.photo.startsWith('data:image/jpeg;base64,'));
     const size = await page.evaluate(async (src) => {
       const img = new Image();

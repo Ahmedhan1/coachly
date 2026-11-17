@@ -7,15 +7,16 @@ import {
   EQUIPMENT_LABELS_AR,
   LEVEL_LABELS_AR,
   muscleGroupLabelAr,
-  muscleLoadForExercise,
+  illustrationSpec,
   type CatalogExercise,
   type MuscleGroupId,
 } from '@/domain/exercises';
 import { t } from '@/i18n';
 import { Button, EmptyState, Icon, ListRow, ListSection, PageHeader, cx } from '@/ui';
-import { intensitiesFromLoad, MuscleMap } from '@/ui/MuscleMap';
+import { MuscleMap } from '@/ui/MuscleMap';
 import { alternativesFor } from '@/domain/exercises';
 import { ExerciseThumb } from './ExerciseThumb';
+import { useExerciseClients } from './useExerciseClients';
 import { StarIcon } from './icons';
 import { PhotoCarousel } from './PhotoCarousel';
 import { RenameSheet } from './RenameSheet';
@@ -60,7 +61,8 @@ function ExerciseDetail({ exercise, catalog }: { exercise: CatalogExercise; cata
   const hasOwnPhotos = !exercise.isCustom && exercise.images.some((i) => i.kind === 'stored');
   const toggleFavourite = useFavouriteToggle(catalog);
   const alternatives = useMemo(() => alternativesFor(exercise, catalog.visible, { limit: 6 }), [exercise, catalog.visible]);
-  const intensities = useMemo(() => intensitiesFromLoad(muscleLoadForExercise(exercise)), [exercise]);
+  const intensities = useMemo(() => illustrationSpec(exercise).intensities, [exercise]);
+  const usedBy = useExerciseClients(exercise.id);
 
   const replacePhotos = async (files: FileList | null) => {
     const list = Array.from(files ?? []);
@@ -135,7 +137,17 @@ function ExerciseDetail({ exercise, catalog }: { exercise: CatalogExercise; cata
         </div>
       </header>
 
-      <ListSection title={t('training.library.detail.muscles')}>
+      {exercise.cues !== undefined && exercise.cues.length > 0 && (
+        <ListSection title={t('exercises.detail.cues')}>
+          <ol className={styles.cues}>
+            {exercise.cues.map((cue) => (
+              <li key={cue}>{cue}</li>
+            ))}
+          </ol>
+        </ListSection>
+      )}
+
+      <ListSection title={t('training.library.detail.muscles')} footer={t('exercises.detail.illustrationLegend')}>
         <div className={styles.mapTile}>
           <MuscleMap view="both" size={200} intensities={intensities} captions />
           <dl className={styles.facts}>
@@ -166,6 +178,19 @@ function ExerciseDetail({ exercise, catalog }: { exercise: CatalogExercise; cata
           </dl>
         </div>
       </ListSection>
+
+      {usedBy !== undefined && usedBy.length > 0 && (
+        <ListSection title={t('exercises.detail.clients')} footer={t('exercises.detail.clientsHint')}>
+          {usedBy.map((use) => (
+            <ListRow
+              key={use.clientId}
+              title={use.clientName}
+              subtitle={t('exercises.detail.clientsPrograms', { programs: use.programNames.join('، ') })}
+              to={`/clients/${encodeURIComponent(use.clientId)}`}
+            />
+          ))}
+        </ListSection>
+      )}
 
       {alternatives.length > 0 && (
         <ListSection title={t('training.library.detail.alternatives')} footer={t('training.library.detail.alternativesHint')}>

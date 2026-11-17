@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
-import { pdfExerciseFromCatalog, progressSummary } from './blocks';
-import { clampLogoPx, layoutPdfDocument } from './document';
+import { buildContentBlocks, pdfExerciseFromCatalog, progressSummary } from './blocks';
+import { layoutPdfDocument, logoBoxes, normalizeLogoSize } from './document';
 import { PDF_TEST_CASES, pdfTestCase, syntheticExercises } from './fixtures';
 import { ageOn, formatDate, formatNumber, resolveDisclaimer, signedLtr } from './format';
 import {
@@ -9,8 +9,9 @@ import {
   estimateBlockHeight,
   estimateLines,
   keepsWithNext,
-  MAX_LOGO_PX,
   paginate,
+  PAGE_WIDTH_PX,
+  TABLE_HEAD_PX,
 } from './layout';
 import { normalizeSections, PDF_PRESETS, presetTemplate } from './presets';
 import type { PdfBlock, PdfDocument } from './types';
@@ -97,13 +98,13 @@ describe('layoutPdfDocument — five spec cases', () => {
     expect(JSON.stringify(doc.pages)).not.toMatch(/"kind":"(stored|pack|url)"/);
   });
 
-  it('max branding clamps logo size and opacity; header logo stays small', () => {
+  it('max branding: large logo, clamped opacity, header logo readable', () => {
     const doc = layoutPdfDocument(pdfTestCase('max_branding', syntheticExercises(12, true)));
-    expect(doc.theme.coverLogoPx).toBe(MAX_LOGO_PX);
-    expect(doc.theme.headerLogoPx).toBeLessThanOrEqual(44);
+    expect(doc.theme.logoSize).toBe('large');
+    expect(doc.theme.coverLogoBox.width).toBeLessThanOrEqual(Math.round(PAGE_WIDTH_PX * 0.46));
+    expect(doc.theme.headerLogoPx).toBeGreaterThanOrEqual(36);
     expect(doc.theme.background?.opacity).toBe(1);
     expect(doc.theme.coverImage).not.toBeNull();
-    expect(clampLogoPx(5)).toBe(24);
   });
 
   it('only selected sections, in the trainer order; muscle maps only with muscle_map', () => {
@@ -141,10 +142,86 @@ describe('layoutPdfDocument — five spec cases', () => {
 
   it('measured heights override estimates', () => {
     const input = pdfTestCase('no_images', syntheticExercises(12, false));
-    const estimated = layoutPdfDocument(input);
-    const n = contentBlocks(estimated).length;
-    const tall = layoutPdfDocument(input, { heights: Array.from({ length: n }, () => 400) });
-    expect(tall.pages.filter((p) => p.kind === 'content').every((p) => p.kind === 'content' && p.blocks.length <= 2)).toBe(true);
+    const n = buildContentBlocks(input).length;
+    const tall = layoutPdfDocument(input, { heights: Array.from({ length: n }, () => 400), headHeightPx: 30 });
+    const own = (p: PdfDocument['pages'][number]) => (p.kind === 'content' ? p.blocks.filter((b) => b.type !== 'exerciseHead' || !b.continued).length : 0);
+    expect(tall.pages.filter((p) => p.kind === 'content').every((p) => own(p) <= 2)).toBe(true);
+  });
+});
+
+describe('logo sizes', () => {
+  it('small < medium < large on the cover and in the header; header never under 36 px', () => {
+    const [s, m, l] = (['small', 'medium', 'large'] as const).map(logoBoxes);
+    expect(s!.cover.width).toBeLessThan(m!.cover.width);
+    expect(m!.cover.width).toBeLessThan(l!.cover.width);
+    expect(l!.cover.width).toBeGreaterThanOrEqual(Math.round(PAGE_WIDTH_PX * 0.4));
+    expect(l!.cover.width).toBeLessThanOrEqual(Math.round(PAGE_WIDTH_PX * 0.46));
+    for (const b of [s!, m!, l!]) expect(b.headerPx).toBeGreaterThanOrEqual(36);
+  });
+  it('unknown sizes fall back to large (the default)', () => {
+    expect(normalizeLogoSize('huge')).toBe('large');
+    expect(normalizeLogoSize(undefined)).toBe('large');
+    expect(normalizeLogoSize('small')).toBe('small');
+  });
+});
+
+describe('workout table', () => {
+  type Ex = Extract<PdfBlock, { type: 'exercise' }>;
+  type Head = Extract<PdfBlock, { type: 'exerciseHead' }>;
+  it('each day opens with its title and the column header', () => {
+    const doc = layoutPdfDocument({ ...pdfTestCase('fifty_exercises', syntheticExercises(50, true)), sections: ['program'] });
+    const blocks = contentBlocks(doc);
+    blocks.forEach((b, i) => {
+      if (b.type === 'subTitle') expect(blocks[i + 1]?.type).toBe('exerciseHead');
+    });
+    const heads = blocks.filter((b): b is Head => b.type === 'exerciseHead');
+    expect(heads[0]?.continued).toBeNull();
+    expect(heads[0]?.columns.setsReps).toBe('سيتات × عدات');
+  });
+  it('a page never starts with a bare row: it repeats the header marked as continued', () => {
+    const doc = layoutPdfDocument({ ...pdfTestCase('fifty_exercises', syntheticExercises(50, true)), sections: ['program'] });
+    const pages = doc.pages.filter((p) => p.kind === 'content');
+    expect(pages.length).toBeGreaterThan(1);
+    for (const p of pages) {
+      if (p.kind !== 'content') continue;
+      expect(p.blocks[0]?.type).not.toBe('exercise');
+      const first = p.blocks[0];
+      if (first?.type === 'exerciseHead' && first.continued) expect(first.continued).toContain('تابع');
+      const used = p.blocks.reduce((n, b) => n + estimateBlockHeight(b), 0);
+      expect(used).toBeLessThanOrEqual(CONTENT_HEIGHT_PX);
+    }
+    const ex = contentBlocks(doc).filter((b): b is Ex => b.type === 'exercise');
+    expect(ex).toHaveLength(50);
+  });
+  it('rows are compact: 50 exercises fit in at most 7 pages', () => {
+    const doc = layoutPdfDocument({ ...pdfTestCase('fifty_exercises', syntheticExercises(50, true)), sections: ['program', 'muscle_map'] });
+    expect(doc.pages.length).toBeLessThanOrEqual(7);
+    expect(TABLE_HEAD_PX).toBeGreaterThan(20);
+  });
+  it('paginate charges the lead cost when a block starts a page', () => {
+    const blocks = [{ k: false }, { k: false }, { k: false }];
+    const pages = paginate(blocks, [400, 400, 400], 1000, () => false, (_b, i) => (i > 0 ? 300 : 0));
+    // page 1: 400+400; page 2 starts with block 3: 300 lead + 400
+    expect(pages.map((p) => p.length)).toEqual([2, 1]);
+    const tight = paginate(blocks, [400, 400, 400], 1000, () => false, () => 250);
+    expect(tight.map((p) => p.length)).toEqual([1, 1, 1]);
+  });
+});
+
+describe('meals and progress tables', () => {
+  it('meal items show grams from the recipe ingredients', () => {
+    const doc = layoutPdfDocument({ ...pdfTestCase('mixed_text', syntheticExercises(4, false)), sections: ['recipes'] });
+    const card = contentBlocks(doc).find((b) => b.type === 'mealCard') as Extract<PdfBlock, { type: 'mealCard' }>;
+    // recipe r1: 150 g + 10 g in grams (eggs are pieces) → 160 جم
+    expect(card.items[0]?.grams).toBe('160 جم');
+  });
+  it('progress prints a measurement table: first, latest, change', () => {
+    const doc = layoutPdfDocument({ ...pdfTestCase('max_branding', syntheticExercises(4, true)), sections: ['progress'] });
+    const table = contentBlocks(doc).find((b) => b.type === 'measureTable') as Extract<PdfBlock, { type: 'measureTable' }>;
+    expect(table).toBeDefined();
+    expect(table.head).toEqual(['القياس', 'أول قياس', 'آخر قياس', 'التغيير']);
+    const weight = table.rows.find((r) => r.label === 'الوزن');
+    expect(weight).toMatchObject({ first: '78', latest: '74.5', change: '\u2066-3.5\u2069', unit: 'كجم' });
   });
 });
 

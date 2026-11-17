@@ -14,21 +14,24 @@ export const CONTENT_WIDTH_PX = PAGE_WIDTH_PX - 2 * PAGE_MARGIN_X_PX;
 export const CONTENT_HEIGHT_PX =
   PAGE_HEIGHT_PX - PAGE_MARGIN_TOP_PX - HEADER_HEIGHT_PX - FOOTER_HEIGHT_PX - PAGE_MARGIN_BOTTOM_PX;
 
-export const MIN_LOGO_PX = 24;
-export const MAX_LOGO_PX = 160;
-/** Header logo height: big enough to read on every page, still a header. */
-export const HEADER_LOGO_MAX_PX = 52;
 /**
- * Cover logo box (object-fit: contain). The trainer's size setting (MIN..MAX_LOGO_PX) scales it between
- * these bounds, so even the smallest setting is ~38 % of the page width and never a corner stamp.
+ * Logo boxes per size setting (object-fit: contain, aspect kept). Cover: large ≈ 45 % of the page width.
+ * Header: never under 36 CSS px (≈ 9.5 mm printed), so the logo stays readable on every page.
  */
-export const COVER_LOGO_MIN = { width: 300, height: 190 } as const;
-export const COVER_LOGO_MAX = { width: 460, height: 300 } as const;
+export const LOGO_BOXES = {
+  small: { cover: { width: 250, height: 170 }, headerPx: 38 },
+  medium: { cover: { width: 310, height: 210 }, headerPx: 46 },
+  large: { cover: { width: 360, height: 250 }, headerPx: 54 },
+} as const;
 
 /** Image box sizes the renderer uses (kept here so estimates match). */
-export const EXERCISE_IMAGE_PX = 96;
-export const MUSCLE_MAP_PX = 84;
-export const EXERCISE_RX_PX = 150;
+export const EXERCISE_IMAGE_PX = 60;
+export const MUSCLE_MAP_PX = 52;
+/** Exercise table columns (CSS px); the name column takes the rest. */
+export const TABLE_COLS = { index: 30, image: 72, setsReps: 96, rest: 64, details: 128, map: 64 } as const;
+export const TABLE_HEAD_PX = 34;
+/** Vertical padding inside a row (top + bottom). */
+export const ROW_PAD_PX = 16;
 export const RECIPE_IMAGE_PX = 132;
 export const SUPPLEMENT_IMAGE_PX = 80;
 export const CHART_HEIGHT_PX = 230;
@@ -86,20 +89,26 @@ export function estimateBlockHeight(block: PdfBlock): number {
     case 'paragraph':
       h = textHeight(block.text, FONT.body, W) + 4;
       break;
+    case 'exerciseHead':
+      // Flush with the first row under it (no gap).
+      return TABLE_HEAD_PX + (block.continued ? 26 : 0);
     case 'exercise': {
-      const textW =
-        W - 44 - EXERCISE_RX_PX - (block.image ? EXERCISE_IMAGE_PX + 12 : 0) - (block.muscleMap ? MUSCLE_MAP_PX + 12 : 0) - 24;
+      const C = TABLE_COLS;
+      const textW = W - C.index - C.image - C.setsReps - C.rest - C.details - (block.withMap ? C.map : 0) - 16;
       const text =
-        textHeight(block.name, FONT.name, textW) +
-        (block.secondaryName ? textHeight(block.secondaryName, FONT.small, textW) : 0) +
-        (block.muscles ? textHeight(block.muscles, FONT.small, textW) : 0) +
-        (block.notes ? textHeight(block.notes, FONT.small, textW) + 6 : 0);
-      const rx = 64 + Math.ceil(block.extras.length / 2) * 22;
-      h = Math.max(block.image ? EXERCISE_IMAGE_PX : 0, block.muscleMap ? MUSCLE_MAP_PX : 0, text, rx) + 20;
-      break;
+        textHeight(block.name, FONT.name - 1, textW) +
+        (block.secondaryName ? textHeight(block.secondaryName, FONT.small - 1, textW) : 0) +
+        (block.muscles ? 22 : 0);
+      const details =
+        block.extras.length * 19 + (block.notes ? textHeight(block.notes, FONT.small - 1, C.details - 12) : 0) + (block.superset ? 22 : 0);
+      h = Math.max(EXERCISE_IMAGE_PX, block.muscleMap ? MUSCLE_MAP_PX : 0, text, details, 40) + ROW_PAD_PX + 1;
+      return h + (block.last ? BLOCK_GAP_PX : 0);
     }
+    case 'measureTable':
+      h = TABLE_HEAD_PX + block.rows.length * 36 + 2;
+      break;
     case 'mealCard': {
-      const rows = block.items.reduce((n, i) => n + textHeight(i.text, FONT.body, W - 220) + 10, 0);
+      const rows = block.items.reduce((n, i) => n + textHeight(i.text, FONT.body, W - 300) + 12, 0);
       h = 52 + rows + (block.totals ? 48 : 0) + 8;
       break;
     }
@@ -143,17 +152,29 @@ export function estimateBlockHeight(block: PdfBlock): number {
   return h + BLOCK_GAP_PX;
 }
 
-/** Headings stay on the same page as the block after them. */
+/** Headings (and a table's column header) stay on the same page as the block after them. */
 export function keepsWithNext(block: PdfBlock): boolean {
-  return block.type === 'sectionTitle' || block.type === 'subTitle';
+  return block.type === 'sectionTitle' || block.type === 'subTitle' || block.type === 'exerciseHead';
+}
+
+/** Space after a block: table rows sit flush; the last row of a day and every other block get the gap. */
+export function blockGap(block: PdfBlock): number {
+  return (block.type === 'exercise' && !block.last) || block.type === 'exerciseHead' ? 0 : BLOCK_GAP_PX;
 }
 
 /**
  * Greedy pagination. `heights[i]` is the outer height of `blocks[i]` (estimated here, or measured in the
  * real DOM by the renderer). Rules: a block is never split; a heading never ends a page (it moves with
- * the block after it); no empty pages; a block taller than a page gets a page of its own.
+ * the block after it); no empty pages; a block taller than a page gets a page of its own. `lead(b, i)` is
+ * extra height charged when block i opens a page (e.g. a repeated table header printed above it).
  */
-export function paginate<T>(blocks: readonly T[], heights: readonly number[], pageHeight: number, keep: (b: T) => boolean): T[][] {
+export function paginate<T>(
+  blocks: readonly T[],
+  heights: readonly number[],
+  pageHeight: number,
+  keep: (b: T) => boolean,
+  lead: (b: T, i: number) => number = () => 0,
+): T[][] {
   const pages: T[][] = [];
   let current: T[] = [];
   let used = 0;
@@ -167,15 +188,14 @@ export function paginate<T>(blocks: readonly T[], heights: readonly number[], pa
       while (j < blocks.length && keep(blocks[j]!)) need += heightAt(j++);
       if (j < blocks.length) need += heightAt(j);
     }
-    if (current.length > 0 && used + need > pageHeight && need <= pageHeight) {
-      pages.push(current);
-      current = [];
-      used = 0;
-    } else if (current.length > 0 && used + heightAt(i) > pageHeight) {
+    const breakNow =
+      current.length > 0 && ((used + need > pageHeight && need + lead(block, i) <= pageHeight) || used + heightAt(i) > pageHeight);
+    if (breakNow) {
       pages.push(current);
       current = [];
       used = 0;
     }
+    if (current.length === 0) used = lead(block, i);
     current.push(block);
     used += heightAt(i);
   }

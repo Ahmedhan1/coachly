@@ -8,7 +8,8 @@ export const PDF_FONTS = ['Readex Pro', 'Alexandria'] as const;
 
 export const pdfBrandingSchema = z.object({
   logoPlacement: z.enum(['start', 'center', 'end']),
-  logoHeightPx: z.number().min(24).max(200),
+  /** Older saves had a pixel slider (logoHeightPx, now dropped); they read as the default 'large'. */
+  logoSize: z.enum(['small', 'medium', 'large']).catch('large'),
   fontFamily: z.enum(PDF_FONTS),
   backgroundImageId: z.string().min(1).nullable(),
   backgroundOpacity: z.number().min(0).max(1),
@@ -23,7 +24,7 @@ export type PdfBrandingSettings = z.infer<typeof pdfBrandingSchema>;
 
 export const DEFAULT_PDF_BRANDING: PdfBrandingSettings = {
   logoPlacement: 'start',
-  logoHeightPx: 72,
+  logoSize: 'large',
   fontFamily: 'Readex Pro',
   backgroundImageId: null,
   backgroundOpacity: 0.12,

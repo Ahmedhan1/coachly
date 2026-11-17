@@ -75,6 +75,21 @@ box-shadow:0 6px 12px -10px rgba(0,0,0,.4)}
 .chart .area{fill:var(--brand);opacity:.12}
 .chart .dot{fill:var(--surface);stroke:var(--brand);stroke-width:2.5}
 .rec{display:flex;justify-content:space-between;gap:8px;padding-block:8px;border-block-start:1px solid var(--line)}.rec:first-of-type{border-block-start:0}
+.next-flag{display:inline-block;margin:12px 0 0;padding:4px 12px;border-radius:var(--r-full);background:var(--brand);color:var(--brand-on);font-weight:700;font-size:14px}
+.badges{list-style:none;margin:0;padding:0;display:flex;flex-wrap:wrap;gap:8px}
+.badge{display:flex;align-items:center;gap:6px;padding:6px 12px;border-radius:var(--r-full);background:var(--brand-tint);font-weight:700;font-size:14px}
+.badge.done::before{content:"";inline-size:8px;block-size:8px;border-radius:50%;background:var(--brand);flex:none}
+.hist{color:var(--text-2)}.hist strong{color:var(--text)}
+.week{margin-block-start:16px;padding-block-start:12px;border-block-start:1px solid var(--line)}
+fieldset.energy{border:0;margin:0 0 12px;padding:0;min-inline-size:0}
+.seg{display:grid;grid-template-columns:repeat(5,1fr);gap:6px}
+.seg-opt{position:relative;display:block}
+.seg-opt input{position:absolute;opacity:0;inline-size:100%;block-size:100%;margin:0;min-block-size:0;cursor:pointer}
+.seg-face{display:flex;flex-direction:column;align-items:center;justify-content:center;min-block-size:56px;border:1px solid var(--line);border-radius:12px;background:var(--surface-2);padding:4px 2px;text-align:center}
+.seg-n{font-weight:800;font-size:17px}.seg-l{font-size:11px;color:var(--text-2);line-height:1.2}
+.seg-opt input:checked+.seg-face{background:var(--brand);border-color:var(--brand);color:var(--brand-on)}
+.seg-opt input:checked+.seg-face .seg-l{color:inherit}
+.seg-opt input:focus-visible+.seg-face{outline:3px solid var(--brand);outline-offset:2px}
 .empty{text-align:center;color:var(--text-2);padding:24px 16px}
 .field{display:block;margin-block:12px}.label{display:block;font:600 13px var(--font);margin-block-end:6px;color:var(--text-2)}
 .row2{display:grid;grid-template-columns:1fr 1fr;gap:10px}.row2 .field{margin-block:0}

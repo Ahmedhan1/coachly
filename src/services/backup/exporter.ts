@@ -21,6 +21,11 @@ export interface ExportArchiveOptions {
   /** Required for the thumbnail variant. */
   downscaler?: ImageDownscaler;
   thumbnailMaxSide?: number;
+  /**
+   * Photo archive: only these images (full bytes) and their metadata, no other table. The file restores by
+   * adding the photos back, never by replacing data.
+   */
+  photoArchive?: { archiveId: string; imageIds: readonly string[] };
   onProgress?: ProgressListener;
   signal?: AbortSignal;
 }
@@ -53,7 +58,7 @@ async function imageBytes(
  * time. Never throws.
  */
 export async function exportArchive(db: AppDatabase, options: ExportArchiveOptions): Promise<Result<ExportedArchive, ExportError>> {
-  const variant = options.imageVariant ?? 'full';
+  const variant: ImageVariant = options.photoArchive ? 'full' : (options.imageVariant ?? 'full');
   const createdAt = options.now.getTime();
   const writer = new ZipBlobWriter(createdAt);
   const files: ManifestFile[] = [];
@@ -61,7 +66,8 @@ export async function exportArchive(db: AppDatabase, options: ExportArchiveOptio
   let skippedImages = 0;
   try {
     await db.open();
-    const snapshot = await snapshotTables(db);
+    const archive = options.photoArchive;
+    const snapshot = archive ? { tables: {} as Record<string, unknown[]>, imageIds: [...new Set(archive.imageIds)].sort() } : await snapshotTables(db);
     const tables = Object.keys(snapshot.tables);
     const imageIds = variant === 'none' ? [] : snapshot.imageIds;
     const total = tables.length + imageIds.length + 1;
@@ -107,6 +113,7 @@ export async function exportArchive(db: AppDatabase, options: ExportArchiveOptio
     await addFile(tableFilePath('images'), encoder.encode(JSON.stringify(imageRows)), true);
 
     const manifest = buildManifest({
+      ...(archive ? { kind: 'photos' as const, archiveId: archive.archiveId } : {}),
       appVersion: options.appVersion,
       schemaVersion: db.verno,
       createdAt,

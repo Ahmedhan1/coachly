@@ -1,6 +1,6 @@
-import { readFileSync } from 'node:fs';
+import { existsSync, readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
-import { storedRecipeNutrition } from '@/domain/meals';
+import { storedRecipeNutrition, foodIconHex } from '@/domain/meals';
 import { findForbiddenTerms } from '@/i18n/fitness-terms';
 import { starterIngredients, starterRecipeSources, starterRecipes, starterSupplements } from './starter';
 
@@ -53,5 +53,29 @@ describe('starter recipe data', () => {
     const raw = readFileSync(new URL('./supplements.ar.json', import.meta.url), 'utf8');
     expect(raw).not.toMatch(/"(dose|timing)"/);
     expect(starterSupplements().map((s) => s.name)).toEqual(['كرياتين', 'واي بروتين', 'أوميجا 3', 'مالتي فيتامين', 'كافيين']);
+  });
+
+  it('is a thorough food table: 250+ foods, each with a group, fibre, household measures and a bundled illustration', () => {
+    expect(table.length).toBeGreaterThanOrEqual(250);
+    for (const f of table) {
+      expect(f.category, f.id).toBeDefined();
+      expect(f.per100g.fiberG, f.id).toBeDefined();
+      expect(f.portions?.length ?? 0, f.id).toBeGreaterThan(0);
+      expect(existsSync(new URL(`../../../public/food/${foodIconHex(f)}.svg`, import.meta.url)), `${f.id} icon`).toBe(true);
+    }
+    const labels = new Set(table.flatMap((f) => f.portions?.map((p) => p.label) ?? []));
+    for (const unit of ['رغيف', 'بيضة', 'معلقة', 'كوباية', 'طبق']) expect(labels.has(unit), unit).toBe(true);
+  });
+
+  it('has 60+ original recipes added on top of the first release, with tags and short steps', () => {
+    const fresh = sources.filter((r) => (r.since ?? 1) > 1);
+    expect(fresh.length).toBeGreaterThanOrEqual(60);
+    for (const r of fresh) {
+      expect(r.tags.length, r.id).toBeGreaterThan(0);
+      expect(r.instructions.length, r.id).toBeGreaterThan(10);
+      expect(r.instructions.length, r.id).toBeLessThan(400);
+    }
+    const tags = new Set(sources.flatMap((r) => r.tags));
+    for (const t of ['فطار', 'غدا', 'عشا', 'سناك', 'تنشيف', 'تضخيم', 'نباتي', 'سريع']) expect(tags.has(t), t).toBe(true);
   });
 });

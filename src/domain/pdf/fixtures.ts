@@ -68,7 +68,7 @@ export const PDF_TEST_LABELS: PdfLabels = {
     fat: 'دهون',
     water: 'المياه',
   },
-  program: { sets: 'مجموعات', reps: 'عدات', rest: 'راحة', tempo: 'تمبو', rpe: 'RPE', superset: 'سوبر سِت', notes: 'ملاحظة', setsReps: 'سيتات × عدات', exerciseCount: 'عدد التمارين' },
+  program: { sets: 'مجموعات', reps: 'عدات', rest: 'راحة', tempo: 'تمبو', rpe: 'RPE', superset: 'سوبر سِت', notes: 'ملاحظة', setsReps: 'سيتات × عدات', exerciseCount: 'عدد التمارين', exercise: 'التمرين', continued: 'تابع', details: 'تمبو وملاحظات' },
   meals: {
       servings: 'حصة',
       ingredients: 'المكونات',
@@ -80,7 +80,7 @@ export const PDF_TEST_LABELS: PdfLabels = {
       water: 'المياه في اليوم',
     },
   supplements: { dose: 'الجرعة', timing: 'الميعاد' },
-  progress: { weightChart: 'الوزن', before: 'قبل', after: 'بعد', first: 'أول قياس', latest: 'آخر قياس', change: 'التغيير' },
+  progress: { weightChart: 'الوزن', before: 'قبل', after: 'بعد', first: 'أول قياس', latest: 'آخر قياس', change: 'التغيير', measurement: 'القياس' },
   notes: { contact: 'للتواصل', closing: 'بالتوفيق! أي سؤال أنا معاك.' },
   units: { kg: 'كجم', cm: 'سم', kcal: 'سعرة', g: 'جم', ml: 'مل', sec: 'ث', years: 'سنة', percent: '%' },
 };
@@ -107,7 +107,7 @@ function branding(id: PdfTestCaseId): PdfBranding {
     trainerName: 'كابتن سارة حسن',
     logo: stored(FIXTURE_IMAGE_IDS.logo),
     logoPlacement: 'center',
-    logoHeightPx: 72,
+    logoSize: 'medium',
     primaryColor: '#2F6F5E',
     secondaryColor: '#3A3A3C',
     fontFamily: 'Readex Pro',
@@ -120,7 +120,7 @@ function branding(id: PdfTestCaseId): PdfBranding {
   if (id === 'max_branding') {
     return {
       ...base,
-      logoHeightPx: 9999,
+      logoSize: 'large',
       logoPlacement: 'start',
       primaryColor: '#8A1C7C',
       fontFamily: 'Alexandria',

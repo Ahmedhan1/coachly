@@ -1,16 +1,19 @@
 import { z } from 'zod';
 import {
+  defaultDietSettings,
   defaultNutritionSettings,
+  parseDietSettings,
   ingredientEntrySchema,
   parseNutritionSettings,
   parseSavedCalculation,
+  type DietSettings,
   type IngredientEntry,
   type NutritionSettings,
   type SavedCalculation,
 } from '@/domain/meals';
 import { DEFAULT_CURRENCY } from '@/domain/models';
 import type { Repositories } from './repositories';
-import { starterIngredients, starterRecipes, starterSupplements } from './seeds/starter';
+import { STARTER_FOOD_VERSION, STARTER_RECIPE_VERSION, starterIngredients, starterRecipes, starterSupplements } from './seeds/starter';
 
 /**
  * Nutrition, supplements and progress data that has no column in the entity tables lives in the `meta`
@@ -23,6 +26,10 @@ export interface KeyValueStore {
 
 export const NUTRITION_KEYS = {
   settings: 'nutrition.settings',
+  dietSettings: 'nutrition.dietSettings',
+  foodsVersion: 'nutrition.foodsVersion',
+  recipesVersion: 'nutrition.recipesVersion',
+  starterRecipeKeys: 'nutrition.starterRecipeKeys',
   ingredients: 'nutrition.ingredients',
   removedIngredients: 'nutrition.removedIngredients',
   favourites: 'nutrition.favouriteRecipes',
@@ -72,6 +79,19 @@ export class NutritionStore {
   async resetSettings(): Promise<NutritionSettings> {
     const d = defaultNutritionSettings();
     await this.kv.set(NUTRITION_KEYS.settings, d);
+    return d;
+  }
+
+  // ---------- diet planner coefficients ----------
+  async getDietSettings(): Promise<DietSettings> {
+    return parseDietSettings(await this.kv.get(NUTRITION_KEYS.dietSettings));
+  }
+  async saveDietSettings(settings: DietSettings): Promise<void> {
+    await this.kv.set(NUTRITION_KEYS.dietSettings, parseDietSettings(settings));
+  }
+  async resetDietSettings(): Promise<DietSettings> {
+    const d = defaultDietSettings();
+    await this.kv.set(NUTRITION_KEYS.dietSettings, d);
     return d;
   }
 
@@ -149,15 +169,57 @@ export class NutritionStore {
     return run;
   }
 
-  /** Adds food-table rows that newer app versions ship (by id), never touching rows the trainer has. */
+  /**
+   * Brings an existing install up to the shipped food table: adds rows it does not have yet (by id, except ones
+   * the trainer deleted) and fills in category, fibre, household measures and illustration on shipped rows that
+   * lack them. Anything the trainer typed (names, values, their own photo) is never overwritten. Runs once per
+   * data version.
+   */
   private async mergeNewIngredients(): Promise<void> {
     const raw = await this.kv.get(NUTRITION_KEYS.ingredients);
     if (raw === undefined) return;
+    if ((await this.kv.get(NUTRITION_KEYS.foodsVersion)) === STARTER_FOOD_VERSION) return;
     const current = await this.getIngredients();
+    const shipped = new Map(starterIngredients().map((i) => [i.id, i]));
     const ids = new Set(current.map((i) => i.id));
     const removed = new Set(parseOr(idList, await this.kv.get(NUTRITION_KEYS.removedIngredients), []));
-    const missing = starterIngredients().filter((i) => !ids.has(i.id) && !removed.has(i.id));
-    if (missing.length > 0) await this.saveIngredients([...current, ...missing]);
+    const enriched = current.map((row) => {
+      const fresh = shipped.get(row.id);
+      if (!fresh) return row;
+      const per100g = { ...row.per100g };
+      if (per100g.fiberG === undefined && fresh.per100g.fiberG !== undefined) per100g.fiberG = fresh.per100g.fiberG;
+      return {
+        ...row,
+        per100g,
+        ...(row.category === undefined && fresh.category !== undefined ? { category: fresh.category } : {}),
+        ...(row.portions === undefined && fresh.portions !== undefined ? { portions: fresh.portions } : {}),
+        ...(row.icon === undefined && fresh.icon !== undefined ? { icon: fresh.icon } : {}),
+      };
+    });
+    const missing = [...shipped.values()].filter((i) => !ids.has(i.id) && !removed.has(i.id));
+    await this.saveIngredients([...enriched, ...missing]);
+    await this.kv.set(NUTRITION_KEYS.foodsVersion, STARTER_FOOD_VERSION);
+  }
+
+  /**
+   * Adds starter recipes that a newer data version ships. Installs from before this bookkeeping existed are taken
+   * to have the original recipes (those without a `since`), so nothing the trainer deleted comes back; a recipe
+   * the trainer deleted later is remembered by key and is not added again.
+   */
+  private async mergeNewRecipes(): Promise<void> {
+    if ((await this.kv.get(NUTRITION_KEYS.recipesVersion)) === STARTER_RECIPE_VERSION) return;
+    const all = starterRecipes();
+    const known = new Set(parseOr(idList, await this.kv.get(NUTRITION_KEYS.starterRecipeKeys), all.filter((r) => r.since <= 1).map((r) => r.key)));
+    const ids = await this.getStarterRecipeIds();
+    for (const r of all) {
+      if (known.has(r.key)) continue;
+      const created = await this.repos.recipes.create({ name: r.name, servings: r.servings, ingredients: r.ingredients, instructions: r.instructions, imageId: null, tags: r.tags });
+      ids.push(created.id);
+      known.add(r.key);
+    }
+    await this.kv.set(NUTRITION_KEYS.starterRecipes, ids);
+    await this.kv.set(NUTRITION_KEYS.starterRecipeKeys, [...known]);
+    await this.kv.set(NUTRITION_KEYS.recipesVersion, STARTER_RECIPE_VERSION);
   }
 
   /** Remembers a starter row the trainer deleted, so a later app version does not bring it back. */
@@ -167,10 +229,15 @@ export class NutritionStore {
   }
 
   private async seedOnce(): Promise<void> {
-    if (await this.kv.get(NUTRITION_KEYS.starterSeeded)) return this.mergeNewIngredients();
+    if (await this.kv.get(NUTRITION_KEYS.starterSeeded)) {
+      await this.mergeNewIngredients();
+      await this.mergeNewRecipes();
+      return;
+    }
     const table = starterIngredients();
     if ((await this.kv.get(NUTRITION_KEYS.ingredients)) === undefined) await this.saveIngredients(table);
     const recipeIds: string[] = [];
+    const recipeKeys: string[] = [];
     for (const r of starterRecipes(table)) {
       const created = await this.repos.recipes.create({
         name: r.name,
@@ -181,6 +248,7 @@ export class NutritionStore {
         tags: r.tags,
       });
       recipeIds.push(created.id);
+      recipeKeys.push(r.key);
     }
     const settings = await this.repos.settings.get();
     const supplementIds: string[] = [];
@@ -197,6 +265,9 @@ export class NutritionStore {
       supplementIds.push(created.id);
     }
     await this.kv.set(NUTRITION_KEYS.starterRecipes, recipeIds);
+    await this.kv.set(NUTRITION_KEYS.starterRecipeKeys, recipeKeys);
+    await this.kv.set(NUTRITION_KEYS.recipesVersion, STARTER_RECIPE_VERSION);
+    await this.kv.set(NUTRITION_KEYS.foodsVersion, STARTER_FOOD_VERSION);
     await this.kv.set(NUTRITION_KEYS.starterSupplements, supplementIds);
     await this.kv.set(NUTRITION_KEYS.starterSeeded, Date.now());
   }

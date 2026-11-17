@@ -1,3 +1,5 @@
+import { planRenewal, type PackageSnapshot } from '../attendance';
+import { mentionsSupplementDose } from './safety';
 import type { ActionArgs, ActionToolName } from './tools';
 
 /**
@@ -9,6 +11,14 @@ export interface ClientRef {
   id: string;
   name: string;
   notes: string;
+  /** The client's package (for renewals); null/absent when there is none. */
+  pkg?: (PackageSnapshot & { currency: string }) | null;
+}
+
+export interface PackageState {
+  startDate: string | null;
+  endDate: string | null;
+  remainingSessions: number;
 }
 export interface SessionRef {
   id: string;
@@ -33,6 +43,8 @@ export type ProposedAction =
   | { type: 'add_client'; name: string; phone: string; goal: ActionArgs<'add_client'>['goal']; sessions: number | null }
   | { type: 'book_session'; clientId: string; clientName: string; startsAt: number; durationMin: number }
   | { type: 'move_session'; sessionId: string; clientId: string; clientName: string; from: number; to: number }
+  | { type: 'cancel_session'; sessionId: string; clientId: string; clientName: string; startsAt: number; durationMin: number }
+  | { type: 'renew_package'; clientId: string; clientName: string; before: PackageState; after: PackageState; chargeMinor: number | null; currency: string }
   | { type: 'record_payment'; clientId: string; clientName: string; amountMinor: number; currency: string; method: 'cash' | 'instapay' | 'wallet' | 'bank' | 'other'; status: 'paid' | 'due'; date: string }
   | { type: 'create_task'; title: string; due: string | null; clientId: string | null; clientName: string | null }
   | { type: 'draft_whatsapp'; clientId: string; clientName: string; text: string }
@@ -41,7 +53,7 @@ export type ProposedAction =
   | { type: 'add_recipe'; recipe: ActionArgs<'add_recipe'> }
   | { type: 'update_client_note'; clientId: string; clientName: string; before: string; after: string; mode: 'append' | 'replace' };
 
-export type PlanError = 'unknown_client' | 'ambiguous_client' | 'unknown_session' | 'in_past';
+export type PlanError = 'unknown_client' | 'ambiguous_client' | 'unknown_session' | 'in_past' | 'no_package' | 'supplement_dose';
 
 type Plan = { ok: true; value: ProposedAction } | { ok: false; error: PlanError };
 
@@ -92,6 +104,33 @@ export function planAction<N extends ActionToolName>(name: N, args: ActionArgs<N
       const c = ctx.clients.find((r) => r.id === s.clientId);
       return { ok: true, value: { type: 'move_session', sessionId: s.id, clientId: s.clientId, clientName: c?.name ?? '', from: s.startsAt, to: ctx.toEpoch(x.date, x.time) } };
     }
+    case 'cancel_session': {
+      const x = a as ActionArgs<'cancel_session'>;
+      const s = ctx.sessions.find((r) => r.id === x.sessionId);
+      if (!s) return { ok: false, error: 'unknown_session' };
+      const c = ctx.clients.find((r) => r.id === s.clientId);
+      return { ok: true, value: { type: 'cancel_session', sessionId: s.id, clientId: s.clientId, clientName: c?.name ?? '', startsAt: s.startsAt, durationMin: s.durationMin } };
+    }
+    case 'renew_package': {
+      const x = a as ActionArgs<'renew_package'>;
+      const c = client(x.clientId);
+      if (!c.ok) return c;
+      const pkg = c.value.pkg;
+      if (!pkg || pkg.totalSessions <= 0) return { ok: false, error: 'no_package' };
+      const plan = planRenewal(pkg, ctx.today);
+      return {
+        ok: true,
+        value: {
+          type: 'renew_package',
+          clientId: c.value.id,
+          clientName: c.value.name,
+          before: { startDate: pkg.startDate, endDate: pkg.endDate, remainingSessions: pkg.remainingSessions },
+          after: { startDate: plan.startDate, endDate: plan.endDate, remainingSessions: plan.remainingSessions },
+          chargeMinor: plan.charge?.amountMinor ?? null,
+          currency: pkg.currency,
+        },
+      };
+    }
     case 'record_payment': {
       const x = a as ActionArgs<'record_payment'>;
       const c = client(x.clientId);
@@ -125,6 +164,7 @@ export function planAction<N extends ActionToolName>(name: N, args: ActionArgs<N
     }
     case 'draft_whatsapp': {
       const x = a as ActionArgs<'draft_whatsapp'>;
+      if (mentionsSupplementDose(x.text)) return { ok: false, error: 'supplement_dose' };
       const c = client(x.clientId);
       if (!c.ok) return c;
       return { ok: true, value: { type: 'draft_whatsapp', clientId: c.value.id, clientName: c.value.name, text: x.text } };
@@ -145,6 +185,7 @@ export function planAction<N extends ActionToolName>(name: N, args: ActionArgs<N
       return { ok: true, value: { type: 'add_recipe', recipe: a as ActionArgs<'add_recipe'> } };
     case 'update_client_note': {
       const x = a as ActionArgs<'update_client_note'>;
+      if (mentionsSupplementDose(x.note)) return { ok: false, error: 'supplement_dose' };
       const c = client(x.clientId);
       if (!c.ok) return c;
       const before = c.value.notes;

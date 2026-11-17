@@ -27,6 +27,8 @@ export interface CatalogExercise {
   mechanic: ExerciseMechanic | null;
   images: readonly ExerciseImage[];
   isCustom: boolean;
+  /** Short Arabic coaching cues (2-4 lines); absent when none were written. */
+  cues?: readonly string[];
   /** 1-based rank in the «الأشهر» (most common) set; undefined for the rest. Lower = more common. */
   popularRank?: number;
 }

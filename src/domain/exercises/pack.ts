@@ -132,6 +132,8 @@ export interface PackExercise {
   mechanic: ExerciseMechanic | null;
   /** File names relative to `ExercisePack.image.base`. Empty when no image could be fetched. */
   images: string[];
+  /** Short Arabic coaching cues (2-4), our own words; absent when none were written yet. */
+  cues?: string[];
   /** 1-based rank in the hand-picked «الأشهر» (most common) set; absent for the rest. */
   popular?: number;
   /** True for the app's own built-in additions (data-src/exercise-extras.json), not from the dataset. */
@@ -247,13 +249,14 @@ export interface BuildExercisePackInput {
   imageBytes?: number;
   /** Exercise ids of the «الأشهر» set, most common first. */
   popular?: readonly string[];
+  /** Exercise id → Arabic coaching cues for dataset exercises (data-src/exercise-cues.ar.json). */
+  cues?: ReadonlyMap<string, readonly string[]>;
   extras?: readonly ExtraExercise[];
 }
 
 function extraToPack(extra: ExtraExercise, imagesById: ReadonlyMap<string, readonly string[]>): PackExercise {
-  const { imagesFrom, ...withPopular } = extra;
-  const rest: Omit<ExtraExercise, 'imagesFrom' | 'popular'> & { popular?: boolean } = { ...withPopular };
-  delete rest.popular;
+  const { imagesFrom, popular, ...rest } = extra;
+  void popular; // the rank is computed in buildExercisePack
   const primary = [...new Set(rest.primary)];
   return {
     ...rest,
@@ -281,7 +284,10 @@ export function buildExercisePack(input: BuildExercisePackInput): ExercisePack {
   const exercises = [...fromDataset, ...extras]
     .map((e) => {
       const r = rank.get(e.id);
-      return r === undefined ? e : { ...e, popular: r };
+      const { cues: own, ...plain } = e;
+      const cues = own !== undefined && own.length > 0 ? own : input.cues?.get(e.id);
+      const withCues: PackExercise = cues !== undefined && cues.length > 0 ? { ...plain, cues: [...cues] } : plain;
+      return r === undefined ? withCues : { ...withCues, popular: r };
     })
     .sort((a, b) => (a.id < b.id ? -1 : a.id > b.id ? 1 : 0));
   return {

@@ -147,4 +147,24 @@ describe('buildExercisePack', () => {
     expect(byId.get('pt_B')?.popular).toBeUndefined();
     expect(byId.get('pt_B')).not.toHaveProperty('imagesFrom');
   });
+  it('attaches Arabic cues: extras carry their own, dataset exercises get them by id; empty lists are dropped', () => {
+    const pack = buildExercisePack({
+      sources: [squat],
+      arabicNames: new Map([['Barbell_Full_Squat', 'سكوات بالبار']]),
+      imagesById: new Map(),
+      image: { format: 'webp', maxSize: 480, quality: 60 },
+      source: 'x',
+      cues: new Map([['Barbell_Full_Squat', ['انزل ببطء', 'ضهرك مفرود']]]),
+      extras: [
+        { id: 'pt_C', en: 'Frog Pump', ar: 'فروج بامب', primary: ['glutes'], secondary: [], equipment: 'body_only', level: 'beginner',
+          category: 'strength', force: 'push', mechanic: 'compound', cues: ['اعصر الجلوتس'] },
+        { id: 'pt_D', en: 'Plank Walk', ar: 'بلانك ووك', primary: ['abs'], secondary: [], equipment: 'body_only', level: 'beginner',
+          category: 'strength', force: null, mechanic: null, cues: [] },
+      ],
+    });
+    const byId = new Map(pack.exercises.map((e) => [e.id, e]));
+    expect(byId.get('Barbell_Full_Squat')?.cues).toEqual(['انزل ببطء', 'ضهرك مفرود']);
+    expect(byId.get('pt_C')?.cues).toEqual(['اعصر الجلوتس']);
+    expect(byId.get('pt_D')).not.toHaveProperty('cues');
+  });
 });

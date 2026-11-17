@@ -146,8 +146,8 @@ export const EQUIPMENT_TERMS: Readonly<Record<string, string>> = {
   'straight bar': 'ستريت بار',
   cable: 'كابل',
   cables: 'كابل',
-  kettlebell: 'كيتل بل',
-  kettlebells: 'كيتل بل',
+  kettlebell: 'كيتل بيل',
+  kettlebells: 'كيتل بيل',
   machine: 'ماشين',
   smith: 'سميث',
   'smith machine': 'سميث ماشين',
@@ -1060,20 +1060,24 @@ export function transliterateExerciseName(english: string): TransliterationResul
 
 /**
  * Egyptian gym-floor word order: the movement first, then the tool, the position and the side, and the grip
- * or stance after a dash — "Incline Dumbbell Press" → "برس بالدامبل عالي (إنكلاين)",
+ * or stance after a dash — "Incline Dumbbell Press" → "برس إنكلاين بالدامبل",
  * "Wide-Grip Lat Pulldown" → "لات بول داون - قبضة واسعة". Connectors are plain Egyptian Arabic; the gym
  * terms themselves stay transliterated (transliterateExerciseName). Hand-curated names
  * (data-src/exercise-names.overrides.ar.json) win over this rule.
  */
-type DescriptorSlot = 'tool' | 'position' | 'side' | 'grip';
+type DescriptorSlot = 'angle' | 'tool' | 'position' | 'side' | 'grip';
 
 const W = String.raw`[\s_-]+`;
 const NATURAL_DESCRIPTORS: readonly { slot: DescriptorSlot; pattern: RegExp; arabic: string }[] = [
+  { slot: 'angle', pattern: /\bincline\b/i, arabic: 'إنكلاين' },
+  { slot: 'angle', pattern: /\bdecline\b/i, arabic: 'ديكلاين' },
+  { slot: 'grip', pattern: new RegExp(String.raw`\b(?:with${W})?palms?${W}down\b`, 'i'), arabic: 'كفوف لتحت' },
+  { slot: 'grip', pattern: new RegExp(String.raw`\b(?:with${W})?palms?${W}up\b`, 'i'), arabic: 'كفوف لفوق' },
   { slot: 'tool', pattern: new RegExp(String.raw`\bsmith(?:${W}machine)?\b`, 'i'), arabic: 'على السميث' },
-  { slot: 'tool', pattern: new RegExp(String.raw`\be[\s_-]*z(?:${W}curl)?${W}bar\b`, 'i'), arabic: 'بالبار الزجزاج' },
+  { slot: 'tool', pattern: new RegExp(String.raw`\be[\s_-]*z(?:${W}curl)?${W}bar\b`, 'i'), arabic: 'بالإيزي بار' },
   { slot: 'tool', pattern: /\bbarbells?\b/i, arabic: 'بالبار' },
   { slot: 'tool', pattern: new RegExp(String.raw`\b(?:two${W})?(?:dumbbells?|db)\b`, 'i'), arabic: 'بالدامبل' },
-  { slot: 'tool', pattern: /\bkettlebells?\b/i, arabic: 'بالكيتل بل' },
+  { slot: 'tool', pattern: /\bkettlebells?\b/i, arabic: 'بالكيتل بيل' },
   { slot: 'tool', pattern: new RegExp(String.raw`\blow${W}pulley\b`, 'i'), arabic: 'على الكابل من تحت' },
   { slot: 'tool', pattern: new RegExp(String.raw`\bhigh${W}pulley\b`, 'i'), arabic: 'على الكابل من فوق' },
   { slot: 'tool', pattern: /\b(?:cables?|pulley)\b/i, arabic: 'على الكابل' },
@@ -1091,8 +1095,6 @@ const NATURAL_DESCRIPTORS: readonly { slot: DescriptorSlot; pattern: RegExp; ara
   { slot: 'position', pattern: /\blying\b/i, arabic: 'نايم' },
   { slot: 'position', pattern: new RegExp(String.raw`\bkneeling\b|\bon${W}(?:your${W})?knees\b`, 'i'), arabic: 'على ركبك' },
   { slot: 'position', pattern: new RegExp(String.raw`\bon${W}the${W}floor\b`, 'i'), arabic: 'على الأرض' },
-  { slot: 'position', pattern: /\bincline\b/i, arabic: 'عالي (إنكلاين)' },
-  { slot: 'position', pattern: /\bdecline\b/i, arabic: 'واطي (ديكلاين)' },
   { slot: 'side', pattern: new RegExp(String.raw`\b(?:one|single)${W}arm(?:ed)?\b`, 'i'), arabic: 'بإيد واحدة' },
   { slot: 'side', pattern: new RegExp(String.raw`\b(?:one|single)${W}leg(?:ged)?\b`, 'i'), arabic: 'برجل واحدة' },
   { slot: 'side', pattern: /\balternat(?:e|ing)\b/i, arabic: 'بالتبادل' },
@@ -1112,7 +1114,7 @@ const NATURAL_DESCRIPTORS: readonly { slot: DescriptorSlot; pattern: RegExp; ara
 ];
 
 export function naturalExerciseName(english: string): TransliterationResult {
-  const slots: Record<DescriptorSlot, string[]> = { tool: [], position: [], side: [], grip: [] };
+  const slots: Record<DescriptorSlot, string[]> = { angle: [], tool: [], position: [], side: [], grip: [] };
   let rest = english;
   for (const { slot, pattern, arabic } of NATURAL_DESCRIPTORS) {
     if (!pattern.test(rest)) continue;
@@ -1127,7 +1129,7 @@ export function naturalExerciseName(english: string): TransliterationResult {
     .replace(/\s+-\s+(?=-|$)/g, ' ');
   const movement = transliterateExerciseName(rest);
   if (movement.arabic === '' || !/[A-Za-z]/.test(rest)) return transliterateExerciseName(english);
-  const head = [movement.arabic, ...slots.tool, ...slots.position, ...slots.side].join(' ');
+  const head = [movement.arabic, ...slots.angle, ...slots.tool, ...slots.position, ...slots.side].join(' ');
   const arabic = (slots.grip.length > 0 ? `${head} - ${slots.grip.join('، ')}` : head).replace(/\s+/g, ' ').trim();
   return { arabic, unknownTokens: movement.unknownTokens };
 }

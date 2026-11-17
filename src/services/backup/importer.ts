@@ -7,6 +7,8 @@ import {
   schemaAction,
   tableFilePath,
   verifyArchiveFiles,
+  type BackupManifest,
+  type SchemaAction,
 } from '@/domain/backup';
 import { err, ok, type Result } from '@/domain/nutrition/result';
 import type { AppDatabase } from '@/data/db';
@@ -51,7 +53,34 @@ export async function importArchive(
   }
 }
 
-async function run(db: AppDatabase, zip: Blob, options: ImportArchiveOptions): Promise<Result<ImportSummary, ImportError>> {
+export interface VerifiedArchive {
+  manifest: BackupManifest;
+  schema: SchemaAction;
+  /** Rows per table; `images` rows carry their Blob. */
+  tables: RestoreTables;
+}
+
+/**
+ * Reads a backup zip entry by entry, checks every file against the manifest's SHA-256 and the schema version
+ * policy, and returns the rows (image rows with their Blob). Writes nothing.
+ */
+export async function readVerifiedArchive(
+  db: AppDatabase,
+  zip: Blob,
+  options: Pick<ImportArchiveOptions, 'onProgress' | 'signal' | 'maxEntryBytes'> = {},
+): Promise<Result<VerifiedArchive, ImportError>> {
+  try {
+    return await readVerified(db, zip, options);
+  } catch {
+    return err('malformed');
+  }
+}
+
+async function readVerified(
+  db: AppDatabase,
+  zip: Blob,
+  options: Pick<ImportArchiveOptions, 'onProgress' | 'signal' | 'maxEntryBytes'>,
+): Promise<Result<VerifiedArchive, ImportError>> {
   const actual = new Map<string, { sha256: string; bytes: number }>();
   const parsedTables = new Map<string, unknown>();
   const imageBlobs = new Map<string, Blob>();
@@ -96,7 +125,7 @@ async function run(db: AppDatabase, zip: Blob, options: ImportArchiveOptions): P
   if (!check.ok) return err(check.error);
   if (found.badJson) return err('malformed');
 
-  let tables: RestoreTables = {};
+  const tables: RestoreTables = {};
   for (const [table, count] of Object.entries(manifest.counts)) {
     const rows = parsedTables.get(tableFilePath(table));
     if (!Array.isArray(rows) || rows.length !== count) return err('malformed');
@@ -115,8 +144,19 @@ async function run(db: AppDatabase, zip: Blob, options: ImportArchiveOptions): P
   imageBlobs.clear();
   tables.images = withBlobs;
   options.onProgress?.({ phase: 'verify', done: 1, total: 1 });
+  return ok({ manifest, schema: action.value, tables });
+}
+
+async function run(db: AppDatabase, zip: Blob, options: ImportArchiveOptions): Promise<Result<ImportSummary, ImportError>> {
+  const verified = await readVerified(db, zip, options);
+  if (!verified.ok) return verified;
+  const { manifest } = verified.value;
+  let tables = verified.value.tables;
+  if (manifest.kind === 'photos' && !options.verifyOnly) return err('photo_archive');
   if (options.verifyOnly) {
     return ok({
+      kind: manifest.kind,
+      archiveId: manifest.archiveId ?? null,
       counts: { ...manifest.counts },
       schemaVersion: manifest.schemaVersion,
       migratedFrom: null,
@@ -127,7 +167,7 @@ async function run(db: AppDatabase, zip: Blob, options: ImportArchiveOptions): P
   }
 
   let migratedFrom: number | null = null;
-  if (action.value === 'migrate') {
+  if (verified.value.schema === 'migrate') {
     options.onProgress?.({ phase: 'migrate', done: 0, total: 1 });
     try {
       tables = await migrateRows(tables, manifest.schemaVersion, { migrations: options.migrations, openTemp: options.openTemp });
@@ -151,6 +191,8 @@ async function run(db: AppDatabase, zip: Blob, options: ImportArchiveOptions): P
   const counts: Record<string, number> = {};
   for (const [table, rows] of Object.entries(tables)) counts[table] = rows.length;
   return ok({
+    kind: manifest.kind,
+    archiveId: manifest.archiveId ?? null,
     counts,
     schemaVersion: db.verno,
     migratedFrom,

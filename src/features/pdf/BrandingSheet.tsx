@@ -47,7 +47,12 @@ export function BrandingSheet({ initial, onClose }: { initial: PdfBrandingSettin
           onChange={(x) => set('logoPlacement', x)}
           options={(['start', 'center', 'end'] as const).map((p) => ({ value: p, label: t(`pdf.branding.placements.${p}`) }))}
         />
-        <Slider label={t('pdf.branding.logoSize')} value={v.logoHeightPx} min={24} max={200} step={4} onChange={(x) => set('logoHeightPx', x)} display={String(v.logoHeightPx)} unit="px" />
+        <SegmentedControl
+          label={t('pdf.branding.logoSize')}
+          value={v.logoSize}
+          onChange={(x) => set('logoSize', x)}
+          options={(['small', 'medium', 'large'] as const).map((p) => ({ value: p, label: t(`pdf.branding.logoSizes.${p}`) }))}
+        />
         <Select label={t('pdf.branding.font')} value={v.fontFamily} onChange={(x) => set('fontFamily', x)} options={PDF_FONTS.map((f) => ({ value: f, label: f }))} />
         <PhotoField
           label={t('pdf.branding.background')}

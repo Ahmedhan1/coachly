@@ -23,6 +23,7 @@ export function catalogFromPack(pack: ExercisePack, packUrl: string): CatalogExe
     mechanic: e.mechanic,
     images: e.images.map((file): ExerciseImage => ({ kind: 'pack', path: `${base}${file}` })),
     isCustom: false,
+    ...(e.cues !== undefined && e.cues.length > 0 ? { cues: e.cues } : {}),
     ...(e.popular !== undefined ? { popularRank: e.popular } : {}),
   }));
   return popularFirst(list);

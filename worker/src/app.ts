@@ -1,4 +1,5 @@
 import { handleAdmin, type AdminHooks } from './admin/routes';
+import { AI_RELAY_PATH, handleAiRelay } from './ai/relay';
 import { handleActivate, handleStatus } from './api';
 import { routeBackup } from './backup/routes';
 import { clientIp, corsHeaders, json, withHeaders } from './http';
@@ -47,6 +48,7 @@ export async function handleRequest(request: Request, deps: Deps, hooks: AdminHo
 async function routeApi(request: Request, path: string, deps: Deps, clientKey: string): Promise<Response> {
   if (request.method === 'POST' && path === '/api/activate') return handleActivate(request, deps, clientKey);
   if (request.method === 'GET' && path === '/api/license/status') return handleStatus(request, deps, clientKey);
+  if (request.method === 'POST' && path === AI_RELAY_PATH) return handleAiRelay(request, deps, clientKey);
   const storage = path === '/api/backup' || path.startsWith('/api/backup/') || path === '/api/checkins' || path.startsWith('/api/share/');
   // R2 not bound yet (owner has not enabled R2): those features answer 503 and the app keeps its local copy.
   if (storage && !deps.cloud.bucket) return json({ error: 'storage_unavailable' }, 503);

@@ -2,39 +2,21 @@ import { useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useServices } from '@/app/services';
 import { useUiStore } from '@/app/uiStore';
-import { NutritionStore } from '@/data/nutritionStore';
-import { MEAL_DRAFT_JSON_SCHEMA, mealDraftSchema, mealsFromDraft, parseDraft, PROGRAM_DRAFT_JSON_SCHEMA, programDraftSchema, programFromDraft } from '@/domain/ai';
-import { ageInYears } from '@/domain/meals';
-import { toIsoDate, type Client } from '@/domain/models';
+import type { AiError } from '@/domain/ai';
+import type { Client } from '@/domain/models';
+import { aiClients } from '@/features/assistant/aiClient';
+import { readAiConfig } from '@/features/assistant/aiSettings';
+import { localNow } from '@/features/assistant/assistantData';
+import { draftMealDay, draftProgram } from '@/features/assistant/drafts';
+import { deviceZone } from '@/features/schedule/zone';
 import { t } from '@/i18n';
 import { Button, SegmentedControl, Select, Sheet, TextArea } from '@/ui';
-import { AnthropicAiService } from '@/services/ai/aiService';
-import { readAiKey } from '@/features/online/integrations';
-import { loadBuiltinCatalog } from '@/features/programs/catalog';
-import { newLocalId } from '@/features/programs/ids';
 import styles from './ClientDetail.module.css';
 
-const SYSTEM = `You help an Egyptian personal trainer draft plans. The trainer reviews every draft before using it.
-Write all names in Egyptian Arabic. Gym and muscle terms are transliterated, never translated (Glutes = جلوتس, Bench Press = بنش برس, Deadlift = ديدليفت).
-Never suggest supplements or medication doses. Respect injuries by avoiding exercises that load them.`;
-
-/** Client facts without the name (privacy): goal, sex, age, injuries, measurements. */
-function clientFacts(c: Client, now: Date): string {
-  const m = c.measurements;
-  const age = ageInYears(c.birthDate, toIsoDate(now));
-  return [
-    `goal: ${c.goal}${c.goalNote ? ` (${c.goalNote})` : ''}`,
-    c.gender ? `sex: ${c.gender}` : null,
-    age ? `age: ${age}` : null,
-    m.weightKg ? `weight: ${m.weightKg} kg` : null,
-    m.heightCm ? `height: ${m.heightCm} cm` : null,
-    m.bodyFatPercent ? `body fat: ${m.bodyFatPercent}%` : null,
-    `injuries: ${c.injuries.length ? c.injuries.join('; ') : 'none'}`,
-  ]
-    .filter(Boolean)
-    .join('\n');
-}
-
+/**
+ * Program / meal-day draft for one client over Groq (the trainer's own key). Lazy-loaded by the client
+ * screen. Sends client facts without name or phone; the result is a draft the trainer reviews.
+ */
 export function AiDraftSheet({ client, onClose }: { client: Client; onClose: () => void }) {
   const services = useServices();
   const navigate = useNavigate();
@@ -45,64 +27,34 @@ export function AiDraftSheet({ client, onClose }: { client: Client; onClose: () 
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const abort = useRef<AbortController | null>(null);
-  const ai = useRef(new AnthropicAiService());
+
+  const fail = (code: AiError) => setError(t(`assistant.errors.${code}`));
 
   const run = async () => {
-    const key = await readAiKey(services.meta);
-    if (!key) return setError(t('settings.ai.noKey'));
+    const cfg = await readAiConfig(services.meta);
+    if (!cfg.ok) return fail(cfg.error);
     setBusy(true);
     setError(null);
     abort.current = new AbortController();
+    const deps = { services, ai: aiClients(services.meta).drafts, cfg: { apiKey: cfg.apiKey, model: cfg.settings.model }, signal: abort.current.signal };
+    const today = localNow(deviceZone().clock, new Date()).today;
     try {
       if (kind === 'program') {
-        const catalog = (await loadBuiltinCatalog()) ?? [];
-        const list = catalog.map((e) => `${e.id}|${e.nameEn}|${e.primaryMuscles.join(',')}|${e.equipment}`).join('\n');
-        const r = await ai.current.json(
-          key,
-          {
-            system: SYSTEM,
-            schema: PROGRAM_DRAFT_JSON_SCHEMA,
-            prompt: `Draft a ${days}-day weekly training program.\nClient:\n${clientFacts(client, new Date())}\nTrainer notes: ${notes || '-'}\n\nUse ONLY exerciseId values from this list (id|name|muscles|equipment):\n${list}`,
-          },
-          abort.current.signal,
-        );
-        if (!r.ok) return setError(t(`settings.ai.errors.${r.error}`));
-        const draft = parseDraft(programDraftSchema, r.value);
-        if (!draft) return setError(t('settings.ai.errors.bad_output'));
-        const { body, dropped } = programFromDraft(draft, { knownIds: new Set(catalog.map((e) => e.id)), clientId: client.id, newId: newLocalId });
-        const created = await services.data.repos.programs.create(body);
-        showToast({ message: dropped ? `${t('settings.ai.doneProgram')} ${t('settings.ai.dropped', { n: dropped })}` : t('settings.ai.doneProgram'), duration: 5000 });
+        const r = await draftProgram(deps, client, Number(days), notes, today);
+        if (!r.ok) return fail(r.error);
+        const message = r.value.dropped ? `${t('settings.ai.doneProgram')} ${t('settings.ai.dropped', { n: r.value.dropped })}` : t('settings.ai.doneProgram');
+        showToast({ message, duration: 5000 });
         onClose();
-        navigate(`/programs/${created.id}?from=client`);
+        navigate(`/programs/${r.value.programId}?from=client`);
       } else {
-        const store = new NutritionStore(services.meta, services.data.repos);
-        const calc = await store.getCalculation(client.id);
-        const recipes = await services.data.repos.recipes.list();
-        const target = calc ? `target: ${Math.round(calc.targetKcal)} kcal, protein ${Math.round(calc.proteinG)} g, carbs ${Math.round(calc.carbG)} g, fat ${Math.round(calc.fatG)} g` : 'no calorie target saved';
-        const r = await ai.current.json(
-          key,
-          {
-            system: SYSTEM,
-            schema: MEAL_DRAFT_JSON_SCHEMA,
-            prompt: `Draft one day of Egyptian meals (time as HH:MM, items with rough grams).\nClient:\n${clientFacts(client, new Date())}\n${target}\nTrainer notes: ${notes || '-'}\nTrainer's recipes you may use by name: ${recipes.map((x) => x.name).join('، ') || '-'}`,
-          },
-          abort.current.signal,
-        );
-        if (!r.ok) return setError(t(`settings.ai.errors.${r.error}`));
-        const draft = parseDraft(mealDraftSchema, r.value);
-        if (!draft) return setError(t('settings.ai.errors.bad_output'));
-        const existing = await services.data.repos.mealPlans.listByClient(client.id);
-        await services.data.repos.mealPlans.create({
-          clientId: client.id,
-          name: t('nutrition.plan.dayName', { n: existing.length + 1 }),
-          targetKcal: calc ? Math.round(calc.targetKcal) : null,
-          meals: mealsFromDraft(draft, () => crypto.randomUUID()),
-          notes: draft.notes,
-        });
+        const r = await draftMealDay(deps, client, notes, today);
+        if (!r.ok) return fail(r.error);
         showToast({ message: t('settings.ai.doneMeals'), duration: 5000 });
         onClose();
         navigate(`/clients/${client.id}/meals`);
       }
+    } catch {
+      fail('failed');
     } finally {
       setBusy(false);
     }

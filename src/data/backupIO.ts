@@ -1,7 +1,19 @@
 import Dexie, { type Table } from 'dexie';
 import { AppDatabase, type ImageRecord, type MetaRecord } from './db';
 import { MIGRATIONS, TABLES, type Migration } from './schema';
-import { categoryForSource, collectImageRefs, ORPHAN_GRACE_MS, type StorageCategory, type StoredImageInfo } from '@/domain/backup';
+import {
+  addArchiveEntry,
+  ARCHIVE_REGISTRY_KEY,
+  archivedImageIds,
+  categoryForSource,
+  collectImageRefs,
+  markRestored,
+  ORPHAN_GRACE_MS,
+  parseArchiveRegistry,
+  type PhotoArchiveEntry,
+  type StorageCategory,
+  type StoredImageInfo,
+} from '@/domain/backup';
 
 /**
  * Whole-database read/write used by backup export and restore. Kept in the data layer so services never
@@ -245,4 +257,74 @@ export async function replaceImageBlob(db: AppDatabase, id: string, image: { blo
 /** Reads one image Blob (for re-compression). */
 export async function readImageBlob(db: AppDatabase, id: string): Promise<Blob | undefined> {
   return (await db.images.get(id))?.blob;
+}
+
+/* ---------- «أرشفة الصور القديمة»: placeholders + registry ---------- */
+
+export async function readArchiveRegistry(db: AppDatabase): Promise<PhotoArchiveEntry[]> {
+  return parseArchiveRegistry((await db.meta.get(ARCHIVE_REGISTRY_KEY))?.value);
+}
+
+export interface PlaceholderSwap {
+  id: string;
+  /** The archived original's size and type; the swap is skipped if the stored photo changed since. */
+  expectBytes: number;
+  expectMime: string;
+  placeholder: { blob: Blob; width: number; height: number };
+}
+
+/**
+ * Swaps archived photos for their placeholders and records the archive, in ONE transaction: either every
+ * swap and the registry entry land, or nothing changes. A photo that changed after the archive file was made
+ * (re-compressed, replaced) keeps its current bytes and is left out of the entry. Returns the swapped ids.
+ */
+export async function commitPhotoArchive(
+  db: AppDatabase,
+  entry: Omit<PhotoArchiveEntry, 'imageIds' | 'count' | 'bytes'>,
+  swaps: readonly PlaceholderSwap[],
+): Promise<{ ids: string[]; freedBytes: number }> {
+  return db.transaction('rw', db.images, db.meta, async () => {
+    const ids: string[] = [];
+    let archivedBytes = 0;
+    let freedBytes = 0;
+    for (const s of swaps) {
+      const current = await db.images.get(s.id);
+      if (!current || current.bytes !== s.expectBytes || current.blob.size !== s.expectBytes || current.mime !== s.expectMime) continue;
+      const blob = s.placeholder.blob;
+      await db.images.put({ ...current, blob, mime: blob.type as ImageRecord['mime'], width: s.placeholder.width, height: s.placeholder.height, bytes: blob.size });
+      ids.push(s.id);
+      archivedBytes += current.bytes;
+      freedBytes += current.bytes - blob.size;
+    }
+    if (ids.length > 0) {
+      const registry = parseArchiveRegistry((await db.meta.get(ARCHIVE_REGISTRY_KEY))?.value);
+      const next = addArchiveEntry(registry, { ...entry, imageIds: ids, count: ids.length, bytes: archivedBytes });
+      await db.meta.put({ key: ARCHIVE_REGISTRY_KEY, value: next });
+    }
+    return { ids, freedBytes };
+  });
+}
+
+/**
+ * Puts full photos from an archive file back (same ids). Only photos this app still has as a placeholder or
+ * still lists in the registry are restored, so an archive never brings back photos the trainer deleted since.
+ */
+export async function restoreArchivedImages(db: AppDatabase, rows: readonly ImageRecord[], now: number): Promise<{ restored: number; skipped: number }> {
+  return db.transaction('rw', db.images, db.meta, async () => {
+    const registry = parseArchiveRegistry((await db.meta.get(ARCHIVE_REGISTRY_KEY))?.value);
+    const listed = archivedImageIds(registry);
+    const restoredIds: string[] = [];
+    let skipped = 0;
+    for (const row of rows) {
+      const current = await db.images.get(row.id);
+      if (!current && !listed.has(row.id)) {
+        skipped += 1;
+        continue;
+      }
+      await db.images.put({ ...row, bytes: row.blob.size });
+      restoredIds.push(row.id);
+    }
+    if (restoredIds.length > 0) await db.meta.put({ key: ARCHIVE_REGISTRY_KEY, value: markRestored(registry, restoredIds, now) });
+    return { restored: restoredIds.length, skipped };
+  });
 }

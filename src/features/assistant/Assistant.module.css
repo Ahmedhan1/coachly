@@ -1,0 +1,242 @@
+/* المساعد: chat bubbles, confirmation cards, composer pinned above the tab bar (thumb zone). */
+
+.screen {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-3);
+  padding: 0 var(--gutter) calc(var(--sp-8) * 3);
+}
+
+.card {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-3);
+  padding: var(--sp-4);
+  border-radius: var(--r-lg);
+  background: var(--surface);
+}
+
+.cardTitle {
+  font: var(--t-headline);
+}
+
+.body {
+  color: var(--text-2);
+  font: var(--t-sub);
+}
+
+.banner {
+  padding: var(--sp-3) var(--sp-4);
+  border-radius: var(--r-md);
+  background: var(--warn-tint);
+  color: var(--warn);
+  font: var(--t-callout);
+}
+
+.error {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-2);
+  padding: var(--sp-3) var(--sp-4);
+  border-radius: var(--r-md);
+  background: var(--danger-tint);
+  color: var(--danger);
+  font: var(--t-callout);
+}
+
+.chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--sp-2);
+}
+
+.chip {
+  min-height: var(--tap);
+  padding: var(--sp-2) var(--sp-3);
+  border: 1px solid var(--line);
+  border-radius: var(--r-full);
+  background: var(--surface);
+  color: var(--text);
+  font: var(--t-callout);
+}
+
+.bubble {
+  max-inline-size: 88%;
+  padding: var(--sp-3) var(--sp-4);
+  border-radius: var(--r-lg);
+  font: var(--t-body);
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+
+.user {
+  align-self: flex-start;
+  background: var(--brand);
+  color: var(--brand-on);
+}
+
+.bot {
+  align-self: flex-end;
+  background: var(--surface);
+  color: var(--text);
+}
+
+.thinking {
+  align-self: flex-end;
+  color: var(--text-3);
+  font: var(--t-callout);
+}
+
+.proposal {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-2);
+  padding: var(--sp-4);
+  border: 1px solid var(--brand-tint-strong);
+  border-radius: var(--r-lg);
+  background: var(--surface);
+}
+
+.rows {
+  display: grid;
+  grid-template-columns: max-content 1fr;
+  gap: var(--sp-1) var(--sp-3);
+  margin: 0;
+  font: var(--t-callout);
+}
+
+.rows dt {
+  color: var(--text-3);
+}
+
+.rows dd {
+  margin: 0;
+  overflow-wrap: anywhere;
+}
+
+.long {
+  grid-column: 1 / -1;
+  padding: var(--sp-2) var(--sp-3);
+  border-radius: var(--r-md);
+  background: var(--surface-2);
+  white-space: pre-wrap;
+}
+
+.before {
+  color: var(--text-3);
+  text-decoration: line-through;
+}
+
+.after {
+  color: var(--text);
+  font-weight: 600;
+}
+
+.note {
+  color: var(--text-3);
+  font: var(--t-caption);
+}
+
+.status {
+  color: var(--ok);
+  font: var(--t-callout);
+}
+
+.failed {
+  color: var(--danger);
+  font: var(--t-callout);
+}
+
+.actions {
+  display: flex;
+  gap: var(--sp-2);
+}
+
+.actions > * {
+  flex: 1;
+}
+
+.linkButton {
+  display: inline-flex;
+  flex: 1;
+  align-items: center;
+  justify-content: center;
+  min-height: var(--tap);
+  padding: 0 var(--sp-4);
+  border-radius: var(--r-md);
+  background: var(--brand);
+  color: var(--brand-on);
+  font: var(--t-label);
+  text-decoration: none;
+}
+
+.composer {
+  position: fixed;
+  inset-inline: 0;
+  inset-block-end: calc(var(--tabbar-h) + var(--safe-bottom));
+  display: flex;
+  align-items: flex-end;
+  gap: var(--sp-2);
+  max-inline-size: var(--content-max);
+  margin-inline: auto;
+  padding: var(--sp-2) var(--gutter);
+  background: var(--bg);
+  border-block-start: 1px solid var(--line);
+}
+
+.input {
+  flex: 1;
+  min-block-size: var(--tap);
+  max-block-size: 30vh;
+  padding: var(--sp-2) var(--sp-3);
+  border: 1px solid var(--field-border);
+  border-radius: var(--r-md);
+  background: var(--surface);
+  color: var(--text);
+  font: var(--t-body);
+  resize: none;
+}
+
+.visuallyHidden {
+  position: absolute;
+  inline-size: 1px;
+  block-size: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+.taskList {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-2);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.task {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-2);
+  min-height: var(--tap);
+}
+
+.task label {
+  display: flex;
+  flex: 1;
+  align-items: center;
+  gap: var(--sp-2);
+}
+
+.taskDone {
+  color: var(--text-3);
+  text-decoration: line-through;
+}
+
+.sheetBody {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-3);
+  padding: var(--sp-4) var(--gutter);
+}

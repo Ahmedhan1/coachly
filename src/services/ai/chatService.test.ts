@@ -2,12 +2,12 @@ import { describe, expect, it } from 'vitest';
 import { GroqAiService } from './aiService';
 import { FakeChatService, GROQ_URL, GroqChatService } from './chatService';
 
-type Call = { url: string; body: Record<string, unknown>; auth: string };
+type Call = { url: string; body: Record<string, unknown>; auth: string; groqKey: string | null };
 
 function fakeFetch(responses: Array<{ status: number; body: unknown; headers?: Record<string, string> } | 'network'>, calls: Call[]): typeof fetch {
   return (async (url: RequestInfo | URL, init?: RequestInit) => {
     const headers = new Headers(init?.headers);
-    calls.push({ url: String(url), body: JSON.parse(String(init?.body)) as Record<string, unknown>, auth: headers.get('Authorization') ?? '' });
+    calls.push({ url: String(url), body: JSON.parse(String(init?.body)) as Record<string, unknown>, auth: headers.get('Authorization') ?? '', groqKey: headers.get('X-Groq-Key') });
     const r = responses.shift();
     if (!r || r === 'network') throw new TypeError('Failed to fetch');
     return new Response(JSON.stringify(r.body), { status: r.status, headers: r.headers });
@@ -47,6 +47,56 @@ describe('GroqChatService', () => {
   it('reports bad output for an unreadable body', async () => {
     const calls: Call[] = [];
     expect(await new GroqChatService(fakeFetch([{ status: 200, body: { choices: [] } }], calls)).complete(req)).toEqual({ ok: false, error: 'bad_output' });
+  });
+});
+
+describe('GroqChatService relay fallback', () => {
+  const relay = (token: string | null = 'lic.tok') => ({ baseUrl: 'https://worker.example/', getToken: async () => token });
+
+  it('retries a CORS/network failure through the Worker relay and then keeps using it', async () => {
+    const calls: Call[] = [];
+    const svc = new GroqChatService(fakeFetch(['network', { status: 200, body: okBody('أهلاً') }, { status: 200, body: okBody('تاني') }], calls), { relay: relay() });
+    expect(await svc.complete(req)).toMatchObject({ ok: true, value: { content: 'أهلاً' } });
+    expect(calls[1]).toMatchObject({ url: 'https://worker.example/api/ai/relay', auth: 'Bearer lic.tok', groqKey: 'gsk_test' });
+    await svc.complete(req);
+    expect(calls[2]?.url).toBe('https://worker.example/api/ai/relay');
+  });
+
+  it('does not relay HTTP errors or timeouts, and needs an activated license', async () => {
+    const calls: Call[] = [];
+    const svc = new GroqChatService(fakeFetch([{ status: 401, body: { error: { message: 'Invalid API Key' } } }], calls), { relay: relay() });
+    expect(await svc.complete(req)).toEqual({ ok: false, error: 'auth' });
+    expect(calls).toHaveLength(1);
+    const noLicense = new GroqChatService(fakeFetch(['network'], calls), { relay: relay(null) });
+    expect(await noLicense.complete(req)).toEqual({ ok: false, error: 'offline' });
+    const slow = new GroqChatService(
+      ((_u: RequestInfo | URL, init?: RequestInit) => new Promise<Response>((_r, reject) => init?.signal?.addEventListener('abort', () => reject(new DOMException('aborted', 'AbortError'))))) as typeof fetch,
+      { relay: relay(), timeoutMs: 5 },
+    );
+    expect(await slow.complete(req)).toEqual({ ok: false, error: 'timeout' });
+  });
+
+  it('maps the relay own refusals and Groq 429 passed through it', async () => {
+    const calls: Call[] = [];
+    const own = new GroqChatService(fakeFetch(['network', { status: 429, body: { error: 'rate_limited' }, headers: { 'retry-after': '30' } }], calls), { relay: relay() });
+    expect(await own.complete(req)).toEqual({ ok: false, error: 'rate_limited', retryAfterSec: 30 });
+    const upstream = new GroqChatService(fakeFetch(['network', { status: 502, body: { error: 'upstream' } }], calls), { relay: relay() });
+    expect(await upstream.complete(req)).toEqual({ ok: false, error: 'offline' });
+    const groq429 = new GroqChatService(fakeFetch(['network', { status: 429, body: { error: { message: 'Please try again in 7.2s' } } }], calls), { relay: relay() });
+    expect(await groq429.complete(req)).toEqual({ ok: false, error: 'rate_limited', retryAfterSec: 8 });
+  });
+
+  it('is silently offline when the browser says so (no request)', async () => {
+    const calls: Call[] = [];
+    expect(await new GroqChatService(fakeFetch([], calls), { isOnline: () => false }).complete(req)).toEqual({ ok: false, error: 'offline' });
+    expect(calls).toHaveLength(0);
+  });
+
+  it('pings with one token and reports a missing model', async () => {
+    const calls: Call[] = [];
+    expect(await new GroqChatService(fakeFetch([{ status: 200, body: { choices: [] } }], calls)).ping('gsk_x', 'm1')).toEqual({ ok: true, value: 'm1' });
+    expect(calls[0]?.body).toMatchObject({ model: 'm1', max_tokens: 1 });
+    expect(await new GroqChatService(fakeFetch([{ status: 404, body: { error: { code: 'model_not_found' } } }], calls)).ping('gsk_x', 'gone')).toEqual({ ok: false, error: 'model_unavailable' });
   });
 });
 

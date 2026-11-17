@@ -7,3 +7,5 @@ export * from './filter';
 export * from './favourites';
 export * from './muscleLoad';
 export * from './alternatives';
+export * from './illustration';
+export * from './usage';

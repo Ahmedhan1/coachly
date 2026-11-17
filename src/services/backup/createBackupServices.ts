@@ -5,7 +5,10 @@ import type { CloudSizeEstimate } from '@/domain/backup';
 import { BrowserNetworkStatus } from '@/services/cloud/networkStatus';
 import { HttpCloudBackupClient } from '@/services/cloud/httpCloudBackupClient';
 import type { CloudBackupClient, NetworkStatus, TokenProvider } from '@/services/cloud/types';
-import type { ImageDownscaler } from '@/services/storage/types';
+import type { ImageDownscaler, StorageService } from '@/services/storage/types';
+import { BrowserStorageService } from '@/services/storage/browserStorageService';
+import { StorageCleanupService } from '@/services/storage/storageReport';
+import { PhotoArchiveService } from './photoArchive';
 import { watchDataChanges } from './changeHooks';
 import { CloudRestoreService } from './cloudRestore';
 import { exportArchive } from './exporter';
@@ -27,6 +30,8 @@ export interface BackupServicesOptions {
   timers?: Timers;
   now?: () => number;
   schedulerConfig?: Partial<BackupSchedulerConfig>;
+  /** navigator.storage wrapper for the storage screen (default: the browser's). */
+  storage?: StorageService;
 }
 
 export interface BackupServices {
@@ -34,6 +39,10 @@ export interface BackupServices {
   scheduler: BackupScheduler;
   cloud: CloudRestoreService;
   meta: BackupMetaStore;
+  /** «أرشفة الصور القديمة»: old photos → device file → placeholders; restore brings them back. */
+  archive: PhotoArchiveService;
+  /** Settings → التخزين: usage report, persistence, unused-photo cleanup, shrinking big photos. */
+  storage: StorageCleanupService;
   /** Starts the scheduler and the change hooks. Returns a stop function. */
   start(): () => void;
 }
@@ -66,12 +75,22 @@ export function createBackupServices(o: BackupServicesOptions): BackupServices {
     now,
     config: o.schedulerConfig,
   });
+  const archive = new PhotoArchiveService({
+    db: o.db,
+    downscaler: o.downscaler,
+    appVersion: o.appVersion,
+    now: () => new Date(now()),
+    openFile: (file, opts) => local.openFile(file, opts),
+  });
+  const storage = new StorageCleanupService({ db: o.db, storage: o.storage ?? new BrowserStorageService(), images: o.downscaler, now: () => new Date(now()) });
   const cloud = new CloudRestoreService({ client, tokens: o.tokens, importZip: (zip, opts) => importArchive(o.db, zip, opts) });
   return {
     local,
     scheduler,
     cloud,
     meta,
+    archive,
+    storage,
     start: () => {
       void scheduler.start();
       const unwatch = watchDataChanges(o.db, () => scheduler.notifyChange());

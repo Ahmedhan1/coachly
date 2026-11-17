@@ -41,8 +41,10 @@ export const ingredientEntrySchema = z.object({
   }),
   category: foodCategorySchema.optional(),
   portions: z.array(portionSchema).max(8).optional(),
-  /** Trainer's own photo (images table id); falls back to the category illustration. */
+  /** Trainer's own photo (images table id); falls back to the illustration below. */
   imageId: z.string().min(1).max(64).nullable().optional(),
+  /** Twemoji file name (hex code point, no extension) of the illustration shipped in public/food. */
+  icon: z.string().regex(/^[0-9a-f]{4,6}(-[0-9a-f]{4,6})*$/).optional(),
 });
 export type IngredientEntry = z.infer<typeof ingredientEntrySchema>;
 

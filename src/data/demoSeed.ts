@@ -1,7 +1,8 @@
 import { addDays, toIsoDate, type Client, type ClientId, type IsoDate } from '@/domain/models';
 import type { AppDatabase } from './db';
 import { CASCADE_TABLES } from './clientCascade';
-import { ENTITY_TABLES } from './schema';
+import { ENTITY_TABLES, TABLES } from './schema';
+import { NUTRITION_KEYS } from './nutritionStore';
 import type { Repositories } from './repositories';
 
 const DEMO_META_KEY = 'demoSeededAt';
@@ -51,13 +52,28 @@ const TODAY_SESSIONS: ReadonlyArray<readonly [number, number, number]> = [
 ];
 
 /**
+ * Ids of the base seeds (starter recipes and supplements). They are the app's essentials, not demo content:
+ * "delete demo data" must never touch them, whatever flag they carry. The food table and the settings live in
+ * `meta`, which this action never deletes from either.
+ */
+async function baseSeedIds(db: AppDatabase): Promise<Set<string>> {
+  const ids = new Set<string>();
+  for (const key of [NUTRITION_KEYS.starterRecipes, NUTRITION_KEYS.starterSupplements]) {
+    const value = (await db.meta.get(key))?.value;
+    if (Array.isArray(value)) for (const id of value) if (typeof id === 'string') ids.add(id);
+  }
+  return ids;
+}
+
+/**
  * The seed writes DEMO_META_KEY and removeDemoData deletes it (the key also travels inside backups), so once the
  * demo is gone this reads one meta row instead of scanning years of sessions on every Home render.
  */
 export async function hasDemoData(db: AppDatabase): Promise<boolean> {
   if ((await db.meta.get(DEMO_META_KEY)) === undefined) return false;
+  const base = await baseSeedIds(db);
   for (const name of ENTITY_TABLES) {
-    if ((await db.table<{ demo: boolean }>(name).filter((r) => r.demo).first()) !== undefined) return true;
+    if ((await db.table<{ id: string; demo: boolean }>(name).filter((r) => r.demo && !base.has(r.id)).first()) !== undefined) return true;
   }
   return false;
 }
@@ -112,14 +128,19 @@ export async function removeDemoData(db: AppDatabase): Promise<number> {
   return db.transaction('rw', db.tables, async () => {
     let removed = 0;
     const removedIds: string[] = [];
+    const base = await baseSeedIds(db);
+    // A base seed wrongly carrying the demo flag is healed, so it is never counted as demo content again.
+    for (const name of [TABLES.recipes, TABLES.supplements]) {
+      for (const id of base) await db.table<{ demo: boolean }, string>(name).update(id, { demo: false });
+    }
     const demoClientIds = (await db.clients.filter((c) => c.demo).primaryKeys()) as string[];
     for (const name of ENTITY_TABLES) {
       const table = db.table<{ id: string; demo: boolean }, string>(name);
-      const ids = new Set((await table.filter((r) => r.demo).primaryKeys()) as string[]);
+      const ids = new Set((await table.filter((r) => r.demo && !base.has(r.id)).primaryKeys()) as string[]);
       // Rows the trainer added to a demo client go with it, so nothing points at a removed client.
       if (demoClientIds.length > 0 && (CASCADE_TABLES as readonly string[]).includes(name)) {
         const owned = (await table.where('clientId').anyOf(demoClientIds).primaryKeys()) as string[];
-        for (const id of owned) ids.add(id);
+        for (const id of owned) if (!base.has(id)) ids.add(id);
       }
       await table.bulkDelete([...ids]);
       removedIds.push(...ids);

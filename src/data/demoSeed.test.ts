@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { ensureFirstRun, hasDemoData, removeDemoData } from './demoSeed';
+import { NutritionStore } from './nutritionStore';
 import { createTestData } from './testing';
 
 const now = new Date(2026, 10, 16, 9, 0);
@@ -50,5 +51,54 @@ describe('demo seed', () => {
     expect(await db.payments.where('clientId').equals(demoClient.id).count()).toBe(0);
     expect(await db.sessions.where('clientId').equals(demoClient.id).count()).toBe(0);
     expect(await db.progress.where('clientId').equals(demoClient.id).count()).toBe(0);
+  });
+
+  describe('base seeds survive "delete demo data"', () => {
+    const kvOf = (db: ReturnType<typeof createTestData>['db']) => ({
+      get: async (key: string) => (await db.meta.get(key))?.value,
+      set: async (key: string, value: unknown) => {
+        await db.meta.put({ key, value });
+      },
+    });
+
+    it('keeps the food table, starter recipes and supplements, and removes only demo clients and their rows', async () => {
+      const { repos, db } = createTestData();
+      const store = new NutritionStore(kvOf(db), repos);
+      await store.ensureStarter();
+      await ensureFirstRun(repos, db, now);
+      const before = { recipes: (await repos.recipes.list()).length, supplements: (await repos.supplements.list()).length, foods: (await store.getIngredients()).length };
+      expect(before.recipes).toBeGreaterThanOrEqual(90);
+      expect(before.foods).toBeGreaterThanOrEqual(250);
+      await removeDemoData(db);
+      expect((await repos.recipes.list()).length).toBe(before.recipes);
+      expect((await repos.supplements.list()).length).toBe(before.supplements);
+      expect((await store.getIngredients()).length).toBe(before.foods);
+      expect((await store.getStarterRecipeIds()).length).toBe(before.recipes);
+      expect(await repos.clients.list()).toEqual([]);
+    });
+
+    it('even a base seed that was wrongly flagged as demo is kept, healed and not counted as demo', async () => {
+      const { repos, db } = createTestData();
+      const store = new NutritionStore(kvOf(db), repos);
+      await store.ensureStarter();
+      await ensureFirstRun(repos, db, now);
+      const [firstRecipe] = await store.getStarterRecipeIds();
+      const [firstSupplement] = await store.getStarterSupplementIds();
+      await db.recipes.update(firstRecipe ?? '', { demo: true });
+      await db.supplements.update(firstSupplement ?? '', { demo: true });
+      await removeDemoData(db);
+      expect(await repos.recipes.get(firstRecipe ?? '')).toBeDefined();
+      expect(await repos.supplements.get(firstSupplement ?? '')).toBeDefined();
+      expect((await db.recipes.get(firstRecipe ?? ''))?.demo).toBe(false);
+      expect(await hasDemoData(db)).toBe(false);
+    });
+
+    it('trainer-made recipes flagged as demo by older versions are still demo rows (unchanged behaviour)', async () => {
+      const { repos, db } = createTestData();
+      await ensureFirstRun(repos, db, now);
+      const mine = await repos.recipes.create({ name: 'عينة', servings: 1, ingredients: [], instructions: '', imageId: null, tags: [], demo: true });
+      await removeDemoData(db);
+      expect(await repos.recipes.get(mine.id)).toBeUndefined();
+    });
   });
 });

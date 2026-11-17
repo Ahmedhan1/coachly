@@ -1,8 +1,8 @@
 import { toCanvas } from 'html-to-image';
 import { jsPDF } from 'jspdf';
 import {
-  BLOCK_GAP_PX,
   buildContentBlocks,
+  exerciseHead,
   layoutPdfDocument,
   PAGE_HEIGHT_PX,
   PAGE_WIDTH_PX,
@@ -133,13 +133,21 @@ export class HtmlPdfRenderer implements PdfRenderer {
       measure.lang = 'ar';
       measure.style.fontFamily = fontStack(input.branding.fontFamily);
       const ctx = { logoUrl: urlOf(input.branding.logo), trainerName: input.branding.trainerName };
-      measure.innerHTML = blocks.map((b) => blockHtml(b, urlOf, input.branding.primaryColor, ctx)).join('');
+      // One extra "continued" table header at the end, to measure the repeated header too.
+      const probe = exerciseHead(input, input.sections.includes('muscle_map'), input.labels.program.continued);
+      measure.innerHTML = [...blocks, probe].map((b) => blockHtml(b, urlOf, input.branding.primaryColor, ctx)).join('');
       host.appendChild(measure);
       await imagesReady(measure);
-      // Each block carries margin-block-end = BLOCK_GAP_PX; measure the border box and add the gap.
-      const heights = [...measure.children].map((el) => Math.ceil((el as HTMLElement).getBoundingClientRect().height) + BLOCK_GAP_PX);
+      // Outer height = border box + its margins (table rows have none, other blocks the block gap).
+      const outer = (el: Element) => {
+        const cs = getComputedStyle(el);
+        return Math.ceil(el.getBoundingClientRect().height + parseFloat(cs.marginBlockStart || '0') + parseFloat(cs.marginBlockEnd || '0'));
+      };
+      const all = [...measure.children].map(outer);
+      const headHeightPx = all.pop();
+      const heights = all;
       measure.remove();
-      const doc = layoutPdfDocument(input, { heights });
+      const doc = layoutPdfDocument(input, { heights, headHeightPx });
       progress?.({ phase: 'layout', done: 1, total: 1 });
       if (doc.pages.length === 0) return err('no_pages');
 

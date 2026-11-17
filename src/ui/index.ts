@@ -20,3 +20,5 @@ export { Money } from './Num/Money';
 export { PackageRing } from './PackageRing/PackageRing';
 export { cx } from './cx';
 export { useIncrementalList } from './List/useIncrementalList';
+export { fromOf, hereOf, useFromHere, type FromState } from './nav/fromState';
+export { LineChart } from './LineChart/LineChart';

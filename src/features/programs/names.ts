@@ -20,3 +20,11 @@ export function exerciseSubline(exercise: CatalogExercise | undefined): string {
   const parts = [muscle ? muscleGroupLabelAr(muscle) : null, exercise.equipment !== 'other' ? EQUIPMENT_LABELS_AR[exercise.equipment] : null];
   return parts.filter(Boolean).join(' · ');
 }
+
+/** A program day's label: its name, or "اليوم n" by position. Empty string when the day is gone. */
+export function programDayName(days: readonly { id: string; name: string }[], dayId: string | null | undefined): string {
+  const index = days.findIndex((d) => d.id === dayId);
+  const day = days[index];
+  if (!day) return '';
+  return day.name || t('training.programs.builder.dayDefault', { n: index + 1 });
+}

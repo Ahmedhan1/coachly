@@ -69,7 +69,7 @@ export function buildPdfInput(src: PdfSources): PdfDocumentInput {
       trainerName: src.settings.name,
       logo: stored(src.settings.logoImageId),
       logoPlacement: b.logoPlacement,
-      logoHeightPx: b.logoHeightPx,
+      logoSize: b.logoSize,
       primaryColor: src.settings.primaryColor,
       secondaryColor: src.settings.secondaryColor,
       fontFamily: b.fontFamily,

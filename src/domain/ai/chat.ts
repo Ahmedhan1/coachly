@@ -5,7 +5,10 @@ import { z } from 'zod';
  * Pure: no fetch here. The HTTP client in src/services/ai uses these to build requests and read replies.
  */
 
-export type AiError = 'no_key' | 'disabled' | 'auth' | 'rate_limited' | 'offline' | 'refused' | 'bad_output' | 'model_unavailable' | 'failed';
+export type AiError = 'no_key' | 'disabled' | 'auth' | 'rate_limited' | 'offline' | 'timeout' | 'refused' | 'bad_output' | 'model_unavailable' | 'failed';
+
+/** Groq's OpenAI-compatible endpoint (https://console.groq.com/docs/openai). */
+export const GROQ_CHAT_URL = 'https://api.groq.com/openai/v1/chat/completions';
 
 export interface ToolCall {
   id: string;
@@ -30,7 +33,11 @@ export interface ChatReply {
   model: string;
 }
 
-/** Free Groq models that support tool calling. The first is the default; the rest are fallbacks. */
+/**
+ * Free Groq models that support tool calling. The first is the default; the rest are fallbacks.
+ * Names as of 2026-11 — check console.groq.com/docs/models (and /docs/tool-use) before a release:
+ * Groq retires models; a retired one answers 404/model_decommissioned and the chain moves on.
+ */
 export const DEFAULT_MODEL = 'llama-3.3-70b-versatile';
 export const FALLBACK_MODELS: readonly string[] = ['openai/gpt-oss-120b', 'llama-3.1-8b-instant'];
 export const KNOWN_MODELS: readonly string[] = [DEFAULT_MODEL, ...FALLBACK_MODELS];
@@ -99,11 +106,21 @@ function errorMessage(body: unknown): string {
   return typeof m === 'string' ? m : '';
 }
 
-/** Seconds to wait after a 429, from the retry-after header; clamped to 1..120, default 20. */
-export function retryAfterSeconds(header: string | null): number {
-  const n = header ? Number.parseFloat(header) : Number.NaN;
+/**
+ * Seconds to wait after a 429: the retry-after header, else Groq's "Please try again in 1m2.5s" message;
+ * clamped to 1..120, default 20.
+ */
+export function retryAfterSeconds(header: string | null, body?: unknown): number {
+  let n = header ? Number.parseFloat(header) : Number.NaN;
+  if (!Number.isFinite(n) || n <= 0) n = fromMessage(errorMessage(body));
   if (!Number.isFinite(n) || n <= 0) return 20;
   return Math.min(120, Math.max(1, Math.ceil(n)));
+}
+
+function fromMessage(message: string): number {
+  const m = /try again in\s+(?:(\d+)m)?\s*(?:(\d+(?:\.\d+)?)s)?/i.exec(message);
+  if (!m || (m[1] === undefined && m[2] === undefined)) return Number.NaN;
+  return Number(m[1] ?? 0) * 60 + Number.parseFloat(m[2] ?? '0');
 }
 
 /** Keeps the last `max` messages without starting on an orphan tool result or tool-call reply. */

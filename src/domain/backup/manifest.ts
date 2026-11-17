@@ -8,7 +8,19 @@ import { err, ok, type Result } from '../nutrition/result';
  *   images/<id>.<ext>        one image Blob, stored without re-compression
  */
 export const BACKUP_FORMAT = 'pt-coach-backup';
-export const BACKUP_FORMAT_VERSION = 1;
+/** Full backups are still written as version 1, so older app versions keep reading them. */
+export const FULL_BACKUP_FORMAT_VERSION = 1;
+/**
+ * Photo archives ("أرشفة الصور القديمة") hold only images and must never be restored as a full backup, which
+ * would replace all data with photos only. They are version 2: app versions that predate them refuse them.
+ */
+export const PHOTO_ARCHIVE_FORMAT_VERSION = 2;
+/** Newest archive-format version this app reads. */
+export const BACKUP_FORMAT_VERSION = PHOTO_ARCHIVE_FORMAT_VERSION;
+
+/** `full`: every table (restore replaces all data). `photos`: only images + their metadata (restore adds them back). */
+export type BackupKind = 'full' | 'photos';
+const ARCHIVE_ID = /^[A-Za-z0-9_-]{1,64}$/;
 export const MANIFEST_PATH = 'manifest.json';
 
 /** Which photo bytes the archive carries. Cloud copies may carry thumbnails or no photos (LIMITS.md policy). */
@@ -53,6 +65,9 @@ const fileEntrySchema = z.object({
 const manifestSchema = z.object({
   format: z.literal(BACKUP_FORMAT),
   formatVersion: z.number().int().positive(),
+  /** Missing in files made before photo archives existed: those are full backups. */
+  kind: z.enum(['full', 'photos']).default('full'),
+  archiveId: z.string().regex(ARCHIVE_ID).optional(),
   appVersion: z.string().min(1).max(40),
   schemaVersion: z.number().int().positive(),
   createdAt: z.number().int().nonnegative(),
@@ -67,6 +82,9 @@ export type BackupManifest = z.infer<typeof manifestSchema>;
 export type ManifestFile = z.infer<typeof fileEntrySchema>;
 
 export interface ManifestInput {
+  kind?: BackupKind;
+  /** Photo archives only: the id the app's archive registry records. */
+  archiveId?: string;
   appVersion: string;
   schemaVersion: number;
   createdAt: number;
@@ -77,9 +95,12 @@ export interface ManifestInput {
 
 export function buildManifest(input: ManifestInput): BackupManifest {
   const files = [...input.files].sort((a, b) => (a.path < b.path ? -1 : a.path > b.path ? 1 : 0));
+  const kind = input.kind ?? 'full';
   return {
     format: BACKUP_FORMAT,
-    formatVersion: BACKUP_FORMAT_VERSION,
+    formatVersion: kind === 'photos' ? PHOTO_ARCHIVE_FORMAT_VERSION : FULL_BACKUP_FORMAT_VERSION,
+    kind,
+    ...(input.archiveId !== undefined ? { archiveId: input.archiveId } : {}),
     appVersion: input.appVersion,
     schemaVersion: input.schemaVersion,
     createdAt: input.createdAt,
@@ -112,6 +133,11 @@ export function parseManifest(text: string): Result<BackupManifest, ManifestErro
   if (paths.size !== m.files.length) return err('malformed');
   if (m.files.filter((f) => f.path.startsWith('images/')).length !== m.imageFiles) return err('malformed');
   for (const table of Object.keys(m.counts)) if (!paths.has(tableFilePath(table))) return err('malformed');
+  if (m.kind === 'photos') {
+    const onlyImages =
+      Object.keys(m.counts).every((t) => t === 'images') && m.files.every((f) => f.path.startsWith('images/') || f.path === tableFilePath('images'));
+    if (m.formatVersion < PHOTO_ARCHIVE_FORMAT_VERSION || !m.archiveId || !onlyImages || m.imageVariant !== 'full') return err('malformed');
+  }
   return ok(m);
 }
 

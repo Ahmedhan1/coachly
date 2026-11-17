@@ -4,7 +4,7 @@ import type { ShareDocument } from '../src/share/document';
 export const SAMPLE_DOCUMENT: ShareDocument = {
   v: 1,
   updatedAt: 1_790_000_000,
-  brand: { name: 'كابتن سارة فيتنس', color: '#C81E3A' },
+  brand: { name: 'كابتن سارة فيتنس', color: '#C81E3A', logo: 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAGAAAABgCAYAAADimHc4AAABz0lEQVR42u2dUVICMRBEky7OIceQ0vNryTHkIvjvh0Uwk57ZvP6G3aRfeiYsFGkNIYTQrupVBvr18nYffc/l9tkBsMjsqlD6DqZnhtF3Mz0bjL678W4QHeO9IDrGe0EI873jF+Z759Ex3luShPne+QnzvfMU5nvnK8z3zluY752/MN8LQZjvhSDM90IQtnklVr83BcJ8LwRhvhfCyTXA1++Ph197Pb+nv09oD2D1x6WAXVD2XRCrPzYFJCBzAlj98SkgAdU+CaNFACg/a8oQCaAEAYDyYyxDJIASBAAEAADQgE2N+FRh0CNfqlCCEAAAgAAAAAQAACAAAAABILNKPIpY9dvQFAmo8DdflfXbX0oQPQAACAAAoBEbGjAJoAQhjcQFzS0/JIAShPRMbNCc8kMCKpQgUhC3+klAlSZMCmJWf2sD/5zLj3ZjAGjmxdC4X4q4KOY/7pMiL475fBI+xi6IFMT5opU3w/zJJQgI//dBzpvvbv60JrwrhBnzVqbB7Gb+9G3oLhBmzlOZB3d081sLPknvSA/wohaWKg76KOYveRRRHUL0+DlN1bxwOE/YnFhO1DaXSs6UNytlg4yEkW1TUGaH8gwUntYihNCf+gHbTeOGlKMNvAAAAABJRU5ErkJggg==' },
   client: { firstName: 'نورهان' },
   programTitle: 'برنامج 3 أيام',
   days: [
@@ -56,4 +56,12 @@ export const SAMPLE_DOCUMENT: ShareDocument = {
   package: { left: 5, total: 12, endDate: '2026-12-31' },
   attended: 7,
   nextDay: 1,
+  streakWeeks: 4,
+  startDate: '2026-08-01',
+  checkins: [
+    { d: '2026-10-01', weightKg: 73.6, waistCm: 81 },
+    { d: '2026-09-15', weightKg: 74.9 },
+    { d: '2026-09-01', weightKg: 75.5 },
+    { d: '2026-08-15', weightKg: 76.8 },
+  ],
 };

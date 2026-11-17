@@ -1,28 +1,9 @@
 import { memo, useState } from 'react';
-import { muscleLoadForExercise, type CatalogExercise, type ExerciseImage } from '@/domain/exercises';
-import { t } from '@/i18n';
+import type { CatalogExercise, ExerciseImage } from '@/domain/exercises';
 import { cx } from '@/ui';
-import { intensitiesFromLoad, MuscleMap, VIEW_PATHS } from '@/ui/MuscleMap';
+import { IllustrationImage } from './IllustrationImage';
 import { useImageUrl } from './useImageUrl';
 import styles from './ExerciseThumb.module.css';
-
-/** Front view unless the main target is drawn only on the back. */
-export function bestView(exercise: CatalogExercise): 'front' | 'back' {
-  const first = exercise.primaryMuscles[0];
-  if (first === undefined) return 'front';
-  return VIEW_PATHS.front.some(([id]) => id === first) ? 'front' : 'back';
-}
-
-export function MuscleFallback({ exercise, size }: { exercise: CatalogExercise; size: number }) {
-  return (
-    <MuscleMap
-      view={bestView(exercise)}
-      size={size}
-      intensities={intensitiesFromLoad(muscleLoadForExercise(exercise))}
-      label={t('training.library.photoFallback')}
-    />
-  );
-}
 
 interface PhotoProps {
   exercise: CatalogExercise;
@@ -33,7 +14,7 @@ interface PhotoProps {
   eager?: boolean;
 }
 
-/** Exercise photo with a muscle-map fallback when it is missing, offline-uncached or fails to load. */
+/** Exercise photo (the trainer's own first); our muscle-target picture when it is missing, offline-uncached or fails to load. */
 export function ExercisePhoto({ exercise, image, fallbackSize, className, eager }: PhotoProps) {
   const url = useImageUrl(image);
   const [failed, setFailed] = useState<string | null>(null);
@@ -41,7 +22,7 @@ export function ExercisePhoto({ exercise, image, fallbackSize, className, eager 
   return (
     <span className={cx(styles.slot, className)}>
       {broken ? (
-        image?.kind === 'stored' && url === null ? null : <MuscleFallback exercise={exercise} size={fallbackSize} />
+        image?.kind === 'stored' && url === null ? null : <IllustrationImage exercise={exercise} fallbackSize={fallbackSize} />
       ) : (
         <img
           src={url}

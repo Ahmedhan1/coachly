@@ -26,6 +26,14 @@ const pack: ExercisePack = {
   exercises: [entry('Hip_Thrust'), entry('Plank', { images: [], primary: ['abs'], secondary: [] })],
 };
 
+describe('catalogFromPack cues', () => {
+  it('passes cues through and leaves the field out when there are none', () => {
+    const list = catalogFromPack({ ...pack, exercises: [entry('A', { cues: ['اعصر الجلوتس'] }), entry('B')] }, 'exercise-pack/');
+    expect(list.find((e) => e.id === 'A')?.cues).toEqual(['اعصر الجلوتس']);
+    expect(list.find((e) => e.id === 'B')).not.toHaveProperty('cues');
+  });
+});
+
 describe('catalogFromPack', () => {
   it('turns pack entries into built-in catalog exercises with resolved image paths', () => {
     const catalog = catalogFromPack(pack, 'exercise-pack/');

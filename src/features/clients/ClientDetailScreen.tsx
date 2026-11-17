@@ -1,13 +1,20 @@
 import { lazy, Suspense, useEffect, useRef, useState } from 'react';
 import { useNavigate, useParams, useSearchParams } from 'react-router-dom';
 import { useRepos, useServices } from '@/app/services';
+import { useGo } from '@/app/nav';
+import { useUiStore } from '@/app/uiStore';
+import { useLive } from '@/app/useLive';
 import { readAiKey } from '@/features/online/integrations';
 import { clientPagesEnabled } from '@/features/online/prefs';
-import { useLive } from '@/app/useLive';
-import { subscriptionAttention, toIsoDate, type Client, type Payment, type Program, type Session } from '@/domain/models';
+import { sessionForWorkout } from '@/domain/clientHub';
+import { localDayRange, subscriptionAttention, type Client, type Payment, type Program } from '@/domain/models';
+import type { BuiltinKind } from '@/domain/whatsapp';
 import { t } from '@/i18n';
-import { Badge, Button, EmptyState, Icon, IconButton, ListRow, ListSection, Money, Num, PackageRing, PageHeader, Tx } from '@/ui';
-import { formatIsoDate, formatMoney, formatNumber, timeParts } from '@/ui/format';
+import { Badge, Button, EmptyState, Icon, IconButton, PageHeader } from '@/ui';
+import { WhatsappPickerSheet } from '@/features/whatsapp/WhatsappPickerSheet';
+import { useExerciseCatalog } from '@/features/programs/catalog';
+import { exerciseName } from '@/features/programs/names';
+import { useAssignProgram } from '@/features/programs/useAssignProgram';
 import { attentionLabel, attentionTone } from './attention';
 import { telUrl } from './contact';
 import { ClientPageSheet } from './ClientPageSheet';
@@ -16,26 +23,32 @@ import { PackageSheet } from './PackageSheet';
 import { PaymentSheet } from './PaymentSheet';
 import { useDeletePayment, useRenewPackage } from './useMoneyActions';
 import { useDeleteClient } from './useDeleteClient';
-import { WhatsappPickerSheet } from '@/features/whatsapp/WhatsappPickerSheet';
-import type { BuiltinKind } from '@/domain/whatsapp';
-import { balanceDue } from '@/domain/finance';
+import { ExerciseHistorySheet } from './hub/ExerciseHistorySheet';
+import { HubTabs } from './hub/HubTabs';
+import { exerciseUrl, programUrl, sessionUrl } from './hub/links';
+import { NutritionTab } from './hub/NutritionTab';
+import { OverviewTab } from './hub/OverviewTab';
+import { PaymentsTab } from './hub/PaymentsTab';
+import { ProgramChooserSheet, type ProgramChoice } from './hub/ProgramChooserSheet';
+import { ProgressTab } from './hub/ProgressTab';
+import { SessionsTab } from './hub/SessionsTab';
+import { useHubTab } from './hub/tabs';
+import { TrainingTab } from './hub/TrainingTab';
+import { useHubData, type HubData } from './hub/useHubData';
 import styles from './ClientDetail.module.css';
+import hubStyles from './hub/Hub.module.css';
 
 /** The AI sheet pulls in the Anthropic SDK (~300 kB); load it only when the trainer opens it. */
 const AiDraftSheet = lazy(() => import('./AiDraftSheet').then((m) => ({ default: m.AiDraftSheet })));
 
 const BACK = { to: '/clients', label: t('clientDetail.back') };
 
+/** /clients/:id — the client hub: everything about one client, in tabs, linked to every screen it touches. */
 export function ClientDetailScreen() {
   const { clientId = '' } = useParams();
   const repos = useRepos();
   // null = loaded but missing; undefined = still loading
   const client = useLive(async () => (await repos.clients.get(clientId)) ?? null, [repos, clientId]);
-  const payments = useLive(() => repos.payments.listByClient(clientId), [repos, clientId]);
-  const sessions = useLive(() => repos.sessions.listByClient(clientId), [repos, clientId]);
-  const programs = useLive(() => repos.programs.listByClient(clientId), [repos, clientId]);
-  const settings = useLive(() => repos.settings.get(), [repos]);
-
   if (client === undefined) return <PageHeader title="" back={BACK} />;
   if (client === null) {
     return (
@@ -45,60 +58,78 @@ export function ClientDetailScreen() {
       </>
     );
   }
-  return <ClientDetail client={client} payments={payments ?? []} sessions={sessions ?? []} programs={programs ?? []} currency={settings?.currency ?? 'EGP'} />;
+  return <ClientHub client={client} />;
 }
 
-function nextSessionOf(sessions: Session[], now: number): Session | null {
-  return (
-    sessions
-      .filter((s) => s.attendance === 'scheduled' && s.startsAt + s.durationMin * 60_000 > now)
-      .sort((a, b) => a.startsAt - b.startsAt)[0] ?? null
-  );
-}
+type SheetName = null | 'edit' | 'package' | 'page' | 'ai' | 'whatsapp' | 'program' | { payment: Payment | null } | { exercise: string };
 
-type SheetName = null | 'edit' | 'package' | 'page' | 'ai' | 'whatsapp' | { payment: Payment | null };
-
-interface ClientDetailProps {
-  client: Client;
-  payments: Payment[];
-  sessions: Session[];
-  programs: Program[];
-  currency: string;
-}
-
-function ClientDetail({ client, payments, sessions, programs, currency }: ClientDetailProps) {
+function ClientHub({ client }: { client: Client }) {
+  const hub = useHubData(client);
+  const [tab, setTab] = useHubTab();
   const navigate = useNavigate();
+  const go = useGo();
+  const showToast = useUiStore((s) => s.showToast);
   const deleteClient = useDeleteClient();
   const renew = useRenewPackage();
   const deletePayment = useDeletePayment();
+  const assign = useAssignProgram();
+  const catalog = useExerciseCatalog();
   const [sheet, setSheet] = useState<SheetName>(null);
   const { meta } = useServices();
   const pagesOn = useLive(() => clientPagesEnabled(meta), [meta]) ?? false;
   const aiOn = (useLive(() => readAiKey(meta), [meta]) ?? null) !== null;
-  const program = [...programs].sort((a, b) => b.updatedAt - a.updatedAt)[0];
-  const [now] = useState(() => Date.now());
-  const today = toIsoDate(new Date(now));
-  const attention = subscriptionAttention(client, today);
-  const next = nextSessionOf(sessions, now);
-  const owed = balanceDue(payments);
-  const firstDue = payments.filter((p) => p.status === 'due').sort((a, b) => ((a.dueOn ?? '') < (b.dueOn ?? '') ? -1 : 1))[0];
+  const [today] = useState(() => new Date());
+  const attention = subscriptionAttention(client, hub?.today ?? '');
+
+  // "/clients/:id?renew=1" (Home «جدّد») renews once on arrival; "?pay=1" (Home «حصّل») opens a payment.
+  const [params, setParams] = useSearchParams();
+  const handled = useRef<string | null>(null);
+  useEffect(() => {
+    const renewing = params.get('renew') === '1';
+    const paying = params.get('pay') === '1';
+    if ((!renewing && !paying) || handled.current === client.id) return;
+    handled.current = client.id;
+    setParams(
+      (p) => {
+        const out = new URLSearchParams(p);
+        out.delete('renew');
+        out.delete('pay');
+        return out;
+      },
+      { replace: true, state: null },
+    );
+    if (renewing) void renew(client);
+    if (paying) setSheet({ payment: null });
+  }, [params, setParams, renew, client]);
+
+  if (!hub) return <PageHeader title="" back={BACK} />;
+
+  const program = hub.programs.active;
+  const { start, end } = localDayRange(today);
+  const todays = sessionForWorkout(hub.sessions, start, end, today.getTime());
+  const startUrl = sessionUrl({ clientId: client.id, programId: program?.id, dayId: hub.nextDay?.dayId, scheduleId: todays?.id });
+  const owed = hub.overview.owedMinor;
+  const firstDue = hub.payments.filter((p) => p.status === 'due').sort((a, b) => ((a.dueOn ?? '') < (b.dueOn ?? '') ? -1 : 1))[0];
   // The message the trainer most likely wants first: what is late, then what ends, then the next session.
   const waPreferred: BuiltinKind = owed > 0 ? 'payment_due' : attention ? 'renewal' : 'session_reminder';
-
-  // "/clients/:id?renew=1" (Home's «جدّد»): renew once on arrival, with the usual undo toast.
-  const [params, setParams] = useSearchParams();
-  const renewedFor = useRef<string | null>(null);
-  useEffect(() => {
-    if (params.get('renew') !== '1' || renewedFor.current === client.id) return;
-    renewedFor.current = client.id;
-    setParams({}, { replace: true });
-    void renew(client);
-  }, [params, setParams, renew, client]);
 
   const onDelete = async () => {
     await deleteClient(client);
     navigate('/clients', { replace: true });
   };
+
+  const pickProgram = async (choice: ProgramChoice) => {
+    setSheet(null);
+    let result: Program;
+    if (choice.kind === 'builtin') result = await assign.fromBuiltin(choice.template, client);
+    else if (choice.kind === 'copy') result = await assign.copyFor(choice.program, client);
+    else if (choice.kind === 'adopt') result = await assign.adopt(choice.program, client);
+    else result = await assign.activate(choice.program, client.id);
+    showToast({ message: t('hub.training.activated', { name: result.name }), duration: 2500 });
+    if (choice.kind !== 'activate') go(programUrl(result.id));
+  };
+
+  const newProgram = () => go(`/more/programs?client=${client.id}`);
 
   return (
     <>
@@ -139,41 +170,31 @@ function ClientDetail({ client, payments, sessions, programs, currency }: Client
         </div>
       </header>
 
-      <PackageSection client={client} next={next} onEdit={() => setSheet('package')} onRenew={() => void renew(client)} />
-      <ListSection title={t('clientDetail.plan')}>
-        <ListRow
-          leading={<Icon name="list" />}
-          title={t('clientDetail.program')}
-          subtitle={program ? program.name : t('clientDetail.programNone')}
-          to={program ? `/programs/${program.id}?from=client` : `/more/programs?client=${client.id}`}
+      <HubTabs value={tab} onChange={setTab} />
+      <div id="hub-panel" role="tabpanel" aria-labelledby={`hub-tab-${tab}`} className={hubStyles.panel}>
+        <TabPanel
+          tab={tab}
+          client={client}
+          hub={hub}
+          catalog={catalog}
+          go={go}
+          startUrl={startUrl}
+          scheduleId={todays?.id ?? null}
+          onTab={setTab}
+          onSheet={setSheet}
+          onRenew={() => void renew(client)}
+          onNewProgram={newProgram}
+          onMakeActive={(p) => void pickProgram({ kind: 'activate', program: p })}
+          pagesOn={pagesOn}
+          aiOn={aiOn}
         />
-        {program && (
-          <ListRow
-            leading={<Icon name="timer" />}
-            title={t('clientDetail.startSession')}
-            subtitle={t('clientDetail.startSessionHint')}
-            to={`/session/new?client=${client.id}&program=${program.id}`}
-          />
+        {tab === 'overview' && (
+          <div className={styles.dangerZone}>
+            <Button variant="danger" icon="trash" onClick={() => void onDelete()}>
+              {t('clientDetail.deleteClient')}
+            </Button>
+          </div>
         )}
-        <ListRow leading={<Icon name="utensils" />} title={t('clientDetail.nutrition')} to={`/clients/${client.id}/nutrition`} />
-        <ListRow leading={<Icon name="note" />} title={t('clientDetail.meals')} to={`/clients/${client.id}/meals`} />
-        <ListRow leading={<Icon name="pill" />} title={t('clientDetail.supplements')} to={`/clients/${client.id}/supplements`} />
-        <ListRow leading={<Icon name="chart" />} title={t('clientDetail.progress')} to={`/clients/${client.id}/progress`} />
-        {aiOn && <ListRow leading={<Icon name="edit" />} title={t('settings.ai.title')} subtitle={t('settings.ai.hint')} onClick={() => setSheet('ai')} />}
-        {pagesOn && <ListRow leading={<Icon name="share" />} title={t('settings.clientPage.title')} subtitle={t('settings.clientPage.hint')} onClick={() => setSheet('page')} />}
-      </ListSection>
-      <MeasurementsSection client={client} />
-      <InjuriesSection client={client} />
-      <PaymentsSection payments={payments} today={today} owed={owed} currency={currency} onAdd={() => setSheet({ payment: null })} onOpen={(p) => setSheet({ payment: p })} />
-
-      <ListSection title={t('clientDetail.notes')}>
-        <p className={client.notes ? styles.note : `${styles.note} ${styles.muted}`}>{client.notes || t('clientDetail.noNotes')}</p>
-      </ListSection>
-
-      <div className={styles.dangerZone}>
-        <Button variant="danger" icon="trash" onClick={() => void onDelete()}>
-          {t('clientDetail.deleteClient')}
-        </Button>
       </div>
 
       <nav className={styles.actionbar} aria-label={t('clientDetail.actions')}>
@@ -181,11 +202,11 @@ function ClientDetail({ client, payments, sessions, programs, currency }: Client
           <Icon name="chat" />
           {t('clientDetail.whatsapp')}
         </button>
-        <button type="button" className={styles.stack} aria-label={t('clientDetail.bookLabel')} onClick={() => navigate(`/schedule?book=1&client=${client.id}`)}>
+        <button type="button" className={styles.stack} aria-label={t('clientDetail.bookLabel')} onClick={() => go(`/schedule?book=1&client=${client.id}`)}>
           <Icon name="calendarPlus" />
           {t('clientDetail.book')}
         </button>
-        <Button size="large" icon="send" className={styles.primary} onClick={() => navigate(`/more/pdf?client=${client.id}`)}>
+        <Button size="large" icon="send" className={styles.primary} onClick={() => go(`/more/pdf?client=${client.id}`)}>
           {t('clientDetail.sendProgram')}
         </Button>
       </nav>
@@ -201,17 +222,31 @@ function ClientDetail({ client, payments, sessions, programs, currency }: Client
           onClose={() => setSheet(null)}
           client={client}
           preferred={waPreferred}
-          extra={{ startsAt: next?.startsAt ?? null, amountMinor: owed > 0 ? (firstDue?.amountMinor ?? owed) : null, currency }}
+          extra={{ startsAt: hub.overview.next?.startsAt ?? null, amountMinor: owed > 0 ? (firstDue?.amountMinor ?? owed) : null, currency: hub.currency }}
         />
       )}
       {sheet === 'page' && <ClientPageSheet client={client} onClose={() => setSheet(null)} />}
       {sheet === 'edit' && <EditClientSheet client={client} onClose={() => setSheet(null)} />}
-      {sheet === 'package' && <PackageSheet client={client} currency={currency} onClose={() => setSheet(null)} />}
-      {sheet !== null && typeof sheet === 'object' && (
+      {sheet === 'package' && <PackageSheet client={client} currency={hub.currency} onClose={() => setSheet(null)} />}
+      {sheet === 'program' && <ProgramChooserSheet client={client} activeId={program?.id ?? null} onClose={() => setSheet(null)} onPick={(c) => void pickProgram(c)} />}
+      {sheet !== null && typeof sheet === 'object' && 'exercise' in sheet && (
+        <ExerciseHistorySheet
+          exerciseId={sheet.exercise}
+          name={exerciseName(catalog?.byId.get(sheet.exercise), sheet.exercise)}
+          logs={hub.logs}
+          unit={hub.unit}
+          onClose={() => setSheet(null)}
+          onOpenDetail={() => {
+            setSheet(null);
+            go(exerciseUrl(sheet.exercise));
+          }}
+        />
+      )}
+      {sheet !== null && typeof sheet === 'object' && 'payment' in sheet && (
         <PaymentSheet
           client={client}
           payment={sheet.payment}
-          currency={currency}
+          currency={hub.currency}
           onClose={() => setSheet(null)}
           onDelete={(p) => {
             setSheet(null);
@@ -223,156 +258,64 @@ function ClientDetail({ client, payments, sessions, programs, currency }: Client
   );
 }
 
-function PackageSection({ client, next, onEdit, onRenew }: { client: Client; next: Session | null; onEdit: () => void; onRenew: () => void }) {
-  const pkg = client.package;
-  if (!pkg || pkg.totalSessions <= 0) {
-    return (
-      <ListSection title={t('clientDetail.package')}>
-        <div className={styles.pkgEmpty}>
-          <p className={styles.pkgTitle}>{t('clientDetail.noPackage')}</p>
-          <p className={styles.pkgSub}>{t('clientDetail.noPackageBody')}</p>
-          <div className={styles.chips}>
-            <Button size="small" icon="plus" onClick={onEdit}>
-              {t('clientDetail.addPackage')}
-            </Button>
-          </div>
-        </div>
-      </ListSection>
-    );
-  }
-  const left = Math.max(0, client.remainingSessions);
-  const attended = Math.max(0, pkg.totalSessions - left);
-  const nextTime = next ? timeParts(next.startsAt) : null;
-  const nextIsToday = next ? toIsoDate(new Date(next.startsAt)) === toIsoDate(new Date()) : false;
-  return (
-    <ListSection title={t('clientDetail.package')}>
-      <div className={styles.pkg}>
-        <PackageRing
-          total={pkg.totalSessions}
-          remaining={left}
-          label={t('clientDetail.ringLabel', { left, total: pkg.totalSessions })}
-          caption={t('clientDetail.ringLeft')}
+interface TabPanelProps {
+  tab: ReturnType<typeof useHubTab>[0];
+  client: Client;
+  hub: HubData;
+  catalog: ReturnType<typeof useExerciseCatalog>;
+  go: (to: string) => void;
+  startUrl: string;
+  scheduleId: string | null;
+  onTab: ReturnType<typeof useHubTab>[1];
+  onSheet: (sheet: SheetName) => void;
+  onRenew: () => void;
+  onNewProgram: () => void;
+  onMakeActive: (p: Program) => void;
+  pagesOn: boolean;
+  aiOn: boolean;
+}
+
+function TabPanel(p: TabPanelProps) {
+  const { client, hub, go } = p;
+  switch (p.tab) {
+    case 'overview':
+      return (
+        <OverviewTab
+          client={client}
+          hub={hub}
+          go={go}
+          actions={{
+            startUrl: p.startUrl,
+            onPay: () => p.onSheet({ payment: null }),
+            onRenew: p.onRenew,
+            onEditPackage: () => p.onSheet('package'),
+            onPage: p.pagesOn ? () => p.onSheet('page') : null,
+            onAi: p.aiOn ? () => p.onSheet('ai') : null,
+            onTab: p.onTab,
+          }}
         />
-        <div className={styles.pkgText}>
-          <h3 className={styles.pkgTitle}>
-            <Tx k="clientDetail.remainingOf" params={{ left, total: pkg.totalSessions }} />
-          </h3>
-          {client.startDate && client.endDate && (
-            <p className={styles.pkgSub}>
-              <Tx k="clientDetail.period" params={{ start: formatIsoDate(client.startDate), end: formatIsoDate(client.endDate) }} />
-            </p>
-          )}
-          {pkg.priceMinor > 0 && (
-            <p className={styles.pkgSub}>
-              <Money minor={pkg.priceMinor} currency={pkg.currency} />
-            </p>
-          )}
-          <div className={styles.chips}>
-            <Badge>
-              <Num>{attended}</Num>
-              {t('clientDetail.attended')}
-            </Badge>
-            {next && nextTime && (
-              <Badge tone="brand">
-                {nextIsToday ? t('home.title') : formatIsoDate(toIsoDate(new Date(next.startsAt)))} <Num>{nextTime.clock}</Num> {nextTime.period}
-              </Badge>
-            )}
-          </div>
-          <div className={styles.chips}>
-            <Button size="small" variant="secondary" icon="edit" onClick={onEdit}>
-              {t('clientDetail.editPackage')}
-            </Button>
-            <Button size="small" variant="secondary" icon="undo" onClick={onRenew}>
-              {t('clientDetail.renew')}
-            </Button>
-          </div>
-        </div>
-      </div>
-    </ListSection>
-  );
-}
-
-function MeasurementsSection({ client }: { client: Client }) {
-  const m = client.measurements;
-  const items = [
-    m.weightKg !== undefined && { label: t('clientDetail.weight'), value: m.weightKg, unit: t('clientDetail.kg') },
-    m.heightCm !== undefined && { label: t('clientDetail.height'), value: m.heightCm, unit: t('clientDetail.cm') },
-    m.bodyFatPercent !== undefined && { label: t('clientDetail.bodyFat'), value: m.bodyFatPercent, unit: t('clientDetail.percent') },
-    m.waistCm !== undefined && { label: t('clientDetail.waist'), value: m.waistCm, unit: t('clientDetail.cm') },
-  ].filter((x): x is { label: string; value: number; unit: string } => Boolean(x));
-  return (
-    <ListSection title={t('clientDetail.goal')}>
-      <div className={styles.goal}>
-        <p className={styles.goalLabel}>
-          <Icon name="target" />
-          {t(`goals.${client.goal}`)}
-        </p>
-        {client.goalNote && <p className={styles.goalText}>{client.goalNote}</p>}
-        {items.length > 0 && (
-          <dl className={styles.facts} aria-label={t('clientDetail.measurements')}>
-            {items.slice(0, 3).map((item) => (
-              <div key={item.label}>
-                <dt>{item.label}</dt>
-                <dd>
-                  <Num>{formatNumber(item.value)}</Num>
-                  <span>{item.unit}</span>
-                </dd>
-              </div>
-            ))}
-          </dl>
-        )}
-      </div>
-    </ListSection>
-  );
-}
-
-function InjuriesSection({ client }: { client: Client }) {
-  return (
-    <ListSection title={t('clientDetail.injuries')} count={client.injuries.length || undefined}>
-      {client.injuries.length === 0 ? (
-        <ListRow leading={<Icon name="check" />} title={t('clientDetail.noInjuries')} />
-      ) : (
-        client.injuries.map((injury) => (
-          <div key={injury} className={styles.injury}>
-            <span className={styles.injuryBadge}>
-              <Icon name="bandage" />
-            </span>
-            <p>{injury}</p>
-          </div>
-        ))
-      )}
-    </ListSection>
-  );
-}
-
-function PaymentsSection({ payments, today, owed, currency, onAdd, onOpen }: { payments: Payment[]; today: string; owed: number; currency: string; onAdd: () => void; onOpen: (p: Payment) => void }) {
-  return (
-    <ListSection
-      title={t('clientDetail.payments')}
-      footer={owed > 0 ? t('schedule.pay.balance', { amount: formatMoney(owed, currency) }) : undefined}
-      action={
-        <Button size="small" variant="plain" icon="plus" onClick={onAdd}>
-          {t('clientDetail.addPayment')}
-        </Button>
-      }
-    >
-      {payments.length === 0 ? (
-        <ListRow leading={<Icon name="wallet" />} title={t('clientDetail.noPayments')} />
-      ) : (
-        payments.map((p) => (
-          <ListRow
-            key={p.id}
-            title={<Money minor={p.amountMinor} currency={p.currency} className={styles.amount} />}
-            subtitle={
-              <>
-                {formatIsoDate(p.paidOn ?? p.dueOn ?? today)} · {t(`clientDetail.methods.${p.method}`)}
-              </>
-            }
-            trailing={<Badge tone={p.status === 'paid' ? 'ok' : 'warning'}>{p.status === 'paid' ? t('clientDetail.paid') : t('clientDetail.due')}</Badge>}
-            onClick={() => onOpen(p)}
-          />
-        ))
-      )}
-    </ListSection>
-  );
+      );
+    case 'training':
+      return (
+        <TrainingTab
+          client={client}
+          hub={hub}
+          catalog={p.catalog}
+          scheduleId={p.scheduleId}
+          go={go}
+          onChooseProgram={() => p.onSheet('program')}
+          onNewProgram={p.onNewProgram}
+          onMakeActive={p.onMakeActive}
+          onOpenExercise={(id) => p.onSheet({ exercise: id })}
+        />
+      );
+    case 'nutrition':
+      return <NutritionTab client={client} go={go} />;
+    case 'progress':
+      return <ProgressTab client={client} hub={hub} go={go} />;
+    case 'sessions':
+      return <SessionsTab client={client} hub={hub} go={go} />;
+    case 'payments':
+      return <PaymentsTab client={client} hub={hub} onEditPackage={() => p.onSheet('package')} onRenew={p.onRenew} onAdd={() => p.onSheet({ payment: null })} onOpen={(pay) => p.onSheet({ payment: pay })} />;
+  }
 }

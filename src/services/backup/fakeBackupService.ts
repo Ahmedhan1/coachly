@@ -16,6 +16,8 @@ import type {
 export class FakeBackupService implements BackupService {
   exportResult: Result<BackupFile, ExportError> | null = null;
   importResult: Result<ImportSummary, ImportError> = ok({
+    kind: 'full',
+    archiveId: null,
     counts: { clients: 3, images: 2 },
     schemaVersion: 1,
     migratedFrom: null,
@@ -61,8 +63,16 @@ export class FakeBackupService implements BackupService {
     return this.importResult;
   }
 
-  async recordSaved(at: number): Promise<void> {
-    this.state = { ...this.state, lastLocalAt: at };
+  async recordSaved(at: number, details: { bytes?: number; how?: 'shared' | 'saved' | 'downloaded' } = {}): Promise<void> {
+    this.state = { ...this.state, lastLocalAt: at, lastLocalBytes: details.bytes ?? null, lastLocalHow: details.how ?? null, reminderSnoozedUntil: null };
+  }
+
+  async snooze(until: number): Promise<void> {
+    this.state = { ...this.state, reminderSnoozedUntil: until };
+  }
+
+  async setFileEncrypted(encrypted: boolean): Promise<void> {
+    this.state = { ...this.state, fileEncrypted: encrypted };
   }
 
   async status(): Promise<BackupStatus> {

@@ -131,14 +131,14 @@ describe('findForbiddenTerms', () => {
 describe('naturalExerciseName (Egyptian gym-floor order)', () => {
   it.each([
     ['Barbell Bench Press - Medium Grip', 'بنش برس بالبار'],
-    ['Incline Dumbbell Press', 'برس بالدامبل عالي (إنكلاين)'],
+    ['Incline Dumbbell Press', 'برس إنكلاين بالدامبل'],
     ['Dumbbell Shoulder Press', 'شولدر برس بالدامبل'],
     ['Barbell Squat', 'سكوات بالبار'],
     ['Wide-Grip Lat Pulldown', 'لات بول داون - قبضة واسعة'],
     ['Seated Cable Rows', 'رو على الكابل قاعد'],
     ['Smith Machine Close-Grip Bench Press', 'بنش برس على السميث - قبضة ضيقة'],
     ['One-Arm Dumbbell Row', 'رو بالدامبل بإيد واحدة'],
-    ['Decline EZ Bar Triceps Extension', 'ترايسبس إكستنشن بالبار الزجزاج واطي (ديكلاين)'],
+    ['Decline EZ Bar Triceps Extension', 'ترايسبس إكستنشن ديكلاين بالإيزي بار'],
     ['Ab Crunch Machine', 'أب كرانش على الماشين'],
     ['Narrow Stance Leg Press', 'ليج برس - رجل ضيقة'],
     ['Dips - Triceps Version', 'ديبس ترايسبس'],

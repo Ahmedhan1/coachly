@@ -5,7 +5,6 @@ import {
   CONTENT_HEIGHT_PX,
   CONTENT_WIDTH_PX,
   EXERCISE_IMAGE_PX,
-  EXERCISE_RX_PX,
   FONT,
   FOOTER_HEIGHT_PX,
   HEADER_HEIGHT_PX,
@@ -17,6 +16,9 @@ import {
   PAGE_WIDTH_PX,
   PHOTO_PAIR_HEIGHT_PX,
   RECIPE_IMAGE_PX,
+  ROW_PAD_PX,
+  TABLE_COLS,
+  TABLE_HEAD_PX,
   SUPPLEMENT_IMAGE_PX,
 } from '@/domain/pdf';
 
@@ -55,6 +57,7 @@ export function pdfStyles(): string {
 .ptpdf-onbg .ptpdf-ftr, .ptpdf-onbg .ptpdf-hdr { background: rgba(255,255,255,.92); border-radius: 12px; padding-inline: 12px; }
 
 .blk { margin-block-end: ${BLOCK_GAP_PX}px; break-inside: avoid; }
+.blk.b-exh, .blk.b-ex:not(.last) { margin-block-end: 0; }
 .card { background: rgba(255,255,255,.96); border: 1px solid #e6e6e9; border-radius: 14px; padding: 12px 14px; }
 .b-section { display: flex; align-items: center; gap: 12px; background: var(--c1); color: var(--on1); border-radius: 12px;
   padding-block: 8px; padding-inline: 8px 16px; font-size: ${FONT.title}px; font-weight: 800; line-height: 1.4; margin-block-start: 4px; }
@@ -94,23 +97,52 @@ export function pdfStyles(): string {
 .b-p { background: rgba(255,255,255,.92); border-radius: 8px; padding-inline: 4px; overflow-wrap: anywhere; white-space: pre-line; }
 .b-p.muted { color: #48484a; font-size: ${FONT.small + 1}px; }
 
-.b-ex { display: flex; gap: 12px; align-items: center; background: rgba(255,255,255,.97); border: 1px solid #e6e6e9; border-radius: 14px; padding: 10px; }
-.b-ex .n { flex: none; width: 32px; height: 32px; border-radius: 10px; background: var(--c1); color: var(--on1); font-weight: 800;
-  display: flex; align-items: center; justify-content: center; font-size: 14px; align-self: flex-start; }
-.b-ex .pic { flex: none; width: ${EXERCISE_IMAGE_PX}px; height: ${EXERCISE_IMAGE_PX}px; border-radius: 10px; background: #f2f2f4; object-fit: cover; display: block; }
-.b-ex .t { flex: 1; min-width: 0; }
-.b-ex .nm { font-size: ${FONT.name}px; font-weight: 800; line-height: 1.45; overflow-wrap: anywhere; }
-.b-ex .en { font-size: ${FONT.small}px; color: #6e6e73; line-height: 1.5; overflow-wrap: anywhere; }
-.b-ex .mus { font-size: ${FONT.small}px; color: var(--ink1); font-weight: 600; line-height: 1.6; overflow-wrap: anywhere; }
-.b-ex .note { font-size: ${FONT.small}px; color: #3a3a3c; background: #f6f6f4; border-radius: 8px; padding: 3px 8px; margin-block-start: 4px; overflow-wrap: anywhere; }
-.b-ex .ss { display: inline-block; font-size: 11px; color: #fff; background: var(--c2); border-radius: 6px; padding: 0 7px; margin-inline-start: 8px; vertical-align: middle; font-weight: 600; }
-.b-ex .rx { flex: none; width: ${EXERCISE_RX_PX}px; align-self: stretch; display: flex; flex-direction: column; justify-content: center; align-items: center;
-  background: var(--tint1); border-radius: 10px; padding: 6px; text-align: center; }
-.b-ex .sr { font-size: 22px; font-weight: 800; color: var(--ink1); line-height: 1.3; white-space: nowrap; }
-.b-ex .sr i { font-style: normal; font-weight: 500; color: #8e8e93; margin-inline: 5px; font-size: 16px; }
-.b-ex .rest { font-size: ${FONT.small}px; color: #48484a; font-weight: 600; }
-.b-ex .ext { display: flex; flex-wrap: wrap; justify-content: center; gap: 2px 8px; font-size: 11px; color: #6e6e73; }
-.b-ex .map { flex: none; width: ${MUSCLE_MAP_PX}px; height: ${MUSCLE_MAP_PX}px; object-fit: contain; border-radius: 10px; background: #fafafa; display: block; }
+.b-exh, .b-ex { display: block; }
+.b-exh .row, .b-ex { display: grid; align-items: center;
+  grid-template-columns: ${TABLE_COLS.index}px ${TABLE_COLS.image}px minmax(0, 1fr) ${TABLE_COLS.setsReps}px ${TABLE_COLS.rest}px ${TABLE_COLS.details}px; }
+.b-exh.wm .row, .b-ex.wm { grid-template-columns: ${TABLE_COLS.index}px ${TABLE_COLS.image}px minmax(0, 1fr) ${TABLE_COLS.setsReps}px ${TABLE_COLS.rest}px ${TABLE_COLS.details}px ${TABLE_COLS.map}px; }
+.b-exh .cont { height: 26px; font-size: ${FONT.small}px; font-weight: 700; color: var(--ink1); padding-inline: 4px; line-height: 22px;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.b-exh .row { height: ${TABLE_HEAD_PX}px; background: var(--deep1); color: #fff; border-radius: 10px 10px 0 0; font-size: 11.5px; font-weight: 700;
+  letter-spacing: .2px; }
+.b-exh .row > span { padding-inline: 6px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.b-exh .c-i { text-align: center; } .b-exh .c-n { grid-column: span 2; }
+.b-exh .c-sr, .b-exh .c-r { text-align: center; }
+.b-ex { background: rgba(255,255,255,.97); border-inline: 1px solid #e3e3e6; border-block-end: 1px solid #ececef;
+  padding-block: ${ROW_PAD_PX / 2}px; min-height: ${EXERCISE_IMAGE_PX + ROW_PAD_PX + 1}px; }
+.b-ex.even { background: #fafaf8; }
+.b-ex.last { border-block-end-color: #e3e3e6; border-radius: 0 0 10px 10px; }
+.b-ex.ss { box-shadow: inset -4px 0 0 var(--c2); }
+.b-ex > div { min-width: 0; padding-inline: 6px; }
+.b-ex .c-i { display: flex; justify-content: center; align-self: start; padding-block-start: 2px; }
+.b-ex .n { width: 24px; height: 24px; border-radius: 7px; background: var(--tint1); color: var(--ink1); font-weight: 800; font-size: 12px;
+  display: flex; align-items: center; justify-content: center; }
+.b-ex .c-p { padding-inline: 0 6px; }
+.b-ex .pic { width: ${EXERCISE_IMAGE_PX}px; height: ${EXERCISE_IMAGE_PX}px; border-radius: 8px; background: #f2f2f4; object-fit: cover; display: block; }
+.b-ex .pic.ph { background: var(--tint1); }
+.b-ex .nm { font-size: ${FONT.name - 1}px; font-weight: 800; line-height: 1.4; overflow-wrap: anywhere; }
+.b-ex .en { font-size: ${FONT.small - 1}px; color: #6e6e73; line-height: 1.45; overflow-wrap: anywhere; }
+.b-ex .mus { display: flex; flex-wrap: wrap; gap: 3px; margin-block-start: 3px; height: 19px; overflow: hidden; }
+.b-ex .mus span { font-size: 10.5px; font-weight: 700; color: var(--ink1); background: var(--tint1); border-radius: 5px; padding: 0 6px; line-height: 19px; }
+.b-ex .c-sr { text-align: center; font-size: 19px; font-weight: 800; color: #111; line-height: 1.3; white-space: nowrap; }
+.b-ex .c-sr i { font-style: normal; font-weight: 500; color: #8e8e93; margin-inline: 4px; font-size: 14px; }
+.b-ex .c-r { text-align: center; font-size: 13px; font-weight: 700; color: #3a3a3c; white-space: nowrap; }
+.b-ex .c-d { display: flex; flex-direction: column; gap: 1px; font-size: ${FONT.small - 1}px; line-height: 1.5; color: #3a3a3c; }
+.b-ex .c-d .x b { color: #8e8e93; font-weight: 600; }
+.b-ex .c-d .note { color: #48484a; overflow-wrap: anywhere; }
+.b-ex .sst { align-self: flex-start; font-size: 10.5px; color: #fff; background: var(--c2); border-radius: 5px; padding: 0 7px; line-height: 19px; font-weight: 700; margin-block-end: 2px; }
+.b-ex .c-m { padding-inline: 4px; }
+.b-ex .map { width: ${MUSCLE_MAP_PX}px; height: ${MUSCLE_MAP_PX}px; object-fit: contain; border-radius: 8px; background: #f6f6f6; display: block; }
+
+.b-mt { width: 100%; border-collapse: separate; border-spacing: 0; border: 1px solid #e3e3e6; border-radius: 10px; overflow: hidden; background: rgba(255,255,255,.97); }
+.b-mt th { height: ${TABLE_HEAD_PX}px; background: var(--deep1); color: #fff; font-size: 12px; font-weight: 700; text-align: center; padding-inline: 8px; }
+.b-mt th:first-child { text-align: start; }
+.b-mt td { height: 36px; text-align: center; border-block-start: 1px solid #ececef; font-weight: 600; font-size: 14px; }
+.b-mt td.l { text-align: start; padding-inline: 12px; color: #3a3a3c; }
+.b-mt td.lt { font-weight: 800; color: var(--ink1); }
+.b-mt td.ch { font-weight: 800; }
+.b-mt small { font-size: 11px; color: #8e8e93; font-weight: 500; }
+.b-mt tr:nth-child(even) td { background: #fafaf8; }
 
 .b-meal { display: flex; gap: 8px; align-items: baseline; padding-inline: 12px; background: rgba(255,255,255,.9); border-radius: 6px; }
 .b-meal .d { margin-inline-start: auto; color: #6e6e73; font-size: ${FONT.small}px; white-space: nowrap; }
@@ -124,6 +156,7 @@ export function pdfStyles(): string {
 .b-mealc li::before { content: ''; width: 7px; height: 7px; border-radius: 4px; background: var(--c1); flex: none; transform: translateY(-2px); }
 .b-mealc .it { flex: 1; min-width: 0; overflow-wrap: anywhere; font-weight: 600; }
 .b-mealc .sv { flex: none; color: #6e6e73; font-size: ${FONT.small}px; }
+.b-mealc .gr { flex: none; width: 64px; text-align: end; color: #48484a; font-size: ${FONT.small}px; font-weight: 600; }
 .b-mealc .kc { flex: none; width: 84px; text-align: end; color: #3a3a3c; font-size: ${FONT.small}px; font-weight: 700; }
 .b-mealc .tot { display: flex; flex-wrap: wrap; gap: 6px 16px; background: var(--tint1); padding: 8px 14px; font-size: ${FONT.small}px; color: #3a3a3c; }
 .b-mealc .tot b { font-size: 14px; font-weight: 800; }
@@ -174,6 +207,8 @@ export function pdfStyles(): string {
 .ptpdf-cover .logo-card img { display: block; max-width: var(--clogo-w); max-height: var(--clogo-h); width: auto; height: auto; object-fit: contain; }
 .ptpdf-cover .mono { color: var(--on1); font-size: 46px; font-weight: 800; line-height: 1.3; max-width: 560px; text-align: center; overflow-wrap: anywhere; }
 .ptpdf-cover .body { position: absolute; inset-block-start: 590px; inset-inline: 64px; inset-block-end: 150px; display: flex; flex-direction: column; gap: 10px; }
+.ptpdf-cover .body > * { flex: none; }
+.ptpdf-cover h1.long { font-size: 34px; line-height: 1.3; }
 .ptpdf-cover .kicker { font-size: 17px; font-weight: 700; color: var(--ink1); letter-spacing: .2px; }
 .ptpdf-cover h1 { font-size: 46px; line-height: 1.25; font-weight: 800; color: #111; overflow-wrap: anywhere;
   display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }

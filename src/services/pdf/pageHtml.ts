@@ -117,25 +117,48 @@ export function blockHtml(b: PdfBlock, urlOf: UrlOf, color: string, ctx: BlockCo
         .join('')}</div></div>`;
     case 'paragraph':
       return `<p class="blk b-p${b.muted ? ' muted' : ''}">${esc(b.text)}</p>`;
+    case 'exerciseHead': {
+      const c = b.columns;
+      return (
+        `<div class="blk b-exh${b.withMap ? ' wm' : ''}">` +
+        (b.continued ? `<div class="cont">${bdi(b.continued)}</div>` : '') +
+        `<div class="row"><span class="c-i">#</span><span class="c-n">${esc(c.exercise)}</span><span class="c-sr">${esc(c.setsReps)}</span>` +
+        `<span class="c-r">${esc(c.rest)}</span><span class="c-d">${esc(c.details)}</span>${b.withMap ? '<span class="c-m"></span>' : ''}</div></div>`
+      );
+    }
     case 'exercise':
       return (
-        `<div class="blk b-ex"><div class="n"><bdi dir="ltr">${b.index}</bdi></div>` +
-        (b.image ? img(urlOf(b.image), 'pic', b.name) : '') +
-        `<div class="t"><div class="nm">${esc(b.name)}${b.superset ? `<span class="ss">${esc(b.superset)}</span>` : ''}</div>` +
+        `<div class="blk b-ex${b.withMap ? ' wm' : ''}${b.index % 2 === 0 ? ' even' : ''}${b.last ? ' last' : ''}${b.superset ? ' ss' : ''}">` +
+        `<div class="c-i"><span class="n"><bdi dir="ltr">${b.index}</bdi></span></div>` +
+        `<div class="c-p">${b.image ? img(urlOf(b.image), 'pic', b.name) : '<div class="pic ph"></div>'}</div>` +
+        `<div class="c-n"><div class="nm">${esc(b.name)}</div>` +
         (b.secondaryName ? `<div class="en">${bdi(b.secondaryName)}</div>` : '') +
-        (b.muscles ? `<div class="mus">${esc(b.muscles)}</div>` : '') +
-        (b.notes ? `<div class="note">${bdi(b.notes)}</div>` : '') +
-        `</div><div class="rx"><div class="sr"><bdi dir="ltr">${esc(b.sets)}<i>×</i>${esc(b.reps)}</bdi></div>` +
-        `<div class="rest">${esc(b.rest)}</div>` +
-        (b.extras.length > 0 ? `<div class="ext">${b.extras.map((p) => `<span>${esc(p.label)} ${bdi(p.value)}</span>`).join('')}</div>` : '') +
-        `</div>${b.muscleMap ? img(urlOf(b.muscleMap), 'map') : ''}</div>`
+        (b.muscles ? `<div class="mus">${b.muscles.split('، ').map((m) => `<span>${esc(m)}</span>`).join('')}</div>` : '') +
+        `</div><div class="c-sr"><bdi dir="ltr">${esc(b.sets)}<i>×</i>${esc(b.reps)}</bdi></div>` +
+        `<div class="c-r">${bdi(b.rest)}</div>` +
+        `<div class="c-d">${b.superset ? `<span class="sst">${esc(b.superset)}</span>` : ''}` +
+        b.extras.map((p) => `<span class="x"><b>${esc(p.label)}</b> ${bdi(p.value)}</span>`).join('') +
+        (b.notes ? `<span class="note">${bdi(b.notes)}</span>` : '') +
+        `</div>${b.withMap ? `<div class="c-m">${b.muscleMap ? img(urlOf(b.muscleMap), 'map') : ''}</div>` : ''}</div>`
+      );
+    case 'measureTable':
+      return (
+        `<table class="blk b-mt"><thead><tr>${b.head.map((h) => `<th>${esc(h)}</th>`).join('')}</tr></thead><tbody>` +
+        b.rows
+          .map(
+            (r) =>
+              `<tr><td class="l">${esc(r.label)}</td><td>${bdi(r.first)} <small>${esc(r.unit)}</small></td>` +
+              `<td class="lt">${bdi(r.latest)} <small>${esc(r.unit)}</small></td><td class="ch">${bdi(r.change)}</td></tr>`,
+          )
+          .join('') +
+        `</tbody></table>`
       );
     case 'mealItem':
       return `<div class="blk b-meal"><span>${esc(b.text)}</span><span class="d">${bdi(b.detail)}</span></div>`;
     case 'mealCard':
       return (
         `<div class="blk card b-mealc"><div class="hd"><span class="nm">${esc(b.name)}</span>${b.time ? `<span class="tm">${bdi(b.time)}</span>` : ''}</div>` +
-        `<ul>${b.items.map((i) => `<li><span class="it">${bdi(i.text)}</span><span class="sv">${bdi(i.detail)}</span><span class="kc">${i.kcal ? bdi(i.kcal) : ''}</span></li>`).join('')}</ul>` +
+        `<ul>${b.items.map((i) => `<li><span class="it">${bdi(i.text)}</span><span class="sv">${bdi(i.detail)}</span><span class="gr">${i.grams ? bdi(i.grams) : ''}</span><span class="kc">${i.kcal ? bdi(i.kcal) : ''}</span></li>`).join('')}</ul>` +
         (b.totals ? `<div class="tot">${b.totals.map((t) => `<span class="${t.emphasis ? 'em' : ''}">${esc(t.label)} <b>${bdi(t.value)}</b> ${esc(t.unit)}</span>`).join('')}</div>` : '') +
         `</div>`
       );
@@ -223,7 +246,7 @@ function coverHtml(doc: PdfDocument, page: Extract<PdfPage, { kind: 'cover' }>, 
     `<div class="ptpdf-page ptpdf-cover" dir="rtl" lang="ar" style="${pageVars(doc)}">` +
     `<div class="hero${coverUrl ? ' photo' : ''}">${coverUrl ? `<img class="cimg" src="${esc(coverUrl)}" alt=""><div class="tint"></div>` : ''}` +
     `<div class="ring r1"></div><div class="ring r2"></div><div class="mark ${t.logoPlacement}">${mark}</div></div>` +
-    `<div class="body">${c.clientName ? `<div class="kicker">${esc(c.planForLabel)}</div>` : ''}<h1>${bdi(heading)}</h1>` +
+    `<div class="body">${c.clientName ? `<div class="kicker">${esc(c.planForLabel)}</div>` : ''}<h1${[...heading].length > 34 ? ' class="long"' : ''}>${bdi(heading)}</h1>` +
     (second ? `<div class="ttl"><span class="bar"></span><span>${bdi(second)}</span></div>` : '') +
     (third ? `<div class="sub">${bdi(third)}</div>` : '') +
     `<div class="facts">${facts.map((f) => `<div><span class="k">${esc(f.k)}</span><span class="v">${bdi(f.v)}</span></div>`).join('')}</div></div>` +
