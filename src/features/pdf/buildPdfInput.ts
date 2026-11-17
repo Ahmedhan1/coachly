@@ -2,7 +2,9 @@ import type { SavedCalculation } from '@/domain/meals';
 import type { CatalogExercise } from '@/domain/exercises';
 import type { Client, MealPlan, PdfSection, Program, ProgressEntry, Recipe, Supplement, TrainerSettings } from '@/domain/models';
 import { pdfExerciseFromCatalog, resolveDisclaimer, type PdfDocumentInput, type PdfExercise, type PdfImageRef, type PdfNutrition } from '@/domain/pdf';
+import { getLocale } from '@/i18n';
 import { ar } from '@/i18n/ar';
+import { pdf as enPdf } from '@/i18n/en/pdf';
 import type { PdfBrandingSettings } from './pdfBranding';
 
 export interface PdfSources {
@@ -56,7 +58,7 @@ export function buildPdfInput(src: PdfSources): PdfDocumentInput {
   for (const day of src.program?.days ?? []) {
     for (const item of day.items) {
       const e = src.catalog.get(item.exerciseId);
-      if (e && !exercises.has(item.exerciseId)) exercises.set(item.exerciseId, pdfExerciseFromCatalog(e, src.muscleMaps?.get(item.exerciseId) ?? null));
+      if (e && !exercises.has(item.exerciseId)) exercises.set(item.exerciseId, pdfExerciseFromCatalog(e, src.muscleMaps?.get(item.exerciseId) ?? null, '', getLocale()));
     }
   }
   const usedRecipeIds = new Set((src.mealPlan?.meals ?? []).flatMap((m) => m.items.flatMap((i) => (i.recipeId ? [i.recipeId] : []))));
@@ -64,7 +66,8 @@ export function buildPdfInput(src: PdfSources): PdfDocumentInput {
   const b = src.branding;
   return {
     sections: src.sections,
-    labels: ar.pdf.doc,
+    labels: getLocale() === 'en' ? enPdf.doc : ar.pdf.doc,
+    language: getLocale(),
     branding: {
       trainerName: src.settings.name,
       logo: stored(src.settings.logoImageId),
@@ -78,7 +81,7 @@ export function buildPdfInput(src: PdfSources): PdfDocumentInput {
       footerText: b.footerText,
       contactLines: b.contactLines,
     },
-    disclaimer: resolveDisclaimer(b.disclaimer, ar.pdf.disclaimerDefault),
+    disclaimer: resolveDisclaimer(b.disclaimer, getLocale() === 'en' ? enPdf.disclaimerDefault : ar.pdf.disclaimerDefault),
     generatedOn: src.today,
     title: src.title,
     subtitle: src.subtitle,

@@ -3,7 +3,7 @@ import { useLive } from '@/app/useLive';
 import type { Client } from '@/domain/models';
 import { t } from '@/i18n';
 import { Button, Icon, ListRow, ListSection, Num, Tx } from '@/ui';
-import { formatNumber } from '@/ui/format';
+import { formatNumber, LIST_SEP } from '@/ui/format';
 import { useNutritionStore } from '@/features/nutrition/shared/useNutritionStore';
 import styles from './Hub.module.css';
 
@@ -93,7 +93,7 @@ export function NutritionTab({ client, go }: { client: Client; go: (to: string) 
       <ListSection title={t('hub.nutrition.supplements')} count={supplements?.length || undefined}>
         <ListRow
           leading={<Icon name="pill" />}
-          title={supplements && supplements.length > 0 ? supplements.join('، ') : t('hub.nutrition.noSupplements')}
+          title={supplements && supplements.length > 0 ? supplements.join(LIST_SEP) : t('hub.nutrition.noSupplements')}
           to={`${base}/supplements`}
         />
       </ListSection>

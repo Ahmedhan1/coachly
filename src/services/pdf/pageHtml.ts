@@ -133,7 +133,7 @@ export function blockHtml(b: PdfBlock, urlOf: UrlOf, color: string, ctx: BlockCo
         `<div class="c-p">${b.image ? img(urlOf(b.image), 'pic', b.name) : '<div class="pic ph"></div>'}</div>` +
         `<div class="c-n"><div class="nm">${esc(b.name)}</div>` +
         (b.secondaryName ? `<div class="en">${bdi(b.secondaryName)}</div>` : '') +
-        (b.muscles ? `<div class="mus">${b.muscles.split('، ').map((m) => `<span>${esc(m)}</span>`).join('')}</div>` : '') +
+        (b.muscles ? `<div class="mus">${b.muscles.split(/[،,] /).map((m) => `<span>${esc(m)}</span>`).join('')}</div>` : '') +
         `</div><div class="c-sr"><bdi dir="ltr">${esc(b.sets)}<i>×</i>${esc(b.reps)}</bdi></div>` +
         `<div class="c-r">${bdi(b.rest)}</div>` +
         `<div class="c-d">${b.superset ? `<span class="sst">${esc(b.superset)}</span>` : ''}` +
@@ -204,6 +204,12 @@ export function fontStack(family: string): string {
   return `'${safe}', 'Readex Pro', 'Alexandria', system-ui, sans-serif`;
 }
 
+/** dir/lang attributes for a page, from the document language (Arabic RTL by default). */
+function dirAttrs(doc: PdfDocument): string {
+  const ltr = doc.theme.dir === 'ltr';
+  return ltr ? 'dir="ltr" lang="en"' : 'dir="rtl" lang="ar"';
+}
+
 function pageVars(doc: PdfDocument): string {
   const t = doc.theme;
   const hex = (c: string, d: string) => safeHex(c, d);
@@ -243,7 +249,7 @@ function coverHtml(doc: PdfDocument, page: Extract<PdfPage, { kind: 'cover' }>, 
       ? `<div class="mono">${esc(c.trainerName)}</div>`
       : '';
   return (
-    `<div class="ptpdf-page ptpdf-cover" dir="rtl" lang="ar" style="${pageVars(doc)}">` +
+    `<div class="ptpdf-page ptpdf-cover" ${dirAttrs(doc)} style="${pageVars(doc)}">` +
     `<div class="hero${coverUrl ? ' photo' : ''}">${coverUrl ? `<img class="cimg" src="${esc(coverUrl)}" alt=""><div class="tint"></div>` : ''}` +
     `<div class="ring r1"></div><div class="ring r2"></div><div class="mark ${t.logoPlacement}">${mark}</div></div>` +
     `<div class="body">${c.clientName ? `<div class="kicker">${esc(c.planForLabel)}</div>` : ''}<h1${[...heading].length > 34 ? ' class="long"' : ''}>${bdi(heading)}</h1>` +
@@ -265,7 +271,7 @@ export function pageHtml(doc: PdfDocument, page: PdfPage, urlOf: UrlOf, title: s
   const ctx: BlockContext = { logoUrl, trainerName: t.trainerName };
   const bgUrl = t.background ? safeUrl(urlOf(t.background.image)) : null;
   return (
-    `<div class="ptpdf-page${bgUrl ? ' ptpdf-onbg' : ''}" dir="rtl" lang="ar" style="${pageVars(doc)}">` +
+    `<div class="ptpdf-page${bgUrl ? ' ptpdf-onbg' : ''}" ${dirAttrs(doc)} style="${pageVars(doc)}">` +
     (bgUrl ? `<img class="ptpdf-bg" src="${esc(bgUrl)}" alt="" style="opacity:${t.background!.opacity}">` : '') +
     `<div class="ptpdf-strip"></div>` +
     `<header class="ptpdf-hdr">${logoUrl ? img(logoUrl, 'lg', t.trainerName) : ''}<div class="id"><span class="who">${esc(t.trainerName)}</span>` +

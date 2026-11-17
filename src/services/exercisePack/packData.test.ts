@@ -1,7 +1,7 @@
 import { readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
 import { findForbiddenTerms } from '@/i18n/fitness-terms';
-import { EQUIPMENT_IDS, MUSCLE_GROUP_IDS, type ExercisePack } from '@/domain/exercises';
+import { EQUIPMENT_IDS, MUSCLE_GROUP_IDS, catalogFromPack, searchExercises, type ExercisePack } from '@/domain/exercises';
 
 const pack = JSON.parse(readFileSync('public/exercise-pack/exercises.json', 'utf8')) as ExercisePack;
 
@@ -26,6 +26,41 @@ describe('the shipped exercise pack (public/exercise-pack/exercises.json)', () =
         expect(findForbiddenTerms(cue), `${e.id}: ${cue}`).toEqual([]);
       }
     }
+  });
+
+  it('every exercise has a clean English name (no Arabic letters, no dataset noise), and no two are alike', () => {
+    const seen = new Map<string, string>();
+    for (const e of pack.exercises) {
+      expect(e.en.trim(), e.id).not.toBe('');
+      expect(e.en, e.id).not.toMatch(/[\u0600-\u06FF]/);
+      expect(e.en, e.id).not.toMatch(/Medium Grip| - |^\s|\s$|\s{2}/);
+      const key = e.en.toLowerCase();
+      expect(seen.get(key), `${e.id} has the same English name as ${seen.get(key)}`).toBeUndefined();
+      seen.set(key, e.id);
+    }
+  });
+
+  it('every exercise with Arabic cues has the same number of short English cues', () => {
+    for (const e of pack.exercises) {
+      if (e.cues === undefined) {
+        expect(e.cuesEn, e.id).toBeUndefined();
+        continue;
+      }
+      expect(e.cuesEn?.length, e.id).toBe(e.cues.length);
+      for (const cue of e.cuesEn ?? []) {
+        expect(cue, e.id).not.toMatch(/[\u0600-\u06FF]/);
+        expect(cue.length, `${e.id}: ${cue}`).toBeLessThanOrEqual(90);
+      }
+    }
+  });
+
+  it('search finds the same exercise by its English or Arabic name', () => {
+    const catalog = catalogFromPack(pack, '');
+    expect(searchExercises(catalog, 'Romanian Deadlift')[0]?.id).toBe('Romanian_Deadlift');
+    expect(searchExercises(catalog, 'رومانيان ديدليفت بالبار')[0]?.id).toBe('Romanian_Deadlift');
+    expect(searchExercises(catalog, 'lat pulldown wide').map((e) => e.id)).toContain('Wide-Grip_Lat_Pulldown');
+    expect(searchExercises(catalog, 'بنش برس')[0]?.id).toBe('Barbell_Bench_Press_-_Medium_Grip');
+    expect(searchExercises(catalog, 'bench press')[0]?.id).toBe('Barbell_Bench_Press_-_Medium_Grip');
   });
 
   it('popular is a unique 1-based rank (a number, not a flag)', () => {

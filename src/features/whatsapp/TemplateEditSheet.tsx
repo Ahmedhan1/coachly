@@ -1,8 +1,8 @@
 import { useState, type FormEvent } from 'react';
 import { useServices } from '@/app/services';
 import { useUiStore } from '@/app/uiStore';
-import { PLACEHOLDERS, renderTemplate, type Placeholder, type WhatsappTemplate } from '@/domain/whatsapp';
-import { t } from '@/i18n';
+import { PLACEHOLDERS, placeholderToken, renderTemplate, type Placeholder, type WhatsappTemplate } from '@/domain/whatsapp';
+import { isEnglish, t } from '@/i18n';
 import { Button, Sheet, TextArea, TextField } from '@/ui';
 import { defaultTemplate, removeTemplate, saveTemplate } from './templatesStore';
 import styles from './Whatsapp.module.css';
@@ -33,7 +33,7 @@ export function TemplateEditSheet({ template, onClose, onDelete }: TemplateEditS
   const isBuiltin = template !== null && template.kind !== 'custom';
 
   const insert = (p: Placeholder) => {
-    const token = `{${p}}`;
+    const token = placeholderToken(p, isEnglish());
     const el = document.getElementById(BODY_ID) as HTMLTextAreaElement | null;
     const start = el?.selectionStart ?? body.length;
     const end = el?.selectionEnd ?? body.length;
@@ -115,8 +115,8 @@ export function TemplateEditSheet({ template, onClose, onDelete }: TemplateEditS
           />
           <div className={styles.chips} role="group" aria-label={t('schedule.wa.insert')}>
             {PLACEHOLDERS.map((p) => (
-              <button key={p} type="button" className={styles.chip} aria-label={t('schedule.wa.insertNamed', { name: p })} onClick={() => insert(p)}>
-                {`{${p}}`}
+              <button key={p} type="button" className={styles.chip} aria-label={t('schedule.wa.insertNamed', { name: placeholderToken(p, isEnglish()) })} onClick={() => insert(p)}>
+                {placeholderToken(p, isEnglish())}
               </button>
             ))}
           </div>

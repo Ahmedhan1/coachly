@@ -529,7 +529,7 @@ function SessionRunner({ client, program, dayId: resolvedDayId, history, unit, s
                   }}
                 >
                   <ExerciseThumb exercise={alt} size="sm" />
-                  <span>{alt.nameAr}</span>
+                  <span>{exerciseName(alt, alt.id)}</span>
                 </button>
               </li>
             ))}

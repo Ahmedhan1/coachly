@@ -1,15 +1,14 @@
 import { useMemo, useState } from 'react';
 import {
   EQUIPMENT_IDS,
-  EQUIPMENT_LABELS_AR,
   LEVEL_IDS,
-  LEVEL_LABELS_AR,
   MUSCLE_GROUPS,
 } from '@/domain/exercises';
 import { t } from '@/i18n';
 import { Button, Sheet } from '@/ui';
 import { ChipGroup, ChipToggle } from './ChipToggle';
 import { NO_FILTERS, toggleIn, type LibraryFilters } from './libraryUi';
+import { equipmentName, levelName, muscleName } from './localized';
 import styles from './Sheets.module.css';
 
 interface FilterSheetProps {
@@ -41,21 +40,21 @@ export function FilterSheet({ initial, countFor, onApply, onClose }: FilterSheet
         <ChipGroup label={t('training.library.filterSheet.muscles')}>
           {MUSCLE_GROUPS.map((g) => (
             <ChipToggle key={g.id} pressed={draft.muscles.includes(g.id)} onToggle={() => set({ muscles: toggleIn(draft.muscles, g.id) })}>
-              {g.labelAr}
+              {muscleName(g.id)}
             </ChipToggle>
           ))}
         </ChipGroup>
         <ChipGroup label={t('training.library.filterSheet.equipment')}>
           {EQUIPMENT_IDS.map((id) => (
             <ChipToggle key={id} pressed={draft.equipment.includes(id)} onToggle={() => set({ equipment: toggleIn(draft.equipment, id) })}>
-              {EQUIPMENT_LABELS_AR[id]}
+              {equipmentName(id)}
             </ChipToggle>
           ))}
         </ChipGroup>
         <ChipGroup label={t('training.library.filterSheet.level')}>
           {LEVEL_IDS.map((id) => (
             <ChipToggle key={id} pressed={draft.levels.includes(id)} onToggle={() => set({ levels: toggleIn(draft.levels, id) })}>
-              {LEVEL_LABELS_AR[id]}
+              {levelName(id)}
             </ChipToggle>
           ))}
         </ChipGroup>

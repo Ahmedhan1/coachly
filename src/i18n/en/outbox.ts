@@ -1,0 +1,35 @@
+// English for src/i18n/features/outbox.ts (daily WhatsApp outbox).
+import type { EnArea } from './types';
+
+export const outbox: EnArea<'outbox'> = {
+  title: 'Today’s messages',
+  hint: 'Ready messages, one tap to send on WhatsApp',
+  howItWorks: 'The app prepares these messages every morning, and nothing is sent on its own: “Send” opens WhatsApp with the message written, and you tap send. “Skip” removes the message from today’s list.',
+  cardCount: '{n} messages ready to send',
+  openAll: 'All messages',
+  empty: 'No messages to send today.',
+  emptyBody: 'The app prepares them on its own: tomorrow’s session reminders, renewals, late payments, weekly check-ins, birthdays, and welcomes for new clients.',
+  send: 'Send',
+  sendLabel: 'Send to {name} on WhatsApp',
+  skip: 'Skip',
+  skipLabel: 'Skip {name}’s message',
+  sent: 'Marked as sent',
+  skipped: 'Removed from the list',
+  undo: 'Undo',
+  kinds: {
+    session_reminder: 'Tomorrow’s session reminder',
+    renewal: 'Package ending soon',
+    payment_due: 'Late payment',
+    missed_session: 'Missed a session',
+    checkin_reminder: 'Weekly check-in',
+    birthday: 'Birthday',
+    welcome: 'Welcome',
+  },
+  daysLeft: '{n} days left',
+  oneSessionLeft: '1 session left',
+  sessionsLeft: '{n} sessions left',
+  settings: 'Message types',
+  settingsHint: 'Choose the messages the app prepares every day.',
+  digestTitle: 'WhatsApp messages ready',
+  digestBody: 'You have {n} messages to send today. Open the app.',
+};

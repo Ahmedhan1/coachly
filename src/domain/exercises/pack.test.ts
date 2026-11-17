@@ -4,6 +4,7 @@ import {
   MUSCLE_GROUP_IDS,
   buildExercisePack,
   buildPackExercise,
+  cleanEnglishName,
   packImageFileName,
   toCategoryId,
   toEquipmentId,
@@ -166,5 +167,50 @@ describe('buildExercisePack', () => {
     expect(byId.get('Barbell_Full_Squat')?.cues).toEqual(['انزل ببطء', 'ضهرك مفرود']);
     expect(byId.get('pt_C')?.cues).toEqual(['اعصر الجلوتس']);
     expect(byId.get('pt_D')).not.toHaveProperty('cues');
+  });
+});
+
+describe('cleanEnglishName', () => {
+  it.each([
+    ['Barbell Bench Press - Medium Grip', 'Barbell Bench Press'],
+    ['Wide-Grip Lat Pulldown', 'Lat Pulldown (Wide Grip)'],
+    ['Close-Grip Front Lat Pulldown', 'Front Lat Pulldown (Close Grip)'],
+    ['Jogging, Treadmill', 'Treadmill Jogging'],
+    ['Pushups', 'Push-Up'],
+    ['Pullups', 'Pull-Up'],
+    ['Dumbbell Flyes', 'Dumbbell Fly'],
+    ['Hammer Curls', 'Hammer Curl'],
+    ['Lying Leg Curls', 'Lying Leg Curl'],
+    ['Standing Calf Raises', 'Standing Calf Raise'],
+    ['Tricep Dumbbell Kickback', 'Dumbbell Triceps Kickback'],
+    ['Front Dumbbell Raise', 'Dumbbell Front Raise'],
+    ['Upright Barbell Row', 'Barbell Upright Row'],
+    ['Incline Dumbbell Press', 'Incline Dumbbell Press'],
+    ['Decline Barbell Bench Press', 'Decline Barbell Bench Press'],
+    ['Back Flyes - With Bands', 'Band Back Fly'],
+    ['Barbell Ab Rollout - On Knees', 'Barbell Ab Rollout (On Knees)'],
+    ['Chest Push (multiple response)', 'Chest Push (Multiple Response)'],
+    ['Dumbbell Step Ups', 'Dumbbell Step-Up'],
+    ['Romanian Deadlift', 'Romanian Deadlift'],
+    ['3/4 Sit-Up', '3/4 Sit-Up'],
+  ])('%s → %s', (raw, clean) => {
+    expect(cleanEnglishName(raw)).toBe(clean);
+  });
+});
+
+describe('English names and cues in the pack', () => {
+  it('uses the English override first, then the cleaned dataset name; attaches English cues', () => {
+    const pack = buildExercisePack({
+      sources: [squat, { ...squat, id: 'Barbell_Bench_Press_-_Medium_Grip', name: 'Barbell Bench Press - Medium Grip' }],
+      arabicNames: new Map(),
+      imagesById: new Map(),
+      image: { format: 'webp', maxSize: 480, quality: 60 },
+      source: 'test',
+      englishNames: new Map([['Barbell_Full_Squat', 'Barbell Back Squat']]),
+      cuesEn: new Map([['Barbell_Full_Squat', ['Brace before you descend']]]),
+    });
+    expect(pack.exercises.map((e) => e.en)).toEqual(['Barbell Bench Press', 'Barbell Back Squat']);
+    expect(pack.exercises[1]?.cuesEn).toEqual(['Brace before you descend']);
+    expect(pack.exercises[0]?.cuesEn).toBeUndefined();
   });
 });

@@ -2,7 +2,7 @@ import type { AppServices } from '@/app/services';
 import { NutritionStore } from '@/data/nutritionStore';
 import {
   clientFacts,
-  DRAFT_SYSTEM,
+  draftSystem,
   MEAL_DRAFT_JSON_SCHEMA,
   mealDraftPrompt,
   mealDraftSchema,
@@ -19,7 +19,7 @@ import type { Client } from '@/domain/models';
 import { err, ok, type Result } from '@/domain/nutrition/result';
 import { loadBuiltinCatalog } from '@/features/programs/catalog';
 import { newLocalId } from '@/features/programs/ids';
-import { t } from '@/i18n';
+import { getLocale, t } from '@/i18n';
 import type { AiConfig, AiService } from '@/services/ai/aiService';
 
 /**
@@ -37,7 +37,7 @@ export interface DraftDeps {
 
 export async function draftProgram(d: DraftDeps, client: Client, days: number, notes: string, today: string): Promise<Result<{ programId: string; dropped: number }, AiError>> {
   const catalog = (await loadBuiltinCatalog()) ?? [];
-  const r = await d.ai.json(d.cfg, { system: DRAFT_SYSTEM, schema: PROGRAM_DRAFT_JSON_SCHEMA, prompt: programDraftPrompt({ facts: clientFacts(client, today), days, notes, catalog }) }, d.signal);
+  const r = await d.ai.json(d.cfg, { system: draftSystem(getLocale()), schema: PROGRAM_DRAFT_JSON_SCHEMA, prompt: programDraftPrompt({ facts: clientFacts(client, today), days, notes, catalog }) }, d.signal);
   if (!r.ok) return r;
   const draft = parseDraft(programDraftSchema, r.value);
   if (!draft) return err('bad_output');
@@ -51,7 +51,7 @@ export async function draftMealDay(d: DraftDeps, client: Client, notes: string, 
   const calc = await new NutritionStore(d.services.meta, repos).getCalculation(client.id);
   const recipes = await repos.recipes.list();
   const target = calc ? { kcal: calc.targetKcal, proteinG: calc.proteinG, carbG: calc.carbG, fatG: calc.fatG } : null;
-  const r = await d.ai.json(d.cfg, { system: DRAFT_SYSTEM, schema: MEAL_DRAFT_JSON_SCHEMA, prompt: mealDraftPrompt({ facts: clientFacts(client, today), target, notes, recipeNames: recipes.map((x) => x.name) }) }, d.signal);
+  const r = await d.ai.json(d.cfg, { system: draftSystem(getLocale()), schema: MEAL_DRAFT_JSON_SCHEMA, prompt: mealDraftPrompt({ facts: clientFacts(client, today), target, notes, recipeNames: recipes.map((x) => x.name) }) }, d.signal);
   if (!r.ok) return r;
   const draft = parseDraft(mealDraftSchema, r.value);
   if (!draft) return err('bad_output');

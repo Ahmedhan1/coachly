@@ -129,8 +129,8 @@ export class HtmlPdfRenderer implements PdfRenderer {
       progress?.({ phase: 'layout', done: 0, total: 1 });
       const measure = document.createElement('div');
       measure.className = 'ptpdf-measure';
-      measure.dir = 'rtl';
-      measure.lang = 'ar';
+      measure.dir = input.language === 'en' ? 'ltr' : 'rtl';
+      measure.lang = input.language ?? 'ar';
       measure.style.fontFamily = fontStack(input.branding.fontFamily);
       const ctx = { logoUrl: urlOf(input.branding.logo), trainerName: input.branding.trainerName };
       // One extra "continued" table header at the end, to measure the repeated header too.

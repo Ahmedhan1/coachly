@@ -8,6 +8,15 @@ Write all names in Egyptian Arabic. Gym and muscle terms are transliterated, nev
 Never suggest supplements or medication doses. Respect injuries by avoiding exercises that load them.
 Reply with ONE JSON object only, matching the JSON schema given in the request. No text outside the JSON.`;
 
+/** Draft system prompt for the trainer's app language (passed in by the UI layer; Arabic by default). */
+export function draftSystem(language: 'ar' | 'en' = 'ar'): string {
+  if (language === 'ar') return DRAFT_SYSTEM;
+  return DRAFT_SYSTEM.replace(
+    /^Write all names in Egyptian Arabic\..*$/m,
+    'Write all names in plain English with standard gym names (Glutes, Bench Press, Deadlift).',
+  );
+}
+
 /** Client facts without name or phone (privacy): goal, sex, age, injuries, measurements. */
 export function clientFacts(c: Client, today: string): string {
   const m = c.measurements;

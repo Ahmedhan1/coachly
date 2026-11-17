@@ -134,6 +134,8 @@ export interface PackExercise {
   images: string[];
   /** Short Arabic coaching cues (2-4), our own words; absent when none were written yet. */
   cues?: string[];
+  /** The same cues in short English (shown when the app language is English). */
+  cuesEn?: string[];
   /** 1-based rank in the hand-picked «الأشهر» (most common) set; absent for the rest. */
   popular?: number;
   /** True for the app's own built-in additions (data-src/exercise-extras.json), not from the dataset. */
@@ -144,7 +146,7 @@ export interface PackExercise {
  * A built-in exercise the dataset lacks (data-src/exercise-extras.json). `imagesFrom` names a dataset
  * exercise whose photos truly show the same movement; without it the app draws the muscle map.
  */
-export interface ExtraExercise extends Omit<PackExercise, 'images' | 'popular' | 'extra'> {
+export interface ExtraExercise extends Omit<PackExercise, 'images' | 'popular' | 'extra' | 'cuesEn'> {
   imagesFrom?: string;
   popular?: boolean;
 }
@@ -215,6 +217,69 @@ export function packImageFileName(id: string, index: number, ext: 'webp' | 'jpg'
   return `${id}-${index}.${ext}`;
 }
 
+const SMALL_WORDS = new Set(['a', 'an', 'and', 'or', 'of', 'off', 'on', 'the', 'to', 'with', 'at', 'for', 'from', 'by']);
+
+/** Plural movement words → the singular gym-standard form ("Hammer Curls" → "Hammer Curl"). */
+const SINGULAR: Readonly<Record<string, string>> = {
+  Flyes: 'Fly', Flys: 'Fly', Flies: 'Fly', Curls: 'Curl', Raises: 'Raise', Rows: 'Row', Extensions: 'Extension',
+  Presses: 'Press', Shrugs: 'Shrug', Kickbacks: 'Kickback', Squats: 'Squat', Crunches: 'Crunch', Lunges: 'Lunge',
+  Hyperextensions: 'Hyperextension', 'Sit-Ups': 'Sit-Up', 'Step-Ups': 'Step-Up', 'Chin-Ups': 'Chin-Up',
+  'Pull-Ups': 'Pull-Up', 'Push-Ups': 'Push-Up', Pushups: 'Push-Up', Pullups: 'Pull-Up', Situps: 'Sit-Up',
+  Tricep: 'Triceps', Bicep: 'Biceps', Pulldowns: 'Pulldown', Pullovers: 'Pullover', Deadlifts: 'Deadlift',
+};
+
+const EQUIPMENT_WORDS = new Set(['Barbell', 'Dumbbell', 'Cable', 'Kettlebell', 'EZ-Bar']);
+/** Words that read naturally before the equipment ("Incline Dumbbell Press"), so the equipment stays put. */
+const BEFORE_EQUIPMENT = new Set([
+  'Incline', 'Decline', 'Flat', 'Seated', 'Standing', 'Lying', 'Kneeling', 'One-Arm', 'Single-Arm', 'One',
+  'Alternating', 'Alternate', 'One-Legged', 'Single-Leg', 'Reverse-Grip', 'Prone', 'Supine', 'Close-Grip',
+  'Wide-Grip', 'Weighted', 'Two-Arm', 'Double', 'Advanced', 'Low', 'High', 'Elevated',
+]);
+
+const capitalise = (word: string): string =>
+  word.length > 0 && /^[a-z]/.test(word) ? word.charAt(0).toUpperCase() + word.slice(1) : word;
+
+/**
+ * Gym-standard English name from a free-exercise-db name: drops "Medium Grip" noise, turns "A - B" into
+ * "A (B)" ("With Bands" becomes a "Band" prefix), "Jogging, Treadmill" into "Treadmill Jogging", leading
+ * grips into a suffix ("Lat Pulldown (Wide Grip)"), plurals into the singular, and moves the equipment to
+ * the front ("Front Dumbbell Raise" → "Dumbbell Front Raise"). Hand-written names in
+ * data-src/exercise-names.en.json win over this.
+ */
+export function cleanEnglishName(raw: string): string {
+  let name = raw.replace(/\s+/g, ' ').trim();
+  name = name.replace(/\s*-\s*Medium Grip$/i, '').replace(/ Medium$/, '');
+  const bands = /^(.*?)\s+-\s+With Bands$/i.exec(name);
+  if (bands?.[1] !== undefined) name = `Band ${bands[1]}`;
+  name = name.replace(/^(.+?)\s+-\s*(.+)$/, '$1 ($2)');
+  const comma = /^([^,]+),\s*([^,]+)$/.exec(name);
+  if (comma?.[1] !== undefined && comma[2] !== undefined) name = `${comma[2]} ${comma[1]}`;
+  const grip = /^(Wide|Close)-Grip (.+)$/.exec(name);
+  if (grip?.[1] !== undefined && grip[2] !== undefined) name = `${grip[2]} (${grip[1]} Grip)`;
+  let words = name.split(' ').map((w) => {
+    const bare = w.replace(/[()]/g, '');
+    const single = SINGULAR[bare];
+    return single === undefined ? w : w.replace(bare, single);
+  });
+  if (words.length >= 2 && words[0] === 'Step' && words[1]?.startsWith('Ups')) words.splice(0, 2, 'Step-Up');
+  for (let i = 1; i < words.length; i++) {
+    if (words[i - 1] === 'Step' && words[i] === 'Ups') words.splice(i - 1, 2, 'Step-Up');
+  }
+  const at = words.findIndex((w) => EQUIPMENT_WORDS.has(w));
+  if (at > 0 && at <= 2 && at < words.length - 1 && words.slice(0, at).every((w) => !BEFORE_EQUIPMENT.has(w))) {
+    const equipment = words[at] as string;
+    words = [equipment, ...words.slice(0, at), ...words.slice(at + 1)];
+  }
+  return words
+    .map((w, i) => {
+      const open = w.startsWith('(');
+      const core = open ? w.slice(1) : w;
+      const keepSmall = i > 0 && !open && SMALL_WORDS.has(core.toLowerCase());
+      return (open ? '(' : '') + (keepSmall ? core.toLowerCase() : capitalise(core));
+    })
+    .join(' ');
+}
+
 export function buildPackExercise(
   source: DatasetExercise,
   arabicName: string | undefined,
@@ -225,7 +290,7 @@ export function buildPackExercise(
   const ar = arabicName?.trim();
   return {
     id: source.id,
-    en: source.name,
+    en: cleanEnglishName(source.name),
     ar: ar !== undefined && ar !== '' ? ar : source.name,
     primary,
     secondary,
@@ -252,6 +317,10 @@ export interface BuildExercisePackInput {
   /** Exercise id → Arabic coaching cues for dataset exercises (data-src/exercise-cues.ar.json). */
   cues?: ReadonlyMap<string, readonly string[]>;
   extras?: readonly ExtraExercise[];
+  /** Exercise id → hand-written English name (data-src/exercise-names.en.json); wins over the cleaned name. */
+  englishNames?: ReadonlyMap<string, string>;
+  /** Exercise id → short English cues (data-src/exercise-cues.en.json), dataset and extras alike. */
+  cuesEn?: ReadonlyMap<string, readonly string[]>;
 }
 
 function extraToPack(extra: ExtraExercise, imagesById: ReadonlyMap<string, readonly string[]>): PackExercise {
@@ -286,8 +355,11 @@ export function buildExercisePack(input: BuildExercisePackInput): ExercisePack {
       const r = rank.get(e.id);
       const { cues: own, ...plain } = e;
       const cues = own !== undefined && own.length > 0 ? own : input.cues?.get(e.id);
-      const withCues: PackExercise = cues !== undefined && cues.length > 0 ? { ...plain, cues: [...cues] } : plain;
-      return r === undefined ? withCues : { ...withCues, popular: r };
+      const named = { ...plain, en: input.englishNames?.get(e.id)?.trim() || plain.en };
+      const withCues: PackExercise = cues !== undefined && cues.length > 0 ? { ...named, cues: [...cues] } : named;
+      const en = input.cuesEn?.get(e.id);
+      const withEn: PackExercise = en !== undefined && en.length > 0 ? { ...withCues, cuesEn: [...en] } : withCues;
+      return r === undefined ? withEn : { ...withEn, popular: r };
     })
     .sort((a, b) => (a.id < b.id ? -1 : a.id > b.id ? 1 : 0));
   return {

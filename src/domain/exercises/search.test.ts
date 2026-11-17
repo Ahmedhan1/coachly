@@ -88,3 +88,15 @@ describe('searchExercises – «الأشهر» tie-break', () => {
     expect(searchExercises(list, 'barbell bench').map((e) => e.id)).toEqual(['b']);
   });
 });
+
+describe('phrase inside a name', () => {
+  it('ranks a whole-phrase match at a word start like a prefix, so the popular one comes first', () => {
+    const base = { primaryMuscles: [], secondaryMuscles: [], equipment: 'barbell', level: 'beginner', category: 'strength', force: null, mechanic: null, images: [], isCustom: false } as const;
+    const list = [
+      { ...base, id: 'pl', nameEn: 'Bench Press (Powerlifting)', nameAr: 'بنش برس باورليفتينج' },
+      { ...base, id: 'bb', nameEn: 'Barbell Bench Press', nameAr: 'بنش برس بالبار', popularRank: 1 },
+    ];
+    expect(searchExercises(list, 'bench press').map((e) => e.id)).toEqual(['bb', 'pl']);
+    expect(searchExercises(list, 'بنش برس').map((e) => e.id)).toEqual(['bb', 'pl']);
+  });
+});

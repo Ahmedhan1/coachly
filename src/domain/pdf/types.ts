@@ -123,6 +123,8 @@ export interface PdfBranding {
 export interface PdfDocumentInput {
   sections: readonly PdfSection[];
   labels: PdfLabels;
+  /** Language the PDF is written in (the trainer's app language). Default Arabic (RTL). */
+  language?: 'ar' | 'en';
   branding: PdfBranding;
   /** Fixed line on every page; the default comes from settings/i18n (see `resolveDisclaimer`). */
   disclaimer: string;
@@ -256,6 +258,9 @@ export interface PdfTheme {
   primaryDeep: string;
   background: { image: PdfImageRef; opacity: number } | null;
   coverImage: PdfImageRef | null;
+  /** Document language and direction (from PdfDocumentInput.language). Absent = Arabic, RTL. */
+  lang?: 'ar' | 'en';
+  dir?: 'rtl' | 'ltr';
 }
 
 export interface PdfFooter {

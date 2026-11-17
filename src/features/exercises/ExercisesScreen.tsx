@@ -1,6 +1,6 @@
 import { useCallback, useDeferredValue, useEffect, useLayoutEffect, useMemo } from 'react';
 import { useSearchParams } from 'react-router-dom';
-import { isMuscleGroupId, muscleGroupLabelAr, EQUIPMENT_LABELS_AR, LEVEL_LABELS_AR, type CatalogExercise } from '@/domain/exercises';
+import { isMuscleGroupId, type CatalogExercise } from '@/domain/exercises';
 import { t } from '@/i18n';
 import { Button, EmptyState, Icon, IconButton, PageHeader, SearchField, Tx, cx } from '@/ui';
 import { AddExerciseSheet } from './AddExerciseSheet';
@@ -9,6 +9,7 @@ import { ExerciseRow, ROW_HEIGHT } from './ExerciseRow';
 import { FilterSheet } from './FilterSheet';
 import { DownloadIcon, FilterIcon } from './icons';
 import { activeFilterCount, NO_FILTERS, toggleIn, useLibraryUi, type LibraryFilters } from './libraryUi';
+import { equipmentName, levelName, muscleName } from './localized';
 import { OfflinePhotosSheet } from './OfflinePhotosSheet';
 import { libraryResults } from './results';
 import { useCatalog } from './useCatalog';
@@ -129,13 +130,13 @@ export function ExercisesScreen() {
             <ActiveChip label={t('training.library.showHidden')} onRemove={() => setFilters({ ...filters, showHidden: false })} />
           )}
           {filters.muscles.map((m) => (
-            <ActiveChip key={m} label={muscleGroupLabelAr(m)} onRemove={() => setFilters({ ...filters, muscles: toggleIn(filters.muscles, m) })} />
+            <ActiveChip key={m} label={muscleName(m)} onRemove={() => setFilters({ ...filters, muscles: toggleIn(filters.muscles, m) })} />
           ))}
           {filters.equipment.map((m) => (
-            <ActiveChip key={m} label={EQUIPMENT_LABELS_AR[m]} onRemove={() => setFilters({ ...filters, equipment: toggleIn(filters.equipment, m) })} />
+            <ActiveChip key={m} label={equipmentName(m)} onRemove={() => setFilters({ ...filters, equipment: toggleIn(filters.equipment, m) })} />
           ))}
           {filters.levels.map((m) => (
-            <ActiveChip key={m} label={LEVEL_LABELS_AR[m]} onRemove={() => setFilters({ ...filters, levels: toggleIn(filters.levels, m) })} />
+            <ActiveChip key={m} label={levelName(m)} onRemove={() => setFilters({ ...filters, levels: toggleIn(filters.levels, m) })} />
           ))}
         </div>
       </div>

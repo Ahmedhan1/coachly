@@ -1,6 +1,7 @@
 import { lazy, Suspense, useMemo, useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
-import { filterExercises, MUSCLE_GROUPS, muscleGroupLabelAr, type MuscleGroupId } from '@/domain/exercises';
+import { filterExercises, MUSCLE_GROUPS, type MuscleGroupId } from '@/domain/exercises';
+import { muscleName } from '@/features/exercises/localized';
 import { useCatalog } from '@/features/exercises/useCatalog';
 import { t } from '@/i18n';
 import { Button, ListRow, ListSection, PageHeader, SegmentedControl, Tx } from '@/ui';
@@ -55,9 +56,9 @@ export function MuscleMapScreen() {
             <div className={styles.selection} aria-live="polite">
               {selected ? (
                 <>
-                  <p className={styles.selectedName}>{t('training.muscles3d.selected', { name: muscleGroupLabelAr(selected) })}</p>
+                  <p className={styles.selectedName}>{t('training.muscles3d.selected', { name: muscleName(selected) })}</p>
                   <Button block icon="dumbbell" onClick={() => navigate(exercisesLink(selected))}>
-                    {t('training.muscles3d.openExercises', { name: muscleGroupLabelAr(selected) })}
+                    {t('training.muscles3d.openExercises', { name: muscleName(selected) })}
                   </Button>
                 </>
               ) : (
@@ -80,7 +81,7 @@ export function MuscleMapScreen() {
           <ListRow
             key={g.id}
             to={exercisesLink(g.id)}
-            title={g.labelAr}
+            title={muscleName(g.id)}
             trailing={catalog.status === 'ready' ? <Tx k="training.library.muscleMap.exerciseCount" params={{ n: counts.get(g.id) ?? 0 }} /> : undefined}
           />
         ))}

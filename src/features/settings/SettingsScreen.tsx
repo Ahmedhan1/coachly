@@ -9,6 +9,7 @@ import { CLIENT_PAGES_ENABLED_KEY, clientPagesEnabled } from '@/features/online/
 import { t } from '@/i18n';
 import { Badge, Icon, ListRow, ListSection, PageHeader } from '@/ui';
 import { formatIsoDate } from '@/ui/format';
+import { LanguageSwitch } from './LanguageSwitch';
 import styles from './SettingsScreen.module.css';
 
 /** Who the license belongs to and until when (from the signed token on this device; no network). */
@@ -51,6 +52,11 @@ export function SettingsScreen() {
         <ListRow to="/more/settings/identity" leading={<Icon name="palette" />} title={t('screens.settings.identity')} subtitle={t('screens.settings.identityHint')} />
         <ListRow to="/more/settings/formulas" leading={<Icon name="target" />} title={t('settings.formulas.title')} subtitle={t('settings.formulas.hint')} />
         <ListRow to="/more/whatsapp-templates" leading={<Icon name="chat" />} title={t('schedule.more.whatsapp')} subtitle={t('schedule.more.whatsappHint')} />
+      </ListSection>
+      <ListSection bare>
+        <div className={styles.language}>
+          <LanguageSwitch />
+        </div>
       </ListSection>
       <ListSection title={t('settings.page.backupTitle')}>
         <ListRow to="/more/settings/backup" leading={<Icon name="database" />} title={t('settings.backup.title')} subtitle={t('settings.backup.hint')} />

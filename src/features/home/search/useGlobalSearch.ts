@@ -4,7 +4,7 @@ import { useLive } from '@/app/useLive';
 import { prepareSearch, filterPrepared } from '@/data';
 import { searchExercises } from '@/domain/exercises';
 import { useExerciseCatalog } from '@/features/programs/catalog';
-import { exerciseSubline } from '@/features/programs/names';
+import { exerciseName, exerciseSubline } from '@/features/programs/names';
 import { useNutritionStore } from '@/features/nutrition/shared/useNutritionStore';
 import { t } from '@/i18n';
 
@@ -58,7 +58,7 @@ export function useGlobalSearch(query: string, active: boolean): Record<SearchGr
       exercises: searchExercises(catalog?.list ?? [], q, PER_GROUP).map((e) => ({
         id: e.id,
         group: 'exercises' as const,
-        title: e.nameAr,
+        title: exerciseName(e, e.id),
         subtitle: exerciseSubline(e),
         to: `/exercises/${encodeURIComponent(e.id)}`,
       })),

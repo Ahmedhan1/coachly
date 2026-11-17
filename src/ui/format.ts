@@ -1,9 +1,12 @@
-import { t, type TKey } from '@/i18n';
+import { getLocale, t, type TKey } from '@/i18n';
 
-/** Arabic locale with Western digits (0-9), per product rule. */
-export const LOCALE = 'ar-EG-u-nu-latn';
+/** Formatting locale for the active language, always with Western digits (0-9), per product rule. */
+export const LOCALE = getLocale() === 'en' ? 'en-GB' : 'ar-EG-u-nu-latn';
 
-const timeFmt = new Intl.DateTimeFormat(LOCALE, { hour: 'numeric', minute: '2-digit' });
+/** Separator for joining short lists in running text ("، " in Arabic, ", " in English). */
+export const LIST_SEP = getLocale() === 'en' ? ', ' : '، ';
+
+const timeFmt = new Intl.DateTimeFormat(LOCALE, { hour: 'numeric', minute: '2-digit', hour12: true });
 const dateFmt = new Intl.DateTimeFormat(LOCALE, { day: 'numeric', month: 'long' });
 const longDateFmt = new Intl.DateTimeFormat(LOCALE, { weekday: 'long', day: 'numeric', month: 'long' });
 const numberFmt = new Intl.NumberFormat(LOCALE, { maximumFractionDigits: 1 });
@@ -13,7 +16,7 @@ export const formatTime = (epochMs: number) => timeFmt.format(epochMs);
 export const formatLongDate = (date: Date) => longDateFmt.format(date);
 export const formatNumber = (n: number) => numberFmt.format(n);
 
-/** "5:00" and "م" separately, so the big hero time can style the period smaller and outside the LTR isolate. */
+/** "5:00" and "م"/"pm" separately, so the big hero time can style the period smaller and outside the LTR isolate. */
 export function timeParts(epochMs: number): { clock: string; period: string } {
   const parts = timeFmt.formatToParts(epochMs);
   const clock = parts

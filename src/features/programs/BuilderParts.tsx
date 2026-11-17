@@ -1,4 +1,5 @@
-import { muscleGroupLabelAr, type CatalogExercise } from '@/domain/exercises';
+import type { CatalogExercise } from '@/domain/exercises';
+import { muscleName } from '@/features/exercises/localized';
 import type { ProgramDay } from '@/domain/models';
 import { dayMuscleLoad, estimateDayMinutes, totalSets, weeklySetsPerMuscle, type ProgramBody } from '@/domain/programs';
 import { t } from '@/i18n';
@@ -58,12 +59,12 @@ export function DayTile({ day, index, catalog }: { day: ProgramDay; index: numbe
           <ul className={styles.muscleChips}>
             {primary.slice(0, 3).map((m) => (
               <li key={m.muscle} className={cx(styles.mChip, styles.mChipBrand)}>
-                {muscleGroupLabelAr(m.muscle)}
+                {muscleName(m.muscle)}
               </li>
             ))}
             {secondary.map((m) => (
               <li key={m.muscle} className={styles.mChip}>
-                {muscleGroupLabelAr(m.muscle)}
+                {muscleName(m.muscle)}
               </li>
             ))}
           </ul>
@@ -89,7 +90,7 @@ export function WeekSummary({ body, catalog }: { body: ProgramBody; catalog: Rea
         <ul className={styles.weekList}>
           {rows.map((r) => (
             <li key={r.muscle} className={styles.weekRow}>
-              <span className={styles.weekName}>{muscleGroupLabelAr(r.muscle)}</span>
+              <span className={styles.weekName}>{muscleName(r.muscle)}</span>
               <span className={styles.weekBar} aria-hidden="true">
                 <i style={{ inlineSize: `${Math.round((r.direct / max) * 100)}%` }} />
               </span>

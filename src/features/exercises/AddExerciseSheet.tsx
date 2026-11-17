@@ -3,9 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { useUiStore } from '@/app/uiStore';
 import {
   EQUIPMENT_IDS,
-  EQUIPMENT_LABELS_AR,
   LEVEL_IDS,
-  LEVEL_LABELS_AR,
   MUSCLE_GROUPS,
   type EquipmentId,
   type ExerciseLevel,
@@ -15,14 +13,15 @@ import { t } from '@/i18n';
 import { Icon, SegmentedControl, Select, Sheet, TextField } from '@/ui';
 import { ChipGroup, ChipToggle } from './ChipToggle';
 import { toggleIn } from './libraryUi';
+import { equipmentName, levelName, muscleName } from './localized';
 import { useLibraryStore } from './useCatalog';
 import { MAX_PHOTOS, usePhotoDrafts } from './usePhotoDrafts';
 import styles from './Sheets.module.css';
 
 const FORM_ID = 'add-exercise-form';
 const NAME_ID = 'add-exercise-name';
-const EQUIPMENT = EQUIPMENT_IDS.map((value) => ({ value, label: EQUIPMENT_LABELS_AR[value] }));
-const LEVELS = LEVEL_IDS.map((value) => ({ value, label: LEVEL_LABELS_AR[value] }));
+const EQUIPMENT = EQUIPMENT_IDS.map((value) => ({ value, label: equipmentName(value) }));
+const LEVELS = LEVEL_IDS.map((value) => ({ value, label: levelName(value) }));
 
 /** Trainer's own exercise: name, muscles, equipment, level and up to two photos. */
 export function AddExerciseSheet({ onClose, initialMuscle }: { onClose: () => void; initialMuscle?: MuscleGroupId }) {
@@ -98,7 +97,7 @@ export function AddExerciseSheet({ onClose, initialMuscle }: { onClose: () => vo
                 setErrors((x) => ({ ...x, muscles: undefined }));
               }}
             >
-              {g.labelAr}
+              {muscleName(g.id)}
             </ChipToggle>
           ))}
         </ChipGroup>
@@ -110,7 +109,7 @@ export function AddExerciseSheet({ onClose, initialMuscle }: { onClose: () => vo
         <ChipGroup label={`${t('training.library.add.secondary')} (${t('common.optional')})`}>
           {MUSCLE_GROUPS.filter((g) => !primary.includes(g.id)).map((g) => (
             <ChipToggle key={g.id} pressed={secondary.includes(g.id)} onToggle={() => setSecondary(toggleIn(secondary, g.id))}>
-              {g.labelAr}
+              {muscleName(g.id)}
             </ChipToggle>
           ))}
         </ChipGroup>

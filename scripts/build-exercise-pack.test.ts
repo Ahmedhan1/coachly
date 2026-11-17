@@ -56,6 +56,11 @@ describe('parseArgs', () => {
     expect(() => parseArgs(['--what'])).toThrow();
     expect(DEFAULTS.budgetMb).toBe(40);
   });
+
+  it('knows the English data files and the manifest-only mode', () => {
+    expect(parseArgs([], '/repo')).toMatchObject({ manifestOnly: false, namesEn: '/repo/data-src/exercise-names.en.json', cuesEn: '/repo/data-src/exercise-cues.en.json' });
+    expect(parseArgs(['--manifest-only'], '/r').manifestOnly).toBe(true);
+  });
 });
 
 describe('planImages', () => {

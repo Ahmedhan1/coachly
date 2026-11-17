@@ -1,5 +1,5 @@
 import { expect, test, type Page } from '@playwright/test';
-import { openApp } from './helpers';
+import { emulateDownloadOnlySave, openApp, saveDeviceBackup } from './helpers';
 
 /**
  * Scale test: a trainer's multi-year database (500 clients, ~30k sessions over 3 years, 10k payments,
@@ -200,6 +200,7 @@ async function scrollThrough(page: Page): Promise<{ totalMs: number; longestFram
 
 test('scale: multi-year data on a throttled iPhone 13 viewport', async ({ page }, testInfo) => {
   test.setTimeout(600_000);
+  await emulateDownloadOnlySave(page);
   await openApp(page);
   await page.evaluate(async () => {
     await navigator.serviceWorker.ready;
@@ -243,15 +244,9 @@ test('scale: multi-year data on a throttled iPhone 13 viewport', async ({ page }
     history.pushState(null, '', '/more/settings/backup');
     dispatchEvent(new PopStateEvent('popstate'));
   });
-  await page.getByRole('button', { name: 'اعمل ملف نسخة' }).click();
-  await page.getByRole('dialog').getByRole('checkbox').uncheck();
   const e0 = Date.now();
-  await page.getByRole('dialog').getByRole('button', { name: 'اعمل ملف نسخة' }).click();
-  const ready = page.getByRole('button', { name: /الملف جاهز/ });
-  await expect(ready).toBeVisible({ timeout: 300_000 });
+  const download = await saveDeviceBackup(page, null);
   results.backupExportMs = Date.now() - e0;
-  results.backupLabel = (await ready.textContent()) ?? '';
-  const [download] = await Promise.all([page.waitForEvent('download'), ready.click()]);
   const file = testInfo.outputPath('scale-backup.zip');
   await download.saveAs(file);
   const { size } = await import('node:fs').then((fs) => fs.statSync(file));

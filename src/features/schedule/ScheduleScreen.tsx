@@ -10,7 +10,7 @@ import { addDays, type Client, type IsoDate, type Session } from '@/domain/model
 import { isIsoDate, weekDates, weekdayOf } from '@/domain/schedule';
 import { t, type TKey } from '@/i18n';
 import { Button, EmptyState, Icon, IconButton, ListSection, Num, PageHeader, SearchField, SegmentedControl, Tx, cx } from '@/ui';
-import { formatIsoDate } from '@/ui/format';
+import { formatIsoDate, LIST_SEP } from '@/ui/format';
 import { BookingSheet, type BookingTarget } from './BookingSheet';
 import { useMinuteNow, useScheduleWriter } from './hooks';
 import { PrefsSheet } from './PrefsSheet';
@@ -313,7 +313,7 @@ function WeekList({ days, today, sessions, dateOf, byId, onPick }: WeekListProps
     <ListSection label={t('schedule.viewWeek')} className={styles.dayList}>
       {days.map((d) => {
         const items = sessions.filter((s) => dateOf(s) === d);
-        const names = items.map((s) => byId.get(s.clientId)?.name.split(' ')[0] ?? '—').join('، ');
+        const names = items.map((s) => byId.get(s.clientId)?.name.split(' ')[0] ?? '—').join(LIST_SEP);
         return (
           <button key={d} type="button" className={cx(styles.weekRow, d === today && styles.weekRowToday)} onClick={() => onPick(d)}>
             <span className={styles.weekDate}>
