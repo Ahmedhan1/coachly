@@ -101,7 +101,7 @@ export function IncomeScreen() {
                     title={client?.name ?? '—'}
                     subtitle={`${formatMoney(p.amountMinor, currency)} · ${late > 0 ? t('schedule.income.lateDays', { n: late }) : formatIsoDate(p.dueDate)}`}
                     trailing={<WaTrailing client={client} href={client ? paymentLink(client, { amountMinor: p.amountMinor, currency }) : null} label={client ? t('schedule.income.remindPayment', { name: client.name }) : ''} />}
-                    to={client ? `/clients/${client.id}` : undefined}
+                    to={client ? `/clients/${client.id}?tab=payments` : undefined}
                   />
                 );
               })

@@ -1,5 +1,6 @@
 import { useState, type FormEvent } from 'react';
 import { useServices } from '@/app/services';
+import { useGo } from '@/app/nav';
 import { useUiStore } from '@/app/uiStore';
 import { useLive } from '@/app/useLive';
 import { bookingConflicts, type BookingRepeat } from '@/domain/attendance';
@@ -129,6 +130,7 @@ function BookingForm({
 }: BookingSheetProps & { head: Session | null; future: Session[]; clientSessions: Session[] }) {
   const { data, meta } = useServices();
   const writer = useScheduleWriter();
+  const go = useGo();
   const showToast = useUiStore((s) => s.showToast);
   const session = target.mode === 'edit' ? target.session : null;
   const inSeries = Boolean(session?.seriesId);
@@ -426,6 +428,16 @@ function BookingForm({
         />
         {session && (
           <div className={styles.sheetActions}>
+            <Button
+              variant="secondary"
+              icon="user"
+              onClick={() => {
+                onClose();
+                go(`/clients/${session.clientId}?tab=sessions`);
+              }}
+            >
+              {t('hub.session.openClient', { name: nameOf(session.clientId) })}
+            </Button>
             {googleLink ? (
               <>
                 <a className={styles.linkButton} href={googleLink} target="_blank" rel="noreferrer">

@@ -1,9 +1,10 @@
+import { Link } from 'react-router-dom';
 import { useServices } from '@/app/services';
 import { useUiStore } from '@/app/uiStore';
 import type { Client } from '@/domain/models';
 import type { OutboxItem } from '@/domain/outbox';
 import { t } from '@/i18n';
-import { Avatar, Badge, Icon } from '@/ui';
+import { Avatar, Badge, Icon, useFromHere } from '@/ui';
 import { useWhatsappTemplates, defaultTemplate } from '@/features/whatsapp/templatesStore';
 import { linkFor } from '@/features/whatsapp/useWhatsappLink';
 import { renderTemplate, templateFor } from '@/domain/whatsapp';
@@ -16,6 +17,7 @@ export function OutboxList({ items, clients, onChange, limit }: { items: OutboxI
   const { meta } = useServices();
   const showToast = useUiStore((s) => s.showToast);
   const templates = useWhatsappTemplates();
+  const { from: here } = useFromHere();
   const shown = limit ? items.slice(0, limit) : items;
 
   const mark = async (item: OutboxItem, name: string, skipped = false) => {
@@ -42,7 +44,11 @@ export function OutboxList({ items, clients, onChange, limit }: { items: OutboxI
           <li key={item.id} className={styles.row}>
             <Avatar name={client.name} />
             <div className={styles.text}>
-              <p className={styles.name}>{client.name}</p>
+              <p className={styles.name}>
+                <Link to={`/clients/${client.id}`} state={{ from: here }} className={styles.nameLink}>
+                  {client.name}
+                </Link>
+              </p>
               <p className={styles.reason}>
                 {t(`outbox.kinds.${item.kind}`)}
                 {item.daysLeft !== undefined && <Badge>{t('outbox.daysLeft', { n: item.daysLeft })}</Badge>}

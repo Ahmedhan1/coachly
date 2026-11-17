@@ -108,3 +108,14 @@
   color: var(--text-2);
   font: var(--t-sub);
 }
+
+.nameLink {
+  position: relative;
+  color: inherit;
+}
+
+.nameLink::after {
+  content: '';
+  position: absolute;
+  inset: -10px -4px;
+}

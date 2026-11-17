@@ -74,7 +74,8 @@ function ClientHub({ client }: { client: Client }) {
   const deletePayment = useDeletePayment();
   const assign = useAssignProgram();
   const catalog = useExerciseCatalog();
-  const [sheet, setSheet] = useState<SheetName>(null);
+  const [params, setParams] = useSearchParams();
+  const [sheet, setSheet] = useState<SheetName>(() => (params.get('pay') === '1' ? { payment: null } : null));
   const { meta } = useServices();
   const pagesOn = useLive(() => clientPagesEnabled(meta), [meta]) ?? false;
   const aiOn = (useLive(() => readAiKey(meta), [meta]) ?? null) !== null;
@@ -82,7 +83,6 @@ function ClientHub({ client }: { client: Client }) {
   const attention = subscriptionAttention(client, hub?.today ?? '');
 
   // "/clients/:id?renew=1" (Home «جدّد») renews once on arrival; "?pay=1" (Home «حصّل») opens a payment.
-  const [params, setParams] = useSearchParams();
   const handled = useRef<string | null>(null);
   useEffect(() => {
     const renewing = params.get('renew') === '1';
@@ -99,7 +99,6 @@ function ClientHub({ client }: { client: Client }) {
       { replace: true, state: null },
     );
     if (renewing) void renew(client);
-    if (paying) setSheet({ payment: null });
   }, [params, setParams, renew, client]);
 
   if (!hub) return <PageHeader title="" back={BACK} />;
