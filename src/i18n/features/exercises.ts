@@ -13,4 +13,10 @@ export const exercises = {
     clientsPrograms: 'في برنامج: {programs}',
     alternativesHint: 'نفس العضلة الأساسية، الأقرب في الحركة والأداة الأول.',
   },
+  names: {
+    nameAr: 'الاسم بالعربي',
+    nameEn: 'الاسم بالإنجليزي (اختياري)',
+    nameEnHint: 'بيظهر لما تختار اللغة الإنجليزية.',
+    nameEnDefault: 'سيبه فاضي للاسم الأصلي: {name}',
+  },
 } as const;

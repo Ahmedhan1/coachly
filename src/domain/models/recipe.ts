@@ -18,9 +18,12 @@ export const ingredientSchema = z.object({
 export const recipeSchema = z.object({
   id: recipeIdSchema,
   name: requiredNameSchema,
+  /** Optional English name (shown when the app is in English). */
+  nameEn: shortTextSchema.optional(),
   servings: z.number().int().min(1).max(100),
   ingredients: z.array(ingredientSchema).max(60),
   instructions: longTextSchema,
+  instructionsEn: longTextSchema.optional(),
   imageId: imageIdSchema.nullable(),
   tags: z.array(shortTextSchema).max(20),
   ...entityMetaShape,

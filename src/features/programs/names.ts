@@ -1,7 +1,9 @@
 import type { CatalogExercise } from '@/domain/exercises';
 import { equipmentName, exName, muscleName } from '@/features/exercises/localized';
-import type { BuiltinTemplateId } from '@/domain/programs';
-import { t, type TKey } from '@/i18n';
+import { localizeTemplateDayName, type BuiltinTemplateId } from '@/domain/programs';
+import { getLocale, t, type TKey } from '@/i18n';
+import { ar } from '@/i18n/ar';
+import { en } from '@/i18n/en';
 
 export const templateName = (id: BuiltinTemplateId) => t(`training.programs.templates.${id}` as TKey);
 
@@ -10,6 +12,11 @@ export function templateDayName(key: string): string {
   const label = t(k);
   return label === k ? key : label;
 }
+
+const DAY_LABELS = { ar: ar.training.programs.dayNames, en: en.training?.programs?.dayNames };
+
+/** A day name from a ready template ("فول بادي" / "Full Body") in the app language; the trainer's own names stay. */
+export const dayLabel = (name: string): string => localizeTemplateDayName(name, DAY_LABELS, getLocale());
 
 /** Name in the app language (the trainer's rename wins), or the raw id when the exercise is missing from the catalog. */
 export const exerciseName = (exercise: CatalogExercise | undefined, id: string) => (exercise ? exName(exercise) : id.replace(/_/g, ' '));
@@ -27,5 +34,5 @@ export function programDayName(days: readonly { id: string; name: string }[], da
   const index = days.findIndex((d) => d.id === dayId);
   const day = days[index];
   if (!day) return '';
-  return day.name || t('training.programs.builder.dayDefault', { n: index + 1 });
+  return dayLabel(day.name) || t('training.programs.builder.dayDefault', { n: index + 1 });
 }

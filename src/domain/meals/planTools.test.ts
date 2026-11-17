@@ -42,3 +42,36 @@ describe('shoppingList', () => {
     expect(shoppingText('مشتريات', list)).toContain('• شاي');
   });
 });
+
+describe('items with exact gram lines', () => {
+  const line = (name: string, grams: number, kcal: number, p: number, c: number, f: number) => ({ name, grams, kcal, proteinG: p, carbG: c, fatG: f });
+  const gramMeals = [
+    {
+      id: 'g1',
+      name: 'غدا',
+      time: null,
+      items: [{ recipeId: 'rice', text: '', servings: 2.1, lines: [line('صدر فراخ ني (من غير جلد)', 200, 240, 45, 0, 5), line('رز أبيض مطبوخ', 150, 195, 4, 42, 0)] }],
+    },
+  ];
+
+  it('totals come from the lines, not the servings', () => {
+    const r = scaleDayToTarget(gramMeals, lookup, 435)!;
+    expect(r.beforeKcal).toBe(435);
+  });
+
+  it('scaling moves the grams on a 5 g grid and the values with them', () => {
+    const r = scaleDayToTarget(gramMeals, lookup, 870)!;
+    const lines = r.meals[0]!.items[0]!.lines!;
+    expect(lines.map((l) => l.grams)).toEqual([400, 300]);
+    expect(lines.map((l) => l.kcal)).toEqual([480, 390]);
+    expect(r.afterKcal).toBe(870);
+  });
+
+  it('shopping adds up the grams by food', () => {
+    const list = shoppingList([{ meals: gramMeals }, { meals: gramMeals }], new Map(), 1);
+    expect(list.lines).toEqual([
+      { name: 'رز أبيض مطبوخ', unit: 'g', quantity: 300 },
+      { name: 'صدر فراخ ني (من غير جلد)', unit: 'g', quantity: 400 },
+    ]);
+  });
+});

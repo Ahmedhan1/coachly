@@ -31,8 +31,10 @@ export interface CatalogExercise {
   cues?: readonly string[];
   /** The same cues in short English, shown when the app language is English. */
   cuesEn?: readonly string[];
-  /** True when the trainer renamed this built-in exercise: their name then wins in every language. */
+  /** True when the trainer renamed this built-in exercise in Arabic: that name wins in English too, unless... */
   renamed?: boolean;
+  /** ...the trainer also typed their own English name (then `nameEn` holds it and wins in English). */
+  renamedEn?: boolean;
   /** 1-based rank in the «الأشهر» (most common) set; undefined for the rest. Lower = more common. */
   popularRank?: number;
 }
@@ -55,6 +57,8 @@ export interface CustomExerciseInput {
 export interface ExerciseOverride {
   exerciseId: string;
   nameAr?: string;
+  /** The trainer's English name; empty or absent keeps the pack's English name. */
+  nameEn?: string;
   /** Trainer photos replacing the pack photos. An empty array keeps the pack photos. */
   imageIds?: readonly string[];
   hidden?: boolean;

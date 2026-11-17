@@ -17,11 +17,15 @@ import type { CatalogExercise } from './types';
 /** Same values as the app's Locale type (src/i18n/locale.ts). */
 export type ExerciseLocale = 'ar' | 'en';
 
-type Named = Pick<CatalogExercise, 'nameAr' | 'nameEn' | 'renamed'>;
+type Named = Pick<CatalogExercise, 'nameAr' | 'nameEn' | 'renamed' | 'renamedEn'>;
 
-/** The name to show: English when asked and available, unless the trainer renamed the exercise. */
+/**
+ * The name to show. English: the trainer's English name, else their Arabic rename, else the pack's English
+ * name. Arabic: always the Arabic name (the trainer's rename when there is one).
+ */
 export function exerciseName(exercise: Named, locale: ExerciseLocale): string {
-  if (locale === 'en' && exercise.renamed !== true && exercise.nameEn.trim() !== '') return exercise.nameEn;
+  const en = exercise.nameEn.trim();
+  if (locale === 'en' && en !== '' && (exercise.renamedEn === true || exercise.renamed !== true)) return exercise.nameEn;
   return exercise.nameAr;
 }
 

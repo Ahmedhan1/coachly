@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { defaultNutritionSettings } from '@/domain/meals';
 import { NUTRITION_KEYS, NutritionStore, type KeyValueStore } from './nutritionStore';
-import { starterIngredients, starterRecipes } from './seeds/starter';
+import { starterFoodRenames, starterIngredients, starterRecipes } from './seeds/starter';
 import { createTestData } from './testing';
 
 function memoryKv(): KeyValueStore {
@@ -103,6 +103,40 @@ describe('NutritionStore', () => {
       expect((await repos.recipes.list()).length).toBe(first);
       expect((await store.getStarterRecipeIds()).length).toBe(first);
     });
+  });
+
+  it('refreshes untouched starter recipes (slots, English, raw/cooked names) and follows renamed foods, but keeps edits', async () => {
+    const { repos } = createTestData();
+    const kv = memoryKv();
+    const all = starterIngredients();
+    const chicken = all.find((i) => i.id === 'chicken_breast');
+    const renames = starterFoodRenames();
+    if (!chicken || !renames.chicken_breast) throw new Error('seed rows missing');
+    // An install from data version 2: old food names, recipes without English or slot tags on salads.
+    await kv.set(NUTRITION_KEYS.ingredients, [{ id: chicken.id, name: renames.chicken_breast, per100g: chicken.per100g }]);
+    await kv.set(NUTRITION_KEYS.starterSeeded, 1);
+    await kv.set(NUTRITION_KEYS.foodsVersion, 3);
+    await kv.set(NUTRITION_KEYS.recipesVersion, 2);
+    const shipped = starterRecipes().filter((r) => r.since <= 2);
+    await kv.set(NUTRITION_KEYS.starterRecipeKeys, shipped.map((r) => r.key));
+    const salad = shipped.find((r) => r.key === 'baladi_salad');
+    const foul = shipped.find((r) => r.key === 'foul');
+    if (!salad || !foul) throw new Error('recipes missing');
+    const untouched = await repos.recipes.create({ name: salad.name, servings: salad.servings, ingredients: salad.ingredients, instructions: salad.instructions, imageId: null, tags: ['سلطات'] });
+    const edited = await repos.recipes.create({ name: 'فول بتاعي', servings: 1, ingredients: foul.ingredients, instructions: 'بطريقتي', imageId: null, tags: ['فطار'] });
+    await kv.set(NUTRITION_KEYS.starterRecipes, [untouched.id]);
+    const store = new NutritionStore(kv, repos);
+    await store.ensureStarter();
+    const refreshed = await repos.recipes.get(untouched.id);
+    expect(refreshed?.tags).toContain('غدا');
+    expect(refreshed?.nameEn).toBe('Egyptian Salad');
+    expect((await repos.recipes.get(edited.id))?.instructions).toBe('بطريقتي');
+    expect((await repos.recipes.get(edited.id))?.nameEn).toBeUndefined();
+    const foods = await store.getIngredients();
+    expect(foods.find((f) => f.id === 'chicken_breast')?.name).toBe(chicken.name);
+    expect(foods.find((f) => f.id === 'egg')?.unitG).toBe(50);
+    expect(foods.find((f) => f.id === 'egg')?.nameEn).toBe('Egg');
+    expect((await repos.recipes.list()).length).toBe(2 + starterRecipes().filter((r) => r.since > 2).length);
   });
 
   it('stores diet settings with safe fallbacks', async () => {

@@ -45,6 +45,23 @@ describe('ExerciseLibraryStore', () => {
     expect(c.overrides[0]?.nameAr).toBe('بار سكوات');
   });
 
+  it('keeps an English name next to the Arabic one; an empty English name clears it', async () => {
+    const { store, db } = setup();
+    await store.rename(SQUAT.id, SQUAT, 'سكوات الكابتن');
+    await store.setEnglishName(SQUAT.id, SQUAT, ' Coach Squat ');
+    expect(await db.exercises.count()).toBe(1);
+    let c = await store.changes();
+    expect(c.overrides[0]).toMatchObject({ nameAr: 'سكوات الكابتن', nameEn: 'Coach Squat' });
+    await store.setEnglishName(SQUAT.id, SQUAT, '');
+    c = await store.changes();
+    expect(c.overrides[0]?.nameAr).toBe('سكوات الكابتن');
+    expect(c.overrides[0]?.nameEn).toBeUndefined();
+
+    const id = await store.createCustom({ nameAr: 'تمريني', nameEn: 'My Move', primaryMuscles: ['abs'], secondaryMuscles: [], equipment: 'other', level: 'beginner', imageIds: [] });
+    c = await store.changes();
+    expect(c.custom.find((e) => e.id === id)?.nameEn).toBe('My Move');
+  });
+
   it('creates, favourites and deletes a custom exercise with undo', async () => {
     const { store, db, clock } = setup();
     const id = await store.createCustom({

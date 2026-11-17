@@ -18,7 +18,7 @@ import {
 } from '@/domain/exercises';
 import { getLocale } from '@/i18n';
 
-type Named = Pick<CatalogExercise, 'nameAr' | 'nameEn' | 'renamed'>;
+type Named = Pick<CatalogExercise, 'nameAr' | 'nameEn' | 'renamed' | 'renamedEn'>;
 
 export const exName = (exercise: Named): string => exerciseName(exercise, getLocale());
 export const exAltName = (exercise: Named): string | null => exerciseAltName(exercise, getLocale());

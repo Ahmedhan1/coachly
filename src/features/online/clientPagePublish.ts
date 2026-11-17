@@ -4,6 +4,8 @@ import { bestLifts, buildShareDocument, nextProgramDay, shareExtras, type ShareD
 import type { Client, MealPlan } from '@/domain/models';
 import { getLocale, t } from '@/i18n';
 import { newClientShare } from '@/services/clientPage/clientPageService';
+import { ExerciseLibraryStore } from '@/data/exerciseLibraryStore';
+import { mergeCatalog, type CatalogExercise } from '@/domain/exercises';
 import { loadBuiltinCatalog } from '@/features/programs/catalog';
 import { exerciseName } from '@/features/programs/names';
 import { clientPageLogo } from '@/features/identity/brandAssets';
@@ -22,6 +24,14 @@ const mealsOf = (plan: MealPlan, recipeName: ReadonlyMap<string, string>): Share
     return meal;
   });
 
+/** The pack with the trainer's renames and custom exercises (hidden ones kept so old programs keep their names). */
+async function loadClientCatalog(services: AppServices): Promise<CatalogExercise[] | null> {
+  const store = new ExerciseLibraryStore(services.data.repos, services.meta);
+  const [builtin, changes] = await Promise.all([loadBuiltinCatalog(), store.changes().catch(() => null)]);
+  if (builtin === null || changes === null) return builtin;
+  return mergeCatalog(builtin, { custom: changes.custom, overrides: changes.overrides.map((o) => ({ ...o, hidden: false })) });
+}
+
 /**
  * Everything the client's page shows, from this phone's data: program (with the next day), meals for each
  * plan, supplements as the trainer typed them, targets, progress series, sessions, streak, best lifts and
@@ -38,7 +48,7 @@ export async function buildClientShareDoc(services: AppServices, client: Client,
     repos.recipes.list(),
     store.getClientSupplements(client.id),
     repos.supplements.list(),
-    loadBuiltinCatalog(),
+    loadClientCatalog(services),
     repos.progress.listByClient(client.id),
     repos.sessions.listByClient(client.id),
     repos.workoutLogs.listByClient(client.id),
