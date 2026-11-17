@@ -1,4 +1,6 @@
 import { ar, type Strings } from './ar';
+import { en } from './en';
+import { getLocale } from './locale';
 
 type Leaves<T, Prefix extends string = ''> = {
   [K in keyof T & string]: T[K] extends string ? `${Prefix}${K}` : Leaves<T[K], `${Prefix}${K}.`>;
@@ -8,13 +10,22 @@ type Leaves<T, Prefix extends string = ''> = {
 export type TKey = Leaves<Strings>;
 export type TParams = Record<string, string | number>;
 
-function lookup(key: string): string {
-  let node: unknown = ar;
+function find(root: unknown, key: string): string | undefined {
+  let node: unknown = root;
   for (const part of key.split('.')) {
-    if (typeof node !== 'object' || node === null) return key;
+    if (typeof node !== 'object' || node === null) return undefined;
     node = (node as Record<string, unknown>)[part];
   }
-  return typeof node === 'string' ? node : key;
+  return typeof node === 'string' ? node : undefined;
+}
+
+/** Active-language string; English falls back to Arabic for any key not translated yet. */
+function lookup(key: string): string {
+  if (getLocale() === 'en') {
+    const hit = find(en, key);
+    if (hit !== undefined) return hit;
+  }
+  return find(ar, key) ?? key;
 }
 
 /** Typed lookup with {placeholder} interpolation. Numbers render with Western digits. */
@@ -48,4 +59,5 @@ export function tParts<T>(key: TKey, params: Record<string, T | string | number>
   return out;
 }
 
-export { ar };
+export { ar, en };
+export { getLocale, isEnglish, localeDir, pick, setLocale, type Locale } from './locale';

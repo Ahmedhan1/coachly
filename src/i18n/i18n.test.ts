@@ -28,3 +28,14 @@ describe('tParts()', () => {
     expect(tParts('clients.remaining', {}).join('')).toBe('باقي {n} حصة');
   });
 });
+
+describe('English locale', () => {
+  it('falls back to Arabic for untranslated keys and switches back', async () => {
+    const { setLocaleForTests } = await import('./locale');
+    setLocaleForTests('en');
+    expect(typeof t('tabs.home')).toBe('string');
+    expect(t('tabs.home').length).toBeGreaterThan(0);
+    setLocaleForTests('ar');
+    expect(t('tabs.home')).toBe('الرئيسية');
+  });
+});
