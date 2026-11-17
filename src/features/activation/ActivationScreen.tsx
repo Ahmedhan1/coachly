@@ -5,6 +5,7 @@ import { formatActivationCodeInput, isCompleteActivationCode } from '@/services/
 import type { ActivationError, ActivationState, LockReason } from '@/services/activation/types';
 import { Button, Icon, TextArea, TextField } from '@/ui';
 import { OFFLINE_CODE_PREFIX } from '../../../shared/license';
+import { checkForAppUpdate, setReloadSafe } from '@/app/appUpdate';
 import { DeviceIdCard } from './DeviceIdCard';
 import styles from './ActivationScreen.module.css';
 
@@ -23,8 +24,16 @@ export function ActivationScreen({ locked = null, onActivated }: ActivationScree
   const [code, setCode] = useState('');
   const [longCode, setLongCode] = useState('');
   const [error, setError] = useState<FormError | null>(null);
+  const [detail, setDetail] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
   const [deviceId, setDeviceId] = useState<string | null>(null);
+
+  // Nothing to lose on this screen: let a newer app version replace this one immediately.
+  useEffect(() => {
+    setReloadSafe(true);
+    void checkForAppUpdate();
+    return () => setReloadSafe(false);
+  }, []);
 
   useEffect(() => {
     let cancelled = false;
@@ -40,12 +49,16 @@ export function ActivationScreen({ locked = null, onActivated }: ActivationScree
     if (mode === 'long' && !longCode.replace(/\s+/g, '').startsWith(OFFLINE_CODE_PREFIX)) return setError('malformedLong');
     setBusy(true);
     setError(null);
+    setDetail(null);
     const result = await activation.activate(mode === 'short' ? code : longCode);
     if (result.ok) {
       await onActivated(result.state);
     } else {
       setError(result.error);
+      setDetail(result.detail ?? null);
       setBusy(false);
+      // A network/server failure may mean this phone still runs an old cached build: look for a new one.
+      if (result.error === 'offline' || result.error === 'unavailable') void checkForAppUpdate();
     }
   };
 
@@ -124,7 +137,16 @@ export function ActivationScreen({ locked = null, onActivated }: ActivationScree
         </Button>
       </form>
 
+      {detail && (
+        <p className={styles.detail} dir="ltr">
+          {detail}
+        </p>
+      )}
+
       <DeviceIdCard deviceId={deviceId} />
+      <p className={styles.build} dir="ltr">
+        {import.meta.env.VITE_BUILD_ID ?? 'dev'}
+      </p>
     </main>
   );
 }

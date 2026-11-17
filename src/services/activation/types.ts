@@ -21,7 +21,10 @@ export type ActivationError =
   | 'wrong_device'
   | 'clock';
 
-export type ActivationResult = { ok: true; state: ActivationState } | { ok: false; error: ActivationError };
+export type ActivationResult =
+  | { ok: true; state: ActivationState }
+  /** `detail` is a short technical hint (e.g. "HTTP 500", "network") shown small under the message for support. */
+  | { ok: false; error: ActivationError; detail?: string };
 
 export interface ActivationService {
   /** Current state, verified offline on every launch. Never needs the network. */

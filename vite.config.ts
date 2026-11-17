@@ -1,3 +1,4 @@
+import { execSync } from 'node:child_process';
 import { readFileSync } from 'node:fs';
 import { fileURLToPath, URL } from 'node:url';
 import react from '@vitejs/plugin-react';
@@ -22,7 +23,18 @@ function licenseKeyWarning(): Plugin {
   };
 }
 
+/** Short build stamp shown on the activation and About screens, so a screenshot tells which build a phone runs. */
+function buildId(): string {
+  const day = new Date().toISOString().slice(0, 10);
+  try {
+    return `${day}-${execSync('git rev-parse --short HEAD', { stdio: ['ignore', 'pipe', 'ignore'] }).toString().trim()}`;
+  } catch {
+    return day;
+  }
+}
+
 export default defineConfig({
+  define: { 'import.meta.env.VITE_BUILD_ID': JSON.stringify(buildId()) },
   resolve: { alias: { '@': fileURLToPath(new URL('./src', import.meta.url)) } },
   plugins: [
     react(),

@@ -54,6 +54,7 @@ function setup(over: Partial<LicenseServiceDeps> = {}, clockSeconds = ISSUED + D
     fetch: fetchMock,
     now: () => clock.now,
     newDeviceId: () => 'new-device',
+    sleep: () => Promise.resolve(),
     ...over,
   });
   return { service, store, clock, fetchMock };
@@ -110,9 +111,9 @@ describe('LicenseActivationService — short code', () => {
       (_url, init) =>
         new Promise((_resolve, reject) => init?.signal?.addEventListener('abort', () => reject(new DOMException('aborted', 'AbortError')))),
     );
-    expect(await service.activate(CODE)).toEqual({ ok: false, error: 'offline' });
+    expect(await service.activate(CODE)).toEqual({ ok: false, error: 'offline', detail: 'timeout' });
     fetchMock.mockRejectedValue(new TypeError('Failed to fetch'));
-    expect(await service.activate(CODE)).toEqual({ ok: false, error: 'offline' });
+    expect(await service.activate(CODE)).toEqual({ ok: false, error: 'offline', detail: 'network' });
     expect(store.dump()[META_KEYS.token]).toBeUndefined();
   });
 
@@ -133,7 +134,7 @@ describe('LicenseActivationService — short code', () => {
       });
       return new Response(body, { status: 200 });
     });
-    expect(await service.activate(CODE)).toEqual({ ok: false, error: 'offline' });
+    expect(await service.activate(CODE)).toEqual({ ok: false, error: 'offline', detail: 'timeout' });
   });
 
   it('does not touch the network when the device says it is offline', async () => {
@@ -155,12 +156,14 @@ describe('LicenseActivationService — short code', () => {
 
   it('maps a 5xx or garbage answer to "unavailable"', async () => {
     const { service, fetchMock } = setup();
-    fetchMock.mockResolvedValue(new Response('oops', { status: 502 }));
-    expect(await service.activate(CODE)).toEqual({ ok: false, error: 'unavailable' });
-    fetchMock.mockResolvedValue(json(200, { nope: true }));
-    expect(await service.activate(CODE)).toEqual({ ok: false, error: 'unavailable' });
-    fetchMock.mockResolvedValue(new Response('<html>', { status: 200 }));
-    expect(await service.activate(CODE)).toEqual({ ok: false, error: 'unavailable' });
+    fetchMock.mockImplementation(async () => new Response('oops', { status: 502 }));
+    expect(await service.activate(CODE)).toEqual({ ok: false, error: 'unavailable', detail: 'HTTP 502' });
+    fetchMock.mockImplementation(async () => json(200, { nope: true }));
+    expect(await service.activate(CODE)).toEqual({ ok: false, error: 'unavailable', detail: 'bad reply' });
+    fetchMock.mockImplementation(async () => new Response('<html>', { status: 200 }));
+    expect(await service.activate(CODE)).toEqual({ ok: false, error: 'unavailable', detail: 'bad reply' });
+    fetchMock.mockImplementation(async () => new Response('<html>', { status: 403 }));
+    expect(await service.activate(CODE)).toEqual({ ok: false, error: 'unavailable', detail: 'HTTP 403' });
   });
 
   it('rejects a license the server signed with another key', async () => {
@@ -184,7 +187,38 @@ describe('LicenseActivationService — short code', () => {
 
   it('reports "unavailable" when no worker URL is configured', async () => {
     const { service } = setup({ workerUrl: undefined });
-    expect(await service.activate(CODE)).toEqual({ ok: false, error: 'unavailable' });
+    expect(await service.activate(CODE)).toEqual({ ok: false, error: 'unavailable', detail: 'no server address' });
+  });
+});
+
+describe('LicenseActivationService — retry and diagnostics', () => {
+  it('retries once after a dropped connection and then activates', async () => {
+    const { service, fetchMock } = setup();
+    fetchMock.mockRejectedValueOnce(new TypeError('Failed to fetch'));
+    fetchMock.mockResolvedValueOnce(json(200, { license: await token(), dataKey: 'k' }));
+    const result = await service.activate(CODE);
+    expect(result.ok).toBe(true);
+    expect(fetchMock).toHaveBeenCalledTimes(2);
+  });
+
+  it('retries once after a 5xx and reports the status when both attempts fail', async () => {
+    const { service, fetchMock } = setup();
+    fetchMock.mockImplementation(async () => json(500, { error: 'server_error' }));
+    expect(await service.activate(CODE)).toEqual({ ok: false, error: 'unavailable', detail: 'HTTP 500' });
+    expect(fetchMock).toHaveBeenCalledTimes(2);
+  });
+
+  it('does not retry a definite answer such as "used"', async () => {
+    const { service, fetchMock } = setup();
+    fetchMock.mockResolvedValue(json(409, { error: 'used' }));
+    expect(await service.activate(CODE)).toEqual({ ok: false, error: 'used' });
+    expect(fetchMock).toHaveBeenCalledTimes(1);
+  });
+
+  it('says "network" after two failed connections', async () => {
+    const { service, fetchMock } = setup();
+    fetchMock.mockRejectedValue(new TypeError('Failed to fetch'));
+    expect(await service.activate(CODE)).toEqual({ ok: false, error: 'offline', detail: 'network' });
   });
 });
 
