@@ -12,3 +12,9 @@
 .list {
   margin-block-start: 0;
 }
+
+/* Long lists (hundreds of clients): the browser skips rendering rows far off screen. */
+.list > div > * {
+  content-visibility: auto;
+  contain-intrinsic-size: auto 72px;
+}

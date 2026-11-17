@@ -60,25 +60,18 @@ function bestOf(sets: readonly SetValue[], divisor: number): { best: SetValue; e
 }
 
 function entriesFor(logs: readonly LogLike[], exerciseId: string, divisor: number): ExerciseSessionEntry[] {
-  const out: Array<ExerciseSessionEntry & { at: number }> = [];
+  const out: Array<{ entry: ExerciseSessionEntry; at: number }> = [];
   for (const log of logs) {
     const sets = log.exercises
       .filter((e) => e.exerciseId === exerciseId)
       .flatMap((e) => e.sets.filter((s) => s.done).map((s) => ({ weightKg: s.weightKg, reps: s.reps })));
     if (sets.length === 0) continue;
     const { best, e1rm } = bestOf(sets, divisor);
-    out.push({
-      logId: log.id,
-      date: log.date,
-      sets,
-      best: { ...best },
-      bestE1rm: e1rm,
-      volumeKg: round1(sets.reduce((n, s) => n + s.weightKg * s.reps, 0)),
-      at: log.createdAt,
-    });
+    const entry = { logId: log.id, date: log.date, sets, best: { ...best }, bestE1rm: e1rm, volumeKg: round1(sets.reduce((n, s) => n + s.weightKg * s.reps, 0)) };
+    out.push({ entry, at: log.createdAt });
   }
-  out.sort((a, b) => b.date.localeCompare(a.date) || b.at - a.at);
-  return out.map(({ at: _at, ...entry }) => entry);
+  out.sort((a, b) => b.entry.date.localeCompare(a.entry.date) || b.at - a.at);
+  return out.map((o) => o.entry);
 }
 
 export function exerciseHistory(logs: readonly LogLike[], exerciseId: string, divisor: number = DEFAULT_EPLEY_DIVISOR): ExerciseHistory {

@@ -5,7 +5,7 @@ import { useLive } from '@/app/useLive';
 import { filterPrepared, prepareSearch } from '@/data';
 import { subscriptionAttention, toIsoDate, type Client } from '@/domain/models';
 import { t } from '@/i18n';
-import { Avatar, Badge, Button, EmptyState, IconButton, ListRow, ListSection, PageHeader, SearchField, SwipeRow, Tx, useIncrementalList } from '@/ui';
+import { Avatar, Badge, Button, EmptyState, IconButton, ListRow, ListSection, PageHeader, SearchField, SwipeRow, Tx } from '@/ui';
 import { attentionLabel, attentionTone } from './attention';
 import { useDeleteClient } from './useDeleteClient';
 import styles from './Clients.module.css';
@@ -20,7 +20,6 @@ export function ClientsListScreen() {
   const prepared = useMemo(() => (all ? prepareSearch(all, (c) => [c.name, c.phone, c.goalNote, c.notes]) : null), [all]);
   const deferredQuery = useDeferredValue(query);
   const results = useMemo(() => (prepared ? filterPrepared(prepared, deferredQuery) : undefined), [prepared, deferredQuery]);
-  const { visible, sentinel } = useIncrementalList(results ?? [], { resetKey: deferredQuery, step: 30, rootMargin: '1200px 0px' });
   const [today] = useState(() => toIsoDate(new Date()));
 
   return (
@@ -57,7 +56,8 @@ export function ClientsListScreen() {
         )}
         {results && results.length > 0 && (
           <ListSection className={styles.list} label={t('clients.title')}>
-            {visible.map((client) => (
+            {/* Every row is rendered; off-screen rows skip layout and paint (content-visibility), so scrolling stays smooth. */}
+            {results.map((client) => (
               <SwipeRow
                 key={client.id}
                 onDelete={() => void deleteClient(client)}
@@ -67,7 +67,6 @@ export function ClientsListScreen() {
                 <ClientRow client={client} today={today} />
               </SwipeRow>
             ))}
-            {sentinel}
           </ListSection>
         )}
       </div>

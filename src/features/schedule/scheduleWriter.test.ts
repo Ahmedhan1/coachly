@@ -116,4 +116,15 @@ describe('schedule prefs', () => {
       lateCancelUsesSession: true,
     });
   });
+  it('stores the program a booking is for; an edit without one keeps it', async () => {
+    const { repos, writer, clientId } = await setup();
+    const program = await repos.programs.create({ name: 'برنامج', clientId, isTemplate: false, days: [], notes: '' });
+    const r = await writer.book({ clientId, notes: '', date: '2026-11-21', startMinute: 540, durationMinutes: 60, repeat: null, programId: program.id });
+    if (!r.ok) throw new Error(r.error);
+    const s = r.value.sessions[0]!;
+    expect(s.programId).toBe(program.id);
+    const e = await writer.edit(s, { clientId, notes: 'x', date: '2026-11-21', startMinute: 600, durationMinutes: 60, repeat: null }, 'one');
+    if (!e.ok) throw new Error(e.error);
+    expect((await repos.sessions.get(s.id))?.programId).toBe(program.id);
+  });
 });
