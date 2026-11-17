@@ -1,20 +1,33 @@
-import { muscleGroupLabelAr } from '../exercises/labels';
+import { exerciseAltName, exerciseName, muscleLabel, type ExerciseLocale } from '../exercises/display';
 import type { CatalogExercise } from '../exercises/types';
 import type { Measurements, PdfSection, ProgressEntry, Recipe } from '../models';
 import { chunkText } from './layout';
 import { ageOn, formatDate, formatNumber, signedLtr } from './format';
 import type { KeyValue, PdfBlock, PdfDocumentInput, PdfExercise, PdfImageRef, StatItem } from './types';
 
-/** Builds the PDF view of a catalog exercise. `packBase` prefixes pack image paths (e.g. 'exercise-pack/img/'). */
-export function pdfExerciseFromCatalog(e: CatalogExercise, muscleMap: PdfImageRef | null = null, packBase = ''): PdfExercise {
+/**
+ * Builds the PDF view of a catalog exercise. `packBase` prefixes pack image paths (e.g. 'exercise-pack/img/').
+ * `locale` picks the main name and muscle labels; the other language's name is the small second line.
+ */
+export function pdfExerciseFromCatalog(
+  e: CatalogExercise,
+  muscleMap: PdfImageRef | null = null,
+  packBase = '',
+  locale: ExerciseLocale = 'ar',
+): PdfExercise {
   const first = e.images[0];
   const image: PdfImageRef | null = !first
     ? null
     : first.kind === 'pack'
       ? { kind: 'pack', path: `${packBase}${first.path}` }
       : { kind: 'stored', imageId: first.imageId };
-  const secondary = e.nameEn && e.nameEn !== e.nameAr ? e.nameEn : null;
-  return { name: e.nameAr, secondaryName: secondary, muscles: e.primaryMuscles.map(muscleGroupLabelAr), image, muscleMap };
+  return {
+    name: exerciseName(e, locale),
+    secondaryName: locale === 'ar' ? (e.nameEn && e.nameEn !== e.nameAr ? e.nameEn : null) : exerciseAltName(e, locale),
+    muscles: e.primaryMuscles.map((m) => muscleLabel(m, locale)),
+    image,
+    muscleMap,
+  };
 }
 
 const MEASUREMENT_KEYS: readonly (keyof Measurements)[] = [
@@ -27,6 +40,9 @@ const MEASUREMENT_KEYS: readonly (keyof Measurements)[] = [
   'armCm',
   'thighCm',
 ];
+
+/** List separator for the document language. */
+const listSep = (input: PdfDocumentInput): string => (input.language === 'en' ? ', ' : '، ');
 
 function measurementUnit(key: keyof Measurements, input: PdfDocumentInput): string {
   const u = input.labels.units;
@@ -60,7 +76,7 @@ function clientBlocks(input: PdfDocumentInput): PdfBlock[] {
   }
   const out: PdfBlock[] = [{ type: 'clientCard', name: c.name, chips, tiles }];
   if (c.goalNote) out.push(...paragraphs(`${L.goalNote}: ${c.goalNote}`));
-  if (c.injuries.length > 0) out.push(...paragraphs(`${L.injuries}: ${c.injuries.join('، ')}`));
+  if (c.injuries.length > 0) out.push(...paragraphs(`${L.injuries}: ${c.injuries.join(listSep(input))}`));
   return out;
 }
 
@@ -139,7 +155,7 @@ function programBlocks(input: PdfDocumentInput, withMuscleMaps: boolean): PdfBlo
         index,
         name: ex?.name ?? item.exerciseId,
         secondaryName: ex?.secondaryName ?? null,
-        muscles: ex ? ex.muscles.join('، ') : '',
+        muscles: ex ? ex.muscles.join(listSep(input)) : '',
         sets: String(item.sets),
         reps: item.reps,
         rest: `${item.restSec} ${input.labels.units.sec}`,

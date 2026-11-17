@@ -36,6 +36,8 @@ export interface ShareExtras {
   checkins?: Array<{ d: string; weightKg?: number; waistCm?: number }>;
   /** Date of the first measurement (YYYY-MM-DD). */
   startDate?: string;
+  /** Language the trainer's app is in; the viewer shows its labels (and direction) in it. Absent = Arabic. */
+  lang?: 'ar' | 'en';
 }
 
 export interface CheckinDocumentV1 {
@@ -90,6 +92,7 @@ const num = (v: number | undefined, min: number, max: number) => (v !== undefine
 /** Drops anything outside the Worker guard's ranges so one odd value never blanks the whole page. */
 function cleanExtras(x: ShareExtras): ShareExtras {
   const out: ShareExtras = {};
+  if (x.lang === 'en') out.lang = 'en';
   if (x.goal?.title) out.goal = x.goal.note ? { title: cut(x.goal.title, 80), note: cut(x.goal.note, 500) } : { title: cut(x.goal.title, 80) };
   if (x.targets) {
     const t = x.targets;

@@ -1,3 +1,7 @@
 .first {
   margin-block-start: var(--sp-5);
 }
+
+.language {
+  padding-inline: var(--sp-4);
+}

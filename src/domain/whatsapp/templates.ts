@@ -28,7 +28,25 @@ export interface RenderedTemplate {
   missing: Placeholder[];
 }
 
+/** English spellings accepted in template bodies (the English default texts use them). */
+export const PLACEHOLDER_ALIASES: Readonly<Record<string, Placeholder>> = {
+  name: 'الاسم',
+  when: 'الموعد',
+  package: 'الباقة',
+  amount: 'المبلغ',
+};
+
+/** Placeholder token as written in a body for the given language, e.g. "{name}" or "{الاسم}". */
+export function placeholderToken(p: Placeholder, english: boolean): string {
+  const alias = english ? Object.keys(PLACEHOLDER_ALIASES).find((k) => PLACEHOLDER_ALIASES[k] === p) : undefined;
+  return `{${alias ?? p}}`;
+}
+
 const PLACEHOLDER_RE = /\{([^{}\n]{1,20})\}/g;
+
+function canonical(name: string): string {
+  return PLACEHOLDER_ALIASES[name] ?? name;
+}
 
 function isPlaceholder(name: string): name is Placeholder {
   return (PLACEHOLDERS as readonly string[]).includes(name);
@@ -38,7 +56,7 @@ function isPlaceholder(name: string): name is Placeholder {
 export function placeholdersIn(body: string): Placeholder[] {
   const out: Placeholder[] = [];
   for (const m of body.matchAll(PLACEHOLDER_RE)) {
-    const name = (m[1] ?? '').trim();
+    const name = canonical((m[1] ?? '').trim());
     if (isPlaceholder(name) && !out.includes(name)) out.push(name);
   }
   return out;
@@ -51,7 +69,7 @@ export function placeholdersIn(body: string): Placeholder[] {
 export function renderTemplate(body: string, values: TemplateValues): RenderedTemplate {
   const missing: Placeholder[] = [];
   const replaced = body.replace(PLACEHOLDER_RE, (match, raw: string) => {
-    const name = raw.trim();
+    const name = canonical(raw.trim());
     if (!isPlaceholder(name)) return match;
     const value = values[name]?.trim();
     if (value) return value;

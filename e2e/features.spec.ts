@@ -1,5 +1,5 @@
 import { expect, test, type Page } from '@playwright/test';
-import { openApp } from './helpers';
+import { emulateDownloadOnlySave, openApp, saveDeviceBackup } from './helpers';
 
 /** Opens the demo client "سارة محمود" from the clients tab. */
 async function openSara(page: Page) {
@@ -72,17 +72,14 @@ test('PDF builder makes a file for a client offline-capable, with share and down
   await expect(page.getByRole('button', { name: 'نزّل الملف' })).toBeVisible();
 });
 
-test('local backup: export an encrypted file', async ({ page }) => {
+test('local backup: save an encrypted file to the phone', async ({ page }) => {
+  await emulateDownloadOnlySave(page);
   await openApp(page);
   await page.getByRole('button', { name: 'المزيد والإعدادات' }).click();
   await page.getByRole('link', { name: /الإعدادات/ }).first().click();
   await page.getByRole('link', { name: /النسخ الاحتياطي/ }).click();
-  await page.getByRole('button', { name: 'اعمل ملف نسخة' }).click();
-  const sheet = page.getByRole('dialog', { name: 'اعمل ملف نسخة' });
-  await sheet.getByLabel('كلمة السر', { exact: true }).fill('secret-pass-1');
-  await sheet.getByLabel('اكتبها تاني').fill('secret-pass-1');
-  await sheet.getByRole('button', { name: 'اعمل ملف نسخة' }).click();
-  await expect(page.getByRole('button', { name: /الملف جاهز/ })).toBeVisible({ timeout: 30_000 });
+  const file = await saveDeviceBackup(page, 'secret-pass-1');
+  expect(file.suggestedFilename()).toMatch(/\./);
 });
 
 test('income dashboard renders from demo payments', async ({ page }) => {

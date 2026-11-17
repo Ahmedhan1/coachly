@@ -3,6 +3,7 @@ import { MUSCLE_GROUPS, filterExercises, searchExercises, type CatalogExercise, 
 import { t } from '@/i18n';
 import { Num, SearchField, Sheet, Tx, cx } from '@/ui';
 import { ExerciseThumb } from './ExerciseThumb';
+import { exName, muscleName } from '@/features/exercises/localized';
 import { exerciseSubline } from './names';
 import styles from './Shared.module.css';
 
@@ -39,7 +40,7 @@ export function ExercisePickerSheet({ open, onClose, onPick, exercises, favourit
   const chips: Array<{ value: Filter; label: string }> = [
     { value: 'all', label: t('training.programs.picker.all') },
     ...(favourites && favourites.size > 0 ? [{ value: 'fav' as const, label: t('training.programs.picker.favourites') }] : []),
-    ...MUSCLE_GROUPS.map((g) => ({ value: g.id, label: g.labelAr })),
+    ...MUSCLE_GROUPS.map((g) => ({ value: g.id, label: muscleName(g.id) })),
   ];
 
   return (
@@ -76,10 +77,10 @@ export function ExercisePickerSheet({ open, onClose, onPick, exercises, favourit
         <ul className={styles.pickerList}>
           {results.slice(0, LIMIT).map((e) => (
             <li key={e.id}>
-              <button type="button" className={styles.pickerRow} onClick={() => onPick(e)} aria-label={t('training.programs.picker.add', { name: e.nameAr })}>
+              <button type="button" className={styles.pickerRow} onClick={() => onPick(e)} aria-label={t('training.programs.picker.add', { name: exName(e) })}>
                 <ExerciseThumb exercise={e} size="sm" />
                 <span className={styles.pickerText}>
-                  <span className={styles.pickerName}>{e.nameAr}</span>
+                  <span className={styles.pickerName}>{exName(e)}</span>
                   <span className={styles.pickerSub}>{exerciseSubline(e)}</span>
                 </span>
               </button>

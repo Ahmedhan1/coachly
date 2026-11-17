@@ -1,6 +1,6 @@
 import { useEffect, useState, type FormEvent } from 'react';
 import { useServices } from '@/app/services';
-import { t } from '@/i18n';
+import { getLocale, setLocale, t } from '@/i18n';
 import { formatActivationCodeInput, isCompleteActivationCode } from '@/services/activation/codeFormat';
 import type { ActivationError, ActivationState, LockReason } from '@/services/activation/types';
 import { Button, Icon, TextArea, TextField } from '@/ui';
@@ -66,6 +66,19 @@ export function ActivationScreen({ locked = null, onActivated }: ActivationScree
 
   return (
     <main className={styles.page}>
+      <div className={styles.langRow}>
+        <button
+          type="button"
+          className={styles.langToggle}
+          lang={getLocale() === 'en' ? 'ar' : 'en'}
+          aria-label={t('settings.language.title')}
+          data-testid="activation-language"
+          onClick={() => setLocale(getLocale() === 'en' ? 'ar' : 'en')}
+        >
+          <Icon name="globe" />
+          {getLocale() === 'en' ? t('settings.language.ar') : t('settings.language.en')}
+        </button>
+      </div>
       <span className={styles.mark} aria-hidden="true">
         {t('app.name').charAt(0)}
       </span>

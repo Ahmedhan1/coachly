@@ -1,26 +1,14 @@
 import { expect, test } from '@playwright/test';
-import { openAddClient, openApp } from './helpers';
+import { emulateDownloadOnlySave, openAddClient, openApp, saveDeviceBackup } from './helpers';
 
 test('backup: encrypted file export → change data → restore from the file brings the old data back', async ({ page }) => {
   test.setTimeout(120_000);
-  await page.addInitScript(() => {
-    // No file share sheet (Android Chrome / desktop): the backup is downloaded.
-    Object.defineProperty(navigator, 'canShare', { value: () => false, configurable: true });
-  });
+  await emulateDownloadOnlySave(page);
   await openApp(page);
   await page.goto('/more/settings/backup?standalone=1');
-  await page.getByRole('button', { name: 'اعمل ملف نسخة' }).click();
-  const sheet = page.getByRole('dialog', { name: 'اعمل ملف نسخة' });
-  await sheet.getByLabel('كلمة السر', { exact: true }).fill('secret-pass-1');
-  await sheet.getByLabel('اكتبها تاني').fill('secret-pass-1');
-  await sheet.getByRole('button', { name: 'اعمل ملف نسخة' }).click();
-  const ready = page.getByRole('button', { name: /الملف جاهز/ });
-  await expect(ready).toBeVisible({ timeout: 30_000 });
-  const download = page.waitForEvent('download');
-  await ready.click();
-  const file = await (await download).path();
-  // A download must tell the trainer where the file went.
-  await expect(page.getByText(/اتنزّل في «التنزيلات»/)).toBeVisible();
+  const file = await (await saveDeviceBackup(page, 'secret-pass-1')).path();
+  // The screen now remembers the backup.
+  await expect(page.getByText(/آخر ملف:/)).toBeVisible();
 
   // Change data after the backup: a new client.
   await page.goto('/clients?standalone=1');

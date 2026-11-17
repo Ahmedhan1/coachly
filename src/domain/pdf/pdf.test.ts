@@ -247,11 +247,39 @@ describe('presets and catalog mapping', () => {
     expect(e.muscles[0]).toBe('كوادز');
   });
 
+  it('pdfExerciseFromCatalog in English: English name first, Arabic as the second line, English muscles', () => {
+    const e = pdfExerciseFromCatalog(
+      {
+        id: 'Barbell_Squat', nameEn: 'Barbell Back Squat', nameAr: 'سكوات بالبار', primaryMuscles: ['glutes'], secondaryMuscles: [],
+        equipment: 'barbell', level: 'beginner', category: 'strength', force: 'push', mechanic: 'compound', images: [], isCustom: false,
+      },
+      null,
+      '',
+      'en',
+    );
+    expect(e).toMatchObject({ name: 'Barbell Back Squat', secondaryName: 'سكوات بالبار', muscles: ['Glutes'], image: null });
+  });
+
   it('progress summary: weights sorted, first/last photos', () => {
     const input = pdfTestCase('max_branding', syntheticExercises(4, true));
     const s = progressSummary([...input.progress].reverse());
     expect(s.weights.map((w) => w.kg)).toEqual([78, 77.2, 76.5, 75.9, 75.1, 74.5]);
     expect(s.before?.date).toBe('2026-06-01');
     expect(s.after?.date).toBe('2026-11-01');
+  });
+});
+
+describe('PDF language', () => {
+  it('is Arabic RTL by default and English LTR when asked, with English list separators', () => {
+    const input = pdfTestCase('mixed_text', syntheticExercises(3, false));
+    const arDoc = layoutPdfDocument(input);
+    expect(arDoc.theme.dir).toBe('rtl');
+    expect(arDoc.theme.lang).toBe('ar');
+    const enDoc = layoutPdfDocument({ ...input, language: 'en' });
+    expect(enDoc.theme.dir).toBe('ltr');
+    expect(enDoc.theme.lang).toBe('en');
+    const client = input.client ? { ...input.client, injuries: ['Knee', 'Back'] } : null;
+    const text = JSON.stringify(buildContentBlocks({ ...input, client, language: 'en', sections: ['client_info'] }));
+    if (client) expect(text).toContain('Knee, Back');
   });
 });

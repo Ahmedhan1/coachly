@@ -1,4 +1,4 @@
-import { expect, type Page } from '@playwright/test';
+import { expect, type Download, type Page } from '@playwright/test';
 
 export const DEMO_CODE = 'ABCD-EFGH-JKMN';
 export const ADD_BUTTON = 'إضافة: عميل، حصة، برنامج';
@@ -43,4 +43,38 @@ export async function swipeToReveal(page: Page, rowText: string): Promise<void> 
   await page.mouse.down();
   for (let i = 1; i <= 8; i++) await page.mouse.move(box.x + box.width * 0.3 + i * 15, y);
   await page.mouse.up();
+}
+
+/**
+ * Makes the backup file saver behave like Android Chrome: no file share sheet and no save picker, so the
+ * backup lands as a plain download. Call before the first navigation.
+ */
+export async function emulateDownloadOnlySave(page: Page): Promise<void> {
+  await page.addInitScript(() => {
+    Object.defineProperty(navigator, 'canShare', { value: () => false, configurable: true });
+    delete (window as { showSaveFilePicker?: unknown }).showSaveFilePicker;
+  });
+}
+
+/**
+ * On the backup screen: «نزّل نسخة على التليفون» → first-time setup (password, or none) → the file downloads →
+ * answer «أيوه، لقيته». Needs `emulateDownloadOnlySave` first. Returns the downloaded file.
+ */
+export async function saveDeviceBackup(page: Page, password: string | null): Promise<Download> {
+  await page.getByRole('button', { name: 'نزّل نسخة على التليفون' }).click();
+  const sheet = page.getByRole('dialog', { name: 'نسخة التليفون' });
+  if (password === null) {
+    await sheet.getByRole('checkbox', { name: /اقفل الملف بكلمة سر/ }).uncheck();
+  } else {
+    await sheet.getByLabel('كلمة السر', { exact: true }).fill(password);
+    await sheet.getByLabel('اكتبها تاني').fill(password);
+  }
+  const download = page.waitForEvent('download', { timeout: 300_000 });
+  await sheet.getByRole('button', { name: 'اعمل النسخة' }).click();
+  const file = await download;
+  // A plain download gives no completion signal: the app asks where the file went.
+  await expect(page.getByRole('alertdialog', { name: 'الملف اتنزّل؟' })).toBeVisible();
+  await page.getByRole('button', { name: 'أيوه، لقيته' }).click();
+  await expect(page.getByText('النسخة اتحفظت برة التطبيق')).toBeVisible();
+  return file;
 }

@@ -787,6 +787,34 @@ export const DATASET_FIELD_TERMS = {
   },
 } as const satisfies Readonly<Record<string, Readonly<Record<string, string>>>>;
 
+/**
+ * English display names (gym-standard, Title Case) for the same dictionary keys, used when the app
+ * language is English. Keys match MUSCLE_TERMS / EQUIPMENT_TERMS / DATASET_FIELD_TERMS.
+ */
+export const ENGLISH_TERMS = {
+  muscle: {
+    chest: 'Chest', shoulders: 'Shoulders', biceps: 'Biceps', triceps: 'Triceps', forearms: 'Forearms',
+    abs: 'Abs', obliques: 'Obliques', neck: 'Neck', traps: 'Traps', lats: 'Lats', 'middle back': 'Middle Back',
+    'lower back': 'Lower Back', glutes: 'Glutes', 'hip flexors': 'Hip Flexors', quads: 'Quads',
+    hamstrings: 'Hamstrings', adductors: 'Adductors', abductors: 'Abductors', calves: 'Calves', tibialis: 'Tibialis',
+  },
+  equipment: {
+    barbell: 'Barbell', dumbbell: 'Dumbbell', cable: 'Cable', machine: 'Machine', kettlebell: 'Kettlebell',
+    bands: 'Bands', 'body only': 'Bodyweight', 'medicine ball': 'Medicine Ball', 'exercise ball': 'Exercise Ball',
+    'e-z curl bar': 'EZ Bar', 'foam roll': 'Foam Roller', other: 'Other',
+  },
+  level: { beginner: 'Beginner', intermediate: 'Intermediate', expert: 'Advanced' },
+  category: {
+    strength: 'Strength',
+    stretching: 'Stretching',
+    plyometrics: 'Plyometrics',
+    strongman: 'Strongman',
+    powerlifting: 'Powerlifting',
+    cardio: 'Cardio',
+    'olympic weightlifting': 'Olympic Weightlifting',
+  },
+} as const satisfies Readonly<Record<string, Readonly<Record<string, string>>>>;
+
 // forbidden-words:begin — the scanner skips this block (it is the list itself).
 /**
  * Literal / textbook translations that must never appear in user-visible text or exercise data.

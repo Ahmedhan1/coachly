@@ -3,19 +3,16 @@ import { useNavigate, useParams } from 'react-router-dom';
 import { useServices } from '@/app/services';
 import { useUiStore } from '@/app/uiStore';
 import {
-  CATEGORY_LABELS_AR,
-  EQUIPMENT_LABELS_AR,
-  LEVEL_LABELS_AR,
-  muscleGroupLabelAr,
   illustrationSpec,
   type CatalogExercise,
   type MuscleGroupId,
 } from '@/domain/exercises';
-import { t } from '@/i18n';
+import { getLocale, pick, t } from '@/i18n';
 import { Button, EmptyState, Icon, ListRow, ListSection, PageHeader, cx } from '@/ui';
 import { MuscleMap } from '@/ui/MuscleMap';
 import { alternativesFor } from '@/domain/exercises';
 import { ExerciseThumb } from './ExerciseThumb';
+import { categoryName, equipmentName, exAltName, exCues, exName, levelName, muscleName } from './localized';
 import { useExerciseClients } from './useExerciseClients';
 import { StarIcon } from './icons';
 import { PhotoCarousel } from './PhotoCarousel';
@@ -45,7 +42,7 @@ export function ExerciseDetailScreen() {
 
 function MuscleNames({ ids }: { ids: readonly MuscleGroupId[] }) {
   if (ids.length === 0) return <>{t('training.library.detail.none')}</>;
-  return <>{ids.map(muscleGroupLabelAr).join('، ')}</>;
+  return <>{ids.map(muscleName).join(pick('، ', ', '))}</>;
 }
 
 function ExerciseDetail({ exercise, catalog }: { exercise: CatalogExercise; catalog: CatalogState }) {
@@ -58,6 +55,9 @@ function ExerciseDetail({ exercise, catalog }: { exercise: CatalogExercise; cata
   const ref = exercise.isCustom ? null : catalog.builtinRef(exercise.id);
   const favourite = changes.favourites.has(exercise.id);
   const hidden = changes.hidden.has(exercise.id);
+  const altName = exAltName(exercise);
+  const altLocale = getLocale() === 'en' ? 'ar' : 'en';
+  const cues = exCues(exercise);
   const hasOwnPhotos = !exercise.isCustom && exercise.images.some((i) => i.kind === 'stored');
   const toggleFavourite = useFavouriteToggle(catalog);
   const alternatives = useMemo(() => alternativesFor(exercise, catalog.visible, { limit: 6 }), [exercise, catalog.visible]);
@@ -109,7 +109,7 @@ function ExerciseDetail({ exercise, catalog }: { exercise: CatalogExercise; cata
             type="button"
             className={cx(styles.round, favourite && styles.starOn)}
             aria-pressed={favourite}
-            aria-label={t(favourite ? 'training.library.favouriteRemove' : 'training.library.favouriteAdd', { name: exercise.nameAr })}
+            aria-label={t(favourite ? 'training.library.favouriteRemove' : 'training.library.favouriteAdd', { name: exName(exercise) })}
             onClick={() => toggleFavourite(exercise)}
           >
             <StarIcon filled={favourite} />
@@ -118,29 +118,29 @@ function ExerciseDetail({ exercise, catalog }: { exercise: CatalogExercise; cata
       />
       <PhotoCarousel exercise={exercise} />
       <header className={styles.head}>
-        <h1 className={styles.name}>{exercise.nameAr}</h1>
-        {exercise.nameEn && exercise.nameEn !== exercise.nameAr && (
-          <p className={styles.en} dir="ltr" lang="en">
-            {exercise.nameEn}
+        <h1 className={styles.name}>{exName(exercise)}</h1>
+        {altName !== null && (
+          <p className={styles.en} dir={altLocale === 'en' ? 'ltr' : 'rtl'} lang={altLocale}>
+            {altName}
           </p>
         )}
         <div className={styles.tags}>
           {exercise.primaryMuscles.map((m) => (
             <span key={m} className={cx(styles.tag, styles.tagBrand)}>
-              {muscleGroupLabelAr(m)}
+              {muscleName(m)}
             </span>
           ))}
-          <span className={styles.tag}>{EQUIPMENT_LABELS_AR[exercise.equipment]}</span>
-          <span className={styles.tag}>{LEVEL_LABELS_AR[exercise.level]}</span>
+          <span className={styles.tag}>{equipmentName(exercise.equipment)}</span>
+          <span className={styles.tag}>{levelName(exercise.level)}</span>
           {exercise.isCustom && <span className={styles.tag}>{t('training.library.custom')}</span>}
           {hidden && <span className={styles.tag}>{t('training.library.hidden')}</span>}
         </div>
       </header>
 
-      {exercise.cues !== undefined && exercise.cues.length > 0 && (
+      {cues.length > 0 && (
         <ListSection title={t('exercises.detail.cues')}>
           <ol className={styles.cues}>
-            {exercise.cues.map((cue) => (
+            {cues.map((cue) => (
               <li key={cue}>{cue}</li>
             ))}
           </ol>
@@ -165,15 +165,15 @@ function ExerciseDetail({ exercise, catalog }: { exercise: CatalogExercise; cata
             </div>
             <div>
               <dt>{t('training.library.detail.equipment')}</dt>
-              <dd>{EQUIPMENT_LABELS_AR[exercise.equipment]}</dd>
+              <dd>{equipmentName(exercise.equipment)}</dd>
             </div>
             <div>
               <dt>{t('training.library.detail.level')}</dt>
-              <dd>{LEVEL_LABELS_AR[exercise.level]}</dd>
+              <dd>{levelName(exercise.level)}</dd>
             </div>
             <div>
               <dt>{t('training.library.detail.category')}</dt>
-              <dd>{CATEGORY_LABELS_AR[exercise.category]}</dd>
+              <dd>{categoryName(exercise.category)}</dd>
             </div>
           </dl>
         </div>
@@ -185,7 +185,7 @@ function ExerciseDetail({ exercise, catalog }: { exercise: CatalogExercise; cata
             <ListRow
               key={use.clientId}
               title={use.clientName}
-              subtitle={t('exercises.detail.clientsPrograms', { programs: use.programNames.join('، ') })}
+              subtitle={t('exercises.detail.clientsPrograms', { programs: use.programNames.join(pick('، ', ', ')) })}
               to={`/clients/${encodeURIComponent(use.clientId)}`}
             />
           ))}
@@ -198,8 +198,8 @@ function ExerciseDetail({ exercise, catalog }: { exercise: CatalogExercise; cata
             <ListRow
               key={alt.id}
               leading={<ExerciseThumb exercise={alt} />}
-              title={alt.nameAr}
-              subtitle={EQUIPMENT_LABELS_AR[alt.equipment]}
+              title={exName(alt)}
+              subtitle={equipmentName(alt.equipment)}
               to={`/exercises/${encodeURIComponent(alt.id)}`}
             />
           ))}

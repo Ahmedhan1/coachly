@@ -5,7 +5,7 @@ import { toDayNumber } from '@/domain/schedule';
 import { toIsoDate, type Client } from '@/domain/models';
 import { t } from '@/i18n';
 import { EmptyState, Icon, IconButton, ListRow, ListSection, Money, PageHeader } from '@/ui';
-import { formatIsoDate, formatMoney } from '@/ui/format';
+import { formatIsoDate, formatMoney, LOCALE } from '@/ui/format';
 import { useWhatsappLinkBuilder } from '@/features/whatsapp/useWhatsappLink';
 import { buildIncome, monthRef } from './incomeModel';
 import styles from './Income.module.css';
@@ -147,7 +147,7 @@ function WaTrailing({ client, href, label }: { client: Client | undefined; href:
   );
 }
 
-const monthFmt = new Intl.DateTimeFormat('ar-EG-u-nu-latn', { month: 'long', year: 'numeric' });
+const monthFmt = new Intl.DateTimeFormat(LOCALE, { month: 'long', year: 'numeric' });
 function formatMonth(iso: string): string {
   const [y, m] = iso.split('-').map(Number) as [number, number];
   return monthFmt.format(new Date(y, m - 1, 1));

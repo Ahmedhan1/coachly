@@ -3,6 +3,7 @@ import {
   mergeTemplates,
   normalizePhoneForWhatsapp,
   placeholdersIn,
+  placeholderToken,
   renderTemplate,
   templateFor,
   whatsappLink,
@@ -94,5 +95,27 @@ describe('mergeTemplates', () => {
     const merged = mergeTemplates(defaults, stored);
     expect(merged.map((m) => m.body)).toEqual(['a', 'edited', 'c', 'x']);
     expect(templateFor('renewal', merged)?.body).toBe('edited');
+  });
+});
+
+describe('English placeholder aliases', () => {
+  it('fills {name} {when} {package} {amount} like the Arabic placeholders', () => {
+    const r = renderTemplate('Hi {name}, your session is {when}. {package} for {amount}.', {
+      الاسم: 'Sara',
+      الموعد: 'Wed 6 PM',
+      الباقة: '12 sessions',
+      المبلغ: 'EGP 3,000',
+    });
+    expect(r.text).toBe('Hi Sara, your session is Wed 6 PM. 12 sessions for EGP 3,000.');
+    expect(placeholdersIn('Hi {name} {الاسم} {amount}')).toEqual(['الاسم', 'المبلغ']);
+  });
+  it('reports missing aliases by their canonical name and keeps unknown words', () => {
+    const r = renderTemplate('Hi {name}, see {other}', {});
+    expect(r.missing).toEqual(['الاسم']);
+    expect(r.text).toBe('Hi, see {other}');
+  });
+  it('writes the token for the active language', () => {
+    expect(placeholderToken('الموعد', true)).toBe('{when}');
+    expect(placeholderToken('الموعد', false)).toBe('{الموعد}');
   });
 });

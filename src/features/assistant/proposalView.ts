@@ -1,6 +1,7 @@
 import type { ProposedAction } from '@/domain/ai';
 import type { ZonedClock } from '@/domain/schedule';
 import { t, type TKey } from '@/i18n';
+import { LIST_SEP } from '@/ui/format';
 import { hhmm } from './assistantData';
 
 /** What a confirmation card shows: a title, label/value rows (with before → after for changes) and a note. */
@@ -90,7 +91,7 @@ export function cardView(a: ProposedAction, clock: ZonedClock): CardView {
         rows: [
           { label: t('assistant.card.name'), value: a.recipe.name },
           { label: t('assistant.card.servings'), value: String(a.recipe.servings) },
-          { label: t('assistant.card.ingredients'), value: a.recipe.ingredients.map((i) => `${i.name} ${i.grams} ${t('assistant.card.gramUnit')}`).join('، '), long: true },
+          { label: t('assistant.card.ingredients'), value: a.recipe.ingredients.map((i) => `${i.name} ${i.grams} ${t('assistant.card.gramUnit')}`).join(LIST_SEP), long: true },
         ],
         note: null,
       };

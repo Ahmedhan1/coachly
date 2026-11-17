@@ -9,3 +9,4 @@ export * from './muscleLoad';
 export * from './alternatives';
 export * from './illustration';
 export * from './usage';
+export * from './display';

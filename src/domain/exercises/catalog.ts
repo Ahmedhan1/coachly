@@ -24,6 +24,7 @@ export function catalogFromPack(pack: ExercisePack, packUrl: string): CatalogExe
     images: e.images.map((file): ExerciseImage => ({ kind: 'pack', path: `${base}${file}` })),
     isCustom: false,
     ...(e.cues !== undefined && e.cues.length > 0 ? { cues: e.cues } : {}),
+    ...(e.cuesEn !== undefined && e.cuesEn.length > 0 ? { cuesEn: e.cuesEn } : {}),
     ...(e.popular !== undefined ? { popularRank: e.popular } : {}),
   }));
   return popularFirst(list);
@@ -42,9 +43,11 @@ const stored = (ids: readonly string[]): ExerciseImage[] => ids.map((imageId) =>
 function applyOverride(exercise: CatalogExercise, override: ExerciseOverride | undefined): CatalogExercise {
   if (override === undefined) return exercise;
   const name = override.nameAr?.trim();
+  const renamed = name !== undefined && name !== '' && name !== exercise.nameAr;
   return {
     ...exercise,
-    nameAr: name !== undefined && name !== '' ? name : exercise.nameAr,
+    nameAr: renamed ? name : exercise.nameAr,
+    ...(renamed ? { renamed: true } : {}),
     images: override.imageIds !== undefined && override.imageIds.length > 0 ? stored(override.imageIds) : exercise.images,
   };
 }

@@ -29,6 +29,10 @@ export interface CatalogExercise {
   isCustom: boolean;
   /** Short Arabic coaching cues (2-4 lines); absent when none were written. */
   cues?: readonly string[];
+  /** The same cues in short English, shown when the app language is English. */
+  cuesEn?: readonly string[];
+  /** True when the trainer renamed this built-in exercise: their name then wins in every language. */
+  renamed?: boolean;
   /** 1-based rank in the «الأشهر» (most common) set; undefined for the rest. Lower = more common. */
   popularRank?: number;
 }

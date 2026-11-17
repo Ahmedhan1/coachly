@@ -1,16 +1,12 @@
 import { readFileSync, writeFileSync } from 'node:fs';
 import { expect, test, type Page } from '@playwright/test';
-import { openApp } from './helpers';
+import { emulateDownloadOnlySave, openApp, saveDeviceBackup } from './helpers';
 
 /** Export a plain backup of the demo data through the real screen and save it to `path`. */
 async function exportBackup(page: Page, path: string): Promise<void> {
+  await emulateDownloadOnlySave(page);
   await openApp(page, '/more/settings/backup');
-  await page.getByRole('button', { name: 'اعمل ملف نسخة' }).click();
-  await page.getByRole('dialog').getByRole('checkbox').uncheck();
-  await page.getByRole('dialog').getByRole('button', { name: 'اعمل ملف نسخة' }).click();
-  const ready = page.getByRole('button', { name: /الملف جاهز/ });
-  await expect(ready).toBeVisible();
-  const [download] = await Promise.all([page.waitForEvent('download'), ready.click()]);
+  const download = await saveDeviceBackup(page, null);
   await download.saveAs(path);
 }
 

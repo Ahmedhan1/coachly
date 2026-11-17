@@ -25,13 +25,19 @@ export const foodCategorySchema = z.enum(FOOD_CATEGORIES);
 export type FoodCategory = z.infer<typeof foodCategorySchema>;
 
 /** A household measure: "رغيف" = 90 g. */
-export const portionSchema = z.object({ label: z.string().trim().min(1).max(40), grams: z.number().positive().max(5000) });
+export const portionSchema = z.object({
+  label: z.string().trim().min(1).max(40),
+  grams: z.number().positive().max(5000),
+  labelEn: z.string().trim().min(1).max(40).optional(),
+});
 export type Portion = z.infer<typeof portionSchema>;
 
 /** One row of the trainer's ingredient table: nutrition per 100 g. Category, fibre, portions and photo are optional. */
 export const ingredientEntrySchema = z.object({
   id: z.string().min(1).max(64),
   name: z.string().trim().min(1).max(120),
+  /** Optional English name, shown when the app is in English. */
+  nameEn: z.string().trim().min(1).max(120).optional(),
   per100g: z.object({
     kcal: z.number().min(0).max(1000),
     proteinG: z.number().min(0).max(100),
@@ -45,6 +51,10 @@ export const ingredientEntrySchema = z.object({
   imageId: z.string().min(1).max(64).nullable().optional(),
   /** Twemoji file name (hex code point, no extension) of the illustration shipped in public/food. */
   icon: z.string().regex(/^[0-9a-f]{4,6}(-[0-9a-f]{4,6})*$/).optional(),
+  /** Counted food: grams of one unit (an egg, a loaf). The planner then rounds to whole units. */
+  unitG: z.number().positive().max(1000).optional(),
+  /** Half units allowed (half a loaf). */
+  unitHalf: z.boolean().optional(),
 });
 export type IngredientEntry = z.infer<typeof ingredientEntrySchema>;
 

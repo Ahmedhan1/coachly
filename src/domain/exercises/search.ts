@@ -28,7 +28,9 @@ const SCORE = { exact: 100, prefix: 80, wordPrefix: 60, contains: 40, primaryMus
 function textScore(text: string, query: string, tokens: readonly string[]): number {
   if (text === '') return 0;
   if (text === query) return SCORE.exact;
-  if (text.startsWith(query)) return SCORE.prefix;
+  // The whole query at the start of any word ("bench press" in "barbell bench press") ranks like a prefix,
+  // so the «الأشهر» rank decides between "Barbell Bench Press" and "Bench Press (Powerlifting)".
+  if (text.startsWith(query) || text.includes(` ${query}`)) return SCORE.prefix;
   const words = text.split(' ');
   if (tokens.every((t) => words.some((w) => w.startsWith(t)))) return SCORE.wordPrefix;
   if (tokens.every((t) => text.includes(t))) return SCORE.contains;

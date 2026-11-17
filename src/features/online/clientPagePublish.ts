@@ -2,10 +2,10 @@ import type { AppServices } from '@/app/services';
 import { NutritionStore } from '@/data/nutritionStore';
 import { bestLifts, buildShareDocument, nextProgramDay, shareExtras, type ShareDocumentV1 } from '@/domain/clientPage';
 import type { Client, MealPlan } from '@/domain/models';
-import { t } from '@/i18n';
-import { ar } from '@/i18n/ar';
+import { getLocale, t } from '@/i18n';
 import { newClientShare } from '@/services/clientPage/clientPageService';
 import { loadBuiltinCatalog } from '@/features/programs/catalog';
+import { exerciseName } from '@/features/programs/names';
 import { clientPageLogo } from '@/features/identity/brandAssets';
 import { readShare, saveShare, type ShareRecord } from './prefs';
 
@@ -47,11 +47,11 @@ export async function buildClientShareDoc(services: AppServices, client: Client,
   ]);
   const program = [...programs].sort((a, b) => b.updatedAt - a.updatedAt)[0] ?? null;
   const byEx = new Map((catalog ?? []).map((e) => [e.id, e]));
-  const exName = (id: string) => byEx.get(id)?.nameAr ?? id.replace(/_/g, ' ');
+  const exName = (id: string) => exerciseName(byEx.get(id), id);
   const recipeName = new Map(recipes.map((r) => [r.id as string, r.name]));
   const supp = new Map(supplements.map((s) => [s.id as string, s]));
   const sortedPlans = [...plans].sort((a, b) => a.createdAt - b.createdAt);
-  const goalTitle = ar.pdf.doc.client.goals[client.goal];
+  const goalTitle = t(`pdf.doc.client.goals.${client.goal}`);
   return buildShareDocument({
     now,
     trainerName: settings.name,
@@ -74,6 +74,7 @@ export async function buildClientShareDoc(services: AppServices, client: Client,
     checkinsEnabled,
     extras: {
       ...shareExtras({ now, progress, sessions }),
+      ...(getLocale() === 'en' ? { lang: 'en' as const } : {}),
       goal: client.goalNote ? { title: goalTitle, note: client.goalNote } : { title: goalTitle },
       ...(calc
         ? { targets: { kcal: calc.targetKcal, proteinG: calc.proteinG, carbG: calc.carbG, fatG: calc.fatG, waterMinMl: calc.waterMinMl, waterMaxMl: calc.waterMaxMl } }

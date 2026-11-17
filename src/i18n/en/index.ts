@@ -1,11 +1,32 @@
 import type { Strings } from '../ar';
+import { assistant } from './assistant';
+import { core } from './core';
+import { exercises } from './exercises';
+import { hub } from './hub';
+import { outbox } from './outbox';
+import { pdf } from './pdf';
+import { schedule } from './schedule';
+import { settings } from './settings';
+import { storage } from './storage';
+import { training } from './training';
+import type { StringShape } from './types';
 
-/** Same tree as the Arabic strings, but any string value (Arabic literals are `as const`). */
-export type StringShape<T> = { [K in keyof T]: T[K] extends string ? string : StringShape<T[K]> };
+export type { StringShape } from './types';
 type DeepPartial<T> = { [K in keyof T]?: T[K] extends string ? string : DeepPartial<T[K]> };
 
 /**
  * English UI strings. Missing keys fall back to Arabic at runtime; i18n.test.ts lists any gaps.
  * Gym terms keep their normal English names (Biceps Curl, Glutes...).
  */
-export const en: DeepPartial<StringShape<Strings>> = {};
+export const en: DeepPartial<StringShape<Strings>> = {
+  ...core,
+  training,
+  exercises,
+  outbox,
+  pdf,
+  settings,
+  storage,
+  schedule,
+  assistant,
+  hub,
+};

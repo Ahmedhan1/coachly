@@ -165,3 +165,29 @@ describe('bestLifts', () => {
     ]);
   });
 });
+
+describe('client page language', () => {
+  const base = {
+    now: 1_700_000_000_000,
+    trainerName: 'Coach Ahmed',
+    color: '#F25C1F',
+    client: { name: 'Sara Mahmoud' },
+    program: null,
+    exercise: () => ({ name: 'Bench Press', imageFile: null }),
+    dayTitle: (i: number) => `Day ${i + 1}`,
+    mealPlan: null,
+    mealItem: () => '',
+    supplements: [],
+    notes: '',
+    checkinsEnabled: true,
+  };
+  it('marks an English page and the live Worker still accepts it', () => {
+    const doc = buildShareDocument({ ...base, extras: { lang: 'en' } });
+    expect(doc.lang).toBe('en');
+    expect(parseWorkerDoc(doc)).not.toBeNull();
+  });
+  it('leaves Arabic pages unmarked and drops unknown languages', () => {
+    expect(buildShareDocument({ ...base, extras: {} }).lang).toBeUndefined();
+    expect(buildShareDocument({ ...base, extras: { lang: 'fr' as unknown as 'en' } }).lang).toBeUndefined();
+  });
+});

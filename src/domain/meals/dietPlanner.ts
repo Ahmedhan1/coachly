@@ -89,7 +89,8 @@ function profileGap(per: MacroTotals, want: MacroTargets): number {
   );
 }
 
-function goalBonus(recipe: DietRecipe, goal: DietGoal, style: DietStyle | undefined): number {
+/** Score bonus for recipes tagged for the goal or style (lower scores win). */
+export function goalBonus(recipe: DietRecipe, goal: DietGoal, style: DietStyle | undefined): number {
   let bonus = 0;
   if (goal === 'cut' && recipe.tags.includes(DIET_TAGS.cut)) bonus += 0.15;
   if (goal === 'bulk' && recipe.tags.includes(DIET_TAGS.bulk)) bonus += 0.15;

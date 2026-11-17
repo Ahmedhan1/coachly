@@ -2,7 +2,7 @@
  * Arabic labels for muscle groups and exercise fields. Every label is looked up in the fitness dictionary
  * (src/i18n/fitness-terms.ts) — transliterated, never translated — so the forbidden-words gate covers it.
  */
-import { DATASET_FIELD_TERMS, EQUIPMENT_TERMS, MUSCLE_TERMS } from '../../i18n/fitness-terms';
+import { DATASET_FIELD_TERMS, ENGLISH_TERMS, EQUIPMENT_TERMS, MUSCLE_TERMS } from '../../i18n/fitness-terms';
 import {
   MUSCLE_GROUP_IDS,
   type EquipmentId,
@@ -33,32 +33,32 @@ const FRONT: readonly BodyView[] = ['front'];
 const BACK: readonly BodyView[] = ['back'];
 const BOTH: readonly BodyView[] = ['front', 'back'];
 
-const GROUP_INFO: Readonly<Record<MuscleGroupId, { dict: string; en: string; views: readonly BodyView[]; region: BodyRegion }>> = {
-  chest: { dict: 'chest', en: 'Chest', views: FRONT, region: 'upper' },
-  shoulders: { dict: 'shoulders', en: 'Shoulders', views: BOTH, region: 'upper' },
-  biceps: { dict: 'biceps', en: 'Biceps', views: FRONT, region: 'upper' },
-  triceps: { dict: 'triceps', en: 'Triceps', views: BACK, region: 'upper' },
-  forearms: { dict: 'forearms', en: 'Forearms', views: BOTH, region: 'upper' },
-  abs: { dict: 'abs', en: 'Abs', views: FRONT, region: 'core' },
-  obliques: { dict: 'obliques', en: 'Obliques', views: FRONT, region: 'core' },
-  neck: { dict: 'neck', en: 'Neck', views: BOTH, region: 'upper' },
-  traps: { dict: 'traps', en: 'Traps', views: BOTH, region: 'upper' },
-  lats: { dict: 'lats', en: 'Lats', views: BACK, region: 'upper' },
-  middle_back: { dict: 'middle back', en: 'Middle Back', views: BACK, region: 'upper' },
-  lower_back: { dict: 'lower back', en: 'Lower Back', views: BACK, region: 'core' },
-  glutes: { dict: 'glutes', en: 'Glutes', views: BACK, region: 'lower' },
-  hip_flexors: { dict: 'hip flexors', en: 'Hip Flexors', views: FRONT, region: 'lower' },
-  quads: { dict: 'quads', en: 'Quads', views: FRONT, region: 'lower' },
-  hamstrings: { dict: 'hamstrings', en: 'Hamstrings', views: BACK, region: 'lower' },
-  adductors: { dict: 'adductors', en: 'Adductors', views: FRONT, region: 'lower' },
-  abductors: { dict: 'abductors', en: 'Abductors', views: BOTH, region: 'lower' },
-  calves: { dict: 'calves', en: 'Calves', views: BACK, region: 'lower' },
-  tibialis: { dict: 'tibialis', en: 'Tibialis', views: FRONT, region: 'lower' },
+const GROUP_INFO: Readonly<Record<MuscleGroupId, { dict: string; views: readonly BodyView[]; region: BodyRegion }>> = {
+  chest: { dict: 'chest', views: FRONT, region: 'upper' },
+  shoulders: { dict: 'shoulders', views: BOTH, region: 'upper' },
+  biceps: { dict: 'biceps', views: FRONT, region: 'upper' },
+  triceps: { dict: 'triceps', views: BACK, region: 'upper' },
+  forearms: { dict: 'forearms', views: BOTH, region: 'upper' },
+  abs: { dict: 'abs', views: FRONT, region: 'core' },
+  obliques: { dict: 'obliques', views: FRONT, region: 'core' },
+  neck: { dict: 'neck', views: BOTH, region: 'upper' },
+  traps: { dict: 'traps', views: BOTH, region: 'upper' },
+  lats: { dict: 'lats', views: BACK, region: 'upper' },
+  middle_back: { dict: 'middle back', views: BACK, region: 'upper' },
+  lower_back: { dict: 'lower back', views: BACK, region: 'core' },
+  glutes: { dict: 'glutes', views: BACK, region: 'lower' },
+  hip_flexors: { dict: 'hip flexors', views: FRONT, region: 'lower' },
+  quads: { dict: 'quads', views: FRONT, region: 'lower' },
+  hamstrings: { dict: 'hamstrings', views: BACK, region: 'lower' },
+  adductors: { dict: 'adductors', views: FRONT, region: 'lower' },
+  abductors: { dict: 'abductors', views: BOTH, region: 'lower' },
+  calves: { dict: 'calves', views: BACK, region: 'lower' },
+  tibialis: { dict: 'tibialis', views: FRONT, region: 'lower' },
 };
 
 export const MUSCLE_GROUPS: readonly MuscleGroup[] = MUSCLE_GROUP_IDS.map((id) => {
   const info = GROUP_INFO[id];
-  return { id, labelAr: term(MUSCLE_TERMS, info.dict), labelEn: info.en, views: info.views, region: info.region };
+  return { id, labelAr: term(MUSCLE_TERMS, info.dict), labelEn: term(ENGLISH_TERMS.muscle, info.dict), views: info.views, region: info.region };
 });
 
 const GROUP_BY_ID: ReadonlyMap<MuscleGroupId, MuscleGroup> = new Map(MUSCLE_GROUPS.map((g) => [g.id, g]));
@@ -106,4 +106,20 @@ export const CATEGORY_LABELS_AR: Readonly<Record<ExerciseCategory, string>> = {
   powerlifting: DATASET_FIELD_TERMS.category.powerlifting,
   cardio: DATASET_FIELD_TERMS.category.cardio,
   olympic_weightlifting: DATASET_FIELD_TERMS.category['olympic weightlifting'],
+};
+
+export const EQUIPMENT_LABELS_EN: Readonly<Record<EquipmentId, string>> = Object.fromEntries(
+  Object.entries(EQUIPMENT_DICT_KEY).map(([id, key]) => [id, term(ENGLISH_TERMS.equipment, key)]),
+) as Record<EquipmentId, string>;
+
+export const LEVEL_LABELS_EN: Readonly<Record<ExerciseLevel, string>> = ENGLISH_TERMS.level;
+
+export const CATEGORY_LABELS_EN: Readonly<Record<ExerciseCategory, string>> = {
+  strength: ENGLISH_TERMS.category.strength,
+  stretching: ENGLISH_TERMS.category.stretching,
+  plyometrics: ENGLISH_TERMS.category.plyometrics,
+  strongman: ENGLISH_TERMS.category.strongman,
+  powerlifting: ENGLISH_TERMS.category.powerlifting,
+  cardio: ENGLISH_TERMS.category.cardio,
+  olympic_weightlifting: ENGLISH_TERMS.category['olympic weightlifting'],
 };

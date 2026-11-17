@@ -260,4 +260,11 @@ export const settings = {
     available: 'فيه نسخة جديدة من التطبيق.',
     apply: 'حدّث دلوقتي',
   },
+  /** Language switch (Settings + activation screen). Option labels are each language's own name. */
+  language: {
+    title: 'اللغة / Language',
+    hint: 'لغة التطبيق',
+    ar: 'العربية',
+    en: 'English',
+  },
 } as const;

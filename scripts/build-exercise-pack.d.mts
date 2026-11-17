@@ -14,6 +14,10 @@ export interface PackBuildOptions {
   limit: number;
   budgetMb: number;
   offline: boolean;
+  /** Rewrite exercises.json from data-src only, keeping the existing image list (no image work). */
+  manifestOnly: boolean;
+  namesEn: string;
+  cuesEn: string;
 }
 
 export interface PlannedImage {

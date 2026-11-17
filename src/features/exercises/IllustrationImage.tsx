@@ -1,5 +1,6 @@
 import type { CatalogExercise } from '@/domain/exercises';
 import { t } from '@/i18n';
+import { exName } from './localized';
 import { MuscleFallback } from './MuscleFallback';
 import { useExerciseIllustration } from './useExerciseIllustration';
 import styles from './ExerciseThumb.module.css';
@@ -17,7 +18,7 @@ export function IllustrationImage({ exercise, fallbackSize }: Props) {
   return (
     <img
       src={url}
-      alt={t('exercises.detail.illustrationAlt', { name: exercise.nameAr })}
+      alt={t('exercises.detail.illustrationAlt', { name: exName(exercise) })}
       decoding="async"
       className={styles.illustration}
     />

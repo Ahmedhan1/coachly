@@ -60,6 +60,8 @@ export function pdfTheme(input: PdfDocumentInput): PdfTheme {
     headerLogoPx: boxes.headerPx,
     background: b.background ? { image: b.background.image, opacity: Math.min(1, Math.max(0, b.background.opacity)) } : null,
     coverImage: b.coverImage,
+    lang: input.language ?? 'ar',
+    dir: input.language === 'en' ? 'ltr' : 'rtl',
   };
 }
 

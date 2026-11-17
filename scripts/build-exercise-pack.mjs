@@ -34,6 +34,8 @@ export const DEFAULTS = Object.freeze({
   overrides: 'data-src/exercise-names.overrides.ar.json',
   extras: 'data-src/exercise-extras.json',
   cues: 'data-src/exercise-cues.ar.json',
+  namesEn: 'data-src/exercise-names.en.json',
+  cuesEn: 'data-src/exercise-cues.en.json',
   cache: 'data-src/free-exercise-db/images',
   out: 'public/exercise-pack',
   size: 480,
@@ -44,6 +46,7 @@ export const DEFAULTS = Object.freeze({
   limit: Infinity,
   budgetMb: 40,
   offline: false,
+  manifestOnly: false,
 });
 
 /** @param {string[]} argv @param {string} [root] */
@@ -63,6 +66,9 @@ export function parseArgs(argv, root = repoRoot) {
     };
     switch (flag) {
       case '--offline': opts.offline = true; break;
+      case '--manifest-only': opts.manifestOnly = true; break;
+      case '--names-en': opts.namesEn = value(); break;
+      case '--cues-en': opts.cuesEn = value(); break;
       case '--source': opts.source = value(); break;
       case '--names': opts.names = value(); break;
       case '--overrides': opts.overrides = value(); break;
@@ -85,7 +91,7 @@ export function parseArgs(argv, root = repoRoot) {
       default: throw new Error(`unknown option ${flag}`);
     }
   }
-  for (const key of ['source', 'names', 'overrides', 'extras', 'cues', 'cache', 'out']) opts[key] = resolve(root, opts[key]);
+  for (const key of ['source', 'names', 'overrides', 'extras', 'cues', 'namesEn', 'cuesEn', 'cache', 'out']) opts[key] = resolve(root, opts[key]);
   return opts;
 }
 
@@ -227,12 +233,15 @@ export async function buildPack(opts, log = console.log) {
   const popular = readOptional(opts.overrides, {}).popular ?? [];
   const extras = readOptional(opts.extras, {}).exercises ?? [];
   const cues = new Map(Object.entries(readOptional(opts.cues, {}).cues ?? {}));
+  const englishNames = new Map(Object.entries(readOptional(opts.namesEn, {}).names ?? {}));
+  const cuesEn = new Map(Object.entries(readOptional(opts.cuesEn, {}).cues ?? {}));
   const sourceIds = new Set(sources.map((s) => s.id));
   for (const x of extras) {
     if (x.imagesFrom !== undefined && !sourceIds.has(x.imagesFrom)) throw new Error(`extra ${x.id}: imagesFrom ${x.imagesFrom} is not a dataset exercise`);
   }
   const imgDir = join(opts.out, 'img');
   const manifestFile = join(opts.out, 'exercises.json');
+  if (opts.manifestOnly) return rebuildManifestOnly({ sources, arabicNames, popular, extras, cues, englishNames, cuesEn, manifestFile }, log);
   mkdirSync(imgDir, { recursive: true });
 
   const plan = planImages(sources, opts.format).slice(0, opts.limit);
@@ -289,7 +298,7 @@ export async function buildPack(opts, log = console.log) {
     imagesById.set(p.id, [...(imagesById.get(p.id) ?? []), p.outName]);
   }
   const imgBytes = dirSize(imgDir);
-  const pack = buildExercisePack({ sources, arabicNames, imagesById, image: settings, source: SOURCE_LABEL, imageBytes: imgBytes, popular, extras, cues });
+  const pack = buildExercisePack({ sources, arabicNames, imagesById, image: settings, source: SOURCE_LABEL, imageBytes: imgBytes, popular, extras, cues, englishNames, cuesEn });
   writeFileSync(manifestFile, serializePack(pack));
 
   // 4. report
@@ -307,6 +316,21 @@ export async function buildPack(opts, log = console.log) {
   const overBudget = total > opts.budgetMb * 1024 * 1024;
   if (overBudget) log(`OVER BUDGET: try a smaller --size or --quality`);
   return { pack, imageCount, totalImages, missing, fetched, encoded, failures: [...failures, ...encodeFailures], totalBytes: total, overBudget };
+}
+
+/**
+ * `--manifest-only`: rewrites exercises.json from the data-src files (names, cues, English) and keeps the
+ * image list, settings and byte count of the existing manifest. Never touches, downloads or deletes images.
+ */
+function rebuildManifestOnly({ sources, arabicNames, popular, extras, cues, englishNames, cuesEn, manifestFile }, log) {
+  if (!existsSync(manifestFile)) throw new Error(`--manifest-only needs an existing ${manifestFile}`);
+  const previous = JSON.parse(readFileSync(manifestFile, 'utf8'));
+  const imagesById = new Map(previous.exercises.filter((e) => e.extra !== true).map((e) => [e.id, e.images]));
+  const image = { format: previous.image.format, maxSize: previous.image.maxSize, quality: previous.image.quality };
+  const pack = buildExercisePack({ sources, arabicNames, imagesById, image, source: SOURCE_LABEL, imageBytes: previous.imageBytes, popular, extras, cues, englishNames, cuesEn });
+  writeFileSync(manifestFile, serializePack(pack));
+  log(`manifest only: ${pack.count} exercises, ${pack.exercises.filter((e) => (e.cuesEn?.length ?? 0) > 0).length} with English cues; images untouched`);
+  return { pack, imageCount: 0, totalImages: 0, missing: 0, fetched: 0, encoded: 0, failures: [], totalBytes: 0, overBudget: false };
 }
 
 const invokedDirectly = process.argv[1] !== undefined && import.meta.url === pathToFileURL(resolve(process.argv[1])).href;

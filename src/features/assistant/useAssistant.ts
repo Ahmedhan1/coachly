@@ -13,6 +13,7 @@ import {
   type PlanError,
   type ProposedAction,
 } from '@/domain/ai';
+import { getLocale } from '@/i18n';
 import { deviceZone } from '@/features/schedule/zone';
 import { aiClients } from './aiClient';
 import { readAiConfig } from './aiSettings';
@@ -80,7 +81,7 @@ export function useAssistant(focusClient: { id: string; name: string } | null) {
       const { clock } = deviceZone();
       const settings = await services.data.repos.settings.get();
       const local = localNow(clock, now);
-      const system: ChatMessage = { role: 'system', content: buildSystemPrompt({ ...local, currency: settings.currency, focusClient }) };
+      const system: ChatMessage = { role: 'system', content: buildSystemPrompt({ ...local, currency: settings.currency, focusClient, language: getLocale() }) };
       const sentNotes = [...notes.current];
       const user: ChatMessage = { role: 'user', content: withAppNotes(trimmed, sentNotes) };
       const { chat } = aiClients(services.meta);

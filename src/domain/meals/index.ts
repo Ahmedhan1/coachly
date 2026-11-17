@@ -15,3 +15,6 @@ export * from './dietNotes';
 export * from './dietSafety';
 export * from './dietPlan';
 export * from './foodIcon';
+export * from './foodLines';
+export * from './gramPlanner';
+export * from './gramBook';

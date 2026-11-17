@@ -1,6 +1,6 @@
 import type { KeyboardEvent } from 'react';
-import { muscleGroupLabelAr, type MuscleGroupId } from '@/domain/exercises';
-import { t } from '@/i18n';
+import { muscleLabel, type MuscleGroupId } from '@/domain/exercises';
+import { getLocale, t } from '@/i18n';
 import { cx } from '../cx';
 import { fillStep, muscleFill, type MuscleIntensities, type MuscleMapPalette } from './colors';
 import { BASE_PATHS, VIEW_PATHS, VIEWBOX, type BodyView } from './shapes';
@@ -124,7 +124,7 @@ function Region({ id, view, paths, fill, step, selected, onSelect }: RegionProps
       {...common}
       role="button"
       tabIndex={0}
-      aria-label={muscleGroupLabelAr(id)}
+      aria-label={muscleLabel(id, getLocale())}
       aria-pressed={selected}
       className={cx(common.className, styles.interactive)}
       onClick={() => onSelect(id)}
