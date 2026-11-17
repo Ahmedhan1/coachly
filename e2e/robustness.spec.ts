@@ -113,7 +113,7 @@ test('two tabs: a newer version upgrading the database is not blocked by this ta
   await other.close();
 });
 
-test.fixme('two tabs: the old tab shows a reload prompt (needs <AppStorageProblemToasts/> in AppShell)', async ({ page, context }) => {
+test('two tabs: the old tab shows a reload prompt', async ({ page, context }) => {
   await openApp(page, '/clients');
   const other = await context.newPage();
   await other.goto('/');

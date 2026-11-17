@@ -16,6 +16,7 @@ import { WorkerApi } from '@/services/cloud/workerApi';
 import { BrowserPushService } from '@/services/push/pushService';
 import { META_KEYS } from '@/services/license/licenseActivationService';
 import { buildEnv, createActivationService } from './activationFactory';
+import { afterFirstPaint } from './afterFirstPaint';
 import { createAppRouter } from './router';
 import { CLOUD_PASSWORD_KEY, IDENTITY_SETUP_KEY, ServicesProvider, useServices, type AppServices } from './services';
 
@@ -76,7 +77,6 @@ function Boot() {
     let cancelled = false;
     const afterActivation = async () => {
       await services.data.ensureFirstRun(new Date());
-      void services.data.runDailyPurge(new Date()).catch(() => undefined);
       const done = await services.meta.get(IDENTITY_SETUP_KEY);
       if (!cancelled) setBoot(done ? { phase: 'ready' } : { phase: 'setup' });
     };
@@ -100,6 +100,12 @@ function Boot() {
       cancelled = true;
     };
   }, [services]);
+
+  // The daily purge of old soft-deleted rows waits until the first screen has painted and the main thread is idle.
+  useEffect(() => {
+    if (boot.phase !== 'ready') return;
+    return afterFirstPaint(() => void services.data.runDailyPurge(new Date()).catch(() => undefined));
+  }, [boot.phase, services]);
 
   useEffect(() => {
     if (boot.phase !== 'ready') return;
