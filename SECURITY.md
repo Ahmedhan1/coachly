@@ -23,7 +23,8 @@ almost everything here is planned; only the license token format (`shared/licens
 | **Cloudflare R2** | cloud backup (one per license) | **Yes** — AES-GCM, key from the trainer's password | only the trainer |
 | same | client-page content and weekly check-ins | **Yes** — AES-GCM, key only in the link fragment | the trainer and whoever holds the link |
 | **Cloudflare Pages** | app code, encrypted data bundle (exercise data + 3D model), fonts | bundle encrypted with `dataKey` | public files; bundle needs the key from activation |
-| **Local backup file** (Files / iCloud Drive) | full database + full-size photos | **Yes by default** — same password scheme. iCloud Drive is off the device, so the "nothing leaves unencrypted" rule applies — planned (phase 4) | the trainer |
+| **Device backup file** (saved outside the app by the trainer: «حفظ في الملفات», WhatsApp/mail to self, any app the trainer picks) | full database + full-size photos | **Yes by default** — chunked PTB1 envelope (below). The app has no Google Drive / iCloud integration and the owner runs nothing for it | the trainer |
+| **Photo archive file** («أرشفة الصور القديمة») | old client/progress photos only (full size) + their metadata | Yes when the trainer gives a password (same PTB1 envelope) | the trainer |
 
 **What leaves the device on purpose, unencrypted, by the trainer's own action:** PDFs and WhatsApp messages the
 trainer shares with a client (that is the point of them); and, only if the trainer turns them on, the AI helper
@@ -98,6 +99,37 @@ VAPID (ES256), all with Web Crypto inside the Worker (Node's `web-push` package 
 text itself is stored in D1 in plain form, so it must stay **generic** (no client names) — enforced by building
 it from fixed templates in `src/i18n/ar.ts` with only a time/count inserted.
 
+### Device backup file envelope "PTB1" (implemented, `src/services/backup/chunkedEnvelope.ts`)
+
+Implements steps 1–5 above for the device file: PBKDF2-SHA-256 (600,000 iterations, stored per file) → KEK wraps a
+random 256-bit data key (AAD = header); the zip is encrypted in 4 MB chunks, each with a fresh IV and AAD =
+`header (incl. random fileId, chunkCount, plainSize) | chunkIndex | isLast`, so chunks cannot be reordered, swapped
+between files or truncated. Sealing/opening reads one chunk at a time from the Blob (peak JS memory ≈ 2 chunks; a
+300-photo / 19 MB test never hands Web Crypto more than one chunk). Older single-message PTP1 files still open.
+The cloud copy keeps PTP1 (thumbnails, small).
+
+- **Why not the license `dataKey`?** It is one key shared by every licence (it unlocks the exercise bundle), so a
+  file sealed with it would be readable by any trainer. Device files use the trainer's password only.
+- **Remembered password.** For the one-tap weekly file the trainer may keep the file password on this phone
+  (`backup.filePassword`, device-local, same treatment as `backup.cloudPassword`). It protects the copy that
+  leaves the phone, not the phone itself (the IndexedDB data is already there in clear).
+- **Device-local keys never travel.** Meta keys starting `license.` or `backup.` (licence token, `dataKey`,
+  passwords, backup status) are excluded from every backup and kept untouched by a restore (tested in
+  `src/services/backup/deviceBackup.test.ts`).
+- **Photo archives cannot wipe data.** Their manifest is `kind: "photos"`, `formatVersion: 2`: older app versions
+  refuse them (`unsupported_format`), the full restore refuses them (`photo_archive`), and they are restored only by
+  adding photos back. Originals are swapped for placeholders only after the trainer picked the saved file back and
+  every checksum matched.
+
+### Storage quota and eviction (on-device data)
+
+- Safari gives a home-screen web app a quota relative to free disk space (not a fixed number); the value shown in
+  Settings → التخزين comes from `navigator.storage.estimate()` and grows when the phone has more free space.
+  Re-check WebKit's storage policy before each release.
+- `navigator.storage.persist()` is requested at boot and again from a button (user gesture) in Settings → التخزين.
+  Persisted storage is not evicted under storage pressure; non-persisted origins can be. Deleting the home-screen
+  app still deletes everything, which is why the device file is the primary safety net.
+
 ## 4. License key handling
 
 Contract in CLAUDE.md; implemented in `shared/license.ts` (phase 3, in progress by another agent).
@@ -148,7 +180,7 @@ Contract in CLAUDE.md; implemented in `shared/license.ts` (phase 3, in progress 
 | XSS in the app or client page (would expose keys and data) | No third-party scripts, strict CSP, React escaping, no `dangerouslySetInnerHTML`, Zod validation on every input and on decrypted content | Supply-chain risk of dependencies → pinned versions + license/audit review per phase |
 | Brute-forcing activation codes | ~59-bit codes + rate limiting | Negligible |
 | Brute-forcing a stolen backup's password | PBKDF2 with high iteration count + salt; minimum length | Weak passwords remain weak — strength hint only |
-| iOS evicts website storage under disk pressure | `navigator.storage.persist()`, image downscaling, automatic encrypted cloud backup, weekly local-export reminder | Data since the last backup |
+| iOS evicts website storage under disk pressure | `navigator.storage.persist()` (boot + Settings button), image downscaling, photo archiving, weekly device-file reminder (Home card), optional cloud copy | Data since the last device file |
 | Trainer enables AI / webhooks | Off by default, explicit Arabic warning, trainer's own keys/endpoints | Data goes to the provider the trainer chose |
 
 ## 7. Reporting

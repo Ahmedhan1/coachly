@@ -262,3 +262,15 @@
 .backupDue svg {
   color: var(--danger, var(--brand));
 }
+
+.followBtn {
+  flex: none;
+}
+
+.followMore {
+  display: flex;
+  justify-content: center;
+  padding: var(--sp-2);
+  background: var(--surface);
+  border-block-start: var(--hairline) solid var(--line);
+}

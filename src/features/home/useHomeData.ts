@@ -1,8 +1,12 @@
 import { useEffect, useState } from 'react';
 import { useServices } from '@/app/services';
 import { useLive } from '@/app/useLive';
-import { localDayRange, needsFollowUp, subscriptionAttention, toIsoDate, type Client, type ClientAttention } from '@/domain/models';
-import { attentionRank, daysSinceCheckIn, planToday } from './homeModel';
+import { followUps, plannedDay, splitClientPrograms, type FollowUpReason } from '@/domain/clientHub';
+import { localDayRange, subscriptionAttention, toIsoDate, type Client, type ClientAttention } from '@/domain/models';
+import { readActivePrograms } from '@/features/programs/activePrograms';
+import { programDayName } from '@/features/programs/names';
+import { readSessionDays } from '@/features/schedule/sessionDays';
+import { attentionRank, localWeekRange, planToday } from './homeModel';
 
 export interface HomeData {
   trainerName: string;
@@ -10,7 +14,9 @@ export interface HomeData {
   now: Date;
   plan: ReturnType<typeof planToday>;
   attention: Array<{ client: Client; attention: ClientAttention }>;
-  followUp: Array<{ client: Client; days: number | null }>;
+  followUp: Array<{ client: Client; reasons: FollowUpReason[] }>;
+  /** "Program · day" for each of today's sessions (by session id), when the client has a program. */
+  sessionPlans: ReadonlyMap<string, string>;
   hasDemo: boolean;
 }
 
@@ -26,20 +32,42 @@ function useMinuteClock(): Date {
 
 /** Everything the home screen shows, derived by domain functions from repository data. */
 export function useHomeData(): HomeData | undefined {
-  const { data } = useServices();
+  const { data, meta } = useServices();
+  const repos = data.repos;
   const now = useMinuteClock();
   const today = toIsoDate(now);
   const { start, end } = localDayRange(now);
+  const week = localWeekRange(now);
 
-  const settings = useLive(() => data.repos.settings.get(), [data]);
-  const clients = useLive(() => data.repos.clients.list(), [data]);
-  const sessions = useLive(() => data.repos.sessions.listBetween(start, end), [data, start, end]);
-  const lastCheckIns = useLive(() => data.repos.progress.lastCheckInByClient(), [data]);
+  const settings = useLive(() => repos.settings.get(), [repos]);
+  const clients = useLive(() => repos.clients.list(), [repos]);
+  const sessions = useLive(() => repos.sessions.listBetween(start, end), [repos, start, end]);
+  const weekSessions = useLive(() => repos.sessions.listBetween(week.start, week.end), [repos, week.start, week.end]);
+  const duePayments = useLive(() => repos.payments.listDue(), [repos]);
+  const lastCheckIns = useLive(() => repos.progress.lastCheckInByClient(), [repos]);
   const hasDemo = useLive(() => data.hasDemoData(), [data]);
+  const sessionPlans = useLive(async () => {
+    const out = new Map<string, string>();
+    const list = sessions ?? [];
+    if (list.length === 0) return out;
+    const [active, days] = await Promise.all([readActivePrograms(meta), readSessionDays(meta)]);
+    for (const clientId of new Set(list.map((s) => s.clientId))) {
+      const [programs, logs] = await Promise.all([repos.programs.listByClient(clientId), repos.workoutLogs.listByClient(clientId)]);
+      const fallback = splitClientPrograms(programs, clientId, active[clientId]).active;
+      for (const s of list.filter((x) => x.clientId === clientId)) {
+        const program = programs.find((p) => p.id === s.programId) ?? fallback;
+        if (!program) continue;
+        const day = plannedDay({ days: program.days, attachedDayId: days[s.id], logs, programId: program.id });
+        const name = day ? programDayName(program.days, day.day.id) : '';
+        out.set(s.id, name ? `${program.name} · ${name}` : program.name);
+      }
+    }
+    return out;
+  }, [repos, meta, sessions]);
 
-  if (!settings || !clients || !sessions || !lastCheckIns || hasDemo === undefined) return undefined;
+  if (!settings || !clients || !sessions || !weekSessions || !duePayments || !lastCheckIns || hasDemo === undefined || !sessionPlans) return undefined;
 
-  const byId = new Map(clients.map((c) => [c.id, c] as const));
+  const byId = new Map<string, Client>(clients.map((c) => [c.id, c]));
   const todaySessions = sessions.flatMap((session) => {
     const client = byId.get(session.clientId);
     return client ? [{ session, client }] : [];
@@ -50,9 +78,11 @@ export function useHomeData(): HomeData | undefined {
       return a ? [{ client, attention: a }] : [];
     })
     .sort((x, y) => attentionRank(x.attention) - attentionRank(y.attention));
-  const followUp = clients
-    .filter((c) => needsFollowUp(lastCheckIns.get(c.id) ?? null, today))
-    .map((client) => ({ client, days: daysSinceCheckIn(lastCheckIns.get(client.id) ?? null, today) }));
+  const bookedThisWeek = new Set(weekSessions.filter((s) => s.attendance !== 'cancelled').map((s) => s.clientId));
+  const followUp = followUps({ clients, duePayments, lastCheckIns, bookedThisWeek, today }).flatMap((f) => {
+    const client = byId.get(f.clientId);
+    return client ? [{ client, reasons: f.reasons }] : [];
+  });
 
   return {
     trainerName: settings.name,
@@ -61,6 +91,7 @@ export function useHomeData(): HomeData | undefined {
     plan: planToday(todaySessions, now.getTime()),
     attention,
     followUp,
+    sessionPlans,
     hasDemo,
   };
 }

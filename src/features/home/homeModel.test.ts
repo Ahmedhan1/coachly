@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import type { Client, Session } from '@/domain/models';
-import { attentionRank, daysSinceCheckIn, packageIndex, planToday } from './homeModel';
+import { attentionRank, daysSinceCheckIn, localWeekRange, packageIndex, planToday } from './homeModel';
 
 const MIN = 60_000;
 const NOW = Date.UTC(2026, 10, 16, 15, 0);
@@ -69,5 +69,13 @@ describe('helpers', () => {
       attentionRank({ kind: 'ending_soon', daysLeft: 1 } as never),
     ];
     expect([...ranks].sort((a, b) => a - b)).toEqual([ranks[1], ranks[2], ranks[0]]);
+  });
+});
+
+describe('localWeekRange', () => {
+  it('spans seven local days from the start of the week', () => {
+    const { start, end } = localWeekRange(new Date(2026, 10, 17, 15), 6); // Tue 17 Nov, week from Saturday
+    expect(new Date(start)).toEqual(new Date(2026, 10, 14));
+    expect(new Date(end)).toEqual(new Date(2026, 10, 21));
   });
 });

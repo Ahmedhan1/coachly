@@ -23,6 +23,14 @@
 }
 
 .client {
+  position: relative;
+  display: block;
+  max-inline-size: 100%;
+  color: var(--text);
+  text-align: start;
+  text-decoration: underline;
+  text-decoration-color: var(--line-strong);
+  text-underline-offset: 3px;
   overflow: hidden;
   font: var(--t-headline);
   text-overflow: ellipsis;

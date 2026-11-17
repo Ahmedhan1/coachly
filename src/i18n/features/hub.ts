@@ -173,7 +173,7 @@ export const hub = {
   },
   session: {
     suggestAddWeight: 'جرّب {w}',
-    suggestAddReps: 'جرّب {w}×{r}',
+    suggestAddReps: 'جرّب {w}',
     suggestion: 'اقتراح',
     attendanceSaved: 'اتسجّل حضور {name}',
     leftOf: 'باقي {left} من {total} حصة',

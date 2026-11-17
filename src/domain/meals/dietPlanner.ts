@@ -109,7 +109,8 @@ function mainScore(recipe: DietRecipe, want: MacroTargets, goal: DietGoal, style
   const need = per.kcal > 0 ? want.kcal / per.kcal : Infinity;
   const outside = need < ds.minServings ? ds.minServings / need - 1 : need > ds.maxServings ? need / ds.maxServings - 1 : 0;
   const jitter = ((hash(recipe.id) + salt) % 100) / 100;
-  return profileGap(per, want) + Math.min(2, outside) * 0.6 - goalBonus(recipe, goal, style) + jitter * 0.14;
+  const bulky = Number.isFinite(need) ? Math.max(0, Math.min(need, 6) - 2) * 0.25 : 0;
+  return profileGap(per, want) + Math.min(2, outside) * 0.6 + bulky - goalBonus(recipe, goal, style) + jitter * 0.14;
 }
 
 function usable(book: readonly DietRecipe[], ctx: Pick<DayContext, 'exclude' | 'vegetarian'>): DietRecipe[] {

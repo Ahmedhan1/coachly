@@ -167,7 +167,7 @@ images live on Pages, not R2. Usable for cloud backups ≈ **9 GB**. One backup 
 Realistic size: the database itself (clients, sessions, programs, payments) is text — a few MB even for 200
 clients. Photos dominate: a 1,200 px JPEG ≈ 150–250 KB, so 200 progress photos ≈ 40 MB. With **photos stored in
 the cloud backup as ~400 px thumbnails (~30 KB)** the same 200 photos ≈ 6 MB → a typical backup of **≈ 10 MB**,
-i.e. **~900 trainers fit**. Full-size photos always stay in the local backup file (Files / iCloud Drive).
+i.e. **~900 trainers fit**. Full-size photos always stay in the device backup file the trainer saves outside the app.
 
 **So 500 trainers fit only if the average cloud backup stays ≤ ~18 MB.** The 100 MB per-trainer cap alone does
 not guarantee it.
@@ -202,6 +202,21 @@ not guarantee it.
 - Known, accepted: the global activation limit (300/h) and global login limit (30/h) can be exhausted on
   purpose by a few IPs (temporary lock-out, not a breach; the offline long code still activates). Revoked
   `shares` rows are kept forever so an id is never reused (tiny rows).
+
+## 3b. On-device storage (not Cloudflare)
+
+The app works fully without Cloudflare; the cloud copy is an optional extra. On the phone:
+
+- **Quota.** Safari (iOS 17+) gives a home-screen web app a quota relative to free disk; older iOS used a smaller
+  fixed-ish budget. A trainer seeing "2 GB" sees the browser's current grant, not the phone's disk. It grows with
+  free space. Settings → التخزين shows `storage.estimate()` with photos vs data and "room for about N more clients".
+- **Eviction.** Persisted storage (`navigator.storage.persist()`) is not evicted under pressure; the app asks at
+  boot and from a button. Uninstalling the home-screen app deletes everything → the weekly device file matters.
+- **Growth control.** Photos are downscaled when saved (1200 px, JPEG q 0.82; WebP is not used because Safari 16
+  cannot encode it and silently falls back to PNG). Tools in Settings → التخزين: shrink old oversized photos,
+  delete unreferenced photos, and «أرشفة الصور القديمة» (client/progress photos older than 3/6/12 months → device
+  file, 320 px placeholders kept). Each destructive step needs a device file saved today and an explicit confirm.
+- **Rough capacity.** ~3 MB per client with 12 progress photos → 1 GB ≈ 300 clients before archiving.
 
 ## 4. Re-verify
 

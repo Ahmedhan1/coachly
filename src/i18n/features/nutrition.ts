@@ -420,7 +420,7 @@ export const nutrition = {
     too_large: 'النسخة أكبر من المسموح على السحابة. اعمل ملف نسخة على الموبايل، أو امسح صور قديمة.',
     timeout: 'النت بطيء والرفع ما خلصش. هنحاول تاني لوحدنا.',
     rate_limited: 'رفعت كتير النهارده. هنحاول تاني بكرة لوحدنا.',
-    savedToFiles: 'الملف اتنزّل في «التنزيلات» أو «Files». انقله لـ iCloud Drive أو Google Drive عشان يفضل في أمان لو الموبايل ضاع.',
+    savedToFiles: 'الملف اتحفظ في ملفات التليفون. تقدر تبعته لنفسك على واتساب أو الإيميل عشان يفضل معاك.',
   },
   // Extra labels for الإعدادات ← المعادلات (FormulasScreen is owned by this area).
   formulasExtra: {

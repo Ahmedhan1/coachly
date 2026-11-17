@@ -21,7 +21,6 @@ import {
   goToExercise,
   kgToUnit,
   nextPosition,
-  nextProgramDayId,
   parseSessionState,
   reopenSet,
   restRemaining,
@@ -388,11 +387,11 @@ function SessionRunner({ client, program, dayId: resolvedDayId, history, unit, s
           {hint && (
             <p className={styles.last} data-testid="overload-hint">
               {t('hub.session.suggestion')}:{' '}
-              <Num>
-                {hint.kind === 'add_weight'
-                  ? t('hub.session.suggestAddWeight', { w: kgToUnit(hint.weightKg, unit) })
-                  : t('hub.session.suggestAddReps', { w: kgToUnit(hint.weightKg, unit), r: hint.reps })}
-              </Num>
+              {hint.kind === 'add_weight' ? (
+                <Tx k="hub.session.suggestAddWeight" params={{ w: <Num>{kgToUnit(hint.weightKg, unit)}</Num> }} />
+              ) : (
+                <Tx k="hub.session.suggestAddReps" params={{ w: <Num>{`${kgToUnit(hint.weightKg, unit)}×${hint.reps}`}</Num> }} />
+              )}
             </p>
           )}
 

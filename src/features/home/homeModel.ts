@@ -1,4 +1,5 @@
-import { daysBetween, type Client, type ClientAttention, type IsoDate, type Session } from '@/domain/models';
+import { daysBetween, toIsoDate, type Client, type ClientAttention, type IsoDate, type Session } from '@/domain/models';
+import { DEFAULT_WEEK_START, startOfWeek, type Weekday } from '@/domain/schedule';
 
 export type AgendaStatus = 'upcoming' | 'past' | 'attended' | 'missed';
 
@@ -63,4 +64,11 @@ export function attentionRank(a: ClientAttention): number {
     case 'low_sessions':
       return 100 + a.remaining;
   }
+}
+
+/** [start, end) epoch ms of the local week containing `now` (the trainer's week starts on `weekStart`). */
+export function localWeekRange(now: Date, weekStart: Weekday = DEFAULT_WEEK_START): { start: number; end: number } {
+  const first = startOfWeek(toIsoDate(now), weekStart);
+  const [y, m, d] = first.split('-').map(Number) as [number, number, number];
+  return { start: new Date(y, m - 1, d).getTime(), end: new Date(y, m - 1, d + 7).getTime() };
 }

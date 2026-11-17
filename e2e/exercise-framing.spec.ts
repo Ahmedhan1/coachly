@@ -1,3 +1,4 @@
+import { writeFileSync } from 'node:fs';
 import { expect, test } from '@playwright/test';
 import { openApp } from './helpers';
 
@@ -15,6 +16,13 @@ for (const [name, id] of [
     await openApp(page, `/exercises/${id}`);
     const picture = page.locator('img[alt^="رسمة العضلات"]').first();
     await expect(picture).toBeVisible({ timeout: 30_000 });
-    if (shot) await picture.screenshot({ path: `${shot}/ex-frame-${name}.png` });
+    if (shot) {
+      // the rendered picture itself (the PNG blob), not a crop of the page
+      const base64 = await picture.evaluate(async (img: HTMLImageElement) => {
+        const bytes = new Uint8Array(await (await fetch(img.src)).arrayBuffer());
+        return btoa(Array.from(bytes, (b) => String.fromCharCode(b)).join(''));
+      });
+      writeFileSync(`${shot}/ex-frame-${name}.png`, Buffer.from(base64, 'base64'));
+    }
   });
 }

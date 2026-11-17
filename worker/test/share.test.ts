@@ -271,14 +271,22 @@ describe('share document guard', () => {
       { ...SAMPLE_DOCUMENT, sessions: [{ at: 'soon', durationMin: 60 }] },
       { ...SAMPLE_DOCUMENT, package: { left: 1 } },
       { ...SAMPLE_DOCUMENT, nextDay: 99 },
+      { ...SAMPLE_DOCUMENT, streakWeeks: -1 },
+      { ...SAMPLE_DOCUMENT, checkins: [{ d: '2026-01-01', weightKg: 5 }] },
+      { ...SAMPLE_DOCUMENT, checkins: Array.from({ length: 13 }, () => ({ d: '2026-01-01' })) },
+      { ...SAMPLE_DOCUMENT, startDate: 'today' },
     ];
-    const { goal: _g, targets: _t, mealDays: _m, progress: _p, records: _r, sessions: _s, package: _k, attended: _a, nextDay: _n, ...minimal } = SAMPLE_DOCUMENT;
+    const { goal: _g, targets: _t, mealDays: _m, progress: _p, records: _r, sessions: _s, package: _k, attended: _a, nextDay: _n, streakWeeks: _w, checkins: _c, startDate: _d, ...minimal } = SAMPLE_DOCUMENT;
     expect(parseShareDocument(minimal)).toEqual(minimal); // older apps send only the original fields
     for (const doc of bad) expect(parseShareDocument(doc)).toBeNull();
     expect(parseCheckinDocument({ v: 1, kind: 'checkin', createdAt: 1, photo: 'data:image/png;base64,AAAA' })).toBeNull();
     expect(parseCheckinDocument({ v: 1, kind: 'checkin', createdAt: 1, weightKg: 80, photo: 'data:image/jpeg;base64,AAAA' })).not.toBeNull();
     expect(parseCheckinDocument({ v: 1, kind: 'checkin', createdAt: 1, photos: ['data:image/jpeg;base64,AAAA'], hipCm: 95, armCm: 32 })).not.toBeNull();
     expect(parseCheckinDocument({ v: 1, kind: 'checkin', createdAt: 1, photos: ['data:image/png;base64,AAAA'] })).toBeNull();
+    expect(parseCheckinDocument({ v: 1, kind: 'checkin', createdAt: 1, sleepHours: 7.5, energy: 4, adherence: 80 })).not.toBeNull();
+    for (const bad of [{ energy: 0 }, { energy: 3.5 }, { adherence: 120 }, { sleepHours: 30 }]) {
+      expect(parseCheckinDocument({ v: 1, kind: 'checkin', createdAt: 1, ...bad })).toBeNull();
+    }
     expect(parseCheckinDocument({ v: 1, kind: 'checkin', createdAt: 1, armCm: 500 })).toBeNull();
   });
 });

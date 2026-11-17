@@ -1,6 +1,10 @@
+import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useGo } from '@/app/nav';
 import { useServices } from '@/app/services';
 import { useLive } from '@/app/useLive';
+import type { FollowUpReason } from '@/domain/clientHub';
+import { bookUrl, clientUrl, sessionUrl } from '@/features/clients/hub/links';
 import { backupReminder } from '@/domain/backup/reminder';
 import { toIsoDate } from '@/domain/models';
 import { useUiStore } from '@/app/uiStore';
@@ -17,9 +21,10 @@ import styles from './HomeScreen.module.css';
 export function HomeScreen() {
   const home = useHomeData();
   const navigate = useNavigate();
+  const openSearch = useUiStore((s) => s.openSearch);
   const actions = (
     <>
-      <IconButton icon="search" label={t('home.search')} onClick={() => navigate('/clients')} />
+      <IconButton icon="search" label={t('hub.search.open')} onClick={openSearch} />
       <button type="button" className={styles.profile} aria-label={t('home.profile')} title={t('home.profile')} onClick={() => navigate('/more')}>
         {(home?.trainerName.trim() || t('app.name')).charAt(0)}
       </button>
@@ -31,9 +36,9 @@ export function HomeScreen() {
       <PageHeader title={t('home.title')} actions={actions} subtitle={<DateLine home={home} />} />
       <ActiveSessionBanner />
       {home.hasDemo && <DemoNotice />}
-      {home.plan.next ? <Hero next={home.plan.next} /> : <NoNext />}
+      {home.plan.next ? <Hero next={home.plan.next} plan={home.sessionPlans.get(home.plan.next.session.id) ?? null} /> : <NoNext />}
       <OutboxCard />
-      <RestOfDay items={home.plan.rest} />
+      <RestOfDay items={home.plan.rest} plans={home.sessionPlans} />
       <EndingSoon home={home} />
       <FollowUp home={home} />
       <BackupLine now={home.now} />
@@ -72,20 +77,10 @@ function DemoNotice() {
   );
 }
 
-/** Session mode for the hero session: the session's program, else the client's latest one, linked to the booking. */
-function useStartSessionUrl(next: NextSession): string {
-  const { data } = useServices();
-  const programs = useLive(() => data.repos.programs.listByClient(next.client.id), [data, next.client.id]);
-  const latest = [...(programs ?? [])].sort((a, b) => b.updatedAt - a.updatedAt)[0];
-  const programId = next.session.programId ?? latest?.id ?? null;
-  const params = new URLSearchParams({ client: next.client.id, schedule: next.session.id });
-  if (programId) params.set('program', programId);
-  return `/session/new?${params.toString()}`;
-}
-
-function Hero({ next }: { next: NextSession }) {
-  const navigate = useNavigate();
-  const startUrl = useStartSessionUrl(next);
+function Hero({ next, plan }: { next: NextSession; plan: string | null }) {
+  const go = useGo();
+  // Session mode picks the booking's program and day (or the client's active program and the next day).
+  const startUrl = sessionUrl({ clientId: next.client.id, scheduleId: next.session.id });
   const { clock, period } = timeParts(next.session.startsAt);
   const wa = whatsappUrl(next.client.phone);
   const when =
@@ -106,7 +101,7 @@ function Hero({ next }: { next: NextSession }) {
         <Num>{clock}</Num>
         <small>{period}</small>
       </p>
-      <button type="button" className={styles.heroWho} onClick={() => navigate(`/clients/${next.client.id}`)}>
+      <button type="button" className={styles.heroWho} onClick={() => go(clientUrl(next.client.id))}>
         {next.client.name}
       </button>
       <p className={styles.heroWhat}>
@@ -118,8 +113,9 @@ function Hero({ next }: { next: NextSession }) {
           </>
         )}
       </p>
+      {plan && <p className={styles.heroWhat}>{plan}</p>}
       <div className={styles.heroActions}>
-        <Button variant="onBrand" icon="timer" className={styles.heroStart} onClick={() => navigate(startUrl)}>
+        <Button variant="onBrand" icon="timer" className={styles.heroStart} onClick={() => go(startUrl)}>
           {t('home.start')}
         </Button>
         {wa && (
@@ -155,7 +151,7 @@ function AgendaTime({ startsAt }: { startsAt: number }) {
   );
 }
 
-function RestOfDay({ items }: { items: AgendaItem[] }) {
+function RestOfDay({ items, plans }: { items: AgendaItem[]; plans: ReadonlyMap<string, string> }) {
   const navigate = useNavigate();
   return (
     <ListSection title={t('home.rest')} action={<SectionLink onClick={() => navigate('/schedule')}>{t('home.scheduleLink')}</SectionLink>}>
@@ -171,7 +167,7 @@ function RestOfDay({ items }: { items: AgendaItem[] }) {
             title={status === 'attended' ? <s className={styles.struck}>{client.name}</s> : client.name}
             subtitle={
               <>
-                {t(`goals.${client.goal}`)} · <Tx k="home.duration" params={{ min: session.durationMin }} />
+                {plans.get(session.id) ?? t(`goals.${client.goal}`)} · <Tx k="home.duration" params={{ min: session.durationMin }} />
               </>
             }
             trailing={
@@ -192,7 +188,7 @@ function RestOfDay({ items }: { items: AgendaItem[] }) {
 }
 
 function EndingSoon({ home }: { home: HomeData }) {
-  const navigate = useNavigate();
+  const go = useGo();
   return (
     <ListSection title={t('home.endingSoon')} count={home.attention.length || undefined}>
       {home.attention.length === 0 ? (
@@ -203,7 +199,7 @@ function EndingSoon({ home }: { home: HomeData }) {
           const pkg = client.package;
           return (
             <div key={client.id} className={styles.expRow}>
-              <button type="button" className={styles.expMain} onClick={() => navigate(`/clients/${client.id}`)}>
+              <button type="button" className={styles.expMain} onClick={() => go(clientUrl(client.id))}>
                 <span className={styles.expName}>{client.name}</span>
                 <span className={styles.expSub}>
                   {pkg ? <Tx k="clients.remaining" params={{ n: client.remainingSessions }} /> : t('clients.noPackage')}
@@ -219,7 +215,7 @@ function EndingSoon({ home }: { home: HomeData }) {
                 size="small"
                 variant={hot ? 'primary' : 'secondary'}
                 aria-label={t('home.renewFor', { name: client.name })}
-                onClick={() => navigate(`/clients/${client.id}?renew=1`)}
+                onClick={() => go(`/clients/${client.id}?renew=1`)}
               >
                 {t('home.renew')}
               </Button>
@@ -241,31 +237,73 @@ function EndingSoon({ home }: { home: HomeData }) {
   );
 }
 
+const FOLLOW_UP_SHOWN = 6;
+
+function ReasonText({ reason, currency }: { reason: FollowUpReason; currency: string }) {
+  switch (reason.kind) {
+    case 'overdue_payment': {
+      const amount = <Money minor={reason.amountMinor} currency={currency} className={styles.money} />;
+      return reason.daysLate > 0 ? <Tx k="hub.followUp.overdue" params={{ amount, n: reason.daysLate }} /> : <Tx k="hub.followUp.overdueToday" params={{ amount }} />;
+    }
+    case 'no_session_week':
+      return <>{t('hub.followUp.noSession')}</>;
+    case 'missed_checkin':
+      return reason.days === null ? <>{t('hub.followUp.checkInNever')}</> : <Tx k="hub.followUp.checkIn" params={{ n: reason.days }} />;
+  }
+}
+
+/** Clients who need a look today, each with the one tap that fixes the most urgent reason. */
 function FollowUp({ home }: { home: HomeData }) {
+  const go = useGo();
+  const [all, setAll] = useState(false);
+  const shown = all ? home.followUp : home.followUp.slice(0, FOLLOW_UP_SHOWN);
   return (
-    <ListSection title={t('home.followUp')}>
+    <ListSection title={t('hub.followUp.title')} count={home.followUp.length || undefined}>
       {home.followUp.length === 0 ? (
-        <ListRow leading={<Icon name="check" />} title={t('home.nobodyToFollow')} />
+        <ListRow leading={<Icon name="check" />} title={t('hub.followUp.none')} />
       ) : (
-        home.followUp.map(({ client, days }) => {
+        shown.map(({ client, reasons }) => {
+          const top = reasons[0];
           const wa = whatsappUrl(client.phone);
           return (
             <div key={client.id} className={styles.followRow}>
               <ListRow
-                to={`/clients/${client.id}`}
+                to={clientUrl(client.id, top?.kind === 'overdue_payment' ? 'payments' : top?.kind === 'no_session_week' ? 'sessions' : 'progress')}
                 className={styles.followLink}
                 leading={<Avatar name={client.name} />}
                 title={client.name}
-                subtitle={days === null ? t('home.followUpNever') : <Tx k="home.followUpDays" params={{ n: days }} />}
+                subtitle={reasons.map((r, i) => (
+                  <span key={r.kind}>
+                    {i > 0 && ' · '}
+                    <ReasonText reason={r} currency={home.currency} />
+                  </span>
+                ))}
               />
-              {wa && (
-                <a className={styles.followAction} href={wa} target="_blank" rel="noreferrer" aria-label={t('home.whatsappTo', { name: client.name })}>
+              {top?.kind === 'overdue_payment' && (
+                <Button size="small" className={styles.followBtn} aria-label={t('hub.followUp.payFor', { name: client.name })} onClick={() => go(`/clients/${client.id}?tab=payments&pay=1`)}>
+                  {t('hub.followUp.pay')}
+                </Button>
+              )}
+              {top?.kind === 'no_session_week' && (
+                <Button size="small" variant="secondary" className={styles.followBtn} aria-label={t('hub.followUp.bookFor', { name: client.name })} onClick={() => go(bookUrl(client.id))}>
+                  {t('hub.followUp.book')}
+                </Button>
+              )}
+              {top?.kind === 'missed_checkin' && wa && (
+                <a className={styles.followAction} href={wa} target="_blank" rel="noreferrer" aria-label={t('hub.followUp.remindFor', { name: client.name })}>
                   <Icon name="chat" />
                 </a>
               )}
             </div>
           );
         })
+      )}
+      {home.followUp.length > FOLLOW_UP_SHOWN && (
+        <div className={styles.followMore}>
+          <Button size="small" variant="plain" onClick={() => setAll((v) => !v)}>
+            {all ? t('hub.followUp.showLess') : t('hub.followUp.showAll', { n: home.followUp.length })}
+          </Button>
+        </div>
       )}
     </ListSection>
   );

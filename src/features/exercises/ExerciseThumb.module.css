@@ -21,6 +21,8 @@
 }
 
 .illustration {
+  position: absolute;
+  inset: 0;
   display: block;
   inline-size: 100%;
   block-size: 100%;
