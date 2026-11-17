@@ -16,8 +16,8 @@
 /* Dark stage even in light mode is fine for the model (DESIGN.md §5). */
 .stage {
   position: relative;
-  block-size: min(62dvh, 560px);
-  min-block-size: 360px;
+  /* Fits under the header with the view buttons above the tab bar on a 667pt phone. */
+  block-size: clamp(340px, calc(100dvh - 330px), 560px);
   border-radius: var(--r-lg);
   overflow: hidden;
   background: #151717;

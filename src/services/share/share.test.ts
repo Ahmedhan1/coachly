@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { BrowserShareService, safeFileName, type ShareEnvironment } from './shareService';
+import { asciiFileName, BrowserShareService, safeFileName, type ShareEnvironment } from './shareService';
 
 function env(patch: Partial<ShareEnvironment> = {}) {
   const log: string[] = [];
@@ -42,22 +42,32 @@ describe('BrowserShareService', () => {
 
   it('downloads when files cannot be shared, or when asked to', async () => {
     const noFiles = env({ canShare: () => false });
-    expect(await new BrowserShareService(noFiles.e).shareFile(req)).toEqual({ outcome: 'downloaded' });
-    expect(noFiles.log).toEqual(['download blob:x برنامج سارة.pdf', 'revoke blob:x']);
+    expect(await new BrowserShareService(noFiles.e).shareFile(req)).toEqual({ outcome: 'downloaded', fallback: true, fileName: 'file.pdf' });
+    // Android Chrome saves non-Latin download names as "download": the download uses an ASCII name.
+    expect(noFiles.log).toEqual(['download blob:x file.pdf', 'revoke blob:x']);
+    const named = env({ canShare: () => false });
+    await new BrowserShareService(named.e).shareFile({ ...req, downloadName: 'pt-program-2026-11-17.pdf' });
+    expect(named.log[0]).toBe('download blob:x pt-program-2026-11-17.pdf');
     const noApi = env({ share: undefined, canShare: undefined });
     const s = new BrowserShareService(noApi.e);
     expect(s.canShareFiles()).toBe(false);
-    expect(await s.shareFile(req)).toEqual({ outcome: 'downloaded' });
+    expect(await s.shareFile(req)).toEqual({ outcome: 'downloaded', fallback: true, fileName: 'file.pdf' });
     const prefer = env();
-    expect(await new BrowserShareService(prefer.e).shareFile(req, { prefer: 'download' })).toEqual({ outcome: 'downloaded' });
+    expect(await new BrowserShareService(prefer.e).shareFile(req, { prefer: 'download' })).toEqual({ outcome: 'downloaded', fileName: 'file.pdf' });
     expect(prefer.shared).toHaveLength(0);
   });
 
   it('falls back to download on other share errors, and fails quietly when nothing works', async () => {
     const typeErr = env({ share: async () => Promise.reject(new TypeError('bad')) });
-    expect(await new BrowserShareService(typeErr.e).shareFile(req)).toEqual({ outcome: 'downloaded' });
+    expect(await new BrowserShareService(typeErr.e).shareFile(req)).toEqual({ outcome: 'downloaded', fallback: true, fileName: 'file.pdf' });
     const broken = env({ canShare: () => false, createObjectURL: () => { throw new Error('no'); } });
     expect(await new BrowserShareService(broken.e).shareFile(req)).toEqual({ outcome: 'failed', reason: 'unsupported' });
+  });
+
+  it('makes ASCII download names', () => {
+    expect(asciiFileName('برنامج سارة.pdf', 'pt-program')).toBe('pt-program.pdf');
+    expect(asciiFileName('pt-coach-backup-2026-11-17-1530.ptbackup')).toBe('pt-coach-backup-2026-11-17-1530.ptbackup');
+    expect(asciiFileName('Program سارة 8 weeks.pdf')).toBe('Program-8-weeks.pdf');
   });
 
   it('cleans file names', () => {

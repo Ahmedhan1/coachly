@@ -12,7 +12,8 @@ export const SAMPLE_DOCUMENT: ShareDocument = {
       title: 'اليوم 1 — بوش',
       exercises: [
         { name: 'بنش برس', sets: 4, reps: '8-10', restSec: 90, tempo: '3-1-1', rpe: 8, image: 'Barbell_Bench_Press_-_Medium_Grip-0.webp' },
-        { name: 'دامبل شولدر برس', sets: 3, reps: '12', restSec: 60, notes: 'خلي ضهرك ثابت على الكرسي' },
+        { name: 'دامبل شولدر برس', sets: 3, reps: '12', restSec: 60, notes: 'خلي ضهرك ثابت على الكرسي', group: 'A' },
+        { name: 'لاترال رايز', sets: 3, reps: '15', restSec: 60, image: 'Side_Lateral_Raise-0.webp', image2: 'Side_Lateral_Raise-1.webp', group: 'A' },
       ],
     },
     { title: 'اليوم 2 — ليجز', exercises: [{ name: 'هيب ثرست', sets: 4, reps: '10', rpe: 7.5 }] },
@@ -24,4 +25,35 @@ export const SAMPLE_DOCUMENT: ShareDocument = {
   supplements: [{ name: 'واي بروتين', text: 'سكوب بعد التمرين زي ما اتفقنا' }],
   notes: 'التزم بالنوم 7 ساعات.\nكلمني لو حسيت بأي ألم.',
   checkinsEnabled: true,
+  goal: { title: 'خسارة دهون', note: 'ننزل 6 كيلو قبل الصيف ونحافظ على العضل' },
+  targets: { kcal: 1650, proteinG: 130, carbG: 150, fatG: 55, waterMinMl: 2500, waterMaxMl: 3200 },
+  mealDays: [
+    {
+      title: 'اليوم 1',
+      kcal: 1650,
+      meals: [
+        { title: 'الفطار', time: '9:00', items: ['3 بيض', 'عيش بلدي', 'خيار'] },
+        { title: 'الغدا', items: ['200 جم فراخ', 'رز'], notes: 'اشرب مية كتير' },
+      ],
+    },
+    { title: 'اليوم 2', meals: [{ title: 'الفطار', items: ['زبادي يوناني', 'شوفان'] }] },
+  ],
+  progress: [
+    {
+      key: 'weight',
+      points: [
+        { d: '2026-08-01', v: 78 },
+        { d: '2026-08-15', v: 76.8 },
+        { d: '2026-09-01', v: 75.5 },
+        { d: '2026-09-15', v: 74.9 },
+        { d: '2026-10-01', v: 73.6 },
+      ],
+    },
+    { key: 'waist', points: [{ d: '2026-08-01', v: 86 }, { d: '2026-10-01', v: 81 }] },
+  ],
+  records: [{ name: 'هيب ثرست', weightKg: 80, reps: 8, d: '2026-09-20' }],
+  sessions: [{ at: 4_102_444_800, durationMin: 60 }],
+  package: { left: 5, total: 12, endDate: '2026-12-31' },
+  attended: 7,
+  nextDay: 1,
 };

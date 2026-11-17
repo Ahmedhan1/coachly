@@ -8,7 +8,8 @@ import { weekdayOf, type RecurrenceError, type Weekday } from '@/domain/schedule
 import { sessionWhen } from '@/features/whatsapp/values';
 import { t, type TKey } from '@/i18n';
 import { Button, Icon, SegmentedControl, Select, Sheet, TextArea, TextField, Tx, cx } from '@/ui';
-import { addSessionToCalendar } from './calendarExport';
+import { googleCalendarUrl } from '@/services/calendar';
+import { addSessionToCalendar, calendarEventFor } from './calendarExport';
 import { ClientPicker } from './ClientPicker';
 import { useScheduleWriter } from './hooks';
 import { futureOfSeries } from './scheduleWriter';
@@ -29,6 +30,7 @@ export interface BookingSheetProps {
 }
 
 const FORM_ID = 'booking-form';
+const ANDROID = typeof navigator !== 'undefined' && /Android/i.test(navigator.userAgent);
 const WEEK_ORDER: readonly Weekday[] = [6, 0, 1, 2, 3, 4, 5];
 const DURATIONS = [30, 45, 60, 75, 90, 120];
 const INTERVALS = ['1', '2', '3', '4'] as const;
@@ -216,19 +218,17 @@ function BookingForm({
     onClose();
   };
 
-  const toCalendar = () => {
-    if (!session) return;
+  const calendarRequest = (s: Session) => {
     const { clock, timeZone } = deviceZone();
+    return { session: s, clientSessions, clientName: nameOf(s.clientId), clock, timeZone, alarmMinutesBefore: prefs.alarmMinutesBefore, now: new Date() };
+  };
+  // Android: Chrome cannot share .ics files; Google Calendar's add-event link always works there.
+  const googleLink = session && ANDROID ? googleCalendarUrl(calendarEventFor(calendarRequest(session)), deviceZone().timeZone) : null;
+
+  const toCalendar = (prefer?: 'download') => {
+    if (!session) return;
     // Called straight from the tap: no await before the share sheet opens (iOS user activation).
-    void addSessionToCalendar({
-      session,
-      clientSessions,
-      clientName: nameOf(session.clientId),
-      clock,
-      timeZone,
-      alarmMinutesBefore: prefs.alarmMinutesBefore,
-      now: new Date(),
-    }).then((outcome) => {
+    void addSessionToCalendar(calendarRequest(session), prefer).then((outcome) => {
       if (outcome === 'downloaded') showToast({ message: t('schedule.toast.calendarDownloaded') });
       else if (outcome === 'failed') showToast({ message: t('schedule.toast.calendarFailed') });
     });
@@ -397,9 +397,21 @@ function BookingForm({
         />
         {session && (
           <div className={styles.sheetActions}>
-            <Button variant="secondary" icon="calendarPlus" onClick={toCalendar}>
-              {t('schedule.sheet.addToCalendar')}
-            </Button>
+            {googleLink ? (
+              <>
+                <a className={styles.linkButton} href={googleLink} target="_blank" rel="noreferrer">
+                  <Icon name="calendarPlus" />
+                  {t('schedule.sheet.addToGoogle')}
+                </a>
+                <Button variant="secondary" icon="file" onClick={() => toCalendar('download')}>
+                  {t('schedule.sheet.downloadIcs')}
+                </Button>
+              </>
+            ) : (
+              <Button variant="secondary" icon="calendarPlus" onClick={() => toCalendar()}>
+                {t('schedule.sheet.addToCalendar')}
+              </Button>
+            )}
             <Button variant="danger" icon="trash" onClick={() => void remove()}>
               {inSeries && scope === 'series' ? t('schedule.sheet.deleteSeries') : t('schedule.sheet.delete')}
             </Button>

@@ -69,7 +69,7 @@ export function scoreExercise(exercise: CatalogExercise, normalizedQuery: string
 
 /**
  * Arabic + English search over names (and muscle labels as a weaker signal). Results are sorted by score,
- * then by normalised Arabic name. An empty query returns the list unchanged (up to `limit`).
+ * then «الأشهر» rank (most common first), then by normalised Arabic name. An empty query returns the list unchanged (up to `limit`).
  */
 export function searchExercises(
   exercises: readonly CatalogExercise[],
@@ -79,9 +79,14 @@ export function searchExercises(
   const normalized = normalizeSearchText(query);
   if (normalized === '') return exercises.slice(0, limit);
   return exercises
-    .map((exercise) => ({ exercise, score: scoreExercise(exercise, normalized), key: normalizeSearchText(exercise.nameAr) }))
+    .map((exercise) => ({
+      exercise,
+      score: scoreExercise(exercise, normalized),
+      rank: exercise.popularRank ?? Number.POSITIVE_INFINITY,
+      key: normalizeSearchText(exercise.nameAr),
+    }))
     .filter((r) => r.score > 0)
-    .sort((a, b) => b.score - a.score || (a.key < b.key ? -1 : a.key > b.key ? 1 : 0))
+    .sort((a, b) => b.score - a.score || a.rank - b.rank || (a.key < b.key ? -1 : a.key > b.key ? 1 : 0))
     .slice(0, limit)
     .map((r) => r.exercise);
 }

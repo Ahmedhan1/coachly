@@ -19,7 +19,7 @@
   display: flex;
   gap: var(--sp-3);
   margin: var(--sp-3) 0 0;
-  padding: 0 var(--gutter);
+  padding: 0 var(--gutter) var(--sp-4);
   overflow-x: auto;
   list-style: none;
   scroll-snap-type: x mandatory;

@@ -24,6 +24,15 @@ export interface LicenseServiceDeps {
   isOnline?: () => boolean;
   activateTimeoutMs?: number;
   statusTimeoutMs?: number;
+  /** Pause before the single retry of a failed activation request. */
+  retryDelayMs?: number;
+  sleep?: (ms: number) => Promise<void>;
+}
+
+interface Reply {
+  ok: boolean;
+  status: number;
+  body: unknown;
 }
 
 const SERVER_ERRORS: ReadonlySet<string> = new Set(['invalid', 'used', 'expired', 'rate_limited']);
@@ -70,7 +79,14 @@ export class LicenseActivationService implements ActivationService {
   private readonly d: Required<LicenseServiceDeps>;
 
   constructor(deps: LicenseServiceDeps) {
-    this.d = { isOnline: () => true, activateTimeoutMs: 10_000, statusTimeoutMs: 6_000, ...deps };
+    this.d = {
+      isOnline: () => true,
+      activateTimeoutMs: 12_000,
+      statusTimeoutMs: 6_000,
+      retryDelayMs: 1_000,
+      sleep: (ms) => new Promise((resolve) => setTimeout(resolve, ms)),
+      ...deps,
+    };
   }
 
   async getDeviceId(): Promise<string> {
@@ -117,30 +133,39 @@ export class LicenseActivationService implements ActivationService {
 
     const code = normalizeShortCode(cleaned);
     if (code === null) return { ok: false, error: 'malformed' };
-    if (!this.d.workerUrl) return { ok: false, error: 'unavailable' };
+    if (!this.d.workerUrl) return { ok: false, error: 'unavailable', detail: 'no server address' };
     if (!this.d.isOnline()) return { ok: false, error: 'offline' };
 
-    let reply: { ok: boolean; body: unknown };
-    try {
-      reply = await this.request(
-        '/api/activate',
-        this.d.activateTimeoutMs,
-        {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ code, deviceId: await this.getDeviceId() }),
-        },
-        async (res) => ({ ok: res.ok, body: parseJson(await res.text()) }),
-      );
-    } catch {
-      return { ok: false, error: 'offline' };
+    const deviceId = await this.getDeviceId();
+    let reply: Reply | null = null;
+    let detail = 'network';
+    // One quiet retry: mobile networks often drop the first request after the app wakes up, and a
+    // D1 hiccup answers 5xx. Re-sending is safe: the same device always gets the same license back.
+    for (let attempt = 0; attempt < 2; attempt++) {
+      if (attempt > 0) await this.d.sleep(this.d.retryDelayMs);
+      try {
+        reply = await this.request(
+          '/api/activate',
+          this.d.activateTimeoutMs,
+          { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ code, deviceId }) },
+          async (res) => ({ ok: res.ok, status: res.status, body: parseJson(await res.text()) }),
+        );
+      } catch (e) {
+        reply = null;
+        detail = e instanceof DOMException && e.name === 'AbortError' ? 'timeout' : 'network';
+        continue;
+      }
+      if (reply.status < 500) break;
+      detail = `HTTP ${reply.status}`;
     }
+    if (reply === null) return { ok: false, error: 'offline', detail };
     const { body } = reply;
     if (!reply.ok) {
-      const error = isRecord(body) && typeof body.error === 'string' && SERVER_ERRORS.has(body.error) ? body.error : 'unavailable';
-      return { ok: false, error: error as ActivationError };
+      const known = isRecord(body) && typeof body.error === 'string' && SERVER_ERRORS.has(body.error);
+      if (known) return { ok: false, error: body.error as ActivationError };
+      return { ok: false, error: 'unavailable', detail: `HTTP ${reply.status}` };
     }
-    if (!isRecord(body) || typeof body.license !== 'string') return { ok: false, error: 'unavailable' };
+    if (!isRecord(body) || typeof body.license !== 'string') return { ok: false, error: 'unavailable', detail: 'bad reply' };
     return this.accept(body.license, typeof body.dataKey === 'string' ? body.dataKey : null);
   }
 

@@ -10,3 +10,5 @@ export { viewerMode, detectWebGL, type ModelState, type ViewerMode } from './fal
 export { tintModel, disposeModel, themePalette, meshColor } from './tint';
 export { createLights, frameModel, placeCamera, CAMERA_FOV, type ModelView } from './stage';
 export * from './palette';
+export { pickMuscleAt, nearestMuscleHit, tapSamples } from './pick';
+export { revealCoveredGroups, COVERING_GROUPS } from './reveal';

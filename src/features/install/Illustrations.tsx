@@ -55,3 +55,20 @@ export function HomeScreenIllustration({ label, mark }: { label: string; mark: s
     </svg>
   );
 }
+
+/** Android Chrome: the ⋮ menu open, with the install row highlighted. */
+export function ChromeMenuIllustration({ label }: { label: string }) {
+  return (
+    <svg className={styles.art} viewBox="0 0 240 120" role="img" aria-label={label}>
+      <rect className={styles.device} x="20" y="8" width="200" height="104" rx="14" />
+      <rect className={styles.bar} x="30" y="16" width="150" height="16" rx="8" />
+      <circle className={styles.focus} cx="200" cy="24" r="10" />
+      <path className={styles.icon} d="M200 19v.01M200 24v.01M200 29v.01" />
+      <rect className={styles.screen} x="110" y="38" width="100" height="66" rx="6" />
+      <path className={styles.muted} d="M200 48h-70M200 60h-60" />
+      <rect className={styles.highlight} x="114" y="68" width="92" height="16" rx="4" />
+      <path className={styles.lineStrong} d="M196 76h-60" />
+      <path className={styles.muted} d="M200 94h-66" />
+    </svg>
+  );
+}

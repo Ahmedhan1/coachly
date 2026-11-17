@@ -4,7 +4,7 @@ import { join } from 'node:path';
 import { expect, test } from '@playwright/test';
 import type { HarnessResult } from './harness';
 
-const OUT = join(process.cwd(), 'docs', 'pdf-samples');
+const OUT = process.env.PDF_SAMPLES_OUT ?? join(process.cwd(), 'docs', 'pdf-samples');
 const CASES = ['no_images', 'fifty_exercises', 'long_names', 'mixed_text', 'max_branding'] as const;
 
 test.describe.configure({ mode: 'serial' });

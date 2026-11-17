@@ -20,6 +20,7 @@ export function OutboxScreen() {
         subtitle={t('outbox.hint')}
         actions={<IconButton icon="settings" label={t('outbox.settings')} onClick={() => setSettings(true)} />}
       />
+      <p className={styles.how}>{t('outbox.howItWorks')}</p>
       {outbox &&
         (outbox.items.length === 0 ? (
           <EmptyState icon="chat" title={t('outbox.empty')} body={t('outbox.emptyBody')} />

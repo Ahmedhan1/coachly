@@ -120,4 +120,31 @@ describe('buildExercisePack', () => {
     expect(pack.image).toEqual({ format: 'webp', maxSize: 480, quality: 60, base: 'img/' });
     expect(pack.imageBytes).toBe(1234);
   });
+
+  it('adds built-in extras, reuses photos only via imagesFrom and ranks the popular set', () => {
+    const pack = buildExercisePack({
+      sources: [squat],
+      arabicNames: new Map([['Barbell_Full_Squat', 'سكوات بالبار']]),
+      imagesById: new Map([['Barbell_Full_Squat', ['Barbell_Full_Squat-0.webp', 'Barbell_Full_Squat-1.webp']]]),
+      image: { format: 'webp', maxSize: 480, quality: 60 },
+      source: 'x',
+      popular: ['Barbell_Full_Squat'],
+      extras: [
+        { id: 'pt_A', en: 'Hip Thrust Machine', ar: 'هيب ثرست على الماشين', primary: ['glutes', 'glutes'], secondary: ['glutes', 'hamstrings'],
+          equipment: 'machine', level: 'beginner', category: 'strength', force: 'push', mechanic: 'compound', popular: true },
+        { id: 'pt_B', en: 'Smith Squat', ar: 'سكوات على السميث', primary: ['quads'], secondary: [],
+          equipment: 'machine', level: 'beginner', category: 'strength', force: 'push', mechanic: 'compound', imagesFrom: 'Barbell_Full_Squat' },
+        { id: 'Barbell_Full_Squat', en: 'dup', ar: 'dup', primary: ['quads'], secondary: [],
+          equipment: 'machine', level: 'beginner', category: 'strength', force: null, mechanic: null },
+      ],
+    });
+    expect(pack.count).toBe(3);
+    const byId = new Map(pack.exercises.map((e) => [e.id, e]));
+    expect(byId.get('Barbell_Full_Squat')?.popular).toBe(1);
+    expect(byId.get('Barbell_Full_Squat')?.ar).toBe('سكوات بالبار');
+    expect(byId.get('pt_A')).toMatchObject({ popular: 2, extra: true, images: [], primary: ['glutes'], secondary: ['hamstrings'] });
+    expect(byId.get('pt_B')?.images).toEqual(['Barbell_Full_Squat-0.webp', 'Barbell_Full_Squat-1.webp']);
+    expect(byId.get('pt_B')?.popular).toBeUndefined();
+    expect(byId.get('pt_B')).not.toHaveProperty('imagesFrom');
+  });
 });

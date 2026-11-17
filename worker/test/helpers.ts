@@ -78,7 +78,7 @@ export async function harness(overrides: Omit<DepsOverrides, 'now'> = {}): Promi
       duration: input.duration ?? 'lifetime',
       window: input.window ?? '14',
     });
-    return extractCode(await res.text());
+    return extractCode(await (await followIssued(send, res, cookie)).text());
   };
 
   const activate: Harness['activate'] = (code, deviceId, otherIp) =>
@@ -122,6 +122,18 @@ export function envelopeBytes(magic: 'PTP1' | 'PTK1', size: number, fill = 7): U
 export async function storedBytes(): Promise<number> {
   const row = await env.DB.prepare('SELECT bytes FROM storage_usage WHERE id = 1').first<{ bytes: number }>();
   return row?.bytes ?? 0;
+}
+
+/** Follows the dashboard's Post/Redirect/Get after a code is issued: GET /admin/issued with the one-time cookie. */
+export async function followIssued(
+  send: (path: string, init?: RequestInit) => Promise<Response>,
+  res: Response,
+  sessionCookie: string,
+): Promise<Response> {
+  const location = res.headers.get('Location');
+  const issued = (res.headers.get('Set-Cookie') ?? '').split(';')[0] ?? '';
+  if (res.status !== 303 || location !== '/admin/issued' || issued === '') throw new Error(`no issued redirect: ${res.status}`);
+  return send(location, { headers: { Cookie: `${sessionCookie}; ${issued}` } });
 }
 
 export function extractCode(html: string): string {

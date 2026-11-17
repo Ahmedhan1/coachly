@@ -18,6 +18,18 @@ export interface BackupStatus {
   cloudCeiling: ImageVariant;
   /** "Remind me later" for the weekly reminder. */
   reminderSnoozedUntil: number | null;
+  /** Remind after this many days without any backup (Settings choice, default 7). */
+  reminderDays: number;
+  /** Last successful Google Drive upload (verified before upload). */
+  lastDriveAt: number | null;
+  lastDriveBytes: number | null;
+  lastDriveError: string | null;
+  /** Data changed since the last Drive copy; the Drive auto-backup picks it up. */
+  driveDirtySince: number | null;
+  /** The trainer connected Google Drive on this device (the access token itself is never stored). */
+  driveConnected: boolean;
+  /** How many Drive copies to keep. */
+  driveKeep: number;
 }
 
 export const EMPTY_BACKUP_STATUS: BackupStatus = {
@@ -30,6 +42,13 @@ export const EMPTY_BACKUP_STATUS: BackupStatus = {
   dirtySince: null,
   cloudCeiling: 'full',
   reminderSnoozedUntil: null,
+  reminderDays: 7,
+  lastDriveAt: null,
+  lastDriveBytes: null,
+  lastDriveError: null,
+  driveDirtySince: null,
+  driveConnected: false,
+  driveKeep: 5,
 };
 
 export interface BackupMetaStore {

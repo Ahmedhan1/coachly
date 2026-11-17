@@ -40,7 +40,7 @@ export interface PdfNutrition {
 /** Every user-visible word the PDF prints. The UI fills it from src/i18n/ar.ts. */
 export interface PdfLabels {
   sections: Record<PdfSection, string>;
-  cover: { client: string; preparedBy: string; date: string };
+  cover: { client: string; preparedBy: string; date: string; planFor: string; contact: string };
   client: {
     name: string;
     gender: string;
@@ -65,11 +65,32 @@ export interface PdfLabels {
     fat: string;
     water: string;
   };
-  program: { sets: string; reps: string; rest: string; tempo: string; rpe: string; superset: string; notes: string };
-  meals: { servings: string; ingredients: string; perServing: string };
+  program: {
+    sets: string;
+    reps: string;
+    rest: string;
+    tempo: string;
+    rpe: string;
+    superset: string;
+    notes: string;
+    /** Column head over "4 × 8-12". */
+    setsReps: string;
+    exerciseCount: string;
+  };
+  meals: {
+    servings: string;
+    ingredients: string;
+    perServing: string;
+    mealTotal: string;
+    dailyTotal: string;
+    recipesTitle: string;
+    /** Shown when some items have no macros (free text), so the totals are partial. */
+    partialTotals: string;
+    water: string;
+  };
   supplements: { dose: string; timing: string };
   progress: { weightChart: string; before: string; after: string; first: string; latest: string; change: string };
-  notes: { contact: string };
+  notes: { contact: string; closing: string };
   units: { kg: string; cm: string; kcal: string; g: string; ml: string; sec: string; years: string; percent: string };
 }
 
@@ -130,7 +151,7 @@ export interface StatItem {
 }
 
 export type PdfBlock =
-  | { type: 'sectionTitle'; text: string }
+  | { type: 'sectionTitle'; text: string; index: number }
   | { type: 'subTitle'; text: string; meta: string }
   | { type: 'keyValues'; rows: KeyValue[] }
   | { type: 'stats'; items: StatItem[] }
@@ -142,13 +163,26 @@ export type PdfBlock =
       name: string;
       secondaryName: string | null;
       muscles: string;
-      prescription: KeyValue[];
+      sets: string;
+      reps: string;
+      rest: string;
+      /** Tempo, RPE… only when the trainer set them. */
+      extras: KeyValue[];
       notes: string;
       image: PdfImageRef | null;
       muscleMap: PdfImageRef | null;
       superset: string | null;
     }
+  | { type: 'clientCard'; name: string; chips: string[]; tiles: StatItem[] }
   | { type: 'mealItem'; text: string; detail: string }
+  | {
+      type: 'mealCard';
+      name: string;
+      time: string;
+      items: { text: string; detail: string; kcal: string }[];
+      /** Macros of the items that have them; null when none has. */
+      totals: StatItem[] | null;
+    }
   | {
       type: 'recipe';
       name: string;
@@ -160,7 +194,7 @@ export type PdfBlock =
   | { type: 'supplement'; name: string; rows: KeyValue[]; notes: string; image: PdfImageRef | null }
   | { type: 'weightChart'; title: string; points: { date: string; kg: number }[]; unit: string }
   | { type: 'photoPair'; before: { image: PdfImageRef; caption: string }; after: { image: PdfImageRef; caption: string } }
-  | { type: 'contact'; title: string; lines: string[] };
+  | { type: 'contact'; title: string; lines: string[]; closing: string };
 
 export type PdfBlockType = PdfBlock['type'];
 
@@ -173,6 +207,10 @@ export interface PdfCover {
   trainerName: string;
   dateLabel: string;
   dateText: string;
+  /** Small line above the client name, e.g. "برنامج مخصص لـ". */
+  planForLabel: string;
+  contactLabel: string;
+  contacts: string[];
 }
 
 export interface PdfTheme {
@@ -183,7 +221,14 @@ export interface PdfTheme {
   logo: PdfImageRef | null;
   logoPlacement: PdfBranding['logoPlacement'];
   coverLogoPx: number;
+  /** Box the cover logo is fitted into (object-fit: contain), CSS px. */
+  coverLogoBox: { width: number; height: number };
   headerLogoPx: number;
+  /** Derived from primaryColor: readable text on a primary fill, primary as text on white, pale tint, deep shade. */
+  onPrimary: string;
+  primaryInk: string;
+  primaryTint: string;
+  primaryDeep: string;
   background: { image: PdfImageRef; opacity: number } | null;
   coverImage: PdfImageRef | null;
 }

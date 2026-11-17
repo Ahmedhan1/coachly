@@ -100,3 +100,12 @@
   font: var(--t-caption);
   color: var(--text-2);
 }
+
+.detail,
+.build {
+  margin: 0;
+  font-size: var(--t-caption);
+  color: var(--text-3);
+  text-align: center;
+  font-variant-numeric: tabular-nums;
+}

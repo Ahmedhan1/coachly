@@ -16,7 +16,16 @@ function when(ms: number): string {
   return `${formatIsoDate(toIsoDate(new Date(ms)))} ${formatTime(ms)}`;
 }
 
+const CLOUD_EXTRA: Record<string, TKey> = {
+  storage_unavailable: 'nutrition.cloudExtra.storage_unavailable',
+  too_large: 'nutrition.cloudExtra.too_large',
+  timeout: 'nutrition.cloudExtra.timeout',
+  rate_limited: 'nutrition.cloudExtra.rate_limited',
+};
+
 function errorText<K extends string>(group: 'importErrors' | 'cloudErrors', code: K): string {
+  const extra = group === 'cloudErrors' ? CLOUD_EXTRA[code] : undefined;
+  if (extra) return t(extra);
   const key = `settings.backup.${group}.${code}` as TKey;
   const text = t(key);
   return text === key ? t(`settings.backup.${group}.generic` as TKey) : text;
@@ -62,7 +71,8 @@ export function BackupScreen() {
       await backup.local.recordSaved(Date.now());
       setReady(null);
       setVersion((v) => v + 1);
-      showToast({ message: t('settings.backup.saved'), duration: 2500 });
+      // A download (Android, or no share sheet) lands in Downloads: tell the trainer to move it off the phone.
+      showToast({ message: r.outcome === 'downloaded' ? t('nutrition.cloudExtra.savedToFiles') : t('settings.backup.saved'), duration: r.outcome === 'downloaded' ? 6000 : 2500 });
     }
   };
 

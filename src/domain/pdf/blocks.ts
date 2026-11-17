@@ -3,7 +3,7 @@ import type { CatalogExercise } from '../exercises/types';
 import type { Measurements, PdfSection, ProgressEntry, Recipe } from '../models';
 import { chunkText } from './layout';
 import { ageOn, formatDate, formatNumber, signedLtr } from './format';
-import type { KeyValue, PdfBlock, PdfDocumentInput, PdfExercise, PdfImageRef } from './types';
+import type { KeyValue, PdfBlock, PdfDocumentInput, PdfExercise, PdfImageRef, StatItem } from './types';
 
 /** Builds the PDF view of a catalog exercise. `packBase` prefixes pack image paths (e.g. 'exercise-pack/img/'). */
 export function pdfExerciseFromCatalog(e: CatalogExercise, muscleMap: PdfImageRef | null = null, packBase = ''): PdfExercise {
@@ -33,15 +33,6 @@ function measurementUnit(key: keyof Measurements, input: PdfDocumentInput): stri
   return key === 'weightKg' ? u.kg : key === 'bodyFatPercent' ? u.percent : u.cm;
 }
 
-function measurementRows(m: Measurements, input: PdfDocumentInput): KeyValue[] {
-  const rows: KeyValue[] = [];
-  for (const key of MEASUREMENT_KEYS) {
-    const v = m[key];
-    if (v !== undefined) rows.push({ label: input.labels.client.measurements[key], value: `${formatNumber(v, 1)} ${measurementUnit(key, input)}` });
-  }
-  return rows;
-}
-
 function paragraphs(text: string, muted = false): PdfBlock[] {
   return chunkText(text).map((t) => ({ type: 'paragraph', text: t, muted }));
 }
@@ -57,14 +48,18 @@ function clientBlocks(input: PdfDocumentInput): PdfBlock[] {
   const c = input.client;
   if (!c) return [];
   const L = input.labels.client;
-  const rows: KeyValue[] = [{ label: L.name, value: c.name }];
-  if (c.gender) rows.push({ label: L.gender, value: L.genders[c.gender] });
+  const chips: string[] = [`${L.goal}: ${L.goals[c.goal]}`];
+  if (c.gender) chips.push(L.genders[c.gender]);
   const age = ageOn(c.birthDate, input.generatedOn);
-  if (age !== null) rows.push({ label: L.age, value: `${age} ${input.labels.units.years}` });
-  rows.push({ label: L.goal, value: L.goals[c.goal] });
-  if (c.goalNote) rows.push({ label: L.goalNote, value: c.goalNote });
-  rows.push(...measurementRows(c.measurements, input));
-  const out = keyValueBlocks(rows);
+  if (age !== null) chips.push(`${age} ${input.labels.units.years}`);
+  const tiles: StatItem[] = [];
+  for (const key of MEASUREMENT_KEYS) {
+    const v = c.measurements[key];
+    if (v === undefined) continue;
+    tiles.push({ label: L.measurements[key], value: formatNumber(v, 1), unit: measurementUnit(key, input), emphasis: key === 'weightKg' });
+  }
+  const out: PdfBlock[] = [{ type: 'clientCard', name: c.name, chips, tiles }];
+  if (c.goalNote) out.push(...paragraphs(`${L.goalNote}: ${c.goalNote}`));
   if (c.injuries.length > 0) out.push(...paragraphs(`${L.injuries}: ${c.injuries.join('، ')}`));
   return out;
 }
@@ -125,24 +120,23 @@ function programBlocks(input: PdfDocumentInput, withMuscleMaps: boolean): PdfBlo
   let index = 0;
   for (const day of p.days) {
     if (day.items.length === 0) continue;
-    out.push({ type: 'subTitle', text: day.name, meta: '' });
+    out.push({ type: 'subTitle', text: day.name, meta: `${L.exerciseCount}: ${day.items.length}` });
     for (const item of day.items) {
       index += 1;
       const ex = input.exercises.get(item.exerciseId);
-      const prescription: KeyValue[] = [
-        { label: L.sets, value: String(item.sets) },
-        { label: L.reps, value: item.reps },
-        { label: L.rest, value: `${item.restSec} ${input.labels.units.sec}` },
-      ];
-      if (item.tempo) prescription.push({ label: L.tempo, value: item.tempo });
-      if (item.rpe !== null) prescription.push({ label: L.rpe, value: formatNumber(item.rpe, 1) });
+      const extras: KeyValue[] = [];
+      if (item.tempo) extras.push({ label: L.tempo, value: item.tempo });
+      if (item.rpe !== null) extras.push({ label: L.rpe, value: formatNumber(item.rpe, 1) });
       out.push({
         type: 'exercise',
         index,
         name: ex?.name ?? item.exerciseId,
         secondaryName: ex?.secondaryName ?? null,
         muscles: ex ? ex.muscles.join('، ') : '',
-        prescription,
+        sets: String(item.sets),
+        reps: item.reps,
+        rest: `${item.restSec} ${input.labels.units.sec}`,
+        extras,
         notes: item.notes,
         image: ex?.image ?? null,
         muscleMap: withMuscleMaps ? (ex?.muscleMap ?? null) : null,
@@ -153,12 +147,42 @@ function programBlocks(input: PdfDocumentInput, withMuscleMaps: boolean): PdfBlo
   return out;
 }
 
-function recipeTotals(r: Recipe): { kcal: number; p: number; c: number; f: number } | null {
-  if (r.ingredients.some((i) => i.kcal === null)) return null;
+function recipeTotals(r: Recipe): MacroSum | null {
+  if (r.ingredients.length === 0 || r.ingredients.some((i) => i.kcal === null)) return null;
   const sum = (k: 'kcal' | 'proteinG' | 'carbsG' | 'fatG') => r.ingredients.reduce((n, i) => n + (i[k] ?? 0), 0) / r.servings;
   return { kcal: sum('kcal'), p: sum('proteinG'), c: sum('carbsG'), f: sum('fatG') };
 }
 
+interface MacroSum {
+  kcal: number;
+  p: number;
+  c: number;
+  f: number;
+}
+
+const addMacros = (a: MacroSum, b: MacroSum, times = 1): MacroSum => ({
+  kcal: a.kcal + b.kcal * times,
+  p: a.p + b.p * times,
+  c: a.c + b.c * times,
+  f: a.f + b.f * times,
+});
+
+function macroItems(m: MacroSum, input: PdfDocumentInput, kcalLabel: string): StatItem[] {
+  const u = input.labels.units;
+  const N = input.labels.nutrition;
+  return [
+    { label: kcalLabel, value: formatNumber(m.kcal), unit: u.kcal, emphasis: true },
+    { label: N.protein, value: formatNumber(m.p), unit: u.g },
+    { label: N.carbs, value: formatNumber(m.c), unit: u.g },
+    { label: N.fat, value: formatNumber(m.f), unit: u.g },
+  ];
+}
+
+/**
+ * Meal plan as cards (items + macros per meal), a daily total and water, the plan notes, then the cookbook
+ * pages of the recipes used. Macros come only from recipes with full ingredient data; free-text items are
+ * listed without numbers and the totals say they are partial.
+ */
 function mealBlocks(input: PdfDocumentInput): PdfBlock[] {
   const plan = input.mealPlan;
   if (!plan) return [];
@@ -167,17 +191,45 @@ function mealBlocks(input: PdfDocumentInput): PdfBlock[] {
   const recipes = new Map(input.recipes.map((r) => [r.id as string, r]));
   const used: Recipe[] = [];
   const out: PdfBlock[] = [];
+  const zero: MacroSum = { kcal: 0, p: 0, c: 0, f: 0 };
+  let day = zero;
+  let dayKnown = false;
+  let partial = false;
   for (const meal of plan.meals) {
-    out.push({ type: 'subTitle', text: meal.name, meta: meal.time ?? '' });
-    for (const item of meal.items) {
+    if (meal.items.length === 0) continue;
+    let sum = zero;
+    let known = false;
+    const items = meal.items.map((item) => {
       const recipe = item.recipeId ? recipes.get(item.recipeId) : undefined;
       if (recipe && !used.includes(recipe)) used.push(recipe);
       const name = recipe?.name ?? item.text;
       const extra = recipe && item.text ? ` — ${item.text}` : '';
-      out.push({ type: 'mealItem', text: `${name}${extra}`, detail: `${formatNumber(item.servings, 2)} ${L.servings}` });
+      const t = recipe ? recipeTotals(recipe) : null;
+      if (t) {
+        sum = addMacros(sum, t, item.servings);
+        known = true;
+      } else partial = true;
+      return {
+        text: `${name}${extra}`,
+        detail: `${formatNumber(item.servings, 2)} ${L.servings}`,
+        kcal: t ? `${formatNumber(t.kcal * item.servings)} ${u.kcal}` : '',
+      };
+    });
+    if (known) {
+      day = addMacros(day, sum);
+      dayKnown = true;
     }
+    out.push({ type: 'mealCard', name: meal.name, time: meal.time ?? '', items, totals: known ? macroItems(sum, input, L.mealTotal) : null });
+  }
+  const water = input.nutrition?.waterMl ?? null;
+  if (dayKnown || water !== null) {
+    const items = dayKnown ? macroItems(day, input, L.dailyTotal) : [];
+    if (water !== null) items.push({ label: L.water, value: formatNumber(water), unit: u.ml });
+    out.push({ type: 'stats', items });
+    if (dayKnown && partial) out.push({ type: 'paragraph', text: L.partialTotals, muted: true });
   }
   if (plan.notes) out.push(...paragraphs(plan.notes, true));
+  if (used.length > 0) out.push({ type: 'subTitle', text: L.recipesTitle, meta: '' });
   for (const r of used) {
     const t = recipeTotals(r);
     const detail = t
@@ -267,7 +319,9 @@ function notesBlocks(input: PdfDocumentInput): PdfBlock[] {
   if (input.notes.trim()) out.push(...paragraphs(input.notes));
   if (input.program?.notes.trim()) out.push(...paragraphs(input.program.notes, true));
   const lines = input.branding.contactLines.filter((l) => l.trim());
-  if (lines.length > 0) out.push({ type: 'contact', title: input.labels.notes.contact, lines: [...lines] });
+  if (lines.length > 0 || input.branding.logo || input.branding.trainerName) {
+    out.push({ type: 'contact', title: input.labels.notes.contact, lines: [...lines], closing: input.labels.notes.closing });
+  }
   return out;
 }
 
@@ -284,10 +338,11 @@ export function buildContentBlocks(input: PdfDocumentInput): PdfBlock[] {
     notes: () => notesBlocks(input),
   };
   const out: PdfBlock[] = [];
+  let index = 0;
   for (const section of input.sections) {
     const body = builders[section]?.() ?? [];
     if (body.length === 0) continue;
-    out.push({ type: 'sectionTitle', text: input.labels.sections[section] }, ...body);
+    out.push({ type: 'sectionTitle', text: input.labels.sections[section], index: ++index }, ...body);
   }
   return out;
 }

@@ -47,6 +47,49 @@
 
 .compareCell {
   margin: 0;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: inherit;
+  text-align: center;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.compareCaption {
+  display: block;
+  margin-block-start: var(--sp-1);
+  color: var(--text-2);
+  font: var(--t-caption);
+  text-align: center;
+}
+
+.pickGrid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: var(--sp-2);
+}
+
+.pickCell {
+  padding: 0;
+  border: 2px solid transparent;
+  border-radius: var(--r-md);
+  background: none;
+  color: inherit;
+  cursor: pointer;
+}
+
+.pickCell[aria-pressed='true'] {
+  border-color: var(--brand);
+}
+
+.pickPhoto {
+  display: block;
+  inline-size: 100%;
+  aspect-ratio: 3 / 4;
+  border-radius: var(--r-md);
+  background: var(--photo);
+  object-fit: cover;
 }
 
 .comparePhoto {
@@ -58,12 +101,6 @@
   object-fit: cover;
 }
 
-.compareCell figcaption {
-  margin-block-start: var(--sp-1);
-  color: var(--text-2);
-  font: var(--t-caption);
-  text-align: center;
-}
 
 .rowThumb {
   inline-size: 44px;

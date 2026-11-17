@@ -5,6 +5,8 @@
  * and are passed in; this module never holds user-visible copy.
  */
 
+import { toWesternDigits } from './phone';
+
 export const PLACEHOLDERS = ['الاسم', 'الموعد', 'الباقة', 'المبلغ'] as const;
 export type Placeholder = (typeof PLACEHOLDERS)[number];
 export type TemplateValues = Partial<Record<Placeholder, string>>;
@@ -77,7 +79,7 @@ export function renderTemplate(body: string, values: TemplateValues): RenderedTe
  * country code; other numbers starting with 0 get `defaultCountryCode`. Null when it cannot be a phone.
  */
 export function normalizePhoneForWhatsapp(phone: string, defaultCountryCode = '20'): string | null {
-  const trimmed = phone.trim();
+  const trimmed = toWesternDigits(phone).trim();
   let digits = trimmed.replace(/\D/g, '');
   if (digits.length === 0) return null;
   if (trimmed.startsWith('+')) {

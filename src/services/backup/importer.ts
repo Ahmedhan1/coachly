@@ -22,10 +22,17 @@ export interface ImportArchiveOptions {
   onProgress?: ProgressListener;
   signal?: AbortSignal;
   maxEntryBytes?: number;
+  /** Check every file against the manifest (integrity) and stop: nothing is written. */
+  verifyOnly?: boolean;
 }
 
 const DEFAULT_MAX_ENTRY_BYTES = 64 * 1024 * 1024;
 const decoder = new TextDecoder();
+
+/** Integrity check of a backup zip (every file's SHA-256 against the manifest, rows parse). Writes nothing. */
+export function verifyArchive(db: AppDatabase, zip: Blob, options: Omit<ImportArchiveOptions, 'verifyOnly'> = {}): Promise<Result<ImportSummary, ImportError>> {
+  return importArchive(db, zip, { ...options, verifyOnly: true });
+}
 
 /**
  * Restores a backup zip: reads it entry by entry, checks every file against the manifest's SHA-256, refuses
@@ -108,6 +115,16 @@ async function run(db: AppDatabase, zip: Blob, options: ImportArchiveOptions): P
   imageBlobs.clear();
   tables.images = withBlobs;
   options.onProgress?.({ phase: 'verify', done: 1, total: 1 });
+  if (options.verifyOnly) {
+    return ok({
+      counts: { ...manifest.counts },
+      schemaVersion: manifest.schemaVersion,
+      migratedFrom: null,
+      imageVariant: manifest.imageVariant,
+      createdAt: manifest.createdAt,
+      appVersion: manifest.appVersion,
+    });
+  }
 
   let migratedFrom: number | null = null;
   if (action.value === 'migrate') {

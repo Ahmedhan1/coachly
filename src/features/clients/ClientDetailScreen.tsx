@@ -1,5 +1,5 @@
-import { lazy, Suspense, useState } from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
+import { lazy, Suspense, useEffect, useRef, useState } from 'react';
+import { useNavigate, useParams, useSearchParams } from 'react-router-dom';
 import { useRepos, useServices } from '@/app/services';
 import { readAiKey } from '@/features/online/integrations';
 import { clientPagesEnabled } from '@/features/online/prefs';
@@ -7,15 +7,18 @@ import { useLive } from '@/app/useLive';
 import { subscriptionAttention, toIsoDate, type Client, type Payment, type Program, type Session } from '@/domain/models';
 import { t } from '@/i18n';
 import { Badge, Button, EmptyState, Icon, IconButton, ListRow, ListSection, Money, Num, PackageRing, PageHeader, Tx } from '@/ui';
-import { formatIsoDate, formatNumber, timeParts } from '@/ui/format';
+import { formatIsoDate, formatMoney, formatNumber, timeParts } from '@/ui/format';
 import { attentionLabel, attentionTone } from './attention';
-import { telUrl, whatsappUrl } from './contact';
+import { telUrl } from './contact';
 import { ClientPageSheet } from './ClientPageSheet';
 import { EditClientSheet } from './EditClientSheet';
 import { PackageSheet } from './PackageSheet';
 import { PaymentSheet } from './PaymentSheet';
 import { useDeletePayment, useRenewPackage } from './useMoneyActions';
 import { useDeleteClient } from './useDeleteClient';
+import { WhatsappPickerSheet } from '@/features/whatsapp/WhatsappPickerSheet';
+import type { BuiltinKind } from '@/domain/whatsapp';
+import { balanceDue } from '@/domain/finance';
 import styles from './ClientDetail.module.css';
 
 /** The AI sheet pulls in the Anthropic SDK (~300 kB); load it only when the trainer opens it. */
@@ -53,7 +56,7 @@ function nextSessionOf(sessions: Session[], now: number): Session | null {
   );
 }
 
-type SheetName = null | 'edit' | 'package' | 'page' | 'ai' | { payment: Payment | null };
+type SheetName = null | 'edit' | 'package' | 'page' | 'ai' | 'whatsapp' | { payment: Payment | null };
 
 interface ClientDetailProps {
   client: Client;
@@ -77,7 +80,20 @@ function ClientDetail({ client, payments, sessions, programs, currency }: Client
   const today = toIsoDate(new Date(now));
   const attention = subscriptionAttention(client, today);
   const next = nextSessionOf(sessions, now);
-  const wa = whatsappUrl(client.phone);
+  const owed = balanceDue(payments);
+  const firstDue = payments.filter((p) => p.status === 'due').sort((a, b) => ((a.dueOn ?? '') < (b.dueOn ?? '') ? -1 : 1))[0];
+  // The message the trainer most likely wants first: what is late, then what ends, then the next session.
+  const waPreferred: BuiltinKind = owed > 0 ? 'payment_due' : attention ? 'renewal' : 'session_reminder';
+
+  // "/clients/:id?renew=1" (Home's «جدّد»): renew once on arrival, with the usual undo toast.
+  const [params, setParams] = useSearchParams();
+  const renewedFor = useRef<string | null>(null);
+  useEffect(() => {
+    if (params.get('renew') !== '1' || renewedFor.current === client.id) return;
+    renewedFor.current = client.id;
+    setParams({}, { replace: true });
+    void renew(client);
+  }, [params, setParams, renew, client]);
 
   const onDelete = async () => {
     await deleteClient(client);
@@ -148,7 +164,7 @@ function ClientDetail({ client, payments, sessions, programs, currency }: Client
       </ListSection>
       <MeasurementsSection client={client} />
       <InjuriesSection client={client} />
-      <PaymentsSection payments={payments} today={today} onAdd={() => setSheet({ payment: null })} onOpen={(p) => setSheet({ payment: p })} />
+      <PaymentsSection payments={payments} today={today} owed={owed} currency={currency} onAdd={() => setSheet({ payment: null })} onOpen={(p) => setSheet({ payment: p })} />
 
       <ListSection title={t('clientDetail.notes')}>
         <p className={client.notes ? styles.note : `${styles.note} ${styles.muted}`}>{client.notes || t('clientDetail.noNotes')}</p>
@@ -161,18 +177,11 @@ function ClientDetail({ client, payments, sessions, programs, currency }: Client
       </div>
 
       <nav className={styles.actionbar} aria-label={t('clientDetail.actions')}>
-        {wa ? (
-          <a className={styles.stack} href={wa} target="_blank" rel="noreferrer">
-            <Icon name="chat" />
-            {t('clientDetail.whatsapp')}
-          </a>
-        ) : (
-          <span className={styles.stack} aria-disabled="true">
-            <Icon name="chat" />
-            {t('clientDetail.whatsapp')}
-          </span>
-        )}
-        <button type="button" className={styles.stack} aria-label={t('clientDetail.bookLabel')} onClick={() => navigate('/schedule')}>
+        <button type="button" className={styles.stack} onClick={() => setSheet('whatsapp')}>
+          <Icon name="chat" />
+          {t('clientDetail.whatsapp')}
+        </button>
+        <button type="button" className={styles.stack} aria-label={t('clientDetail.bookLabel')} onClick={() => navigate(`/schedule?book=1&client=${client.id}`)}>
           <Icon name="calendarPlus" />
           {t('clientDetail.book')}
         </button>
@@ -185,6 +194,15 @@ function ClientDetail({ client, payments, sessions, programs, currency }: Client
         <Suspense fallback={null}>
           <AiDraftSheet client={client} onClose={() => setSheet(null)} />
         </Suspense>
+      )}
+      {sheet === 'whatsapp' && (
+        <WhatsappPickerSheet
+          open
+          onClose={() => setSheet(null)}
+          client={client}
+          preferred={waPreferred}
+          extra={{ startsAt: next?.startsAt ?? null, amountMinor: owed > 0 ? (firstDue?.amountMinor ?? owed) : null, currency }}
+        />
       )}
       {sheet === 'page' && <ClientPageSheet client={client} onClose={() => setSheet(null)} />}
       {sheet === 'edit' && <EditClientSheet client={client} onClose={() => setSheet(null)} />}
@@ -327,10 +345,11 @@ function InjuriesSection({ client }: { client: Client }) {
   );
 }
 
-function PaymentsSection({ payments, today, onAdd, onOpen }: { payments: Payment[]; today: string; onAdd: () => void; onOpen: (p: Payment) => void }) {
+function PaymentsSection({ payments, today, owed, currency, onAdd, onOpen }: { payments: Payment[]; today: string; owed: number; currency: string; onAdd: () => void; onOpen: (p: Payment) => void }) {
   return (
     <ListSection
       title={t('clientDetail.payments')}
+      footer={owed > 0 ? t('schedule.pay.balance', { amount: formatMoney(owed, currency) }) : undefined}
       action={
         <Button size="small" variant="plain" icon="plus" onClick={onAdd}>
           {t('clientDetail.addPayment')}

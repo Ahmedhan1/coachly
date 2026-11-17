@@ -97,3 +97,15 @@
   inline-size: 22px;
   block-size: 22px;
 }
+
+.monthNav {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--sp-2);
+  margin: 0 var(--gutter) var(--sp-3);
+}
+
+.monthName {
+  font: var(--t-headline);
+}

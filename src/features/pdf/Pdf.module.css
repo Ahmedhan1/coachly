@@ -87,12 +87,82 @@
   block-size: 22px;
 }
 
-.preview {
+.size {
+  margin-inline-start: auto;
+  color: var(--text-2);
+  font: var(--t-caption);
+}
+
+/* Page previews: a horizontal strip of small page images (works on Android, where an iframe PDF is blank). */
+.pages {
+  display: flex;
+  gap: var(--sp-2);
+  margin: var(--sp-2) 0 0;
+  padding: 0 0 var(--sp-2);
+  overflow-x: auto;
+  list-style: none;
+  scroll-snap-type: x mandatory;
+  -webkit-overflow-scrolling: touch;
+}
+
+.pages li {
+  flex: 0 0 auto;
+  inline-size: min(62vw, 260px);
+  scroll-snap-align: start;
+}
+
+.pages img {
+  display: block;
   inline-size: 100%;
-  block-size: 60vh;
+  block-size: auto;
+  aspect-ratio: 210 / 297;
   border: var(--hairline) solid var(--line);
+  border-radius: var(--r-sm);
+  background: #fff;
+  box-shadow: 0 1px 4px rgb(0 0 0 / 12%);
+}
+
+.openLink {
+  color: var(--brand);
+  font: var(--t-callout);
+}
+
+.help {
+  display: grid;
+  gap: var(--sp-2);
+  margin-block-start: var(--sp-3);
+  padding: var(--sp-3) var(--sp-4);
   border-radius: var(--r-md);
   background: var(--surface-2);
+  color: var(--text);
+  font: var(--t-callout);
+}
+
+.help p {
+  margin: 0;
+}
+
+.helpTitle {
+  font: var(--t-headline);
+}
+
+.whatsapp {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--sp-2);
+  min-block-size: 44px;
+  padding: 0 var(--sp-4);
+  border-radius: var(--r-md);
+  background: var(--ok);
+  color: #fff;
+  font: var(--t-headline);
+  text-decoration: none;
+}
+
+.whatsapp svg {
+  inline-size: 20px;
+  block-size: 20px;
 }
 
 .actionbar {

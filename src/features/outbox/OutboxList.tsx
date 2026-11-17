@@ -6,7 +6,8 @@ import { t } from '@/i18n';
 import { Avatar, Badge, Icon } from '@/ui';
 import { useWhatsappTemplates, defaultTemplate } from '@/features/whatsapp/templatesStore';
 import { linkFor } from '@/features/whatsapp/useWhatsappLink';
-import { templateFor } from '@/domain/whatsapp';
+import { renderTemplate, templateFor } from '@/domain/whatsapp';
+import { templateValues } from '@/features/whatsapp/values';
 import { markSent } from './useOutbox';
 import styles from './Outbox.module.css';
 
@@ -17,11 +18,11 @@ export function OutboxList({ items, clients, onChange, limit }: { items: OutboxI
   const templates = useWhatsappTemplates();
   const shown = limit ? items.slice(0, limit) : items;
 
-  const mark = async (item: OutboxItem, name: string) => {
+  const mark = async (item: OutboxItem, name: string, skipped = false) => {
     await markSent(meta, item.id, true, new Date());
     onChange();
     showToast({
-      message: `${t('outbox.sent')} · ${name}`,
+      message: `${skipped ? t('outbox.skipped') : t('outbox.sent')} · ${name}`,
       actionLabel: t('outbox.undo'),
       onAction: () => void markSent(meta, item.id, false, new Date()).then(onChange),
       duration: 5000,
@@ -34,7 +35,9 @@ export function OutboxList({ items, clients, onChange, limit }: { items: OutboxI
         const client = clients.get(item.clientId);
         if (!client) return null;
         const template = (templates && templateFor(item.kind, templates)) ?? defaultTemplate(item.kind);
-        const href = linkFor(template, client, { startsAt: item.startsAt ?? null, amountMinor: item.amountMinor ?? null });
+        const extra = { startsAt: item.startsAt ?? null, amountMinor: item.amountMinor ?? null };
+        const href = linkFor(template, client, extra);
+        const preview = renderTemplate(template.body, templateValues(client, extra)).text;
         return (
           <li key={item.id} className={styles.row}>
             <Avatar name={client.name} />
@@ -45,8 +48,11 @@ export function OutboxList({ items, clients, onChange, limit }: { items: OutboxI
                 {item.daysLeft !== undefined && <Badge>{t('outbox.daysLeft', { n: item.daysLeft })}</Badge>}
                 {item.sessionsLeft !== undefined && <Badge>{item.sessionsLeft === 1 ? t('outbox.oneSessionLeft') : t('outbox.sessionsLeft', { n: item.sessionsLeft })}</Badge>}
               </p>
+              <p className={styles.preview} title={preview}>
+                {preview}
+              </p>
             </div>
-            <button type="button" className={styles.skip} aria-label={t('outbox.skipLabel', { name: client.name })} onClick={() => void mark(item, client.name)}>
+            <button type="button" className={styles.skip} aria-label={t('outbox.skipLabel', { name: client.name })} onClick={() => void mark(item, client.name, true)}>
               <Icon name="close" />
             </button>
             <a

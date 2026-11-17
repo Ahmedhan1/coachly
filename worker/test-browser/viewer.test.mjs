@@ -97,9 +97,14 @@ try {
     await page.goto(`${ORIGIN}/c/${shareId}#k=${b64url(key)}`);
     await page.waitForSelector('body[data-ready="1"]', { timeout: 10_000 });
     const text = await page.textContent('#app');
-    for (const s of ['أهلاً نورهان', 'برنامج 3 أيام', 'بنش برس', 'سيتات 4', 'عدّات 8-10', 'راحة 90 ث', 'تمبو 3-1-1', 'RPE 8', 'التزم بالنوم']) {
-      assert.ok(text.includes(s), `missing "${s}"`);
+    // nextDay = 1 opens day 2 first; day 1 is one tap away.
+    assert.ok(text.includes('هيب ثرست'), 'next day not shown first');
+    await page.click('.pills .pill >> nth=0');
+    const day1 = await page.textContent('#app');
+    for (const s of ['برنامج 3 أيام', 'بنش برس', 'سيتات 4', 'عدّات 8-10', 'راحة 90 ث', 'تمبو 3-1-1', 'RPE 8', 'سوبر سيت A', 'التزم بالنوم', 'الحصة الجاية', 'فاضل 5 من 12 حصة', 'خسارة دهون']) {
+      assert.ok(day1.includes(s), `missing "${s}"`);
     }
+    assert.ok((await page.textContent('#brand')).includes('أهلاً نورهان'));
     assert.equal(await page.textContent('.brand-name'), 'كابتن سارة فيتنس');
     assert.equal(await page.title(), 'كابتن سارة فيتنس');
     const brand = await page.evaluate(() => getComputedStyle(document.getElementById('brand')).backgroundColor);
@@ -110,13 +115,23 @@ try {
     await page.screenshot({ path: join(shotDir, 'viewer-program-light.png'), fullPage: true });
   });
 
-  await step('tabs are at least 44px tall and the meals tab shows meals and supplements', async () => {
+  await step('tabs are at least 44px tall and the meals tab shows targets, meal days and supplements', async () => {
     const box = await page.locator('.tab').first().boundingBox();
     assert.ok(box && box.height >= 44, `tab height ${box?.height}`);
     await page.click('#t-p-meals');
     const meals = await page.textContent('#p-meals');
-    assert.ok(meals.includes('الفطار') && meals.includes('9:00') && meals.includes('واي بروتين'));
+    assert.ok(meals.includes('1650') && meals.includes('بروتين') && meals.includes('الفطار') && meals.includes('9:00') && meals.includes('واي بروتين'));
     await page.screenshot({ path: join(shotDir, 'viewer-meals-light.png'), fullPage: true });
+    await page.click('#p-meals .pill >> nth=1');
+    assert.ok((await page.textContent('#p-meals')).includes('شوفان'));
+  });
+
+  await step('progress tab draws the weight trend and records', async () => {
+    await page.click('#t-p-progress');
+    const text = await page.textContent('#p-progress');
+    assert.ok(text.includes('الوزن') && text.includes('73.6') && text.includes('−4.4') && text.includes('هيب ثرست'));
+    assert.equal(await page.locator('#p-progress svg.chart').count(), 2);
+    await page.screenshot({ path: join(shotDir, 'viewer-progress-light.png'), fullPage: true });
   });
 
   await step('check-in: Arabic-Indic digits accepted, photo downscaled to <= 1200px JPEG, encrypted, opened by shared/envelope.ts', async () => {
@@ -124,6 +139,8 @@ try {
     await page.fill('input[name=weight]', '٧١٫٥');
     await page.fill('input[name=waist]', '80');
     await page.fill('textarea[name=notes]', 'الأسبوع ده كان كويس');
+    await page.click('#p-checkin summary');
+    await page.fill('input[name=arm]', '33');
     await page.setInputFiles('input[name=photo]', { name: 'me.png', mimeType: 'image/png', buffer: bigPhoto });
     await page.screenshot({ path: join(shotDir, 'viewer-checkin-light.png'), fullPage: true });
     await page.click('#p-checkin .btn');
@@ -137,6 +154,7 @@ try {
     assert.equal(doc.weightKg, 71.5);
     assert.equal(doc.waistCm, 80);
     assert.equal(doc.notes, 'الأسبوع ده كان كويس');
+    assert.equal(doc.armCm, 33);
     assert.ok(doc.photo.startsWith('data:image/jpeg;base64,'));
     const size = await page.evaluate(async (src) => {
       const img = new Image();

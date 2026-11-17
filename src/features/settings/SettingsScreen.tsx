@@ -1,14 +1,38 @@
 import { useEffect, useState } from 'react';
 import { useServices } from '@/app/services';
+import { checkForAppUpdate } from '@/app/appUpdate';
+import { useUiStore } from '@/app/uiStore';
 import { useLive } from '@/app/useLive';
+import { toIsoDate } from '@/domain/models';
 import { DeviceIdCard } from '@/features/activation/DeviceIdCard';
 import { CLIENT_PAGES_ENABLED_KEY, clientPagesEnabled } from '@/features/online/prefs';
 import { t } from '@/i18n';
 import { Badge, Icon, ListRow, ListSection, PageHeader } from '@/ui';
+import { formatIsoDate } from '@/ui/format';
 import styles from './SettingsScreen.module.css';
+
+/** Who the license belongs to and until when (from the signed token on this device; no network). */
+function LicenseRow() {
+  const { activation } = useServices();
+  const state = useLive(() => activation.getState(), [activation]);
+  if (!state || state.status !== 'active') return null;
+  const until = state.expiresAt;
+  return (
+    <ListRow
+      leading={<Icon name="key" />}
+      title={
+        until === null
+          ? t('settings.license.activeLifetime', { name: state.trainerName })
+          : t('settings.license.activeUntil', { name: state.trainerName, date: formatIsoDate(toIsoDate(new Date(until))) })
+      }
+      subtitle={until === null ? t('settings.license.lifetime') : t('settings.license.until')}
+    />
+  );
+}
 
 export function SettingsScreen() {
   const { activation, meta } = useServices();
+  const showToast = useUiStore((st) => st.showToast);
   const [deviceId, setDeviceId] = useState<string | null>(null);
   const [version, setVersion] = useState(0);
   const pagesOn = useLive(() => clientPagesEnabled(meta), [meta, version]);
@@ -45,7 +69,19 @@ export function SettingsScreen() {
         />
         <ListRow to="/more/settings/integrations" leading={<Icon name="key" />} title={t('settings.integrations.title')} subtitle={t('settings.integrations.hint')} />
       </ListSection>
-      <ListSection title={t('screens.settings.license')} bare>
+      <ListSection title={t('screens.settings.license')}>
+        <LicenseRow />
+        <ListRow
+          leading={<Icon name="cloudOk" />}
+          title={t('settings.license.checkUpdate')}
+          subtitle={t('settings.license.checkUpdateHint')}
+          onClick={async () => {
+            showToast({ message: t('settings.license.checking'), duration: 2000 });
+            await checkForAppUpdate();
+          }}
+        />
+      </ListSection>
+      <ListSection bare>
         <DeviceIdCard deviceId={deviceId} />
       </ListSection>
       <ListSection>

@@ -22,7 +22,7 @@ export interface HtmlPdfRendererOptions {
   downscaler?: ImageDownscaler;
   /** Where readex-pro-*.woff2 / alexandria-*.woff2 live. Default '/fonts/'. */
   fontBaseUrl?: string;
-  /** Canvas pixels per CSS px. 1.75 → 1390 × 1965 px per page ≈ 168 dpi. */
+  /** Canvas pixels per CSS px. 2 → 1588 × 2246 px per page ≈ 192 dpi (crisp logo and small text). */
   pixelRatio?: number;
   jpegQuality?: number;
   /** Longest side for embedded pictures before rendering (spec: ~1200 px). */
@@ -32,6 +32,8 @@ export interface HtmlPdfRendererOptions {
    * the second pass; set to 1 on Safari if images come out blank (MANUAL_QA).
    */
   warmupPasses?: number;
+  /** Width in px of the small JPEG preview kept per page (0 = none). Default 360. */
+  previewWidth?: number;
   /** Keep page nodes visible for debugging/screenshots instead of removing them. */
   keepPages?: boolean;
   /** Called with each page node right before it is snapshotted (harness screenshots). */
@@ -61,6 +63,24 @@ async function imagesReady(node: HTMLElement): Promise<void> {
   await Promise.all(
     [...node.querySelectorAll('img')].map((i) => (i.complete ? Promise.resolve() : i.decode().catch(() => undefined))),
   );
+}
+
+/** A small copy of a page for the in-app preview (an <iframe> PDF shows nothing on Android Chrome). */
+async function previewOf(canvas: HTMLCanvasElement, width: number): Promise<Blob | null> {
+  try {
+    const small = document.createElement('canvas');
+    small.width = width;
+    small.height = Math.round((canvas.height / canvas.width) * width);
+    const ctx = small.getContext('2d');
+    if (!ctx) return null;
+    ctx.drawImage(canvas, 0, 0, small.width, small.height);
+    const blob = await new Promise<Blob | null>((resolve) => small.toBlob(resolve, 'image/jpeg', 0.7));
+    small.width = 0;
+    small.height = 0;
+    return blob;
+  } catch {
+    return null;
+  }
 }
 
 function canvasToJpeg(canvas: HTMLCanvasElement, quality: number): Promise<Uint8Array> {
@@ -112,7 +132,8 @@ export class HtmlPdfRenderer implements PdfRenderer {
       measure.dir = 'rtl';
       measure.lang = 'ar';
       measure.style.fontFamily = fontStack(input.branding.fontFamily);
-      measure.innerHTML = blocks.map((b) => blockHtml(b, urlOf, input.branding.primaryColor)).join('');
+      const ctx = { logoUrl: urlOf(input.branding.logo), trainerName: input.branding.trainerName };
+      measure.innerHTML = blocks.map((b) => blockHtml(b, urlOf, input.branding.primaryColor, ctx)).join('');
       host.appendChild(measure);
       await imagesReady(measure);
       // Each block carries margin-block-end = BLOCK_GAP_PX; measure the border box and add the gap.
@@ -123,8 +144,10 @@ export class HtmlPdfRenderer implements PdfRenderer {
       if (doc.pages.length === 0) return err('no_pages');
 
       const pdf = new jsPDF({ unit: 'mm', format: 'a4', orientation: 'portrait', compress: true });
-      const ratio = this.o.pixelRatio ?? 1.75;
-      const quality = this.o.jpegQuality ?? 0.8;
+      const ratio = this.o.pixelRatio ?? 2;
+      const quality = this.o.jpegQuality ?? 0.82;
+      const previewWidth = this.o.previewWidth ?? 360;
+      const previews: Blob[] = [];
       for (let i = 0; i < doc.pages.length; i++) {
         if (cancelled()) return err('cancelled');
         const page = doc.pages[i]!;
@@ -150,6 +173,10 @@ export class HtmlPdfRenderer implements PdfRenderer {
         }
         const canvas = await toCanvas(node, snap);
         const jpeg = await canvasToJpeg(canvas, quality);
+        if (previewWidth > 0) {
+          const preview = await previewOf(canvas, previewWidth);
+          if (preview) previews.push(preview);
+        }
         // Free the bitmap now: iOS caps total canvas memory, and 50-exercise PDFs have many pages.
         canvas.width = 0;
         canvas.height = 0;
@@ -162,7 +189,7 @@ export class HtmlPdfRenderer implements PdfRenderer {
       const blob = pdf.output('blob');
       progress?.({ phase: 'finalize', done: 1, total: 1 });
       const base = [input.title, input.client?.name].filter(Boolean).join(' - ');
-      return ok({ blob, pageCount: doc.pages.length, fileName: `${safeFileName(base, 'program')}.pdf` });
+      return ok({ blob, pageCount: doc.pages.length, fileName: `${safeFileName(base, 'program')}.pdf`, previews });
     } catch {
       return err('render_failed');
     } finally {

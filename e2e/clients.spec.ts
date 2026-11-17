@@ -84,7 +84,7 @@ test('delete from client detail, then undo', async ({ page }) => {
 test('removing demo data leaves an empty state that says what to do', async ({ page }) => {
   await openApp(page);
   await page.getByRole('button', { name: 'امسح البيانات التجريبية' }).click();
-  await page.getByRole('link', { name: 'العملاء' }).click();
+  await page.getByRole('navigation', { name: 'التنقل الرئيسي' }).getByRole('link', { name: 'العملاء', exact: true }).click();
   await expect(page.getByText('لسه مفيش عملاء')).toBeVisible();
   await expect(page.getByRole('button', { name: 'إضافة عميل' }).last()).toBeVisible();
 });

@@ -11,6 +11,8 @@ export interface ExerciseFilter {
   /** When given, only exercises in this set pass. */
   favourites?: ReadonlySet<string>;
   customOnly?: boolean;
+  /** Only the «الأشهر» (most common) set. */
+  popularOnly?: boolean;
 }
 
 const active = <T>(values: readonly T[] | undefined): values is readonly T[] => values !== undefined && values.length > 0;
@@ -29,6 +31,7 @@ export function filterExercises(exercises: readonly CatalogExercise[], filter: E
     if (active(categories) && !categories.includes(e.category)) return false;
     if (favourites !== undefined && !favourites.has(e.id)) return false;
     if (filter.customOnly === true && !e.isCustom) return false;
+    if (filter.popularOnly === true && e.popularRank === undefined) return false;
     return true;
   });
 }

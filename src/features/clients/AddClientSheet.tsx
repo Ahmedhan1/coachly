@@ -4,6 +4,7 @@ import { ZodError } from 'zod';
 import { useRepos } from '@/app/services';
 import { useUiStore } from '@/app/uiStore';
 import { clientGoalSchema, toIsoDate, type ClientGoal } from '@/domain/models';
+import { cleanPhoneInput, phoneProblem } from '@/domain/whatsapp';
 import { t } from '@/i18n';
 import { SegmentedControl, Sheet, TextField } from '@/ui';
 import styles from './AddClientSheet.module.css';
@@ -28,12 +29,18 @@ function AddClientForm({ onClose }: { onClose: () => void }) {
   const [goal, setGoal] = useState<ClientGoal>('fitness');
   const [sessions, setSessions] = useState('');
   const [error, setError] = useState<string | null>(null);
+  const [phoneError, setPhoneError] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
 
   const submit = async (e: FormEvent) => {
     e.preventDefault();
     if (!name.trim()) {
       setError(t('addClient.nameRequired'));
+      return;
+    }
+    const problem = phoneProblem(phone);
+    if (problem) {
+      setPhoneError(t(`addClient.phoneErrors.${problem}`));
       return;
     }
     setSaving(true);
@@ -101,7 +108,9 @@ function AddClientForm({ onClose }: { onClose: () => void }) {
           inputMode="tel"
           maxLength={20}
           value={phone}
-          onChange={(e) => setPhone(e.target.value.replace(/[^0-9+\s-]/g, ''))}
+          onChange={(e) => (setPhone(cleanPhoneInput(e.target.value)), setPhoneError(null))}
+          error={phoneError}
+          hint={t('addClient.phoneHint')}
           autoComplete="off"
           ltr
         />

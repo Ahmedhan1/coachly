@@ -71,7 +71,6 @@ export function MuscleMapScreen() {
               <summary>{t('training.muscles3d.aboutTitle')}</summary>
               <p>{t('training.muscles3d.aboutShort')}</p>
               <p>{t('training.muscles3d.aboutLong')}</p>
-              <p>{t('training.muscles3d.placeholderNote')}</p>
             </details>
           </>
         )}

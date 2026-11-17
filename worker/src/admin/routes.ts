@@ -2,11 +2,25 @@ import { MAX_FORM_BODY_BYTES, readLimitedText } from '../http';
 import type { Deps, LicenseRecord } from '../ports';
 import { dropLicensePush } from '../push/cleanup';
 import { RULES } from '../rateLimit';
-import { codeIssuedPage, confirmPage, dashboardPage, loginPage, messagePage, DURATION_OPTIONS } from './html';
-import { clearSessionCookie, createSessionCookie, hasValidSession } from './session';
+import {
+  ADMIN_SCRIPT,
+  codeIssuedPage,
+  confirmPage,
+  dashboardPage,
+  issuedGonePage,
+  loginPage,
+  messagePage,
+  statusBucket,
+  DURATION_OPTIONS,
+  STATUS_FILTERS,
+} from './html';
+import { createIssuedCookie, readIssuedCookie, type IssuedCode } from './issued';
+import { clearSessionCookie, createSessionCookie, hasValidSession, SESSION_COOKIE } from './session';
 
 const DAY = 86_400;
-const LIST_LIMIT = 500;
+/** Read cap for the dashboard list; search and paging run over these rows. */
+const LIST_LIMIT = 2000;
+const PAGE_SIZE = 25;
 const MAX_NAME_LENGTH = 100;
 const DEFAULT_WINDOW_DAYS = 14;
 
@@ -19,7 +33,7 @@ const SECURITY_HEADERS: Record<string, string> = {
   'Content-Type': 'text/html; charset=utf-8',
   'Cache-Control': 'no-store',
   'Content-Security-Policy':
-    "default-src 'none'; style-src 'unsafe-inline'; form-action 'self'; frame-ancestors 'none'; base-uri 'none'",
+    "default-src 'none'; style-src 'unsafe-inline'; script-src 'self'; form-action 'self'; frame-ancestors 'none'; base-uri 'none'",
   'X-Content-Type-Options': 'nosniff',
   'X-Frame-Options': 'DENY',
   'Referrer-Policy': 'same-origin',
@@ -129,7 +143,12 @@ async function handleGenerate(request: Request, deps: Deps): Promise<Response> {
     expiresAt: null,
     feat: ['core'],
   });
-  return html(codeIssuedPage({ code, name, actBy: record.actBy, durationDays: record.durationDays, moved: false }));
+  return showIssuedOnce(deps, { code, name, actBy: record.actBy, durationDays: record.durationDays, moved: false });
+}
+
+/** Post/Redirect/Get: a refresh of the result page shows the same code again instead of issuing another. */
+async function showIssuedOnce(deps: Deps, issued: IssuedCode): Promise<Response> {
+  return redirect('/admin/issued', { 'Set-Cookie': await createIssuedCookie(deps.crypto, issued, deps.now()) });
 }
 
 async function handleLicenseAction(request: Request, deps: Deps, action: 'move' | 'revoke'): Promise<Response> {
@@ -170,12 +189,39 @@ async function handleLicenseAction(request: Request, deps: Deps, action: 'move' 
   // subscription is tied to the old license, and it goes.
   await dropLicensePush(deps.cloud.db, record.lid);
   await deps.store.audit('moved', record.lid, now);
-  return html(
-    codeIssuedPage({ code, name: record.customerName, actBy: next.actBy, durationDays: next.durationDays, moved: true }),
-  );
+  return showIssuedOnce(deps, { code, name: record.customerName, actBy: next.actBy, durationDays: next.durationDays, moved: true });
 }
 
 const NOTICES: Record<string, string> = { revoked: 'الترخيص اتلغى.' };
+const EXPIRED_NOTICE = 'الجلسة خلصت (بتخلص بعد 12 ساعة). ادخل تاني بكلمة السر، وبعدها كرر آخر خطوة لو ما كملتش.';
+
+function hasCookie(request: Request, name: string): boolean {
+  return (request.headers.get('Cookie') ?? '').split(';').some((part) => part.trim().startsWith(`${name}=`));
+}
+
+async function dashboard(url: URL, deps: Deps, now: number): Promise<Response> {
+  const all = await deps.store.list(LIST_LIMIT);
+  const q = (url.searchParams.get('q') ?? '').trim().slice(0, MAX_NAME_LENGTH);
+  const statusParam = url.searchParams.get('status') ?? '';
+  const status = STATUS_FILTERS.some((o) => o.value === statusParam) ? statusParam : '';
+  const needle = q.toLocaleLowerCase('ar');
+  const matches = all.filter(
+    (r) =>
+      (needle === '' || r.customerName.toLocaleLowerCase('ar').includes(needle)) &&
+      (status === '' || statusBucket(r, now) === status),
+  );
+  const pages = Math.max(1, Math.ceil(matches.length / PAGE_SIZE));
+  const requested = Number(url.searchParams.get('page') ?? '1');
+  const pageNumber = Number.isInteger(requested) ? Math.min(Math.max(requested, 1), pages) : 1;
+  const records = matches.slice((pageNumber - 1) * PAGE_SIZE, pageNumber * PAGE_SIZE);
+  const notice = NOTICES[url.searchParams.get('done') ?? ''] ?? null;
+  return html(
+    dashboardPage(
+      { records, total: matches.length, all: all.length, page: pageNumber, pages, q, status, notice, capped: all.length >= LIST_LIMIT },
+      now,
+    ),
+  );
+}
 
 export async function handleAdmin(request: Request, deps: Deps, clientKey: string, hooks: AdminHooks = {}): Promise<Response> {
   const url = new URL(request.url);
@@ -183,6 +229,11 @@ export async function handleAdmin(request: Request, deps: Deps, clientKey: strin
   const method = request.method;
   const now = deps.now();
 
+  if (method === 'GET' && path === '/admin/admin.js') {
+    return new Response(ADMIN_SCRIPT, {
+      headers: { 'Content-Type': 'text/javascript; charset=utf-8', 'Cache-Control': 'public, max-age=300', 'X-Content-Type-Options': 'nosniff' },
+    });
+  }
   if (method === 'POST' && !sameOrigin(request)) return html(messagePage('ممنوع', 'الطلب ده جاي من مكان غريب.'), 403);
   if (method === 'POST' && path === '/admin/login') return handleLogin(request, deps, clientKey);
 
@@ -194,12 +245,22 @@ export async function handleAdmin(request: Request, deps: Deps, clientKey: strin
   if (!(await limiter.hit(RULES.admin, clientKey, now))) return html(messagePage('استنى شوية', 'طلبات كتير.'), 429);
 
   if (method === 'POST' && path === '/admin/logout') return redirect('/admin', { 'Set-Cookie': clearSessionCookie() });
-  if (!authed) return method === 'GET' && path === '/admin' ? html(loginPage(null)) : redirect('/admin');
+  if (!authed) {
+    // A stale cookie or a form posted from an open dashboard means the 12-hour session ran out: say so.
+    const expired = hasCookie(request, SESSION_COOKIE) || method === 'POST' || url.searchParams.get('expired') === '1';
+    if (method === 'GET' && path === '/admin') return html(loginPage(null, expired ? EXPIRED_NOTICE : null));
+    return redirect(expired ? '/admin?expired=1' : '/admin');
+  }
 
   if (method === 'GET' && path === '/admin') {
     await hooks.prune?.(now);
-    const notice = NOTICES[url.searchParams.get('done') ?? ''] ?? null;
-    return html(dashboardPage(await deps.store.list(LIST_LIMIT), now, notice));
+    return dashboard(url, deps, now);
+  }
+  if (method === 'GET' && path === '/admin/issued') {
+    const issued = await readIssuedCookie(request, deps.crypto, now);
+    return issued === null
+      ? html(issuedGonePage(), 410)
+      : html(codeIssuedPage({ ...issued, appUrl: deps.config.appOrigins[0] ?? null }));
   }
   if (method === 'POST' && path === '/admin/codes') return handleGenerate(request, deps);
   if (method === 'POST' && path === '/admin/licenses/revoke') return handleLicenseAction(request, deps, 'revoke');

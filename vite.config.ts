@@ -1,3 +1,4 @@
+import { execSync } from 'node:child_process';
 import { readFileSync } from 'node:fs';
 import { fileURLToPath, URL } from 'node:url';
 import react from '@vitejs/plugin-react';
@@ -23,7 +24,18 @@ function licenseKeyWarning(): Plugin {
   };
 }
 
+/** Short build stamp shown on the activation and About screens, so a screenshot tells which build a phone runs. */
+function buildId(): string {
+  const day = new Date().toISOString().slice(0, 10);
+  try {
+    return `${day}-${execSync('git rev-parse --short HEAD', { stdio: ['ignore', 'pipe', 'ignore'] }).toString().trim()}`;
+  } catch {
+    return day;
+  }
+}
+
 export default defineConfig({
+  define: { 'import.meta.env.VITE_BUILD_ID': JSON.stringify(buildId()) },
   resolve: { alias: { '@': fileURLToPath(new URL('./src', import.meta.url)) } },
   // Same headers as production (deploy/app), so e2e and manual checks run under the real CSP. Not on the dev
   // server: Vite's HMR client needs inline scripts.
@@ -61,7 +73,8 @@ export default defineConfig({
         // Precache the whole app (every lazy route chunk and the bundled fonts) so it runs fully offline after
         // first load. Exercise photos (~21 MB) are NOT precached: they are cached on first view (route below).
         globPatterns: ['**/*.{js,css,html,png,svg,ico,woff2,json,webmanifest,glb}'],
-        globIgnores: ['exercise-pack/img/**'],
+        // Draco decoders: the shipped model is not Draco-compressed, so never precache them (~0.8 MB).
+        globIgnores: ['exercise-pack/img/**', 'assets/draco_*', 'draco/**'],
         maximumFileSizeToCacheInBytes: 15 * 1024 * 1024,
         importScripts: ['push-sw.js'],
         navigateFallback: '/index.html',

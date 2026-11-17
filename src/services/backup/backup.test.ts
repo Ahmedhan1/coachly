@@ -231,4 +231,32 @@ describe('LocalBackupService (encrypted file)', () => {
     expect(await service.detectFile(new Blob(['x']))).toBe('unknown');
     expect(await service.importFile(new Blob(['x']))).toEqual({ ok: false, error: 'not_a_backup' });
   });
+
+  it('verifyFile checks an encrypted file end to end without writing, and catches a corrupted byte', async () => {
+    const f = testDbFactory();
+    const db = f.open();
+    await seedDatabase(db);
+    const service = new LocalBackupService({ db, meta: memoryBackupMetaStore(), appVersion: APP, now: () => NOW, iterations: 100_000 });
+    const file = await service.exportFile({ password: 'verify-pass-1' });
+    if (!file.ok) throw new Error(file.error);
+    const before = await dumpDatabase(db);
+    const v = await service.verifyFile(file.value.blob, 'verify-pass-1');
+    expect(v.ok).toBe(true);
+    if (v.ok) expect(v.value.counts).toMatchObject({ clients: 2, images: 3 });
+    expect(await dumpDatabase(db)).toEqual(before);
+    expect(await service.verifyFile(file.value.blob, 'other-pass-1')).toEqual({ ok: false, error: 'wrong_password' });
+    // Flip one byte inside the ciphertext: AES-GCM refuses it.
+    const bytes = new Uint8Array(await file.value.blob.arrayBuffer());
+    bytes[bytes.length - 40] = (bytes[bytes.length - 40] ?? 0) ^ 0xff;
+    const bad = await service.verifyFile(new Blob([bytes as BlobPart]), 'verify-pass-1');
+    expect(bad.ok).toBe(false);
+    // A plain zip whose image changed after export fails the checksum.
+    const plain = await service.exportFile();
+    if (!plain.ok) throw new Error(plain.error);
+    const tampered = await rewriteZip(plain.value.blob, (files) => {
+      const key = Object.keys(files).find((k) => k.startsWith('images/'))!;
+      files[key] = strToU8('changed');
+    }, false);
+    expect(await service.verifyFile(tampered, null)).toEqual({ ok: false, error: 'checksum_mismatch' });
+  }, 30_000);
 });

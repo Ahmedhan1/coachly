@@ -139,7 +139,6 @@ export const training = {
     resetView: 'رجّع المجسم لوضعه',
     fallbackNoWebgl: 'الموبايل ده مش بيعرض المجسم 3D، فدي الخريطة بدالها.',
     fallbackLoadError: 'المجسم ما اتحمّلش، فدي الخريطة بدالها.',
-    placeholderNote: 'ده مجسم مؤقت للتجربة لحد ما المجسم النهائي يجهز.',
     aboutTitle: 'عن المجسم',
     aboutShort: 'المجسم: Z-Anatomy و BodyParts3D (CC BY-SA) — نسخة معدّلة',
     aboutLong:
@@ -321,6 +320,14 @@ export const training = {
   },
   session: {
     title: 'الحصة',
+    pendingTitle: 'فيه حصة لسه ما اتحفظتش مع {name}',
+    pendingBody: 'خلّصت فيها {n} سيت. تكمّلها، ولا تحفظها وتبدأ الجديدة؟',
+    pendingResume: 'كمّل الحصة دي',
+    pendingSaveAndNew: 'احفظها وابدأ الجديدة',
+    pendingDiscard: 'امسحها وابدأ الجديدة',
+    pendingSaved: 'الحصة القديمة اتحفظت',
+    bannerTitle: 'حصة شغالة مع {name}',
+    bannerBody: 'خلّصت {n} سيت · اضغط تكمّل',
     close: 'اقفل الحصة (التقدم محفوظ)',
     loading: 'بنجهّز الحصة…',
     exerciseOf: 'تمرين {n} من {total}',

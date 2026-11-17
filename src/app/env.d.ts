@@ -9,6 +9,8 @@ interface ImportMetaEnv {
   /** License Worker base URL, e.g. https://pt-coach-license.<account>.workers.dev */
   readonly VITE_WORKER_URL?: string;
   readonly VITE_APP_VERSION?: string;
+  /** Set by vite.config.ts at build time: build date + git commit. */
+  readonly VITE_BUILD_ID?: string;
 }
 
 interface Navigator {

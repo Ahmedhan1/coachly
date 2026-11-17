@@ -95,3 +95,20 @@ export function clampGoalPercent(goal: CalcInput['goal'], percent: number, s: Nu
   if (percent >= r.min && percent <= r.max) return percent;
   return s.defaultGoalPercent[goal] >= r.min && s.defaultGoalPercent[goal] <= r.max ? s.defaultGoalPercent[goal] : r.min;
 }
+
+export type BodyField = 'age' | 'height' | 'weight' | 'bodyFat';
+
+/** First required body field the trainer left empty (age, height, weight), or null. */
+export function missingField(d: CalcDraft): Exclude<BodyField, 'bodyFat'> | null {
+  for (const f of ['age', 'height', 'weight'] as const) if (d[f].trim() === '') return f;
+  return null;
+}
+
+/** Which input a calculator error points at, so the field itself can show it. */
+export function fieldOfError(error: string): BodyField | null {
+  if (error === 'invalid_age') return 'age';
+  if (error === 'invalid_height') return 'height';
+  if (error === 'invalid_weight') return 'weight';
+  if (error === 'invalid_body_fat' || error === 'missing_body_fat') return 'bodyFat';
+  return null;
+}

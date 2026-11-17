@@ -1,0 +1,511 @@
+{
+ "_note": "Built-in exercises the free-exercise-db lacks but Egyptian gyms use. imagesFrom reuses a pack exercise photo only when it truly shows the same movement; otherwise the app shows the muscle-map illustration.",
+ "exercises": [
+  {
+   "id": "pt_Hip_Thrust_Machine",
+   "en": "Hip Thrust Machine",
+   "ar": "هيب ثرست على الماشين",
+   "primary": [
+    "glutes"
+   ],
+   "secondary": [
+    "hamstrings"
+   ],
+   "equipment": "machine",
+   "level": "beginner",
+   "category": "strength",
+   "force": "push",
+   "mechanic": "compound",
+   "popular": true
+  },
+  {
+   "id": "pt_Glute_Kickback_Machine",
+   "en": "Glute Kickback Machine",
+   "ar": "جلوت كيك باك على الماشين",
+   "primary": [
+    "glutes"
+   ],
+   "secondary": [
+    "hamstrings"
+   ],
+   "equipment": "machine",
+   "level": "beginner",
+   "category": "strength",
+   "force": "push",
+   "mechanic": "isolation",
+   "popular": true
+  },
+  {
+   "id": "pt_Cable_Hip_Abduction",
+   "en": "Standing Cable Hip Abduction",
+   "ar": "أبداكشن على الكابل واقف (فتح)",
+   "primary": [
+    "abductors"
+   ],
+   "secondary": [
+    "glutes"
+   ],
+   "equipment": "cable",
+   "level": "beginner",
+   "category": "strength",
+   "force": "push",
+   "mechanic": "isolation"
+  },
+  {
+   "id": "pt_Reverse_Hack_Squat",
+   "en": "Reverse Hack Squat",
+   "ar": "ريفيرس هاك سكوات على الماشين",
+   "primary": [
+    "glutes"
+   ],
+   "secondary": [
+    "quads",
+    "hamstrings"
+   ],
+   "equipment": "machine",
+   "level": "intermediate",
+   "category": "strength",
+   "force": "push",
+   "mechanic": "compound"
+  },
+  {
+   "id": "pt_Horizontal_Leg_Press",
+   "en": "Seated Horizontal Leg Press",
+   "ar": "ليج برس قاعد (أفقي)",
+   "primary": [
+    "quads"
+   ],
+   "secondary": [
+    "glutes",
+    "hamstrings"
+   ],
+   "equipment": "machine",
+   "level": "beginner",
+   "category": "strength",
+   "force": "push",
+   "mechanic": "compound"
+  },
+  {
+   "id": "pt_Smith_Machine_Lunge",
+   "en": "Smith Machine Lunge",
+   "ar": "لانجز على السميث",
+   "primary": [
+    "quads"
+   ],
+   "secondary": [
+    "glutes",
+    "hamstrings"
+   ],
+   "equipment": "machine",
+   "level": "beginner",
+   "category": "strength",
+   "force": "push",
+   "mechanic": "compound"
+  },
+  {
+   "id": "pt_Dumbbell_Bulgarian_Split_Squat",
+   "en": "Dumbbell Bulgarian Split Squat",
+   "ar": "بلغاري سبليت سكوات بالدامبل",
+   "primary": [
+    "quads"
+   ],
+   "secondary": [
+    "glutes",
+    "hamstrings"
+   ],
+   "equipment": "dumbbell",
+   "level": "intermediate",
+   "category": "strength",
+   "force": "push",
+   "mechanic": "compound",
+   "popular": true
+  },
+  {
+   "id": "pt_Dumbbell_Hip_Thrust",
+   "en": "Dumbbell Hip Thrust",
+   "ar": "هيب ثرست بالدامبل",
+   "primary": [
+    "glutes"
+   ],
+   "secondary": [
+    "hamstrings"
+   ],
+   "equipment": "dumbbell",
+   "level": "beginner",
+   "category": "strength",
+   "force": "push",
+   "mechanic": "compound"
+  },
+  {
+   "id": "pt_Smith_Machine_Hip_Thrust",
+   "en": "Smith Machine Hip Thrust",
+   "ar": "هيب ثرست على السميث (ضهرك على البنش)",
+   "primary": [
+    "glutes"
+   ],
+   "secondary": [
+    "hamstrings"
+   ],
+   "equipment": "machine",
+   "level": "intermediate",
+   "category": "strength",
+   "force": "push",
+   "mechanic": "compound"
+  },
+  {
+   "id": "pt_Machine_Lat_Pulldown",
+   "en": "Plate-Loaded Lat Pulldown Machine",
+   "ar": "لات بول داون على الماشين (هامر)",
+   "primary": [
+    "lats"
+   ],
+   "secondary": [
+    "biceps",
+    "middle_back"
+   ],
+   "equipment": "machine",
+   "level": "beginner",
+   "category": "strength",
+   "force": "pull",
+   "mechanic": "compound"
+  },
+  {
+   "id": "pt_Seated_Machine_Row",
+   "en": "Seated Machine Row",
+   "ar": "سيتد رو على الماشين",
+   "primary": [
+    "middle_back"
+   ],
+   "secondary": [
+    "lats",
+    "biceps"
+   ],
+   "equipment": "machine",
+   "level": "beginner",
+   "category": "strength",
+   "force": "pull",
+   "mechanic": "compound",
+   "popular": true
+  },
+  {
+   "id": "pt_Assisted_Pull_Up_Machine",
+   "en": "Assisted Pull-Up Machine",
+   "ar": "عقلة على الماشين المساعدة",
+   "primary": [
+    "lats"
+   ],
+   "secondary": [
+    "biceps",
+    "middle_back"
+   ],
+   "equipment": "machine",
+   "level": "beginner",
+   "category": "strength",
+   "force": "pull",
+   "mechanic": "compound"
+  },
+  {
+   "id": "pt_Machine_Lateral_Raise",
+   "en": "Machine Lateral Raise",
+   "ar": "لاتيرال رايز على الماشين",
+   "primary": [
+    "shoulders"
+   ],
+   "secondary": [],
+   "equipment": "machine",
+   "level": "beginner",
+   "category": "strength",
+   "force": "push",
+   "mechanic": "isolation"
+  },
+  {
+   "id": "pt_Cable_Lateral_Raise",
+   "en": "Single-Arm Cable Lateral Raise",
+   "ar": "لاتيرال رايز على الكابل بإيد واحدة (من جنب)",
+   "primary": [
+    "shoulders"
+   ],
+   "secondary": [
+    "traps"
+   ],
+   "equipment": "cable",
+   "level": "beginner",
+   "category": "strength",
+   "force": "push",
+   "mechanic": "isolation",
+   "popular": true
+  },
+  {
+   "id": "pt_Cable_Triceps_Kickback",
+   "en": "Cable Triceps Kickback",
+   "ar": "ترايسبس كيك باك على الكابل",
+   "primary": [
+    "triceps"
+   ],
+   "secondary": [],
+   "equipment": "cable",
+   "level": "beginner",
+   "category": "strength",
+   "force": "push",
+   "mechanic": "isolation"
+  },
+  {
+   "id": "pt_Cable_Bar_Curl",
+   "en": "Cable Straight Bar Curl",
+   "ar": "بايسبس كيرل على الكابل بالبار",
+   "primary": [
+    "biceps"
+   ],
+   "secondary": [
+    "forearms"
+   ],
+   "equipment": "cable",
+   "level": "beginner",
+   "category": "strength",
+   "force": "pull",
+   "mechanic": "isolation"
+  },
+  {
+   "id": "pt_Smith_Machine_Shrug",
+   "en": "Smith Machine Shrug",
+   "ar": "شراج على السميث",
+   "primary": [
+    "traps"
+   ],
+   "secondary": [
+    "forearms"
+   ],
+   "equipment": "machine",
+   "level": "beginner",
+   "category": "strength",
+   "force": "pull",
+   "mechanic": "isolation"
+  },
+  {
+   "id": "pt_Kettlebell_Swing",
+   "en": "Two-Arm Kettlebell Swing",
+   "ar": "كيتل بل سوينج بالإيدين",
+   "primary": [
+    "glutes"
+   ],
+   "secondary": [
+    "hamstrings",
+    "lower_back",
+    "shoulders"
+   ],
+   "equipment": "kettlebell",
+   "level": "intermediate",
+   "category": "strength",
+   "force": "push",
+   "mechanic": "compound"
+  },
+  {
+   "id": "pt_Incline_Treadmill_Walk",
+   "en": "Incline Treadmill Walk",
+   "ar": "مشي على التريدميل بميل",
+   "primary": [
+    "quads"
+   ],
+   "secondary": [
+    "glutes",
+    "calves",
+    "hamstrings"
+   ],
+   "equipment": "other",
+   "level": "beginner",
+   "category": "cardio",
+   "force": null,
+   "mechanic": null,
+   "imagesFrom": "Walking_Treadmill",
+   "popular": true
+  },
+  {
+   "id": "pt_Burpee",
+   "en": "Burpee",
+   "ar": "بيربي",
+   "primary": [
+    "quads"
+   ],
+   "secondary": [
+    "chest",
+    "shoulders",
+    "triceps",
+    "abs"
+   ],
+   "equipment": "body_only",
+   "level": "intermediate",
+   "category": "cardio",
+   "force": null,
+   "mechanic": "compound"
+  },
+  {
+   "id": "pt_Jumping_Jacks",
+   "en": "Jumping Jacks",
+   "ar": "جامبينج جاكس",
+   "primary": [
+    "shoulders"
+   ],
+   "secondary": [
+    "calves",
+    "quads",
+    "abductors"
+   ],
+   "equipment": "body_only",
+   "level": "beginner",
+   "category": "cardio",
+   "force": null,
+   "mechanic": "compound"
+  },
+  {
+   "id": "pt_High_Knees",
+   "en": "High Knees",
+   "ar": "هاي نيز (جري في المكان)",
+   "primary": [
+    "hip_flexors"
+   ],
+   "secondary": [
+    "quads",
+    "calves",
+    "abs"
+   ],
+   "equipment": "body_only",
+   "level": "beginner",
+   "category": "cardio",
+   "force": null,
+   "mechanic": "compound"
+  },
+  {
+   "id": "pt_Knee_Push_Up",
+   "en": "Knee Push-Up",
+   "ar": "بوش أب على الركب",
+   "primary": [
+    "chest"
+   ],
+   "secondary": [
+    "triceps",
+    "shoulders"
+   ],
+   "equipment": "body_only",
+   "level": "beginner",
+   "category": "strength",
+   "force": "push",
+   "mechanic": "compound"
+  },
+  {
+   "id": "pt_Fire_Hydrant",
+   "en": "Fire Hydrant",
+   "ar": "فاير هايدرانت",
+   "primary": [
+    "abductors"
+   ],
+   "secondary": [
+    "glutes"
+   ],
+   "equipment": "body_only",
+   "level": "beginner",
+   "category": "strength",
+   "force": "push",
+   "mechanic": "isolation"
+  },
+  {
+   "id": "pt_Banded_Glute_Bridge",
+   "en": "Banded Glute Bridge",
+   "ar": "جلوت بريدج بالباند",
+   "primary": [
+    "glutes"
+   ],
+   "secondary": [
+    "abductors",
+    "hamstrings"
+   ],
+   "equipment": "bands",
+   "level": "beginner",
+   "category": "strength",
+   "force": "push",
+   "mechanic": "isolation"
+  },
+  {
+   "id": "pt_Banded_Lateral_Walk",
+   "en": "Banded Lateral Walk",
+   "ar": "لاتيرال ووك بالباند (مشي جانبي)",
+   "primary": [
+    "abductors"
+   ],
+   "secondary": [
+    "glutes"
+   ],
+   "equipment": "bands",
+   "level": "beginner",
+   "category": "strength",
+   "force": "push",
+   "mechanic": "isolation"
+  },
+  {
+   "id": "pt_Cable_Upright_Kickback",
+   "en": "Standing Cable Glute Kickback",
+   "ar": "جلوت كيك باك على الكابل واقف",
+   "primary": [
+    "glutes"
+   ],
+   "secondary": [
+    "hamstrings"
+   ],
+   "equipment": "cable",
+   "level": "beginner",
+   "category": "strength",
+   "force": "push",
+   "mechanic": "isolation"
+  },
+  {
+   "id": "pt_Leg_Press_Single_Leg",
+   "en": "Single-Leg Leg Press",
+   "ar": "ليج برس برجل واحدة",
+   "primary": [
+    "quads"
+   ],
+   "secondary": [
+    "glutes",
+    "hamstrings"
+   ],
+   "equipment": "machine",
+   "level": "intermediate",
+   "category": "strength",
+   "force": "push",
+   "mechanic": "compound"
+  },
+  {
+   "id": "pt_Smith_Machine_Front_Squat",
+   "en": "Smith Machine Front Squat",
+   "ar": "فرونت سكوات على السميث",
+   "primary": [
+    "quads"
+   ],
+   "secondary": [
+    "glutes",
+    "abs"
+   ],
+   "equipment": "machine",
+   "level": "intermediate",
+   "category": "strength",
+   "force": "push",
+   "mechanic": "compound"
+  },
+  {
+   "id": "pt_Dumbbell_Pullover_Machine",
+   "en": "Pullover Machine",
+   "ar": "بول أوفر على الماشين",
+   "primary": [
+    "lats"
+   ],
+   "secondary": [
+    "chest",
+    "triceps"
+   ],
+   "equipment": "machine",
+   "level": "beginner",
+   "category": "strength",
+   "force": "pull",
+   "mechanic": "isolation"
+  }
+ ]
+}

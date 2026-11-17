@@ -41,14 +41,62 @@ async function svgToPng(svg: string): Promise<string | null> {
   }
 }
 
-/** PNG muscle maps (one per exercise) for the PDF's "خريطة العضلات" next to each exercise. */
-export async function muscleMapRefs(exercises: readonly CatalogExercise[], brand: string): Promise<Map<string, PdfImageRef>> {
+/** Most distinct 3D snapshots per PDF (each is two offscreen WebGL renders); the rest use the 2D map. */
+const MAX_3D_SNAPSHOTS = 24;
+
+/**
+ * The 3D model, front and back side by side on white, as a PNG data URL (spec: "لقطة ثابتة من الـ 3D جنب
+ * التمرين"). Rejects when WebGL or the model is unavailable.
+ */
+async function model3dPng(intensities: MuscleIntensities, palette: MuscleMapPalette): Promise<string> {
+  const w = 256;
+  const h = 512;
+  // Loaded on demand: three.js only when a PDF with muscle pictures is made.
+  const { snapshot } = await import('@/services/model3d');
+  const [front, back] = [await snapshot(intensities, 'front', { width: w, height: h, palette }), await snapshot(intensities, 'back', { width: w, height: h, palette })];
+  const canvas = document.createElement('canvas');
+  canvas.width = w * 2;
+  canvas.height = h;
+  const ctx = canvas.getContext('2d');
+  if (!ctx) throw new Error('no 2d context');
+  ctx.fillStyle = '#ffffff';
+  ctx.fillRect(0, 0, canvas.width, canvas.height);
+  for (const [i, blob] of [front, back].entries()) {
+    const bitmap = await createImageBitmap(blob);
+    ctx.drawImage(bitmap, i * w, 0, w, h);
+    bitmap.close();
+  }
+  const url = canvas.toDataURL('image/png');
+  canvas.width = 0;
+  canvas.height = 0;
+  return url;
+}
+
+/**
+ * Muscle pictures (one per exercise) for the PDF next to each exercise: a still of the 3D model with the
+ * targeted groups coloured; the 2D body map when WebGL/the model is unavailable or after MAX_3D_SNAPSHOTS.
+ */
+export async function muscleMapRefs(exercises: readonly CatalogExercise[], brand: string, use3d = true): Promise<Map<string, PdfImageRef>> {
   const palette: MuscleMapPalette = { base: '#e5e5ea', off: '#d1d1d6', hit: brand };
   const out = new Map<string, PdfImageRef>();
   const cache = new Map<string, string | null>();
+  let can3d = use3d;
+  let shots = 0;
   for (const e of exercises) {
-    const svg = muscleMapSvg(intensitiesFromLoad(muscleLoadForExercise(e)), palette);
-    if (!cache.has(svg)) cache.set(svg, await svgToPng(svg));
+    const intensities = intensitiesFromLoad(muscleLoadForExercise(e));
+    const svg = muscleMapSvg(intensities, palette);
+    if (!cache.has(svg)) {
+      let url: string | null = null;
+      if (can3d && shots < MAX_3D_SNAPSHOTS) {
+        try {
+          url = await model3dPng(intensities, palette);
+          shots++;
+        } catch {
+          can3d = false; // no WebGL here: every picture uses the 2D map
+        }
+      }
+      cache.set(svg, url ?? (await svgToPng(svg)));
+    }
     const url = cache.get(svg);
     if (url) out.set(e.id, { kind: 'url', url });
   }

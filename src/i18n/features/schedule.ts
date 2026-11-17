@@ -20,6 +20,7 @@ export const schedule = {
   searchLabel: 'دوّر في الحصص الجاية',
   searchPlaceholder: 'دوّر باسم العميل',
   searchResults: 'الحصص الجاية',
+  moreResults: 'و{n} حصة كمان. اكتب اسم أوضح عشان تلاقيها.',
   noResultsTitle: 'مفيش حصص جاية بالاسم ده',
   noResultsBody: 'جرّب جزء من الاسم، أو احجز له حصة جديدة.',
   emptyDayTitle: 'اليوم ده فاضي',
@@ -105,6 +106,8 @@ export const schedule = {
     delete: 'احذف الحصة',
     deleteSeries: 'احذف الحصص الجاية',
     addToCalendar: 'أضف للتقويم',
+    addToGoogle: 'أضف لتقويم جوجل',
+    downloadIcs: 'نزّل ملف التقويم',
     invalid: 'راجع اليوم والساعة.',
     errors: {
       invalid_date: 'التاريخ مش مظبوط.',
@@ -131,7 +134,6 @@ export const schedule = {
   calendar: {
     summary: 'حصة {name}',
     description: 'حصة تدريب مع {name}',
-    fileName: 'حصة {name}',
     calendarName: 'حصص التدريب',
   },
   reminders: {
@@ -148,6 +150,11 @@ export const schedule = {
     alarmMinutes: 'قبلها بـ {n} دقيقة',
     alarmHour: 'قبلها بساعة',
     alarmHours: 'قبلها بـ {n} ساعات',
+    noShowRule: 'لو غاب من غير ما يعتذر',
+    lateCancelRule: 'لو اعتذر متأخر',
+    usesSession: 'تتحسب من الباقة',
+    freeSession: 'ما تتحسبش',
+    rulesHint: 'الحضور دايماً بيتحسب من الباقة. القاعدة بتتطبّق على اللي هتسجّله من دلوقتي.',
     saved: 'اتحفظت إعدادات المواعيد',
   },
   pkg: {
@@ -197,6 +204,9 @@ export const schedule = {
     deleted: 'اتحذفت الدفعة',
     delete: 'احذف الدفعة',
     deleteNamed: 'حذف دفعة {amount}',
+    partialHint: 'دفعة جزئية: الباقي {amount} هيفضل مستحق عليه.',
+    savedPartial: 'اتسجل {paid}، وباقي عليه {rest}',
+    balance: 'باقي عليه {amount}',
     methods: {
       cash: 'كاش',
       instapay: 'إنستاباي',
@@ -211,6 +221,7 @@ export const schedule = {
     prevMonth: 'الشهر اللي فات',
     nextMonth: 'الشهر الجاي',
     paid: 'اتدفع الشهر ده',
+    paidIn: 'اتدفع في {month}',
     paidOf: 'من {amount} متوقع',
     expected: 'المتوقع',
     expectedHint: 'المدفوع + المستحق + التجديدات',

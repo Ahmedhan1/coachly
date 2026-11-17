@@ -237,7 +237,7 @@ describe('viewer page /c/:shareId', () => {
     expect(html).toContain(`<script nonce="${nonce}">`);
     expect(html).toContain(`data-share="${shareId}"`);
     expect(html).toContain('data-img="https://app.example/exercise-pack/img/"');
-    expect(html).not.toMatch(/<script[^>]+src=|<link[^>]+href=|@import|https?:\/\/(?!app\.example)[a-z]/i);
+    expect(html).not.toMatch(/<script[^>]+src=|<link[^>]+href=|@import|https?:\/\/(?!app\.example|www\.w3\.org\/2000\/svg')[a-z]/i); // the SVG namespace is an identifier, not a request
 
     const second = await h.send(`/c/${shareId}`);
     expect(second.headers.get('Content-Security-Policy')).not.toBe(csp); // fresh nonce per response
@@ -264,9 +264,21 @@ describe('share document guard', () => {
       { ...SAMPLE_DOCUMENT, days: [{ title: 'd', exercises: [{ name: 'x', rpe: 11 }] }] },
       { ...SAMPLE_DOCUMENT, client: { firstName: 'x'.repeat(41) } },
       { ...SAMPLE_DOCUMENT, checkinsEnabled: 'yes' },
+      { ...SAMPLE_DOCUMENT, progress: [{ key: 'iq', points: [] }] },
+      { ...SAMPLE_DOCUMENT, progress: [{ key: 'weight', points: [{ d: 'yesterday', v: 70 }] }] },
+      { ...SAMPLE_DOCUMENT, days: [{ title: 'd', exercises: [{ name: 'x', image2: '../x' }] }] },
+      { ...SAMPLE_DOCUMENT, mealDays: [{ title: 'd', meals: [{ title: '', items: [] }] }] },
+      { ...SAMPLE_DOCUMENT, sessions: [{ at: 'soon', durationMin: 60 }] },
+      { ...SAMPLE_DOCUMENT, package: { left: 1 } },
+      { ...SAMPLE_DOCUMENT, nextDay: 99 },
     ];
+    const { goal: _g, targets: _t, mealDays: _m, progress: _p, records: _r, sessions: _s, package: _k, attended: _a, nextDay: _n, ...minimal } = SAMPLE_DOCUMENT;
+    expect(parseShareDocument(minimal)).toEqual(minimal); // older apps send only the original fields
     for (const doc of bad) expect(parseShareDocument(doc)).toBeNull();
     expect(parseCheckinDocument({ v: 1, kind: 'checkin', createdAt: 1, photo: 'data:image/png;base64,AAAA' })).toBeNull();
     expect(parseCheckinDocument({ v: 1, kind: 'checkin', createdAt: 1, weightKg: 80, photo: 'data:image/jpeg;base64,AAAA' })).not.toBeNull();
+    expect(parseCheckinDocument({ v: 1, kind: 'checkin', createdAt: 1, photos: ['data:image/jpeg;base64,AAAA'], hipCm: 95, armCm: 32 })).not.toBeNull();
+    expect(parseCheckinDocument({ v: 1, kind: 'checkin', createdAt: 1, photos: ['data:image/png;base64,AAAA'] })).toBeNull();
+    expect(parseCheckinDocument({ v: 1, kind: 'checkin', createdAt: 1, armCm: 500 })).toBeNull();
   });
 });

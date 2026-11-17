@@ -49,6 +49,12 @@ export class FakeBackupService implements BackupService {
     return file.type === 'application/octet-stream' ? 'encrypted' : 'zip';
   }
 
+  verifyResult: Result<ImportSummary, ImportError> | null = null;
+
+  async verifyFile(): Promise<Result<ImportSummary, ImportError>> {
+    return this.verifyResult ?? this.importResult;
+  }
+
   async importFile(file: Blob, options: ImportOptions = {}): Promise<Result<ImportSummary, ImportError>> {
     this.imported.push(file);
     if (options.signal?.aborted) return err('cancelled');

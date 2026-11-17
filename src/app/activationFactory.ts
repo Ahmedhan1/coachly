@@ -4,6 +4,7 @@ import type { ActivationService } from '@/services/activation/types';
 import { LicenseActivationService } from '@/services/license/licenseActivationService';
 import { dexieMetaStore } from '@/services/license/metaStore';
 import { embeddedPublicKey, parsePublicKey } from '@/services/license/publicKey';
+import { resolveWorkerUrl } from '@/services/license/serverConfig';
 
 export interface ActivationEnv {
   e2e: boolean;
@@ -16,7 +17,8 @@ export const buildEnv: ActivationEnv = {
   e2e: import.meta.env.VITE_E2E === '1',
   dev: import.meta.env.DEV,
   fakeInDev: import.meta.env.VITE_FAKE_ACTIVATION === '1',
-  workerUrl: import.meta.env.VITE_WORKER_URL || undefined,
+  // Always a real address in production: the committed default unless the build overrides it.
+  workerUrl: import.meta.env.VITE_E2E === '1' ? import.meta.env.VITE_WORKER_URL || undefined : resolveWorkerUrl(import.meta.env.VITE_WORKER_URL),
 };
 
 const E2E_KEY_STORAGE = 'pt-coach.e2e-license-key';

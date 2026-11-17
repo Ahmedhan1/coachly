@@ -7,6 +7,7 @@ import { Button, Icon, Sheet, TextArea, TextField } from '@/ui';
 import { parseDecimal } from '../shared/numbers';
 import { storePhoto } from '../shared/photos';
 import { StoredImage } from '../shared/StoredImage';
+import { useNutritionStore } from '../shared/useNutritionStore';
 import common from '../shared/common.module.css';
 import styles from './Progress.module.css';
 
@@ -34,7 +35,10 @@ export function EntrySheet({ clientId, entry, onClose }: { clientId: string; ent
     return Object.fromEntries(FIELDS.map(([k]) => [k, m[k] !== undefined ? String(m[k]) : ''])) as Record<Key, string>;
   });
   const [notes, setNotes] = useState(entry?.notes ?? '');
+  const store = useNutritionStore();
   const [photos, setPhotos] = useState<string[]>(entry?.photoIds ?? []);
+  /** Full image id → its small thumbnail, so long lists never decode 1200 px photos. */
+  const [thumbs, setThumbs] = useState<Record<string, string>>({});
   const [error, setError] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
 
@@ -51,8 +55,13 @@ export function EntrySheet({ clientId, entry, onClose }: { clientId: string; ent
     if (Object.keys(measurements).length === 0 && photos.length === 0 && !notes.trim()) return setError(t('nutrition.progress.emptyEntry'));
     const body = { clientId: clientId as ClientId, date, measurements, photoIds: photos as ImageId[], notes: notes.trim(), source: entry?.source ?? ('trainer' as const) };
     try {
-      if (entry) await repos.progress.update(entry.id, body);
-      else await repos.progress.create(body);
+      const saved = entry ? await repos.progress.update(entry.id, body) : await repos.progress.create(body);
+      const known = new Map((await store.getEntryPhotos(saved.id)).map((p) => [p.imageId, p]));
+      const details = photos.flatMap((id) => {
+        const thumbId = thumbs[id] ?? known.get(id)?.thumbId;
+        return thumbId ? [{ imageId: id, thumbId, pose: known.get(id)?.pose ?? ('front' as const) }] : [];
+      });
+      await store.setEntryPhotos(saved.id, details).catch(() => undefined);
     } catch {
       return setError(t('nutrition.progress.invalid'));
     }
@@ -127,6 +136,7 @@ export function EntrySheet({ clientId, entry, onClose }: { clientId: string; ent
                       for (const f of files) {
                         const stored = await storePhoto(services, f);
                         setPhotos((p) => [...p, stored.imageId]);
+                        setThumbs((m) => ({ ...m, [stored.imageId]: stored.thumbId }));
                       }
                     } finally {
                       setBusy(false);

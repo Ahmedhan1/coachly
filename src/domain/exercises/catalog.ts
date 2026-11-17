@@ -10,7 +10,7 @@ const unique = (ids: readonly MuscleGroupId[]): MuscleGroupId[] => [...new Set(i
 export function catalogFromPack(pack: ExercisePack, packUrl: string): CatalogExercise[] {
   const folder = packUrl === '' || packUrl.endsWith('/') ? packUrl : `${packUrl}/`;
   const base = `${folder}${pack.image.base}`;
-  return pack.exercises.map((e) => ({
+  const list = pack.exercises.map((e): CatalogExercise => ({
     id: e.id,
     nameEn: e.en,
     nameAr: e.ar,
@@ -23,7 +23,17 @@ export function catalogFromPack(pack: ExercisePack, packUrl: string): CatalogExe
     mechanic: e.mechanic,
     images: e.images.map((file): ExerciseImage => ({ kind: 'pack', path: `${base}${file}` })),
     isCustom: false,
+    ...(e.popular !== undefined ? { popularRank: e.popular } : {}),
   }));
+  return popularFirst(list);
+}
+
+/** «الأشهر» first (by rank), everything else after in its original order. Stable; does not mutate. */
+export function popularFirst<T extends { popularRank?: number }>(list: readonly T[]): T[] {
+  return list
+    .map((item, index) => ({ item, index, rank: item.popularRank ?? Number.POSITIVE_INFINITY }))
+    .sort((a, b) => a.rank - b.rank || a.index - b.index)
+    .map((r) => r.item);
 }
 
 const stored = (ids: readonly string[]): ExerciseImage[] => ids.map((imageId) => ({ kind: 'stored', imageId }));

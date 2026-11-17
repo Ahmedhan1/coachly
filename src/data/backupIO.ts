@@ -1,6 +1,7 @@
 import Dexie, { type Table } from 'dexie';
 import { AppDatabase, type ImageRecord, type MetaRecord } from './db';
 import { MIGRATIONS, TABLES, type Migration } from './schema';
+import { categoryForSource, collectImageRefs, ORPHAN_GRACE_MS, type StorageCategory, type StoredImageInfo } from '@/domain/backup';
 
 /**
  * Whole-database read/write used by backup export and restore. Kept in the data layer so services never
@@ -29,7 +30,8 @@ export async function readTableRows(db: AppDatabase, name: string): Promise<unkn
 /**
  * Consistent snapshot of every row table plus the list of image ids, read in ONE read-only transaction so
  * an edit made during export cannot produce a half-old, half-new backup. Image Blobs are read afterwards
- * with `readImage` (images are only ever added or deleted, never changed in place).
+ * with `readImage`; each file's checksum is taken from the bytes actually written, so an image re-compressed
+ * in place meanwhile still yields a consistent archive.
  */
 export async function snapshotTables(db: AppDatabase): Promise<{ tables: Record<string, unknown[]>; imageIds: string[] }> {
   return db.transaction('r', db.tables, async () => {
@@ -167,4 +169,80 @@ export async function migrateRows(
     upgraded.close();
     await upgraded.delete().catch(() => undefined);
   }
+}
+
+/* ---------- On-device storage report and safe cleanup (Settings → storage card) ---------- */
+
+/** Every stored image's metadata (no Blob) and which part of the app references it. */
+export async function readImageOwners(db: AppDatabase): Promise<{
+  images: StoredImageInfo[];
+  owners: Map<string, StorageCategory>;
+  clientCount: number;
+}> {
+  const images: StoredImageInfo[] = [];
+  await db.images.each((img) => {
+    images.push({ id: img.id, mime: img.mime, bytes: img.bytes, width: img.width, height: img.height, createdAt: img.createdAt });
+  });
+  const owners = await scanImageOwners(db, new Set(images.map((i) => i.id)));
+  const clientCount = await db.clients.filter((c) => !(c as { deletedAt?: unknown }).deletedAt).count();
+  return { images, owners, clientCount };
+}
+
+/** Scans every row of every table (soft-deleted rows included, so an undo never loses its photo). */
+async function scanImageOwners(db: AppDatabase, ids: ReadonlySet<string>): Promise<Map<string, StorageCategory>> {
+  const owners = new Map<string, StorageCategory>();
+  if (ids.size === 0) return owners;
+  for (const table of db.tables) {
+    if (table.name === TABLES.images || table.name === TABLES.deletions) continue;
+    await table.each((row: unknown) => {
+      const found = new Set<string>();
+      collectImageRefs(row, ids, found);
+      if (found.size === 0) return;
+      const key = table.name === TABLES.meta ? String((row as MetaRecord).key) : undefined;
+      const category = categoryForSource(table.name, key);
+      for (const id of found) {
+        const prev = owners.get(id);
+        if (prev === undefined || prev === 'other') owners.set(id, category);
+      }
+    });
+  }
+  return owners;
+}
+
+/**
+ * Deletes the given images only if, re-checked inside one transaction over every table, nothing references
+ * them and they are older than the grace period. Returns the bytes freed.
+ */
+export async function deleteUnreferencedImages(db: AppDatabase, ids: readonly string[], now: Date): Promise<{ deleted: number; bytes: number }> {
+  return db.transaction('rw', db.tables, async () => {
+    const candidates = new Set(ids);
+    const owners = await scanImageOwners(db, candidates);
+    let deleted = 0;
+    let bytes = 0;
+    for (const id of candidates) {
+      if (owners.has(id)) continue;
+      const img = await db.images.get(id);
+      if (!img || now.getTime() - img.createdAt < ORPHAN_GRACE_MS) continue;
+      await db.images.delete(id);
+      deleted += 1;
+      bytes += img.bytes;
+    }
+    return { deleted, bytes };
+  });
+}
+
+/** Replaces one image's Blob in place (same id, so every reference keeps working). No-op if it is gone. */
+export async function replaceImageBlob(db: AppDatabase, id: string, image: { blob: Blob; width: number; height: number }): Promise<boolean> {
+  return db.transaction('rw', db.images, async () => {
+    const current = await db.images.get(id);
+    if (!current) return false;
+    const mime = image.blob.type as ImageRecord['mime'];
+    await db.images.put({ ...current, blob: image.blob, mime, width: image.width, height: image.height, bytes: image.blob.size });
+    return true;
+  });
+}
+
+/** Reads one image Blob (for re-compression). */
+export async function readImageBlob(db: AppDatabase, id: string): Promise<Blob | undefined> {
+  return (await db.images.get(id))?.blob;
 }

@@ -380,12 +380,14 @@
 
 .pair {
   display: grid;
-  grid-template-columns: 1.3fr 1fr;
+  grid-template-columns: minmax(0, 1.3fr) minmax(0, 1fr);
   gap: var(--sp-3);
 }
 
+.pair > *,
 .pair input {
   min-inline-size: 0;
+  max-inline-size: 100%;
 }
 
 .picker {
@@ -429,6 +431,9 @@
 .clientList {
   display: flex;
   flex-direction: column;
+  margin: 0;
+  padding: 0;
+  list-style: none;
   border-radius: var(--r-md);
   overflow: hidden;
   background: var(--field-bg, var(--surface-2));
@@ -575,4 +580,25 @@
 .remindersHint {
   color: var(--text-2);
   font: var(--t-sub);
+}
+
+.prefsHint {
+  margin: 0;
+  font: var(--t-sub);
+  color: var(--text-2);
+}
+
+/* An <a> that looks like a secondary Button (Google Calendar link on Android). */
+.linkButton {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--sp-2);
+  min-block-size: var(--field-h);
+  padding-inline: var(--sp-5);
+  border-radius: var(--r-md);
+  background: var(--surface-2);
+  color: var(--text);
+  font: 600 16px/1.2 var(--font-ui);
+  text-decoration: none;
 }
