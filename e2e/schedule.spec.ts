@@ -198,3 +198,15 @@ test('200 clients and 2,000 sessions: lists stay usable (long tasks under 4× CP
   expect(clientsMax).toBeLessThan(400);
   expect(scheduleMax).toBeLessThan(400);
 });
+
+test('"/clients/:id?renew=1" (Home «جدّد») renews once on arrival with undo', async ({ page }) => {
+  await openApp(page, '/clients');
+  await page.getByRole('link', { name: /منى حسن/ }).click();
+  await expect(page.getByRole('heading', { level: 1, name: 'منى حسن' })).toBeVisible();
+  const url = page.url().split('?')[0] ?? '';
+  await page.goto(`${url}?renew=1&standalone=1`);
+  await expect(toast(page)).toContainText('منى حسن');
+  await expect(page.getByRole('heading', { name: /باقي 8 من 8 حصة/ })).toBeVisible();
+  await toast(page).getByRole('button', { name: 'تراجع' }).click();
+  await expect(page.getByRole('heading', { name: /باقي 0 من 8 حصة/ })).toBeVisible();
+});

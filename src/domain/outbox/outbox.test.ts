@@ -36,6 +36,11 @@ describe('buildOutbox', () => {
     expect(items.find((i) => i.kind === 'payment_due')?.amountMinor).toBe(150000);
   });
 
+  it('a payment due today is not late yet (matches the income screen)', () => {
+    const items = buildOutbox(base({ payments: [{ id: 'p1', clientId: 'c1', status: 'due', dueOn: '2026-11-16', amountMinor: 1000 }] }));
+    expect(items.some((i) => i.kind === 'payment_due')).toBe(false);
+  });
+
   it('renewal by low sessions reports sessions left; demo clients are not welcomed', () => {
     const items = buildOutbox(base({ clients: [client({ remainingSessions: 1 }), client({ id: 'd', createdOn: '2026-11-16', isDemo: true })], lastCheckIn: new Map([['c1', '2026-11-15'], ['d', '2026-11-15']]) }));
     expect(items).toEqual([{ id: 'renewal:c1:2026-12-30', kind: 'renewal', clientId: 'c1', sessionsLeft: 1 }]);

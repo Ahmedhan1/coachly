@@ -75,7 +75,7 @@ export function buildOutbox(input: OutboxInput): OutboxItem[] {
   if (on('payment_due')) {
     const dueByClient = new Map<string, { amount: number; oldest: string; ids: string[] }>();
     for (const p of input.payments) {
-      if (p.status !== 'due' || !p.dueOn || p.dueOn > input.today || !byId.has(p.clientId)) continue;
+      if (p.status !== 'due' || !p.dueOn || p.dueOn >= input.today || !byId.has(p.clientId)) continue;
       const prev = dueByClient.get(p.clientId) ?? { amount: 0, oldest: p.dueOn, ids: [] };
       dueByClient.set(p.clientId, { amount: prev.amount + p.amountMinor, oldest: p.dueOn < prev.oldest ? p.dueOn : prev.oldest, ids: [...prev.ids, p.id] });
     }

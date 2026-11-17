@@ -219,7 +219,7 @@ function EndingSoon({ home }: { home: HomeData }) {
                 size="small"
                 variant={hot ? 'primary' : 'secondary'}
                 aria-label={t('home.renewFor', { name: client.name })}
-                onClick={() => navigate(`/clients/${client.id}`)}
+                onClick={() => navigate(`/clients/${client.id}?renew=1`)}
               >
                 {t('home.renew')}
               </Button>
