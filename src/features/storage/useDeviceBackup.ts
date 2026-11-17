@@ -1,4 +1,4 @@
-import { useCallback, useMemo, useRef, useState } from 'react';
+import { useCallback, useMemo, useState } from 'react';
 import { useServices } from '@/app/services';
 import { useUiStore } from '@/app/uiStore';
 import { needsSaveConfirmation, shouldRecordSave } from '@/domain/backup';
@@ -45,7 +45,6 @@ export function useDeviceBackup(options: { saver?: DeviceFileSaver; onSaved?: ()
   const showToast = useUiStore((s) => s.showToast);
   const saver = useMemo(() => options.saver ?? new BrowserDeviceFileSaver(), [options.saver]);
   const [state, setState] = useState<DeviceBackupState>({ kind: 'idle' });
-  const passwordRef = useRef<string | null>(null);
   const onSaved = options.onSaved;
 
   const record = useCallback(
@@ -82,7 +81,6 @@ export function useDeviceBackup(options: { saver?: DeviceFileSaver; onSaved?: ()
   const run = useCallback(
     async (password: string | null) => {
       if (!backup) return;
-      passwordRef.current = password;
       setState({ kind: 'working', label: t('storage.device.preparing', { percent: 0 }) });
       const onProgress = (p: BackupProgress) => setState({ kind: 'working', label: progressLabel(p) });
       const made = await backup.local.exportFile({ password, onProgress });

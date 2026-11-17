@@ -20,7 +20,7 @@ test.describe('exercise illustrations and detail extras', () => {
     await expect(page.getByRole('heading', { level: 1, name: 'فروج بامب' })).toBeVisible();
     await expect(page.locator('img[alt^="رسمة العضلات"]').first()).toBeVisible({ timeout: 30_000 });
     await expect(page.getByText('نصايح الأداء')).toBeVisible();
-    await expect(page.getByText('اعصر الجلوتس').first()).toBeVisible();
+    await expect(page.getByText('ارفع الحوض بالجلوتس').first()).toBeVisible();
     if (shot) await page.screenshot({ path: `${shot}/ex-detail-nophoto.png`, fullPage: true });
   });
 

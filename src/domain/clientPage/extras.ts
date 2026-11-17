@@ -89,3 +89,24 @@ export function shareExtras(x: ExtrasInput): Pick<ShareExtras, 'progress' | 'ses
   if (entries[0]) out.startDate = entries[0].date;
   return out;
 }
+
+/** Heaviest completed set per exercise (newest records first, at most `max`), for "أحسن أرقامك". */
+export function bestLifts(logs: readonly WorkoutLog[], name: (exerciseId: string) => string, max = 6): NonNullable<ShareExtras['records']> {
+  const best = new Map<string, { weightKg: number; reps: number; d: string }>();
+  for (const log of logs) {
+    if (log.deletedAt !== null) continue;
+    for (const ex of log.exercises) {
+      for (const set of ex.sets) {
+        if (!set.done || set.weightKg <= 0 || set.reps <= 0) continue;
+        const cur = best.get(ex.exerciseId);
+        if (!cur || set.weightKg > cur.weightKg || (set.weightKg === cur.weightKg && set.reps > cur.reps)) {
+          best.set(ex.exerciseId, { weightKg: set.weightKg, reps: set.reps, d: log.date });
+        }
+      }
+    }
+  }
+  return [...best.entries()]
+    .sort((a, b) => (a[1].d < b[1].d ? 1 : a[1].d > b[1].d ? -1 : 0))
+    .slice(0, max)
+    .map(([id, r]) => ({ name: name(id), ...r }));
+}

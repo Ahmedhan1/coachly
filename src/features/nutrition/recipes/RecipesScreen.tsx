@@ -3,12 +3,13 @@ import { useRepos } from '@/app/services';
 import { useUiStore } from '@/app/uiStore';
 import { useLive } from '@/app/useLive';
 import { searchItems } from '@/data';
+import { recipeIconHex } from '@/domain/meals';
 import type { Recipe } from '@/domain/models';
 import { t } from '@/i18n';
 import { Badge, Button, EmptyState, IconButton, ListRow, ListSection, PageHeader, SearchField, SwipeRow } from '@/ui';
 import { useRecipesWithNutrition } from '../meals/useRecipeLookup';
 import { kcalText } from '../shared/numbers';
-import { StoredImage } from '../shared/StoredImage';
+import { FoodImage } from '../shared/FoodImage';
 import { useNutritionStore, useStarterData } from '../shared/useNutritionStore';
 import { RecipeSheet } from './RecipeSheet';
 import common from '../shared/common.module.css';
@@ -21,6 +22,7 @@ export function RecipesScreen() {
   const store = useNutritionStore();
   const showToast = useUiStore((s) => s.showToast);
   const recipes = useRecipesWithNutrition();
+  const foods = useLive(() => store.getIngredients(), [store, ready]);
   const starter = useLive(() => store.getStarterRecipeIds(), [store]);
   const [query, setQuery] = useState('');
   const [editing, setEditing] = useState<Recipe | 'new' | null>(null);
@@ -66,7 +68,7 @@ export function RecipesScreen() {
           {shown.map(({ recipe, perServing }) => (
             <SwipeRow key={recipe.id} onDelete={() => void remove(recipe)} deleteLabel={t('common.delete')} deleteAccessibleLabel={t('nutrition.book.deleteLabel', { name: recipe.name })}>
               <ListRow
-                leading={<StoredImage imageId={recipe.imageId} alt="" className={styles.thumb} fallbackIcon="utensils" lazy />}
+                leading={<FoodImage imageId={recipe.imageId} icon={recipeIconHex(recipe.ingredients, foods ?? [])} className={styles.thumb} />}
                 title={recipe.name}
                 subtitle={t('nutrition.book.perServing', { kcal: kcalText(perServing.kcal) })}
                 trailing={starterSet.has(recipe.id) ? <Badge>{t('nutrition.book.starter')}</Badge> : undefined}

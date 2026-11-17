@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { buildShareDocument, parseCheckin } from './document';
-import { nextProgramDay, shareExtras } from './extras';
+import { bestLifts, nextProgramDay, shareExtras } from './extras';
 import type { MealPlan, Program, ProgressEntry, Session, WorkoutLog } from '../models';
 // The live Worker's own guard (pure TypeScript, no Worker APIs).
 import { parseShareDocument as parseWorkerDoc } from '../../../worker/src/share/document';
@@ -149,5 +149,19 @@ describe('shareExtras (progress, sessions, targets for the client page)', () => 
     expect(parseCheckin({ v: 1, kind: 'checkin', createdAt: 5, energy: 6 })).toBeNull();
     expect(parseCheckin({ v: 1, kind: 'checkin', createdAt: 5, adherence: 101 })).toBeNull();
     expect(parseCheckin({ v: 1, kind: 'checkin', createdAt: 5, hipCm: 100, photos: ['data:image/jpeg;base64,AAAA'] })).toMatchObject({ hipCm: 100, photos: ['data:image/jpeg;base64,AAAA'] });
+  });
+});
+
+describe('bestLifts', () => {
+  it('keeps the heaviest done set per exercise, newest first', () => {
+    const set = (weightKg: number, reps: number, done = true) => ({ weightKg, reps, done, rpe: null });
+    const logs = [
+      { date: '2026-10-01', deletedAt: null, exercises: [{ exerciseId: 'squat', sets: [set(60, 8), set(70, 5)] }] },
+      { date: '2026-11-01', deletedAt: null, exercises: [{ exerciseId: 'squat', sets: [set(90, 3, false)] }, { exerciseId: 'bench', sets: [set(40, 10)] }] },
+    ] as unknown as WorkoutLog[];
+    expect(bestLifts(logs, (id) => id.toUpperCase())).toEqual([
+      { name: 'BENCH', weightKg: 40, reps: 10, d: '2026-11-01' },
+      { name: 'SQUAT', weightKg: 70, reps: 5, d: '2026-10-01' },
+    ]);
   });
 });

@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useNavigate, useParams, useSearchParams } from 'react-router-dom';
-import { useRepos } from '@/app/services';
+import { useRepos, useServices } from '@/app/services';
+import { useGo } from '@/app/nav';
 import { useUiStore } from '@/app/uiStore';
 import { useLive } from '@/app/useLive';
 import type { ExerciseId, ProgramItem } from '@/domain/models';
@@ -27,6 +28,7 @@ import {
 import { t } from '@/i18n';
 import { Button, EmptyState, Icon, IconButton, PageHeader, Tx } from '@/ui';
 import { ActionSheet, type SheetAction } from './ActionSheet';
+import { markActiveProgram } from './activePrograms';
 import { DayPills, DayTile, WeekSummary } from './BuilderParts';
 import { useExerciseCatalog } from './catalog';
 import { ClientPickerSheet } from './ClientPickerSheet';
@@ -41,7 +43,7 @@ import { useProgramEditor } from './useProgramEditor';
 import { usePushedScreen } from './usePushedScreen';
 import styles from './Builder.module.css';
 
-type SheetName = null | 'add' | 'swap' | 'menu' | 'copy' | 'assign' | 'copyToClient' | 'rename' | 'renameDay';
+type SheetName = null | 'add' | 'swap' | 'menu' | 'copy' | 'assign' | 'copyToClient' | 'assignMany' | 'rename' | 'renameDay';
 
 const ERROR_KEY: Record<ProgramEditError, 'training.programs.menu.tooManyDays' | 'training.programs.menu.tooManyItems' | 'training.programs.builder.notFoundTitle'> = {
   too_many_days: 'training.programs.menu.tooManyDays',
@@ -55,6 +57,8 @@ export function ProgramBuilderScreen() {
   const [params, setParams] = useSearchParams();
   const navigate = useNavigate();
   const repos = useRepos();
+  const { meta } = useServices();
+  const go = useGo();
   const showToast = useUiStore((s) => s.showToast);
   const catalog = useExerciseCatalog();
   const { body, status, apply } = useProgramEditor(programId);
@@ -152,6 +156,7 @@ export function ProgramBuilderScreen() {
 
   const createCopy = async (copy: ProgramBody, message: string) => {
     const created = await repos.programs.create(copy);
+    if (copy.clientId) await markActiveProgram(meta, copy.clientId, created.id);
     showToast({ message, actionLabel: t('training.programs.menu.openCopy'), onAction: () => navigate(`/programs/${created.id}`) });
   };
 
@@ -164,6 +169,7 @@ export function ProgramBuilderScreen() {
       onSelect: () => setSheet('assign'),
     },
     { key: 'copyToClient', label: t('training.programs.menu.copyToClient'), icon: <Icon name="users" />, onSelect: () => setSheet('copyToClient') },
+    { key: 'assignMany', label: t('hub.assignMany.menu'), icon: <Icon name="users" />, onSelect: () => setSheet('assignMany') },
     {
       key: 'template',
       label: t('training.programs.menu.saveTemplate'),
@@ -255,6 +261,7 @@ export function ProgramBuilderScreen() {
       },
     },
     { key: 'copyToClient', label: t('training.programs.menu.copyToClient'), icon: <Icon name="users" />, onSelect: () => setSheet('copyToClient') },
+    { key: 'assignMany', label: t('hub.assignMany.menu'), icon: <Icon name="users" />, onSelect: () => setSheet('assignMany') },
     {
       key: 'template',
       label: t('training.programs.menu.saveTemplate'),
@@ -277,7 +284,15 @@ export function ProgramBuilderScreen() {
         actions={<IconButton icon="more" label={t('training.programs.builder.options')} onClick={() => setSheet('menu')} />}
         subtitle={
           <>
-            {body.isTemplate ? t('training.programs.builder.template') : (client?.name ?? t('training.programs.builder.noClient'))}
+            {body.isTemplate ? (
+              t('training.programs.builder.template')
+            ) : client ? (
+              <button type="button" className={styles.clientLink} onClick={() => go(`/clients/${client.id}`)}>
+                {client.name}
+              </button>
+            ) : (
+              t('training.programs.builder.noClient')
+            )}
             {' · '}
             <Tx k="training.programs.builder.daysPerWeek" params={{ n: body.days.length }} />
             {' · '}
@@ -404,6 +419,7 @@ export function ProgramBuilderScreen() {
         onClose={closeSheet}
         onPick={(c) => {
           apply((b) => ({ ...b, clientId: c.id, isTemplate: false }));
+          void markActiveProgram(meta, c.id, programId);
           setSheet(null);
           showToast({ message: t('training.programs.menu.assigned', { name: c.name }), duration: 2500 });
         }}
@@ -416,6 +432,22 @@ export function ProgramBuilderScreen() {
         onPick={(c) => {
           setSheet(null);
           void createCopy(copyProgramToClient(body, c.id, newLocalId), t('training.programs.menu.copiedTo', { name: c.name }));
+        }}
+      />
+      <ClientPickerSheet
+        open={sheet === 'assignMany'}
+        title={t('hub.assignMany.title')}
+        onClose={closeSheet}
+        onPick={() => undefined}
+        onPickMany={(list) => {
+          setSheet(null);
+          void (async () => {
+            for (const c of list) {
+              const created = await repos.programs.create(copyProgramToClient(body, c.id, newLocalId, t('training.programs.forClient', { name: c.name })));
+              await markActiveProgram(meta, c.id, created.id);
+            }
+            showToast({ message: t('hub.assignMany.done', { n: list.length }), duration: 3000 });
+          })();
         }}
       />
       <NameSheet

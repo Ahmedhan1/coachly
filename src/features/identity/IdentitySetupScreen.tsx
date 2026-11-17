@@ -2,6 +2,7 @@ import { useState, type FormEvent, type ReactNode } from 'react';
 import { t, type TKey } from '@/i18n';
 import { Button, IconButton, Tx } from '@/ui';
 import { useIdentityDraft, type IdentityDraft } from './identityDraft';
+import { useIconHint } from './IconHint';
 import { ColorSection, LogoSection, NameSection, UnitsSection, type SectionProps } from './IdentitySections';
 import styles from './Identity.module.css';
 
@@ -20,6 +21,7 @@ const STEPS: readonly Step[] = [
 /** First run after activation (SPEC screen 1): 4 short steps, every one skippable, all editable later. */
 export function IdentitySetupScreen({ onDone }: { onDone: () => void }) {
   const { draft, update, save } = useIdentityDraft(true);
+  const hint = useIconHint(onDone);
   const [index, setIndex] = useState(0);
   const [saving, setSaving] = useState(false);
   const step = STEPS[index] ?? STEPS[0];
@@ -28,7 +30,7 @@ export function IdentitySetupScreen({ onDone }: { onDone: () => void }) {
   const finish = async (value: IdentityDraft) => {
     setSaving(true);
     await save(value);
-    onDone();
+    if (!(await hint.afterSave())) onDone();
   };
 
   const next = (e: FormEvent) => {
@@ -73,6 +75,7 @@ export function IdentitySetupScreen({ onDone }: { onDone: () => void }) {
           </Button>
         </div>
       </form>
+      {hint.sheet}
     </main>
   );
 }

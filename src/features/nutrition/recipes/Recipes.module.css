@@ -106,3 +106,50 @@
   color: var(--text-2);
   font: var(--t-caption);
 }
+
+.hero {
+  display: grid;
+  place-items: center;
+}
+
+.heroImg {
+  inline-size: 96px;
+  block-size: 96px;
+  border-radius: var(--r-lg);
+}
+
+.heroImg img {
+  inline-size: 64px;
+  block-size: 64px;
+}
+
+.ingIcon {
+  inline-size: 36px;
+  block-size: 36px;
+  align-self: center;
+}
+
+.ingIcon img {
+  inline-size: 24px;
+  block-size: 24px;
+}
+
+.portions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--sp-2);
+}
+
+.portion {
+  min-block-size: 36px;
+  padding-inline: var(--sp-3);
+  border: 1px solid var(--line);
+  border-radius: var(--r-full);
+  background: var(--surface);
+  color: var(--text);
+  font: var(--t-caption);
+}
+
+.foodName {
+  flex: 1;
+}

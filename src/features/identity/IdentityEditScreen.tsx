@@ -4,6 +4,7 @@ import { useUiStore } from '@/app/uiStore';
 import { t, type TKey } from '@/i18n';
 import { Button, PageHeader } from '@/ui';
 import { useIdentityDraft } from './identityDraft';
+import { useIconHint } from './IconHint';
 import { ColorSection, LogoSection, NameSection, UnitsSection } from './IdentitySections';
 import styles from './Identity.module.css';
 
@@ -20,6 +21,7 @@ export function IdentityEditScreen() {
   const navigate = useNavigate();
   const showToast = useUiStore((s) => s.showToast);
   const [saving, setSaving] = useState(false);
+  const hint = useIconHint(() => navigate('/more/settings'));
   const back = { to: '/more/settings', label: t('screens.settings.title') };
   if (!draft) return <PageHeader title={t('screens.settings.identity')} back={back} />;
   return (
@@ -43,13 +45,14 @@ export function IdentityEditScreen() {
               setSaving(true);
               await save(draft);
               showToast({ message: t('screens.settings.saved') });
-              navigate('/more/settings');
+              if (!(await hint.afterSave())) navigate('/more/settings');
             }}
           >
             {t('common.save')}
           </Button>
         </div>
       </div>
+      {hint.sheet}
     </>
   );
 }

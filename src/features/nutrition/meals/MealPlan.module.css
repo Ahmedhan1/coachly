@@ -307,3 +307,13 @@
   color: #fff;
   font: 600 16px/1 var(--font-ui);
 }
+
+.itemImg {
+  inline-size: 36px;
+  block-size: 36px;
+}
+
+.itemImg img {
+  inline-size: 24px;
+  block-size: 24px;
+}

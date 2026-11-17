@@ -124,6 +124,12 @@ export const hub = {
   payments: {
     package: 'الباقة',
   },
+  assignMany: {
+    menu: 'اديه لكذا عميل',
+    title: 'اختار العملاء',
+    confirm: 'اديه لـ {n}',
+    done: 'اتعمل نسخة لـ {n} عميل وبقت البرنامج الحالي ليهم',
+  },
   followUp: {
     title: 'محتاجين متابعة',
     none: 'كله تمام، مفيش حد محتاج متابعة',

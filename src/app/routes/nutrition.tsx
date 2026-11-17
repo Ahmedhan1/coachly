@@ -10,6 +10,7 @@ export const nutritionRoutes: RouteObject[] = [
   { path: 'more/progress', ...screen(() => import('@/features/nutrition/progress/ProgressHubScreen'), 'ProgressHubScreen') },
   { path: 'clients/:clientId/nutrition', ...screen(() => import('@/features/nutrition/calculator/CalculatorScreen'), 'CalculatorScreen') },
   { path: 'clients/:clientId/meals', ...screen(() => import('@/features/nutrition/meals/MealPlanScreen'), 'MealPlanScreen') },
+  { path: 'clients/:clientId/diet', ...screen(() => import('@/features/nutrition/diet/DietScreen'), 'DietScreen') },
   { path: 'clients/:clientId/supplements', ...screen(() => import('@/features/nutrition/supplements/ClientSupplementsScreen'), 'ClientSupplementsScreen') },
   { path: 'clients/:clientId/progress', ...screen(() => import('@/features/nutrition/progress/ClientProgressScreen'), 'ClientProgressScreen') },
 ];

@@ -1,11 +1,11 @@
-import { useEffect, useId, useMemo, useState } from 'react';
+import { useEffect, useId, useState } from 'react';
 import { CLOUD_PASSWORD_KEY, useServices } from '@/app/services';
 import { useUiStore } from '@/app/uiStore';
 import { useLive } from '@/app/useLive';
 import { t, type TKey } from '@/i18n';
-import { MIN_BACKUP_PASSWORD_LENGTH, type BackupFile, type SchedulerState } from '@/services/backup';
-import { BrowserShareService } from '@/services/share';
-import { Badge, Button, PageHeader, Sheet, TextField } from '@/ui';
+import { MIN_BACKUP_PASSWORD_LENGTH, type ImportSummary, type SchedulerState } from '@/services/backup';
+import { DeviceBackupFlow } from '@/features/storage/DeviceBackupFlow';
+import { Badge, Button, Icon, ListRow, ListSection, PageHeader, Sheet, TextField } from '@/ui';
 import { formatBytes, formatIsoDate, formatTime } from '@/ui/format';
 import { toIsoDate } from '@/domain/models';
 import styles from './Settings.module.css';
@@ -49,32 +49,9 @@ export function BackupScreen() {
   const status = useLive(async () => (backup ? backup.local.status() : null), [backup, version, cloudState.lastSuccessAt]);
   const hasPassword = useLive(async () => typeof (await meta.get(CLOUD_PASSWORD_KEY)) === 'string', [meta, version]);
   const used = useLive(() => services.data.repos.images.totalBytes(), [services]);
-  const share = useMemo(() => new BrowserShareService(), []);
-  const [sheet, setSheet] = useState<null | 'export' | 'import' | 'cloud' | 'restoreCloud'>(null);
-  const [busy, setBusy] = useState<string | null>(null);
-  const [ready, setReady] = useState<BackupFile | null>(null);
+  const [sheet, setSheet] = useState<null | 'import' | 'cloud' | 'restoreCloud'>(null);
 
   if (!backup) return <PageHeader title={t('settings.backup.title')} back={{ to: '/more/settings', label: t('screens.settings.title') }} />;
-
-  const doExport = async (password: string | null) => {
-    setSheet(null);
-    setBusy(t('settings.backup.exporting'));
-    const r = await backup.local.exportFile({ password });
-    setBusy(null);
-    if (!r.ok) return showToast({ message: t('settings.backup.exportFailed') });
-    setReady(r.value);
-  };
-
-  const sendFile = async (file: BackupFile) => {
-    const r = await share.shareFile({ data: file.blob, fileName: file.fileName, mimeType: file.mimeType }, { prefer: 'share' });
-    if (r.outcome === 'shared' || r.outcome === 'downloaded') {
-      await backup.local.recordSaved(Date.now());
-      setReady(null);
-      setVersion((v) => v + 1);
-      // A download (Android, or no share sheet) lands in Downloads: tell the trainer to move it off the phone.
-      showToast({ message: r.outcome === 'downloaded' ? t('nutrition.cloudExtra.savedToFiles') : t('settings.backup.saved'), duration: r.outcome === 'downloaded' ? 6000 : 2500 });
-    }
-  };
 
   const cloudOn = hasPassword === true;
   const cloudError = cloudState.lastError ?? (status?.lastCloudError as string | null | undefined) ?? null;
@@ -90,20 +67,16 @@ export function BackupScreen() {
         <p className={styles.body}>{t('settings.backup.localBody')}</p>
         <p className={styles.meta}>{status?.lastLocalAt ? t('settings.backup.lastLocal', { date: when(status.lastLocalAt) }) : t('settings.backup.neverLocal')}</p>
         {used !== undefined && <p className={styles.meta}>{t('settings.backup.storageUsed', { size: formatBytes(used) })}</p>}
-        {ready ? (
-          <Button block icon="share" onClick={() => void sendFile(ready)}>
-            {t('settings.backup.exported')} · {formatBytes(ready.blob.size)}
-          </Button>
-        ) : (
-          <Button block icon="file" disabled={busy !== null} onClick={() => setSheet('export')}>
-            {busy ?? t('settings.backup.export')}
-          </Button>
-        )}
-        <Button block variant="secondary" icon="undo" disabled={busy !== null} onClick={() => setSheet('import')}>
+        <DeviceBackupFlow showSettings onSaved={() => setVersion((v) => v + 1)} />
+        <Button block variant="secondary" icon="undo" onClick={() => setSheet('import')}>
           {t('settings.backup.import')}
         </Button>
         <p className={styles.meta}>{t('settings.backup.importHint')}</p>
       </section>
+
+      <ListSection>
+        <ListRow to="/more/settings/storage" leading={<Icon name="database" />} title={t('storage.screen.title')} subtitle={t('storage.screen.hint')} />
+      </ListSection>
 
       <section className={styles.card} aria-labelledby="cloud-title">
         <div className={styles.cardHead}>
@@ -156,7 +129,6 @@ export function BackupScreen() {
         </Button>
       </section>
 
-      {sheet === 'export' && <ExportSheet onClose={() => setSheet(null)} onExport={(p) => void doExport(p)} />}
       {sheet === 'import' && <ImportSheet onClose={() => setSheet(null)} />}
       {sheet === 'cloud' && (
         <PasswordSheet
@@ -207,46 +179,8 @@ function PasswordSheet({ title, confirm, onClose, onSave, note }: { title: strin
   );
 }
 
-function ExportSheet({ onClose, onExport }: { onClose: () => void; onExport: (password: string | null) => void }) {
-  const [encrypt, setEncrypt] = useState(true);
-  const [a, setA] = useState('');
-  const [b, setB] = useState('');
-  const [error, setError] = useState<string | null>(null);
-  const submit = () => {
-    if (!encrypt) return onExport(null);
-    if (a.length < MIN_BACKUP_PASSWORD_LENGTH) return setError(t('settings.backup.passwordWeak'));
-    if (a !== b) return setError(t('settings.backup.passwordMismatch'));
-    onExport(a);
-  };
-  return (
-    <Sheet
-      open
-      onClose={onClose}
-      title={t('settings.backup.export')}
-      cancelLabel={t('common.cancel')}
-      primaryAction={
-        <button type="button" className={styles.sheetSave} onClick={submit}>
-          {t('settings.backup.export')}
-        </button>
-      }
-    >
-      <div className={styles.form}>
-        <label className={styles.check}>
-          <input type="checkbox" checked={encrypt} onChange={(e) => setEncrypt(e.target.checked)} />
-          <span>
-            {t('settings.backup.encrypt')}
-            <small>{t('settings.backup.encryptHint')}</small>
-          </span>
-        </label>
-        {encrypt && (
-          <>
-            <TextField label={t('settings.backup.password')} type="password" autoComplete="new-password" value={a} error={error} onChange={(e) => (setA(e.target.value), setError(null))} ltr />
-            <TextField label={t('settings.backup.passwordConfirm')} type="password" autoComplete="new-password" value={b} onChange={(e) => setB(e.target.value)} ltr />
-          </>
-        )}
-      </div>
-    </Sheet>
-  );
+function fullConfirmText(s: ImportSummary): string {
+  return t('storage.restore.fullConfirm', { date: s.createdAt ? when(s.createdAt) : '—', clients: s.counts.clients ?? 0, images: s.counts.images ?? 0 });
 }
 
 function ImportSheet({ onClose }: { onClose: () => void }) {
@@ -270,9 +204,25 @@ function ImportSheet({ onClose }: { onClose: () => void }) {
 
   const run = async () => {
     if (!file) return;
-    if (!window.confirm(t('settings.backup.importConfirm'))) return;
+    const pw = needsPassword ? password : null;
     setWorking(true);
-    const r = await backup.local.importFile(file, { password: needsPassword ? password : null });
+    setError(null);
+    // Read and check the whole file first, so the confirmation can say what it holds (and nothing is wiped for a bad file).
+    const checked = await backup.local.verifyFile(file, pw);
+    if (!checked.ok) {
+      setWorking(false);
+      return setError(errorText('importErrors', checked.error));
+    }
+    if (checked.value.kind === 'photos') {
+      if (!window.confirm(t('storage.restore.photosConfirm', { n: checked.value.counts.images ?? 0 }))) return setWorking(false);
+      const r = await backup.archive.restore(file, { password: pw });
+      setWorking(false);
+      if (!r.ok) return setError(errorText('importErrors', r.error));
+      window.alert(t('storage.archive.restored', { n: r.value.restored }));
+      return onClose();
+    }
+    if (!window.confirm(fullConfirmText(checked.value))) return setWorking(false);
+    const r = await backup.local.importFile(file, { password: pw });
     setWorking(false);
     if (!r.ok) return setError(errorText('importErrors', r.error));
     window.alert(t('settings.backup.imported'));
@@ -377,4 +327,6 @@ const IMPORT_ERRORS: Record<string, true> = {
   migration_failed: true,
   write_failed: true,
   cancelled: true,
+  photo_archive: true,
+  not_a_photo_archive: true,
 };

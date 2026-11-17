@@ -85,7 +85,7 @@ describe('PhotoArchiveService', () => {
     if (!enc.ok) throw new Error('export');
     expect(await archive.verifySavedFile(enc.value.file.blob, 'wrong-password', enc.value)).toEqual({ ok: false, error: 'wrong_password' });
     const corrupt = new Uint8Array(await first.value.file.blob.arrayBuffer());
-    corrupt[200] ^= 0xff;
+    corrupt[200] = corrupt[200]! ^ 0xff;
     expect((await archive.verifySavedFile(new Blob([corrupt]), null, first.value)).ok).toBe(false);
     expect((await db.images.get(seeded.imageIds[0]!))!.bytes).toBe(200 * 1024);
   });

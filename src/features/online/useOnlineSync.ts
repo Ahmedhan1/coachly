@@ -2,6 +2,7 @@ import { useEffect } from 'react';
 import { useServices } from '@/app/services';
 import { useUiStore } from '@/app/uiStore';
 import { t } from '@/i18n';
+import { useBrandAssets } from '@/features/identity/useBrandAssets';
 import { runWebhooks } from './integrations';
 import { pullCheckins, syncPush } from './sync';
 
@@ -15,6 +16,8 @@ const EVERY_MS = 15 * 60_000;
 export function useOnlineSync(active: boolean): void {
   const services = useServices();
   const showToast = useUiStore((s) => s.showToast);
+  // Not network work, but it needs the same "app is ready" moment: launch splash + home-screen icon cache.
+  useBrandAssets(active);
   useEffect(() => {
     if (!active || !services.online) return;
     let running = false;

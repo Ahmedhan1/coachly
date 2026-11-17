@@ -99,3 +99,16 @@ describe('notes', () => {
     expect(dietNoteKeys('recomp', 'high_protein', 'normal')).toContain('recompProtein');
   });
 });
+
+describe('recomputeDay', () => {
+  it('re-adds a day after a swap and re-checks it', async () => {
+    const { recomputeDay, checkMacros: check } = await import('.');
+    const book = [r('a', ['غدا'], 500, 40, 50, 15), r('b', ['غدا'], 300, 20, 30, 10)];
+    const slot = { label: 'lunch' as const, kind: 'lunch' as const, time: '14:00', sharePercent: 100 };
+    const target = { kcal: 500, proteinG: 40, carbG: 50, fatG: 15 };
+    const day = recomputeDay([{ slot, items: [{ recipeId: 'b', servings: 2 }] }], book, target, DS);
+    expect(day.totals.kcal).toBe(600);
+    expect(day.check).toEqual(check(day.totals, target, DS));
+    expect(recomputeDay([{ slot, items: [{ recipeId: 'gone', servings: 1 }] }], book, target, DS).totals.kcal).toBe(0);
+  });
+});

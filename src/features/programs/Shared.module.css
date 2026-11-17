@@ -327,3 +327,23 @@
   color: var(--text-2);
   font: var(--t-caption);
 }
+
+.pickerConfirm {
+  position: relative;
+  min-block-size: 36px;
+  padding-inline: var(--sp-4);
+  border-radius: var(--r-sm);
+  background: var(--brand);
+  color: var(--brand-on);
+  font: 600 15px/1 var(--font-ui);
+}
+
+.pickerConfirm::after {
+  content: '';
+  position: absolute;
+  inset: -4px 0;
+}
+
+.pickerConfirm:disabled {
+  opacity: 0.45;
+}

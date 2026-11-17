@@ -1,9 +1,10 @@
 import { useMemo, useState } from 'react';
-import { useParams } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import { useRepos } from '@/app/services';
 import { useUiStore } from '@/app/uiStore';
 import { useLive } from '@/app/useLive';
-import { compareToTarget, dayTotals, duplicateMeals, nextDayNumber, scaleDayToTarget, type MacroTotals, type SavedCalculation } from '@/domain/meals';
+import { recipeIconHex, compareToTarget, dayTotals, duplicateMeals, nextDayNumber, scaleDayToTarget, type MacroTotals, type SavedCalculation } from '@/domain/meals';
+import type { IngredientEntry } from '@/domain/meals';
 import type { Client, Meal, MealPlan } from '@/domain/models';
 import { t } from '@/i18n';
 import { Button, EmptyState, Icon, PageHeader, TextArea } from '@/ui';
@@ -36,8 +37,9 @@ export function MealPlanScreen() {
   const saved = useLive(() => store.getCalculation(clientId), [store, clientId]);
   const settings = useLive(() => store.getSettings(), [store]);
   const recipes = useRecipesWithNutrition();
+  const foods = useLive(() => store.getIngredients(), [store]);
 
-  if (client === undefined || plans === undefined || saved === undefined || settings === undefined || recipes === undefined) {
+  if (client === undefined || plans === undefined || saved === undefined || settings === undefined || recipes === undefined || foods === undefined) {
     return <PageHeader title="" back={{ to: back, label: t('common.back') }} />;
   }
   if (client === null) {
@@ -48,7 +50,7 @@ export function MealPlanScreen() {
       </>
     );
   }
-  return <MealPlanView client={client} plans={plans} saved={saved} tolerance={settings.targetTolerancePercent} recipes={recipes} back={back} />;
+  return <MealPlanView client={client} plans={plans} saved={saved} tolerance={settings.targetTolerancePercent} recipes={recipes} foods={foods} back={back} />;
 }
 
 interface ViewProps {
@@ -57,17 +59,20 @@ interface ViewProps {
   saved: SavedCalculation | null;
   tolerance: number;
   recipes: ReturnType<typeof useRecipesWithNutrition> & object;
+  foods: IngredientEntry[];
   back: string;
 }
 
-function MealPlanView({ client, plans, saved, tolerance, recipes, back }: ViewProps) {
+function MealPlanView({ client, plans, saved, tolerance, recipes, foods, back }: ViewProps) {
   const repos = useRepos();
   const showToast = useUiStore((s) => s.showToast);
+  const navigate = useNavigate();
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [sheet, setSheet] = useState<SheetState | null>(null);
   const [tool, setTool] = useState<null | 'shopping' | 'copyTo'>(null);
   const day = plans.find((p) => p.id === selectedId) ?? plans[0];
   const lookup = useMemo(() => new Map<string, MacroTotals>(recipes.map((r) => [r.recipe.id, r.perServing])), [recipes]);
+  const images = useMemo(() => new Map(recipes.map((r) => [r.recipe.id, { imageId: r.recipe.imageId, icon: recipeIconHex(r.recipe.ingredients, foods) }])), [recipes, foods]);
   const names = useMemo(() => new Map(recipes.map((r) => [r.recipe.id, r.recipe.name])), [recipes]);
   const target = saved?.targetKcal ?? day?.targetKcal ?? null;
 
@@ -156,9 +161,14 @@ function MealPlanView({ client, plans, saved, tolerance, recipes, back }: ViewPr
             title={t('nutrition.plan.emptyTitle')}
             body={saved ? t('nutrition.plan.emptyBody') : t('nutrition.plan.emptyBodyNoTarget')}
             action={
-              <Button icon="plus" onClick={() => void addDay()}>
-                {t('nutrition.plan.startFirstDay')}
-              </Button>
+              <>
+                <Button icon="plus" onClick={() => void addDay()}>
+                  {t('nutrition.plan.startFirstDay')}
+                </Button>
+                <Button variant="secondary" icon="target" onClick={() => navigate(`/clients/${client.id}/diet`, { replace: true })}>
+                  {t('nutrition.diet.open')}
+                </Button>
+              </>
             }
           />
         </div>
@@ -193,6 +203,7 @@ function MealPlanView({ client, plans, saved, tolerance, recipes, back }: ViewPr
                 meal={meal}
                 lookup={lookup}
                 names={names}
+                images={images}
                 onAdd={() => setSheet({ kind: 'add', mealId: meal.id })}
                 onSwap={(index) => setSheet({ kind: 'swap', mealId: meal.id, index })}
                 onRemoveItem={(index) => void updateMeals(day.meals.map((m) => (m.id === meal.id ? { ...m, items: m.items.filter((_, i) => i !== index) } : m)))}
@@ -211,6 +222,9 @@ function MealPlanView({ client, plans, saved, tolerance, recipes, back }: ViewPr
             </Button>
             <Button variant="secondary" icon="target" onClick={() => void scaleDay()}>
               {t('nutrition.tools.scale')}
+            </Button>
+            <Button variant="secondary" icon="target" onClick={() => navigate(`/clients/${client.id}/diet`, { replace: true })}>
+              {t('nutrition.diet.open')}
             </Button>
             <Button variant="secondary" icon="list" onClick={() => setTool('shopping')}>
               {t('nutrition.tools.shopping')}

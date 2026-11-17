@@ -2,12 +2,15 @@ import { useState, type FormEvent } from 'react';
 import { useUiStore } from '@/app/uiStore';
 import { useLive } from '@/app/useLive';
 import { searchItems } from '@/data';
-import { ingredientEntrySchema, type IngredientEntry } from '@/domain/meals';
+import { FOOD_CATEGORIES, ingredientEntrySchema, type FoodCategory, type IngredientEntry, type Portion } from '@/domain/meals';
 import { t } from '@/i18n';
-import { IconButton, ListRow, ListSection, PageHeader, SearchField, Sheet, SwipeRow, TextField } from '@/ui';
+import { IconButton, ListRow, ListSection, PageHeader, SearchField, Select, Sheet, SwipeRow, TextField } from '@/ui';
+import { FoodImage } from '../shared/FoodImage';
+import { PhotoField } from '../shared/PhotoField';
 import { fieldText, parseDecimal } from '../shared/numbers';
 import { useNutritionStore, useStarterData } from '../shared/useNutritionStore';
 import common from '../shared/common.module.css';
+import styles from './Foods.module.css';
 
 const fmt = (n: number) => String(Math.round(n * 10) / 10);
 
@@ -19,8 +22,10 @@ export function FoodsScreen() {
   const [version, setVersion] = useState(0);
   const foods = useLive(() => store.getIngredients(), [store, version, ready]);
   const [query, setQuery] = useState('');
+  const [cat, setCat] = useState<FoodCategory | 'all'>('all');
   const [editing, setEditing] = useState<IngredientEntry | 'new' | null>(null);
-  const list = searchItems([...(foods ?? [])].sort((a, b) => a.name.localeCompare(b.name, 'ar')), query, (f) => [f.name]);
+  const inCat = (foods ?? []).filter((f) => cat === 'all' || f.category === cat);
+  const list = searchItems([...inCat].sort((a, b) => a.name.localeCompare(b.name, 'ar')), query, (f) => [f.name]);
 
   const save = async (next: IngredientEntry[]) => {
     await store.saveIngredients(next);
@@ -44,12 +49,20 @@ export function FoodsScreen() {
       <div className={common.section}>
         <SearchField value={query} onChange={setQuery} label={t('nutrition.foods.search')} placeholder={t('nutrition.foods.search')} clearLabel={t('common.clearSearch')} />
       </div>
+      <div className={styles.cats} role="group" aria-label={t('nutrition.foods.category')}>
+        {(['all', ...FOOD_CATEGORIES] as const).map((c) => (
+          <button key={c} type="button" className={styles.cat} aria-pressed={cat === c} onClick={() => setCat(c)}>
+            {c === 'all' ? t('nutrition.foods.all') : t(`nutrition.foodCats.${c}`)}
+          </button>
+        ))}
+      </div>
       <ListSection title={t('nutrition.foods.count', { n: list.length })}>
         {list.map((f) => (
           <SwipeRow key={f.id} onDelete={() => void remove(f)} deleteLabel={t('common.delete')} deleteAccessibleLabel={t('nutrition.foods.deleteLabel', { name: f.name })}>
             <ListRow
+              leading={<FoodImage imageId={f.imageId} food={f} />}
               title={f.name}
-              subtitle={t('nutrition.foods.per100', { kcal: fmt(f.per100g.kcal), p: fmt(f.per100g.proteinG), c: fmt(f.per100g.carbG), f: fmt(f.per100g.fatG) })}
+              subtitle={`${t('nutrition.foods.per100', { kcal: fmt(f.per100g.kcal), p: fmt(f.per100g.proteinG), c: fmt(f.per100g.carbG), f: fmt(f.per100g.fatG) })}${f.per100g.fiberG === undefined ? '' : ` · ${t('nutrition.foods.fiberShort', { n: fmt(f.per100g.fiberG) })}`}`}
               onClick={() => setEditing(f)}
             />
           </SwipeRow>
@@ -78,14 +91,28 @@ function FoodSheet({ food, onClose, onSave }: { food: IngredientEntry | null; on
     proteinG: fieldText(food?.per100g.proteinG),
     carbG: fieldText(food?.per100g.carbG),
     fatG: fieldText(food?.per100g.fatG),
+    fiberG: fieldText(food?.per100g.fiberG),
   });
+  const [category, setCategory] = useState<FoodCategory | ''>(food?.category ?? '');
+  const [imageId, setImageId] = useState<string | null>(food?.imageId ?? null);
+  const portions: Portion[] = food?.portions ?? [];
   const [error, setError] = useState<string | null>(null);
   const submit = (e: FormEvent) => {
     e.preventDefault();
     const entry = {
       id: food?.id ?? `custom_${crypto.randomUUID().slice(0, 8)}`,
       name: name.trim(),
-      per100g: { kcal: parseDecimal(v.kcal), proteinG: parseDecimal(v.proteinG), carbG: parseDecimal(v.carbG), fatG: parseDecimal(v.fatG) },
+      per100g: {
+        kcal: parseDecimal(v.kcal),
+        proteinG: parseDecimal(v.proteinG),
+        carbG: parseDecimal(v.carbG),
+        fatG: parseDecimal(v.fatG),
+        ...(v.fiberG.trim() === '' ? {} : { fiberG: parseDecimal(v.fiberG) }),
+      },
+      ...(category ? { category } : {}),
+      ...(portions.length > 0 ? { portions } : {}),
+      ...(food?.icon ? { icon: food.icon } : {}),
+      imageId,
     };
     const parsed = ingredientEntrySchema.safeParse(entry);
     if (!parsed.success) return setError(t('nutrition.foods.invalid'));
@@ -113,7 +140,21 @@ function FoodSheet({ food, onClose, onSave }: { food: IngredientEntry | null; on
           {field('proteinG', t('nutrition.foods.protein'))}
           {field('carbG', t('nutrition.foods.carb'))}
           {field('fatG', t('nutrition.foods.fat'))}
+          {field('fiberG', t('nutrition.foods.fiber'))}
         </div>
+        <Select
+          label={t('nutrition.foods.category')}
+          value={category}
+          onChange={setCategory}
+          options={[{ value: '', label: '—' }, ...FOOD_CATEGORIES.map((c) => ({ value: c, label: t(`nutrition.foodCats.${c}`) }))]}
+        />
+        {portions.length > 0 && (
+          <p className={common.caption}>
+            {t('nutrition.foods.portions')}: {portions.map((p) => `${p.label} = ${p.grams} ${t('nutrition.units.g')}`).join(' · ')}
+          </p>
+        )}
+        <PhotoField label={t('nutrition.foods.photo')} addLabel={t('nutrition.foods.addPhoto')} removeLabel={t('nutrition.foods.removePhoto')} imageId={imageId} onChange={setImageId} />
+        <p className={common.caption}>{t('nutrition.foods.photoNote')}</p>
       </form>
     </Sheet>
   );

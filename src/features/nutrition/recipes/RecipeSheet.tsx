@@ -1,13 +1,14 @@
 import { useState, type FormEvent } from 'react';
 import { useRepos } from '@/app/services';
 import { useUiStore } from '@/app/uiStore';
-import { storedRecipeNutrition } from '@/domain/meals';
+import { foodIconHex, recipeIconHex, storedRecipeNutrition, type Portion } from '@/domain/meals';
 import type { ImageId, Ingredient, Recipe } from '@/domain/models';
 import type { IngredientEntry } from '@/domain/meals';
 import { searchItems } from '@/data';
 import { useLive } from '@/app/useLive';
 import { t } from '@/i18n';
 import { Icon, IconButton, Num, SearchField, Sheet, TextArea, TextField } from '@/ui';
+import { FoodImage } from '../shared/FoodImage';
 import { fieldText, gramsText, kcalText, parseDecimal } from '../shared/numbers';
 import { PhotoField } from '../shared/PhotoField';
 import { useNutritionStore } from '../shared/useNutritionStore';
@@ -24,12 +25,13 @@ interface Row {
   fatG: string;
   /** Set when the row came from the food table: macros follow the grams. */
   per100?: { kcal: number; proteinG: number; carbG: number; fatG: number };
+  portions?: Portion[];
 }
 
 const r1 = (n: number) => String(Math.round(n * 10) / 10);
-function fromTable(name: string, per100: NonNullable<Row['per100']>, grams: number): Row {
+function fromTable(name: string, per100: NonNullable<Row['per100']>, grams: number, portions?: Portion[]): Row {
   const k = grams / 100;
-  return { name, quantity: String(grams), unit: 'جم', kcal: r1(per100.kcal * k), proteinG: r1(per100.proteinG * k), carbsG: r1(per100.carbG * k), fatG: r1(per100.fatG * k), per100 };
+  return { name, ...(portions ? { portions } : {}), quantity: String(grams), unit: 'جم', kcal: r1(per100.kcal * k), proteinG: r1(per100.proteinG * k), carbsG: r1(per100.carbG * k), fatG: r1(per100.fatG * k), per100 };
 }
 
 const emptyRow = (): Row => ({ name: '', quantity: '', unit: 'جم', kcal: '', proteinG: '', carbsG: '', fatG: '' });
@@ -82,7 +84,7 @@ export function RecipeSheet({ recipe, onClose }: { recipe: Recipe | null; onClos
         // Typing grams on a food-table row recomputes its macros; editing a macro by hand unlinks it.
         if (next.per100 && 'quantity' in patch) {
           const g = parseDecimal(next.quantity);
-          return Number.isFinite(g) && g > 0 ? { ...fromTable(next.name, next.per100, g), quantity: next.quantity } : next;
+          return Number.isFinite(g) && g > 0 ? { ...fromTable(next.name, next.per100, g, next.portions), quantity: next.quantity } : next;
         }
         if (['kcal', 'proteinG', 'carbsG', 'fatG', 'unit'].some((k) => k in patch)) delete next.per100;
         return next;
@@ -129,6 +131,9 @@ export function RecipeSheet({ recipe, onClose }: { recipe: Recipe | null; onClos
           }}
           autoComplete="off"
         />
+        <div className={styles.hero}>
+          <FoodImage imageId={imageId} icon={recipeIconHex(ingredients ?? [], foods ?? [])} className={styles.heroImg} />
+        </div>
         <TextField label={t('nutrition.book.servings')} inputMode="numeric" value={servings} onChange={(e) => setServings(e.target.value)} ltr />
 
         <fieldset className={styles.ingredients}>
@@ -137,9 +142,19 @@ export function RecipeSheet({ recipe, onClose }: { recipe: Recipe | null; onClos
           {rows.map((r, i) => (
             <div key={i} className={styles.ingRow}>
               <div className={styles.ingTop}>
+                <FoodImage icon={foodIconHex(foods?.find((f) => f.name === r.name) ?? {})} className={styles.ingIcon} />
                 <TextField label={t('nutrition.book.ingredient')} value={r.name} onChange={(e) => setRow(i, { name: e.target.value })} autoComplete="off" />
                 <IconButton icon="close" tone="muted" label={t('nutrition.book.removeIngredient', { name: r.name || String(i + 1) })} onClick={() => setRows((rs) => (rs.length > 1 ? rs.filter((_, j) => j !== i) : [emptyRow()]))} />
               </div>
+              {r.portions && r.portions.length > 0 && (
+                <div className={styles.portions} role="group" aria-label={t('nutrition.foods.portions')}>
+                  {r.portions.map((p) => (
+                    <button key={p.label} type="button" className={styles.portion} onClick={() => setRow(i, { quantity: String(p.grams) })}>
+                      {p.label} · <bdi className="num">{p.grams}</bdi>
+                    </button>
+                  ))}
+                </div>
+              )}
               <div className={styles.ingGrid}>
                 <TextField label={t('nutrition.book.quantity')} inputMode="decimal" value={r.quantity} onChange={(e) => setRow(i, { quantity: e.target.value })} ltr />
                 <TextField label={t('nutrition.book.unit')} value={r.unit} onChange={(e) => setRow(i, { unit: e.target.value })} />
@@ -183,7 +198,7 @@ export function RecipeSheet({ recipe, onClose }: { recipe: Recipe | null; onClos
           onClose={() => setPicking(false)}
           onPick={(f) => {
             setPicking(false);
-            setRows((rs) => [...rs.filter((r) => r.name.trim() !== ''), fromTable(f.name, f.per100g, 100)]);
+            setRows((rs) => [...rs.filter((r) => r.name.trim() !== ''), fromTable(f.name, f.per100g, 100, f.portions)]);
           }}
         />
       )}
@@ -201,7 +216,8 @@ function FoodPicker({ foods, onClose, onPick }: { foods: IngredientEntry[]; onCl
         {shown.map((f) => (
           <li key={f.id}>
             <button type="button" className={styles.foodRow} onClick={() => onPick(f)}>
-              <span>{f.name}</span>
+              <FoodImage imageId={f.imageId} food={f} className={styles.ingIcon} />
+              <span className={styles.foodName}>{f.name}</span>
               <small>
                 <Num>{Math.round(f.per100g.kcal)}</Num> {t('nutrition.units.kcal')} / 100 {t('nutrition.units.g')}
               </small>

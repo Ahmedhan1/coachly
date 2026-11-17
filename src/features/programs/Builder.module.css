@@ -408,3 +408,17 @@
 .primary {
   flex: 1;
 }
+
+.clientLink {
+  position: relative;
+  color: var(--brand-ink);
+  font: inherit;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.clientLink::after {
+  content: '';
+  position: absolute;
+  inset: -12px -6px;
+}

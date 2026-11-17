@@ -9,7 +9,7 @@ import {
   type MarkStatus,
   type PlannedOccurrence,
 } from '@/domain/attendance';
-import { addDays, type Client, type ClientId, type Session } from '@/domain/models';
+import { addDays, type Client, type ClientId, type ProgramId, type Session } from '@/domain/models';
 import type { AttendanceStatus, RecurrenceError, ZonedClock } from '@/domain/schedule';
 import { ok, type Result } from '@/domain/nutrition/result';
 import type { MetaStore } from '@/services/license/metaStore';
@@ -28,6 +28,8 @@ export interface ScheduleWriterDeps {
 export interface BookingRequest extends BookingInput {
   clientId: ClientId;
   notes: string;
+  /** The client's program the session is for (left as it is when undefined). */
+  programId?: ProgramId | null;
 }
 
 export type Undo = () => Promise<void>;
@@ -91,12 +93,13 @@ async function syncRows(
       durationMin: p.durationMinutes,
       notes: req.notes,
       recurrence: i === 0 ? rule : null,
+      ...(req.programId !== undefined ? { programId: req.programId } : {}),
     };
     const row = rows[i];
     if (row) {
       out.push(await repos.sessions.update(row.id, { ...fields, seriesId: rule ? seriesId : null }));
     } else {
-      const created = await repos.sessions.create({ ...fields, seriesId: seriesId, attendance: 'scheduled', programId: null });
+      const created = await repos.sessions.create({ programId: null, ...fields, seriesId: seriesId, attendance: 'scheduled' });
       if (rule && seriesId === null) {
         seriesId = created.id;
         out.push(await repos.sessions.update(created.id, { seriesId }));
@@ -157,6 +160,7 @@ export function createScheduleWriter({ repos, meta, clock }: ScheduleWriterDeps)
           notes: req.notes,
           seriesId: null,
           recurrence: null,
+          ...(req.programId !== undefined ? { programId: req.programId } : {}),
         })];
       } else {
         sessions = await syncRows(repos, rows, planned.value, req);

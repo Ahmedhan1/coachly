@@ -2,6 +2,7 @@ import { itemTotals, mealTotals, type MacroTotals } from '@/domain/meals';
 import type { Meal } from '@/domain/models';
 import { t } from '@/i18n';
 import { Icon, IconButton, Num } from '@/ui';
+import { FoodImage } from '../shared/FoodImage';
 import { kcalText } from '../shared/numbers';
 import styles from './MealPlan.module.css';
 
@@ -9,6 +10,8 @@ interface MealCardProps {
   meal: Meal;
   lookup: ReadonlyMap<string, MacroTotals>;
   names: ReadonlyMap<string, string>;
+  /** Photo / illustration per recipe id. */
+  images: ReadonlyMap<string, { imageId: string | null; icon: string }>;
   onAdd: () => void;
   onSwap: (index: number) => void;
   onRemoveItem: (index: number) => void;
@@ -16,7 +19,7 @@ interface MealCardProps {
   onDelete: () => void;
 }
 
-export function MealCard({ meal, lookup, names, onAdd, onSwap, onRemoveItem, onEdit, onDelete }: MealCardProps) {
+export function MealCard({ meal, lookup, names, images, onAdd, onSwap, onRemoveItem, onEdit, onDelete }: MealCardProps) {
   const total = mealTotals(meal, lookup).totals.kcal;
   return (
     <section className={styles.meal} aria-label={meal.name}>
@@ -37,6 +40,7 @@ export function MealCard({ meal, lookup, names, onAdd, onSwap, onRemoveItem, onE
           const r = itemTotals(item, lookup);
           return (
             <li key={`${item.recipeId ?? item.text}-${index}`} className={styles.item}>
+              {item.recipeId && <FoodImage imageId={images.get(item.recipeId)?.imageId} icon={images.get(item.recipeId)?.icon} className={styles.itemImg} />}
               <div className={styles.itemText}>
                 <p className={styles.itemName}>{name}</p>
                 <p className={styles.itemSub}>

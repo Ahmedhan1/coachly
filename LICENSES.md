@@ -190,7 +190,8 @@ Obligations (verdict **YELLOW = OK with obligations**):
 | AnatomyTool Open 3D Model (<https://anatomytool.org/node/63903>) | CC BY-SA (per spec; page not re-read today) | YELLOW — re-verify if we use it as the fallback |
 | wger (<https://github.com/wger-project/wger>) | AGPL-3.0 | **RED** — ideas only, never copy code |
 | hasaneyldrm/exercises-dataset | images marked © Gym visual | **RED** — do not use |
-| Recipes / food table | our own content | OK |
+| Recipes / food table | our own content (values: USDA FoodData Central / FAO-INFOODS family, approximated) | OK |
+| Twemoji SVG illustrations in `public/food/` (npm `@twemoji/svg` 15.0.0, copied, not a dependency) | Graphics CC-BY 4.0 (code MIT); attribution in app About screen and `public/food/ATTRIBUTION.txt` | GREEN with attribution |
 
 ## 6. To re-verify at phase end
 

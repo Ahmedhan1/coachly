@@ -1,6 +1,7 @@
 import { useMemo, useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
-import { useRepos } from '@/app/services';
+import { useRepos, useServices } from '@/app/services';
+import { useGo } from '@/app/nav';
 import { useUiStore } from '@/app/uiStore';
 import { useLive } from '@/app/useLive';
 import type { Client, ClientId, Program } from '@/domain/models';
@@ -8,6 +9,7 @@ import { BUILTIN_TEMPLATES, duplicateProgram, instantiateTemplate, type BuiltinT
 import { searchItems } from '@/data';
 import { t } from '@/i18n';
 import { Badge, Button, EmptyState, Icon, IconButton, ListRow, ListSection, PageHeader, SearchField, SwipeRow, Tx } from '@/ui';
+import { markActiveProgram } from './activePrograms';
 import { newLocalId } from './ids';
 import { templateDayName, templateName } from './names';
 import styles from './Programs.module.css';
@@ -23,7 +25,9 @@ function exercisesIn(p: Pick<Program, 'days'>) {
 /** More → البرامج (or a client's programs with ?client=): built-in templates, own templates, client programs. */
 export function ProgramsScreen() {
   const repos = useRepos();
+  const { meta } = useServices();
   const navigate = useNavigate();
+  const go = useGo();
   const showToast = useUiStore((s) => s.showToast);
   const [params] = useSearchParams();
   const clientFilter = params.get('client');
@@ -43,7 +47,7 @@ export function ProgramsScreen() {
   const assigned = shown.filter((p) => !p.isTemplate && p.clientId);
   const loose = shown.filter((p) => !p.isTemplate && !p.clientId);
 
-  const open = (id: string) => navigate(`/programs/${id}${clientFilter ? '?from=client' : ''}`);
+  const open = (id: string) => go(`/programs/${id}${clientFilter ? '?from=client' : ''}`);
 
   const fromBuiltin = async (tpl: BuiltinTemplate) => {
     const name = forClient ? t('training.programs.forClient', { name: forClient.name }) : templateName(tpl.id);
@@ -54,6 +58,7 @@ export function ProgramsScreen() {
       clientId: (clientFilter as ClientId | null) ?? null,
     });
     const created = await repos.programs.create(body);
+    if (clientFilter) await markActiveProgram(meta, clientFilter, created.id);
     showToast({ message: t('training.programs.created'), duration: 2500 });
     open(created.id);
   };
@@ -66,6 +71,7 @@ export function ProgramsScreen() {
       days: [],
       notes: '',
     });
+    if (clientFilter) await markActiveProgram(meta, clientFilter, created.id);
     open(created.id);
   };
 

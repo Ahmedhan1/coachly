@@ -5,45 +5,22 @@ import { useLive } from '@/app/useLive';
 import { t } from '@/i18n';
 import { Button, PageHeader, Select, TextField } from '@/ui';
 import { postWebhook } from '@/services/integrations/webhook';
-import { AI_KEY, readAiKey, readWebhook, saveWebhook, type WebhookSettings } from '@/features/online/integrations';
+import { readWebhook, saveWebhook, type WebhookSettings } from '@/features/online/integrations';
+import { AiSettingsCard } from './AiSettingsCard';
 import styles from './Settings.module.css';
 
 /** الإعدادات ← الـ AI والتكاملات: both off by default. */
 export function IntegrationsScreen() {
   const { meta } = useServices();
-  const key = useLive(() => readAiKey(meta), [meta]);
   const hook = useLive(() => readWebhook(meta), [meta]);
   const back = { to: '/more/settings', label: t('screens.settings.title') };
-  if (key === undefined || !hook) return <PageHeader title={t('settings.integrations.title')} back={back} />;
+  if (!hook) return <PageHeader title={t('settings.integrations.title')} back={back} />;
   return (
     <>
       <PageHeader title={t('settings.integrations.title')} back={back} />
-      <AiCard initial={key ?? ''} />
+      <AiSettingsCard />
       <WebhookCard initial={hook} />
     </>
-  );
-}
-
-function AiCard({ initial }: { initial: string }) {
-  const { meta } = useServices();
-  const showToast = useUiStore((s) => s.showToast);
-  const [key, setKey] = useState(initial);
-  return (
-    <section className={styles.card}>
-      <h2 className={styles.cardTitle}>{t('settings.integrations.aiTitle')}</h2>
-      <p className={styles.body}>{t('settings.integrations.aiBody')}</p>
-      <TextField label={t('settings.integrations.aiKey')} hint={t('settings.integrations.aiKeyHint')} type="password" autoComplete="off" value={key} onChange={(e) => setKey(e.target.value)} ltr />
-      <Button
-        block
-        onClick={async () => {
-          const v = key.trim();
-          await meta.set(AI_KEY, v || null);
-          showToast({ message: v ? t('settings.integrations.aiSaved') : t('settings.integrations.aiRemoved'), duration: 2500 });
-        }}
-      >
-        {t('settings.integrations.save')}
-      </Button>
-    </section>
   );
 }
 

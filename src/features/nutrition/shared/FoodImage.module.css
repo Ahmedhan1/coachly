@@ -1,0 +1,18 @@
+.box {
+  display: block;
+  flex: none;
+  inline-size: 44px;
+  block-size: 44px;
+  border-radius: var(--r-sm);
+}
+
+.icon {
+  display: grid;
+  place-items: center;
+  background: var(--surface-2);
+}
+
+.icon img {
+  inline-size: 28px;
+  block-size: 28px;
+}

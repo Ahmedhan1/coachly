@@ -102,7 +102,7 @@ export function showBootSplash(cache: BrandCache | null, fallbackIcon = '/icons/
   el.id = SPLASH_ID;
   el.setAttribute('aria-hidden', 'true');
   el.style.cssText =
-    'position:fixed;inset:0;z-index:2147483000;display:flex;align-items:center;justify-content:center;' +
+    'position:fixed;inset:0;z-index:2147483000;pointer-events:none;display:flex;align-items:center;justify-content:center;' +
     `background:${cache?.color ?? 'var(--bg, #ededea)'};transition:opacity 280ms ease-out;`;
   const img = document.createElement('img');
   img.alt = '';

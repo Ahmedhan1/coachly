@@ -32,7 +32,7 @@ describe('PTB1 chunked envelope', () => {
     expect(await openChunked(sealed, 'password2')).toEqual({ ok: false, error: 'wrong_password' });
     const bytes = new Uint8Array(await sealed.arrayBuffer());
     const flipped = bytes.slice();
-    flipped[PTB1_HEADER_BYTES + 40] ^= 1;
+    flipped[PTB1_HEADER_BYTES + 40] = flipped[PTB1_HEADER_BYTES + 40]! ^ 1;
     expect(await openChunked(new Blob([flipped]), 'password1')).toEqual({ ok: false, error: 'malformed' });
     const chunk = 12 + 1024 + 16;
     const truncated = bytes.slice(0, bytes.length - chunk);
@@ -42,7 +42,7 @@ describe('PTB1 chunked envelope', () => {
     swapped.set(bytes.subarray(PTB1_HEADER_BYTES, PTB1_HEADER_BYTES + chunk), PTB1_HEADER_BYTES + chunk);
     expect(await openChunked(new Blob([swapped]), 'password1')).toEqual({ ok: false, error: 'malformed' });
     const tamperedHeader = bytes.slice();
-    tamperedHeader[45] ^= 1; // fileId: wrapped key no longer opens
+    tamperedHeader[45] = tamperedHeader[45]! ^ 1; // fileId: wrapped key no longer opens
     expect((await openChunked(new Blob([tamperedHeader]), 'password1')).ok).toBe(false);
   });
 });

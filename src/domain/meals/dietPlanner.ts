@@ -318,3 +318,19 @@ export function slotAlternatives(
   });
   return scored.slice(0, Math.max(0, limit)).map((c) => ({ recipeId: c.r.id, servings: c.servings }));
 }
+
+// ---------- after a manual change ----------
+
+/** Rebuilds totals and checks for a day whose items the trainer changed (a swap); unknown recipes count as zero. */
+export function recomputeDay(meals: ReadonlyArray<{ slot: DietSlot; items: readonly DietItem[] }>, book: readonly DietRecipe[], target: MacroTargets, ds: DietSettings): DietDay {
+  const byId = new Map(book.map((r) => [r.id, r.perServing]));
+  const rebuilt: DietMeal[] = meals.map((m) => {
+    const totals = m.items.reduce((acc, i) => {
+      const per = byId.get(i.recipeId);
+      return per ? addTotals(acc, scale(per, i.servings)) : acc;
+    }, ZERO_TOTALS);
+    return { slot: m.slot, items: m.items.map((i) => ({ ...i })), totals };
+  });
+  const totals = rebuilt.reduce((acc, m) => addTotals(acc, m.totals), ZERO_TOTALS);
+  return { meals: rebuilt, totals, check: checkMacros(totals, target, ds) };
+}

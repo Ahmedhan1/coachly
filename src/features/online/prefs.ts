@@ -33,6 +33,8 @@ const shareRecordSchema = z.object({
   key: z.string().min(40).max(64),
   checkinsEnabled: z.boolean(),
   publishedAt: z.number().nullable(),
+  /** Fingerprint of the last uploaded document (skip re-uploads of an unchanged page). */
+  docHash: z.string().max(64).optional(),
 });
 export type ShareRecord = z.infer<typeof shareRecordSchema> & ClientShare;
 

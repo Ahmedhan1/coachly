@@ -15,7 +15,7 @@ export function NutritionTab({ client, go }: { client: Client; go: (to: string) 
   const plans = useLive(async () => (await repos.mealPlans.listByClient(client.id)).sort((a, b) => a.createdAt - b.createdAt), [repos, client.id]);
   const supplements = useLive(async () => {
     const [assigned, catalog] = await Promise.all([store.getClientSupplements(client.id), repos.supplements.list()]);
-    const names = new Map(catalog.map((s) => [s.id, s.name] as const));
+    const names = new Map<string, string>(catalog.map((s) => [s.id, s.name]));
     return assigned.map((a) => names.get(a.supplementId)).filter((n): n is string => Boolean(n));
   }, [store, repos, client.id]);
   const base = `/clients/${client.id}`;
