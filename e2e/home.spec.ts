@@ -20,10 +20,11 @@ test('home: next session starts session mode, WhatsApp uses the real number, eve
   await expect(page.getByText('بتخلص قريب')).toBeVisible();
   await expect(page.getByText('محتاجين متابعة')).toBeVisible();
 
-  // Last backup: real status, opens the backup screen.
-  const backup = page.getByRole('link', { name: /لسه مفيش نسخة/ });
-  await expect(backup).toBeVisible();
-  await backup.click();
+  // Last backup: real status, a one-tap device copy, and a link to the backup screen.
+  const backup = page.getByRole('region', { name: 'النسخة الاحتياطية' });
+  await expect(backup.getByText('لسه ما عملتش نسخة على التليفون')).toBeVisible();
+  await expect(backup.getByRole('button', { name: 'نزّل نسخة على التليفون' })).toBeVisible();
+  await backup.getByRole('link', { name: 'إعدادات النسخ' }).click();
   await expect(page).toHaveURL(/\/more\/settings\/backup/);
   await page.goBack();
 

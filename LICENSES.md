@@ -203,3 +203,11 @@ Other agents are adding dependencies in `worker/` and the root **right now**. At
 3. Re-check: `react-body-highlighter` with React 19 (Phase 5), drei helpers that fetch remote assets (Phase 6),
    Z-Anatomy NC objects excluded (Phase 6), font OFL.txt files shipped (done in Phase 2b), Rate Limiting binding plan
    availability (Phase 3, see LIMITS.md).
+
+## Nutrition data, wave 4 (cookbook + English names)
+
+- `src/data/seeds/ingredients.ar.json` (v4) and `recipes.ar.json` (v3): 4 new foods, 104 new original recipes
+  (214 in total), English names for every food and recipe and short English steps. Values per 100 g are rounded
+  approximations entered by us from general knowledge of USDA FoodData Central (public domain) and the
+  Egyptian/Middle-East food composition tables (nothing copied wholesale). No new dependencies, no new images
+  (new foods reuse the bundled Twemoji illustrations, CC BY 4.0).

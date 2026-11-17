@@ -34,8 +34,11 @@ test('attendance: حضر takes a session from the package, undo gives it back', 
   await openApp(page, '/schedule');
   const group = page.getByRole('group', { name: 'الحضور: كريم يوسف' });
   await group.getByRole('button', { name: 'حضر' }).click();
+  await expect(group.getByRole('button', { name: 'حضر' })).toHaveAttribute('aria-pressed', 'true');
   await expect(toast(page)).toContainText('باقي 0 حصة');
   await toast(page).getByRole('button', { name: 'تراجع' }).click();
+  // The undo is saved before leaving (a full page load would cut a pending write).
+  await expect(group.getByRole('button', { name: 'حضر' })).toHaveAttribute('aria-pressed', 'false');
   await page.goto('/clients?standalone=1');
   await expect(page.getByRole('link', { name: /كريم يوسف/ })).toBeVisible();
   await page.getByRole('link', { name: /كريم يوسف/ }).click();
@@ -105,8 +108,9 @@ test('quick add → دفعة: an unpaid charge is settled; paying part leaves th
 test('outbox: explains that nothing is sent without a tap and shows the exact text', async ({ page }) => {
   await openApp(page, '/more/outbox');
   await expect(page.getByText(/مفيش حاجة بتتبعت لوحدها/)).toBeVisible();
-  await expect(page.getByText(/أهلاً منى/).first()).toBeVisible();
-  await page.getByRole('button', { name: 'تجاهل رسالة منى حسن' }).click();
+  // Demo: Kareem has one session left in his package → a renewal message with the real price.
+  await expect(page.getByText(/أهلاً كريم،\s*باقتك \(16 حصة\) قربت تخلص\. التجديد بـ 4,000 ج\.م/).first()).toBeVisible();
+  await page.getByRole('button', { name: 'تجاهل رسالة كريم يوسف' }).click();
   await expect(toast(page)).toContainText('اتشالت من القائمة');
 });
 

@@ -47,7 +47,7 @@ export const pdf: EnArea<'pdf'> = {
   fallbackBody: 'This browser cannot send a PDF directly, so we saved it in Downloads as “{name}”.',
   fallbackSteps: 'In WhatsApp: open the client’s chat → tap the paperclip → “Document” → pick the file from Downloads.',
   downloadedBody: 'The file “{name}” is in Downloads or Files. You can send it from there.',
-  openWhatsapp: 'Open {name}’s chat on WhatsApp',
+  openWhatsapp: 'Open WhatsApp chat with {name}',
   openWhatsappNoClient: 'Open WhatsApp',
   whatsappText: 'Hi {name}, I am sending you the program file now.',
   share: 'Send (WhatsApp, AirDrop…)',
@@ -59,7 +59,7 @@ export const pdf: EnArea<'pdf'> = {
   noSections: 'Choose at least one section.',
   shareFailed: 'Sharing did not work. Download the file and send it from Files.',
   noProgram: 'This client has no program; the exercises section will be removed.',
-  defaultTitle: '{name}’s program',
+  defaultTitle: 'Program for {name}',
   defaultTitleNoClient: 'Training program',
   branding: {
     title: 'File look',

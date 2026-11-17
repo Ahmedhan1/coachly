@@ -199,7 +199,7 @@ test('PDF in English: generates, previews LTR pages, and a session screen in Eng
   await page.getByRole('button', { name: /Push \/ Pull \/ Legs/ }).click();
   await page.getByRole('button', { name: 'Program options' }).click();
   await page.getByRole('button', { name: 'Assign to a client' }).click();
-  await page.getByRole('dialog', { name: 'Choose the client' }).getByRole('button').filter({ hasText: /\S/ }).nth(1).click();
+  await page.getByRole('dialog').getByRole('listitem').first().getByRole('button').click();
   await expect(page.getByText(/Program assigned to/)).toBeVisible();
   const programUrl = page.url();
 
@@ -214,7 +214,7 @@ test('PDF in English: generates, previews LTR pages, and a session screen in Eng
   await settle(page);
   await page.goto('/more/pdf');
   await settle(page);
-  await page.getByLabel('Client').selectOption({ index: 1 });
+  await page.getByLabel('Client', { exact: true }).selectOption({ index: 1 });
   await page.getByRole('button', { name: 'Create the file' }).click();
   await expect(page.getByText(/File ready: \d+ pages/)).toBeVisible({ timeout: 90_000 });
   const first = page.getByRole('img', { name: 'Page 1' });

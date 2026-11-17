@@ -54,7 +54,8 @@ export function DietScreen() {
   const dietSettings = useLive(() => store.getDietSettings(), [store, version]);
 
   const header = <PageHeader title={t('nutrition.diet.title')} subtitle={client?.name} back={{ to: back, label: t('nutrition.diet.back') }} />;
-  if (client === undefined || saved === undefined || settings === undefined || dietSettings === undefined || recipes === undefined || foods === undefined) return header;
+  // Wait for the starter cookbook: planning while it is still being written would re-plan for every new recipe.
+  if (!ready || client === undefined || saved === undefined || settings === undefined || dietSettings === undefined || recipes === undefined || foods === undefined) return header;
   if (client === null) {
     return (
       <>
@@ -130,7 +131,8 @@ function DietView({ client, saved, settings, dietSettings, recipes, foods, heade
   const perServing = useMemo(() => new Map(recipes.map((r) => [r.recipe.id as string, r.perServing.kcal])), [recipes]);
 
   // Planning follows the controls without blocking them (a slider drag stays smooth on a phone).
-  const live = useDeferredValue({ targets, goal, style, schedule, meals, vegetarian, seed });
+  const controls = useMemo(() => ({ targets, goal, style, schedule, meals, vegetarian, seed }), [targets, goal, style, schedule, meals, vegetarian, seed]);
+  const live = useDeferredValue(controls);
   const week = useMemo(
     () => planGramWeek(book, live.targets, { goal: live.goal, schedule: live.schedule, mealsPerDay: live.meals, days: 7, style: live.style, vegetarian: live.vegetarian, seed: live.seed }, dietSettings),
     [book, live, dietSettings],

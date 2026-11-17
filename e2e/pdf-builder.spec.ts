@@ -54,9 +54,18 @@ test('PDF: the three presets from the real UI, previews, download', async ({ pag
   }
 });
 
+/** Gives the open client a ready program (فول بادي) from the client file, so the exercise sections have content. */
+async function assignTemplateProgram(page: Page, clientId: string) {
+  await page.goto(`/clients/${clientId}?standalone=1`);
+  await page.getByRole('link', { name: /البرنامج/ }).first().click();
+  await page.getByRole('button', { name: /فول بادي/ }).click();
+  await expect(page.getByTestId('exercise-card').first()).toBeVisible();
+}
+
 test('PDF: every section on its own renders', async ({ page }) => {
   test.setTimeout(300_000);
   const id = await openSara(page);
+  await assignTemplateProgram(page, id);
   await page.goto(`/more/pdf?client=${id}&standalone=1`);
   const names = ['الغلاف', 'بيانات العميل', 'جدول التمارين', 'السعرات والماكروز', 'خطة الوجبات', 'المكملات', 'التقدم', 'تعليمات وملاحظات'];
   for (const only of names) {
@@ -91,4 +100,18 @@ test('PDF: without a file share sheet (Android Chrome) the download fallback exp
   await expect(page.getByText(/المشبك/)).toBeVisible();
   const wa = page.getByRole('link', { name: /افتح محادثة سارة محمود على واتساب/ });
   await expect(wa).toHaveAttribute('href', /^https:\/\/wa\.me\//);
+});
+
+test('PDF: only the exercise table for a client without a program says why instead of failing', async ({ page }) => {
+  const id = await openSara(page);
+  await page.goto(`/more/pdf?client=${id}&standalone=1`);
+  await expect(page.getByText('العميل ده ما عندوش برنامج، قسم التمارين هيتشال.').first()).toBeVisible();
+  for (const name of ['الغلاف', 'بيانات العميل', 'السعرات والماكروز', 'خطة الوجبات', 'المكملات', 'التقدم', 'تعليمات وملاحظات', 'خريطة العضلات']) {
+    const box = page.getByRole('checkbox', { name, exact: true });
+    if (await box.isChecked()) await box.click();
+  }
+  await expect(page.getByRole('checkbox', { name: 'جدول التمارين', exact: true })).toBeChecked();
+  await page.getByRole('button', { name: 'اعمل الملف' }).click();
+  await expect(page.getByRole('status').filter({ hasText: 'العميل ده ما عندوش برنامج' })).toBeVisible();
+  await expect(page.getByText('الملف ما اتعملش')).toHaveCount(0);
 });

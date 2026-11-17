@@ -1,7 +1,8 @@
 import { itemTotals, mealTotals, type MacroTotals } from '@/domain/meals';
 import type { Meal } from '@/domain/models';
 import { t } from '@/i18n';
-import { Icon, IconButton, Num } from '@/ui';
+import { pick } from '@/i18n/locale';
+import { Icon, IconButton, Num, Tx } from '@/ui';
 import { FoodImage } from '../shared/FoodImage';
 import { kcalText } from '../shared/numbers';
 import styles from './MealPlan.module.css';
@@ -43,11 +44,33 @@ export function MealCard({ meal, lookup, names, images, onAdd, onSwap, onRemoveI
               {item.recipeId && <FoodImage imageId={images.get(item.recipeId)?.imageId} icon={images.get(item.recipeId)?.icon} className={styles.itemImg} />}
               <div className={styles.itemText}>
                 <p className={styles.itemName}>{name}</p>
+                {item.lines && item.lines.length > 0 ? (
+                  <ul className={styles.lines}>
+                    {item.lines.map((l, li) => (
+                      <li key={`${l.name}-${li}`}>
+                        <span>{pick(l.name, l.nameEn)}</span>
+                        <span>
+                          {l.units !== undefined && l.unitLabel ? (
+                            <Tx k="nutrition.plan.lineUnits" params={{ n: l.units, unit: pick(l.unitLabel, l.unitLabelEn), g: l.grams }} />
+                          ) : (
+                            <Tx k="nutrition.plan.lineGrams" params={{ g: l.grams }} />
+                          )}
+                          {' · '}
+                          <Num>{kcalText(l.kcal)}</Num> {t('nutrition.units.kcal')}
+                        </span>
+                      </li>
+                    ))}
+                  </ul>
+                ) : null}
                 <p className={styles.itemSub}>
-                  <Num>{item.servings}</Num> {t('nutrition.plan.servingShort')}
+                  {!item.lines?.length && (
+                    <>
+                      <Num>{item.servings}</Num> {t('nutrition.plan.servingShort')}
+                    </>
+                  )}
                   {r.counted && (
                     <>
-                      {' · '}
+                      {!item.lines?.length && ' · '}
                       <Num>{kcalText(r.totals.kcal)}</Num> {t('nutrition.units.kcal')}
                     </>
                   )}

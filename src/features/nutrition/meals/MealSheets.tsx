@@ -3,6 +3,7 @@ import { replaceItem, swapCandidates, type MacroTotals } from '@/domain/meals';
 import type { Meal, RecipeId } from '@/domain/models';
 import { searchItems } from '@/data';
 import { t } from '@/i18n';
+import { pick } from '@/i18n/locale';
 import { Button, Icon, Num, SearchField, Sheet, TextField } from '@/ui';
 import { kcalText, gramsText } from '../shared/numbers';
 import type { RecipeWithNutrition } from './useRecipeLookup';
@@ -19,7 +20,7 @@ function RecipeChoice({ r, onPick }: { r: RecipeWithNutrition; onPick: () => voi
   return (
     <li>
       <button type="button" className={styles.choice} onClick={onPick}>
-        <span className={styles.choiceName}>{r.recipe.name}</span>
+        <span className={styles.choiceName}>{pick(r.recipe.name, r.recipe.nameEn)}</span>
         <span className={styles.choiceSub}>
           <Num>{kcalText(r.perServing.kcal)}</Num> {t('nutrition.units.kcal')} · <Num>{gramsText(r.perServing.proteinG)}</Num>{' '}
           {t('nutrition.units.gProtein')}
@@ -34,7 +35,7 @@ export function AddItemSheet({ recipes, onClose, onAdd }: { recipes: RecipeWithN
   const [servings, setServings] = useState(1);
   const [text, setText] = useState('');
   const groupId = useId();
-  const shown = useMemo(() => searchItems(recipes, query, (r) => [r.recipe.name, ...r.recipe.tags]), [recipes, query]);
+  const shown = useMemo(() => searchItems(recipes, query, (r) => [r.recipe.name, r.recipe.nameEn ?? '', ...r.recipe.tags]), [recipes, query]);
   return (
     <Sheet open onClose={onClose} title={t('nutrition.plan.addItemTitle')} cancelLabel={t('common.cancel')}>
       <div className={common.form}>

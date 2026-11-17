@@ -87,3 +87,235 @@
   font: var(--t-body);
   text-align: start;
 }
+
+/* ---- exact-grams plan (wave 4) ---- */
+
+.kcalRow {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--sp-2);
+  margin-block-end: var(--sp-2);
+}
+
+.kcalLabel {
+  font: var(--t-label);
+}
+
+.stepper,
+.lineControls {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-1);
+}
+
+.stepBtn,
+.lockBtn {
+  display: grid;
+  place-items: center;
+  inline-size: var(--tap);
+  block-size: var(--tap);
+  padding: 0;
+  border: 1px solid var(--line);
+  border-radius: var(--r-md);
+  background: var(--bg);
+  color: var(--text);
+  font: var(--t-title);
+  line-height: 1;
+}
+
+.stepBtn:active,
+.lockBtn:active {
+  background: var(--surface-2);
+}
+
+.lockBtn {
+  color: var(--text-3);
+}
+
+.lockBtn svg {
+  inline-size: 18px;
+  block-size: 18px;
+}
+
+.lockBtn[aria-pressed='true'] {
+  border-color: var(--brand);
+  background: var(--brand);
+  color: var(--brand-on);
+}
+
+.kcalInput,
+.gramsInput {
+  inline-size: 72px;
+  block-size: var(--tap);
+  padding: 0 var(--sp-1);
+  border: 1px solid var(--line);
+  border-radius: var(--r-md);
+  background: var(--bg);
+  color: var(--text);
+  font: var(--t-headline);
+  text-align: center;
+}
+
+.gramsInput {
+  inline-size: 60px;
+  font: var(--t-callout);
+}
+
+.kcalInput:focus,
+.gramsInput:focus {
+  outline: 2px solid var(--brand);
+  outline-offset: 1px;
+}
+
+.linkButton {
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--brand-ink);
+  font: inherit;
+  text-decoration: underline;
+}
+
+.dayBox {
+  margin-block: var(--sp-3);
+  padding: var(--sp-3);
+  border-radius: var(--r-lg);
+  background: var(--surface);
+}
+
+.dayBoxHead {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--sp-2);
+  margin-block-end: var(--sp-2);
+}
+
+.dayBoxTitle {
+  font: var(--t-headline);
+}
+
+.dayGrid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: var(--sp-2);
+  margin: 0;
+}
+
+.dayGrid > div {
+  padding: var(--sp-2) var(--sp-1);
+  border-radius: var(--r-md);
+  background: var(--bg);
+  text-align: center;
+}
+
+.dayGrid > div[data-status='under'],
+.dayGrid > div[data-status='over'] {
+  box-shadow: inset 0 0 0 1px var(--warn);
+}
+
+.dayGrid dt {
+  color: var(--text-2);
+  font: var(--t-caption);
+}
+
+.dayGrid dd {
+  margin: 0;
+  font: var(--t-headline);
+}
+
+.dayGrid dd.of {
+  color: var(--text-3);
+  font: var(--t-caption);
+}
+
+.dish {
+  padding-block: var(--sp-2);
+  border-block-start: 1px solid var(--hairline);
+}
+
+.dishHead {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-2);
+}
+
+.dishImg {
+  flex: none;
+  inline-size: 32px;
+  block-size: 32px;
+}
+
+.dishName {
+  flex: 1;
+  min-inline-size: 0;
+  margin: 0;
+  font: var(--t-label);
+}
+
+.dishKcal {
+  color: var(--text-2);
+  font: var(--t-sub);
+}
+
+.lines {
+  margin: var(--sp-1) 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.line {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  align-items: center;
+  gap: var(--sp-1) var(--sp-2);
+  padding-block: var(--sp-2);
+}
+
+.line + .line {
+  border-block-start: 1px dashed var(--hairline);
+}
+
+.line[data-locked] .lineName::after {
+  content: ' •';
+  color: var(--brand);
+}
+
+.lineImg {
+  inline-size: 28px;
+  block-size: 28px;
+}
+
+.lineText {
+  min-inline-size: 0;
+}
+
+.lineName {
+  margin: 0;
+  font: var(--t-body);
+}
+
+.lineSub {
+  margin: 0;
+  color: var(--text-2);
+  font: var(--t-caption);
+}
+
+.lineControls {
+  grid-column: 1 / -1;
+  justify-content: flex-end;
+}
+
+.altKcal {
+  color: var(--text-2);
+  font: var(--t-caption);
+}
+
+.alt {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--sp-2);
+}

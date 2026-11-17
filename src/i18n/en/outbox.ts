@@ -12,7 +12,7 @@ export const outbox: EnArea<'outbox'> = {
   send: 'Send',
   sendLabel: 'Send to {name} on WhatsApp',
   skip: 'Skip',
-  skipLabel: 'Skip {name}’s message',
+  skipLabel: 'Skip message to {name}',
   sent: 'Marked as sent',
   skipped: 'Removed from the list',
   undo: 'Undo',
