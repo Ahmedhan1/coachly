@@ -1,0 +1,167 @@
+.chartHead {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--sp-2);
+}
+
+.chart {
+  inline-size: 100%;
+  block-size: auto;
+  overflow: visible;
+}
+
+.grid {
+  stroke: var(--line);
+  stroke-width: 1;
+}
+
+.axis {
+  fill: var(--text-3);
+  font: 500 11px var(--font-num);
+}
+
+.line {
+  fill: none;
+  stroke: var(--brand);
+  stroke-width: 2.5;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.dot {
+  fill: var(--surface);
+  stroke: var(--brand);
+  stroke-width: 2;
+}
+
+.dotLast {
+  fill: var(--brand);
+}
+
+.compare {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--sp-2);
+}
+
+.compareCell {
+  margin: 0;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: inherit;
+  text-align: center;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.compareCaption {
+  display: block;
+  margin-block-start: var(--sp-1);
+  color: var(--text-2);
+  font: var(--t-caption);
+  text-align: center;
+}
+
+.pickGrid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: var(--sp-2);
+}
+
+.pickCell {
+  padding: 0;
+  border: 2px solid transparent;
+  border-radius: var(--r-md);
+  background: none;
+  color: inherit;
+  cursor: pointer;
+}
+
+.pickCell[aria-pressed='true'] {
+  border-color: var(--brand);
+}
+
+.pickPhoto {
+  display: block;
+  inline-size: 100%;
+  aspect-ratio: 3 / 4;
+  border-radius: var(--r-md);
+  background: var(--photo);
+  object-fit: cover;
+}
+
+.comparePhoto {
+  display: block;
+  inline-size: 100%;
+  aspect-ratio: 3 / 4;
+  border-radius: var(--r-md);
+  background: var(--photo);
+  object-fit: cover;
+}
+
+
+.rowThumb {
+  inline-size: 44px;
+  block-size: 44px;
+  border-radius: var(--r-sm);
+  object-fit: cover;
+}
+
+.none {
+  padding: var(--sp-3) var(--sp-4);
+  color: var(--text-2);
+  font: var(--t-caption);
+}
+
+.photoField {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-2);
+}
+
+.photoRow {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--sp-2);
+}
+
+.photoCell {
+  position: relative;
+}
+
+.photoThumb {
+  display: block;
+  inline-size: 64px;
+  block-size: 64px;
+  border-radius: var(--r-sm);
+  object-fit: cover;
+}
+
+.photoRemove {
+  position: absolute;
+  inset-block-start: -8px;
+  inset-inline-end: -8px;
+  display: grid;
+  place-items: center;
+  inline-size: 28px;
+  block-size: 28px;
+  border: 0;
+  border-radius: var(--r-full);
+  background: var(--text);
+  color: var(--bg);
+}
+
+.photoRemove svg {
+  inline-size: 14px;
+  block-size: 14px;
+}
+
+.fileInput {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  cursor: pointer;
+}

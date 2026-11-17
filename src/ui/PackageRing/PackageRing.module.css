@@ -1,0 +1,30 @@
+.ring {
+  position: relative;
+  flex: none;
+  inline-size: 104px;
+  block-size: 104px;
+}
+
+/* Counter-clockwise from 12 o'clock regardless of page direction. */
+.svg {
+  inline-size: 100%;
+  block-size: 100%;
+  transform: scaleX(-1) rotate(-90deg);
+}
+
+.center {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-content: center;
+  text-align: center;
+}
+
+.value {
+  font: 800 34px/1 var(--font-num);
+}
+
+.caption {
+  font: var(--t-caption);
+  color: var(--text-2);
+}

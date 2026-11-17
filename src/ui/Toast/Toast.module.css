@@ -1,0 +1,63 @@
+.host {
+  position: fixed;
+  z-index: 80;
+  inset-inline: var(--gutter);
+  inset-block-end: calc(var(--tabbar-h) + var(--safe-bottom) + var(--sp-3));
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-2);
+  max-inline-size: var(--content-max);
+  margin-inline: auto;
+  pointer-events: none;
+}
+
+/* Inverted, 52pt, radius 14 (DESIGN.md §5). */
+.toast {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-3);
+  min-block-size: 52px;
+  padding-inline: var(--sp-4) var(--sp-2);
+  border-radius: var(--r-md);
+  background: var(--text);
+  color: var(--bg);
+  pointer-events: auto;
+  animation: rise var(--dur-2) var(--ease-out) both;
+}
+
+.message {
+  flex: 1;
+  min-inline-size: 0;
+  padding-block: var(--sp-2);
+  font: var(--t-callout);
+  /* A very long client name must not turn the toast into a wall of text over the content. */
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  overflow: hidden;
+  overflow-wrap: anywhere;
+}
+
+.action {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--sp-1);
+  min-block-size: var(--tap);
+  padding-inline: var(--sp-3);
+  color: var(--bg);
+  font: 700 15px/1 var(--font-ui);
+  text-decoration: underline;
+  text-underline-offset: 4px;
+}
+
+.action svg {
+  inline-size: 18px;
+  block-size: 18px;
+}
+
+@keyframes rise {
+  from {
+    transform: translateY(12px);
+    opacity: 0;
+  }
+}

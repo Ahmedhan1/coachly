@@ -1,0 +1,132 @@
+.hero {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.heroLabel {
+  font: var(--t-label);
+  color: var(--text-2);
+}
+
+.heroValue {
+  display: flex;
+  align-items: baseline;
+  gap: var(--sp-2);
+}
+
+.heroValue :global(.num) {
+  font: var(--t-num-lg);
+  color: var(--text);
+}
+
+.heroValue span:last-child {
+  font: var(--t-sub);
+  color: var(--text-2);
+}
+
+.facts {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  margin: 0;
+  padding-block: var(--sp-3);
+  border-block: var(--hairline) solid var(--line);
+}
+
+.facts > div + div {
+  padding-inline-start: var(--sp-3);
+  border-inline-start: var(--hairline) solid var(--line);
+}
+
+.facts dt {
+  font: var(--t-caption);
+  color: var(--text-2);
+}
+
+.facts dd {
+  margin: 4px 0 0;
+}
+
+.facts dd :global(.num) {
+  font: 800 20px/1.1 var(--font-num);
+}
+
+.water {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-2);
+  font: var(--t-callout);
+}
+
+.water svg {
+  flex: none;
+  inline-size: 18px;
+  block-size: 18px;
+  color: var(--text-3);
+}
+
+.water :global(.num) {
+  font: 700 17px/1 var(--font-num);
+}
+
+.navy {
+  background: var(--surface-2);
+}
+
+.navy > summary {
+  min-block-size: 52px;
+  font: var(--t-callout);
+}
+
+.navy :global(input) {
+  background: var(--surface);
+}
+
+.navyResult {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--sp-2);
+  font: var(--t-headline);
+}
+
+.navyResult :global(.num) {
+  font: 800 22px/1 var(--font-num);
+}
+
+.steps {
+  margin: 0;
+  padding: 0 var(--sp-4) var(--sp-2);
+  list-style: none;
+}
+
+.steps li {
+  padding-block: var(--sp-3);
+  border-block-start: var(--hairline) solid var(--line);
+}
+
+.stepLabel {
+  font: var(--t-label);
+  color: var(--text-2);
+}
+
+.stepMath {
+  margin-block-start: 4px;
+  text-align: end;
+  font: 600 15px/1.5 var(--font-num);
+  overflow-wrap: anywhere;
+}
+
+.stepsNote {
+  padding: 0 var(--sp-4) var(--sp-4);
+  font: var(--t-caption);
+  color: var(--text-2);
+}
+
+.savedAt {
+  margin-block-start: var(--sp-3);
+  padding-inline: var(--gutter);
+  text-align: center;
+  font: var(--t-caption);
+  color: var(--text-2);
+}

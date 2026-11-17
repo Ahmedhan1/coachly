@@ -1,0 +1,349 @@
+/* Shared pieces of the programs area: glyphs, steppers, exercise thumbs, pickers and action sheets. */
+
+.glyph {
+  inline-size: var(--icon, 22px);
+  block-size: var(--icon, 22px);
+  stroke-width: var(--icon-stroke, 1.8);
+}
+
+.grip {
+  color: var(--text-3);
+}
+
+/* Toast sits above the pushed screen's bottom bar. */
+:global(html[data-pushed-screen='bar'] .toast-host),
+:global(html[data-pushed-screen='full'] .toast-host) {
+  inset-block-end: calc(var(--safe-bottom) + 88px);
+}
+
+/* Exercise photo slot */
+.photo {
+  position: relative;
+  display: grid;
+  flex: none;
+  place-items: center;
+  overflow: hidden;
+  border-radius: var(--r-sm);
+  background: var(--photo);
+  color: var(--photo-ink);
+}
+
+.sm {
+  inline-size: 48px;
+  block-size: 48px;
+}
+
+.md {
+  inline-size: 84px;
+  block-size: 84px;
+}
+
+.lg {
+  inline-size: 100%;
+  aspect-ratio: 4 / 3;
+}
+
+.img {
+  inline-size: 100%;
+  block-size: 100%;
+  object-fit: cover;
+}
+
+.fallbackMap {
+  inline-size: 100%;
+  block-size: 100%;
+}
+
+.mapBadge {
+  position: absolute;
+  inset-inline-end: 4px;
+  inset-block-end: 4px;
+  padding: 2px;
+  border-radius: var(--r-xs);
+  background: var(--surface);
+}
+
+.tag {
+  position: absolute;
+  inset-inline-start: 4px;
+  inset-block-start: 4px;
+  min-inline-size: 22px;
+  padding-inline: 5px;
+  border-radius: var(--r-xs);
+  background: var(--text);
+  color: var(--bg);
+  font: 700 12px/20px var(--font-num);
+  text-align: center;
+}
+
+/* Stepper */
+.stepper {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-1);
+  min-inline-size: 0;
+}
+
+.stepperLabel {
+  color: var(--text-2);
+  font: var(--t-caption);
+}
+
+.stepperRow {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-1);
+  padding: 2px;
+  border-radius: var(--r-md);
+  background: var(--surface-2);
+}
+
+.stepBtn {
+  display: grid;
+  flex: none;
+  place-items: center;
+  inline-size: var(--tap);
+  block-size: var(--tap);
+  border: 0;
+  border-radius: var(--r-sm);
+  background: var(--surface);
+  color: var(--text);
+}
+
+.stepBtn:disabled {
+  opacity: 0.35;
+}
+
+.stepBtn svg {
+  inline-size: 20px;
+  block-size: 20px;
+}
+
+.stepValue {
+  display: flex;
+  flex: 1;
+  align-items: baseline;
+  justify-content: center;
+  gap: 2px;
+  min-inline-size: 0;
+}
+
+.stepInput {
+  inline-size: 100%;
+  min-inline-size: 2ch;
+  border: 0;
+  background: none;
+  color: var(--text);
+  font: var(--t-num);
+  text-align: center;
+}
+
+.stepInput:focus {
+  outline: none;
+}
+
+.stepUnit {
+  color: var(--text-2);
+  font: var(--t-caption);
+}
+
+.stepperBig .stepperRow {
+  padding: 4px;
+}
+
+.stepperBig .stepBtn {
+  inline-size: 56px;
+  block-size: 56px;
+}
+
+.stepperBig .stepInput {
+  font: var(--t-num-lg);
+}
+
+/* Set editor */
+.editor {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-4);
+}
+
+.editorGrid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--sp-3);
+}
+
+.editorActions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--sp-2);
+}
+
+.textAction {
+  min-block-size: var(--tap);
+  padding-inline: var(--sp-3);
+  border: 0;
+  border-radius: var(--r-md);
+  background: var(--surface-2);
+  color: var(--text);
+  font: var(--t-label);
+}
+
+.danger {
+  color: var(--danger);
+}
+
+/* Action sheet */
+.actionList {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.actionRow {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-3);
+  inline-size: 100%;
+  min-block-size: var(--row-h);
+  padding: 0;
+  border: 0;
+  border-block-end: var(--hairline) solid var(--line);
+  background: none;
+  color: var(--text);
+  font: var(--t-body);
+  text-align: start;
+}
+
+.actionRow:disabled {
+  opacity: 0.4;
+}
+
+.actionRow svg {
+  flex: none;
+  inline-size: 22px;
+  block-size: 22px;
+  color: var(--text-2);
+}
+
+.actionRow.danger,
+.actionRow.danger svg {
+  color: var(--danger);
+}
+
+/* Pickers */
+.pickerTop {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-3);
+}
+
+.chipRow {
+  display: flex;
+  gap: var(--sp-2);
+  margin-inline: calc(var(--gutter) * -1);
+  padding-inline: var(--gutter);
+  padding-block: 4px;
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+
+.filterChip {
+  position: relative;
+  flex: none;
+  min-block-size: 36px;
+  padding-inline: var(--sp-3);
+  border: 1px solid var(--line);
+  border-radius: var(--r-full);
+  background: var(--surface);
+  color: var(--text);
+  font: var(--t-label);
+}
+
+.filterChip::after {
+  content: '';
+  position: absolute;
+  inset: -4px 0;
+}
+
+.filterChipOn {
+  border-color: var(--text);
+  background: var(--text);
+  color: var(--bg);
+}
+
+.pickerCount,
+.pickerEmpty,
+.pickerMore {
+  color: var(--text-2);
+  font: var(--t-caption);
+}
+
+.pickerEmpty {
+  padding-block: var(--sp-5);
+  text-align: center;
+}
+
+.pickerMore {
+  padding-block: var(--sp-3);
+  text-align: center;
+}
+
+.pickerList {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.pickerRow {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-3);
+  inline-size: 100%;
+  min-block-size: var(--row-h);
+  padding-block: var(--sp-2);
+  border: 0;
+  border-block-end: var(--hairline) solid var(--line);
+  background: none;
+  color: var(--text);
+  text-align: start;
+}
+
+.pickerText {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  min-inline-size: 0;
+}
+
+.pickerName {
+  overflow: hidden;
+  font: var(--t-headline);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.pickerSub {
+  color: var(--text-2);
+  font: var(--t-caption);
+}
+
+.pickerConfirm {
+  position: relative;
+  min-block-size: 36px;
+  padding-inline: var(--sp-4);
+  border-radius: var(--r-sm);
+  background: var(--brand);
+  color: var(--brand-on);
+  font: 600 15px/1 var(--font-ui);
+}
+
+.pickerConfirm::after {
+  content: '';
+  position: absolute;
+  inset: -4px 0;
+}
+
+.pickerConfirm:disabled {
+  opacity: 0.45;
+}

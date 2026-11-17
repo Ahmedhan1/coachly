@@ -1,0 +1,13 @@
+node_modules
+dist
+dev-dist
+.wrangler
+.dev.vars
+*.local
+*.pem
+*.key
+keys/
+test-results
+playwright-report
+.DS_Store
+*.tsbuildinfo

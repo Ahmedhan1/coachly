@@ -1,0 +1,35 @@
+.iconButton {
+  display: inline-grid;
+  place-items: center;
+  flex: none;
+  inline-size: var(--tap);
+  block-size: var(--tap);
+  border-radius: var(--r-full);
+  color: var(--text);
+}
+
+.iconButton:active {
+  opacity: 0.8;
+}
+
+.iconButton:disabled {
+  opacity: 0.4;
+}
+
+.round {
+  background: var(--surface);
+}
+
+.muted {
+  background: var(--surface-2);
+}
+
+.muted svg {
+  inline-size: 20px;
+  block-size: 20px;
+}
+
+.brand {
+  background: var(--brand);
+  color: var(--brand-on);
+}

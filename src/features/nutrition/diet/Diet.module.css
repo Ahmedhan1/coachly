@@ -1,0 +1,89 @@
+.intro {
+  margin-block-start: var(--sp-3);
+  padding-inline: var(--gutter);
+}
+
+.check {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-3);
+  min-block-size: var(--tap);
+  font: var(--t-body);
+}
+
+.check input {
+  inline-size: 22px;
+  block-size: 22px;
+}
+
+.targets {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: var(--sp-2);
+  margin: 0 0 var(--sp-3);
+}
+
+.targets > div {
+  padding: var(--sp-3);
+  border-radius: var(--r-md);
+  background: var(--surface);
+  text-align: center;
+}
+
+.targets dt {
+  color: var(--text-2);
+  font: var(--t-caption);
+}
+
+.targets dd {
+  margin: 0;
+  font: var(--t-title);
+}
+
+.days {
+  display: flex;
+  gap: var(--sp-2);
+  overflow-x: auto;
+  scrollbar-width: none;
+  padding-block-end: var(--sp-2);
+}
+
+.dot {
+  display: inline-block;
+  inline-size: 8px;
+  block-size: 8px;
+  margin-inline-start: var(--sp-2);
+  border-radius: var(--r-full);
+  background: var(--warn);
+}
+
+.dayTotal {
+  margin-block: var(--sp-3);
+  font: var(--t-callout);
+}
+
+.notes {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-2);
+  margin: 0;
+  padding-inline-start: var(--sp-5);
+  font: var(--t-callout);
+}
+
+.alts {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.alt {
+  inline-size: 100%;
+  min-block-size: var(--row-h);
+  border: 0;
+  border-block-end: var(--hairline) solid var(--line);
+  background: none;
+  color: var(--text);
+  font: var(--t-body);
+  text-align: start;
+}

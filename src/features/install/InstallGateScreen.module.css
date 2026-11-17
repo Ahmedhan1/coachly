@@ -1,0 +1,115 @@
+.page {
+  max-inline-size: var(--content-max);
+  margin-inline: auto;
+  padding:
+    calc(var(--safe-top) + var(--sp-7)) calc(var(--gutter) + var(--safe-right))
+    calc(var(--safe-bottom) + var(--sp-7)) calc(var(--gutter) + var(--safe-left));
+}
+
+.header {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-3);
+  margin-block-end: var(--sp-6);
+}
+
+.mark {
+  display: grid;
+  place-items: center;
+  inline-size: 56px;
+  block-size: 56px;
+  border-radius: var(--r-md);
+  background: var(--brand);
+  color: var(--brand-on);
+  font: 800 26px/1 var(--font-display);
+}
+
+.title {
+  font: var(--t-display);
+}
+
+.lead {
+  font: var(--t-body);
+  color: var(--text-2);
+}
+
+.steps {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-3);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.step {
+  display: flex;
+  gap: var(--sp-3);
+  padding: var(--sp-4);
+  border-radius: var(--r-lg);
+  background: var(--surface);
+}
+
+.number {
+  flex: none;
+  display: grid;
+  place-items: center;
+  inline-size: 32px;
+  block-size: 32px;
+  border-radius: var(--r-sm);
+  background: var(--text);
+  color: var(--bg);
+  font: 800 16px/1 var(--font-num);
+}
+
+.stepText {
+  flex: 1;
+  min-inline-size: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-2);
+}
+
+.stepTitle {
+  font: 700 17px/1.35 var(--font-display);
+}
+
+.stepBody {
+  font: var(--t-sub);
+  color: var(--text-2);
+}
+
+.blocked {
+  margin-block-start: var(--sp-6);
+  font: var(--t-sub);
+  color: var(--text-2);
+  text-align: center;
+}
+
+.installBox {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-2);
+  margin-block-end: var(--sp-4);
+}
+
+.installHint {
+  font: var(--t-sub);
+  color: var(--text-2);
+  text-align: center;
+}
+
+.callout {
+  display: flex;
+  gap: var(--sp-3);
+  align-items: flex-start;
+  padding: var(--sp-4);
+  margin-block-end: var(--sp-4);
+  border-radius: var(--r-lg);
+  background: var(--brand-tint);
+  font: var(--t-sub);
+}
+
+.calloutTitle {
+  font: 700 17px/1.35 var(--font-display);
+}

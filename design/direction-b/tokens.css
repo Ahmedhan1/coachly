@@ -1,0 +1,113 @@
+/* Direction B — «الحديد» (Iron). Token file: swap this file to switch direction.
+   Same token NAMES as direction A. Brand values = design/brand-derive.mjs output for #F25C1F. */
+@import url("../fonts/fonts.css");
+
+:root {
+  color-scheme: light dark;
+
+  /* Type */
+  --font-ui: "Readex Pro", system-ui, sans-serif;
+  --font-display: "Alexandria", "Readex Pro", sans-serif;
+  --font-num: "Alexandria", "Readex Pro", sans-serif;
+  --t-display: 800 30px/1.2 var(--font-display);
+  --t-title: 700 20px/1.3 var(--font-display);
+  --t-headline: 500 17px/1.35 var(--font-ui);
+  --t-body: 400 16px/1.55 var(--font-ui);
+  --t-callout: 500 15px/1.4 var(--font-ui);
+  --t-sub: 400 14px/1.45 var(--font-ui);
+  --t-caption: 400 12.5px/1.35 var(--font-ui);
+  --t-label: 600 13px/1.2 var(--font-ui);
+  --t-num: 700 18px/1 var(--font-num);
+  --t-num-lg: 800 44px/1 var(--font-num);
+
+  /* Space (4pt base) */
+  --sp-1: 4px; --sp-2: 8px; --sp-3: 12px; --sp-4: 16px; --sp-5: 20px; --sp-6: 24px; --sp-7: 32px; --sp-8: 40px;
+  --gutter: 16px;
+
+  /* Shape */
+  --r-xs: 6px; --r-sm: 10px; --r-md: 14px; --r-lg: 18px; --r-sheet: 22px; --r-full: 999px;
+  --hairline: 1px;
+  --icon-stroke: 2;
+
+  /* Sizes */
+  --tap: 44px; --row-h: 60px; --tabbar-h: 56px; --field-h: 48px;
+
+  /* Motion */
+  --dur-1: 120ms; --dur-2: 200ms; --dur-3: 300ms;
+  --ease-out: cubic-bezier(.2, .8, .2, 1);
+  --ease-sheet: cubic-bezier(.32, .72, 0, 1);
+
+  /* Neutrals — cool concrete */
+  --bg: #EDEDEA;
+  --surface: #FFFFFF;
+  --surface-2: #F3F3F1;
+  --line: #E3E3DF;
+  --line-strong: #D2D3CF;
+  --text: #0E0F0F;
+  --text-2: #4A4D4E;
+  --text-3: #5F6364;
+  --muscle-base: #D9DAD6;
+  --muscle-off: #C3C5C1;
+  --photo: #DCDDD9;
+  --photo-ink: #8E928F;
+  --scrim: rgb(14 15 15 / .4);
+
+  /* Brand (derived) */
+  --brand: #F25C1F;
+  --brand-on: #111111;
+  --brand-ink: #AA3F14;
+  --brand-tint: #F6E3D9;
+  --brand-tint-strong: #EED0C1;
+  --muscle-hit: var(--brand);
+  --muscle-hit-2: color-mix(in oklab, var(--brand) 45%, var(--muscle-off));
+
+  /* Semantic */
+  --ok: #1B7040;      --ok-tint: #DCEFE2;
+  --warn: #8F5600;    --warn-tint: #F7E7C8;
+  --danger: #B42318;  --danger-tint: #F9DEDA;
+
+  --shadow-sheet: 0 -8px 40px rgb(0 0 0 / .18);
+  --shadow-raise: none;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #0B0C0C;
+    --surface: #161818;
+    --surface-2: #1F2222;
+    --line: #252828;
+    --line-strong: #2E3232;
+    --text: #F2F3F1;
+    --text-2: #A3A8A6;
+    --text-3: #868B89;
+    --muscle-base: #262929;
+    --muscle-off: #363A3A;
+    --photo: #222525;
+    --photo-ink: #5A605E;
+    --scrim: rgb(0 0 0 / .6);
+
+    --brand: #F25C1F;
+    --brand-on: #111111;
+    --brand-ink: #FF7A45;
+    --brand-tint: #2A1710;
+    --brand-tint-strong: #4C2211;
+    --muscle-hit: var(--brand);
+
+    --ok: #5CC88A;     --ok-tint: #14241A;
+    --warn: #F0B04F;   --warn-tint: #2B2113;
+    --danger: #FF8A7E; --danger-tint: #2E1614;
+    --shadow-sheet: 0 -8px 40px rgb(0 0 0 / .6);
+  }
+}
+
+/* Alternate brand proof: trainer picked crimson #C81E3A — on-color flips to white automatically */
+:root[data-brand="alt"] {
+  --brand: #C81E3A; --brand-on: #FFFFFF; --brand-ink: #B01A33;
+  --brand-tint: #F4DDE0; --brand-tint-strong: #E6C4C7;
+}
+@media (prefers-color-scheme: dark) {
+  :root[data-brand="alt"]:not([data-theme="light"]) {
+    --brand: #C81E3A; --brand-on: #FFFFFF; --brand-ink: #F0708A;
+    --brand-tint: #290F13; --brand-tint-strong: #401119;
+  }
+}

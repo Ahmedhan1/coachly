@@ -1,0 +1,15 @@
+{
+  "source": "yuhonas/free-exercise-db dist/exercises.json",
+  "exercises": 876,
+  "fullyCoveredNames": 876,
+  "fullyCoveredPercent": 100,
+  "englishWords": 3066,
+  "unknownWords": 0,
+  "wordCoveragePercent": 100,
+  "distinctUnknownTokens": 0,
+  "curatedNames": 394,
+  "popular": 105,
+  "missingFieldValues": [],
+  "unknownByFrequency": [],
+  "note": "Machine transliteration. Every name must be reviewed by a real Egyptian trainer before release."
+}

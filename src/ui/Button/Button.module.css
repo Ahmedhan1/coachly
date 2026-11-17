@@ -1,0 +1,74 @@
+.button {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--sp-2);
+  min-block-size: var(--field-h);
+  min-inline-size: var(--tap);
+  padding-inline: var(--sp-5);
+  border-radius: var(--r-md);
+  font: 600 16px/1.2 var(--font-ui);
+  text-align: center;
+}
+
+.button:disabled {
+  opacity: 0.45;
+  cursor: default;
+}
+
+.button:active:not(:disabled) {
+  opacity: 0.85;
+}
+
+.block {
+  display: flex;
+  inline-size: 100%;
+}
+
+.large {
+  min-block-size: 52px;
+  font-size: 17px;
+}
+
+/* 36pt visual, 44pt hit area (DESIGN.md §1.5) */
+.small {
+  min-block-size: 36px;
+  min-inline-size: 0;
+  padding-inline: var(--sp-3);
+  border-radius: var(--r-sm);
+  font-size: 14px;
+}
+
+.small::after {
+  content: '';
+  position: absolute;
+  inset: -4px 0;
+}
+
+.primary {
+  background: var(--brand);
+  color: var(--brand-on);
+}
+
+.secondary {
+  background: var(--surface-2);
+  color: var(--text);
+}
+
+.onBrand {
+  background: var(--brand-on);
+  color: var(--brand);
+}
+
+.plain {
+  background: transparent;
+  color: var(--brand-ink);
+  padding-inline: var(--sp-3);
+}
+
+.danger {
+  background: transparent;
+  color: var(--danger);
+  padding-inline: var(--sp-3);
+}

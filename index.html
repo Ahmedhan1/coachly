@@ -1,0 +1,29 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <meta name="color-scheme" content="light dark" />
+    <meta name="theme-color" media="(prefers-color-scheme: light)" content="#ededea" />
+    <meta name="theme-color" media="(prefers-color-scheme: dark)" content="#0b0c0c" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+    <meta name="apple-mobile-web-app-title" content="كوتش" />
+    <meta name="format-detection" content="telephone=no" />
+    <link rel="icon" type="image/png" sizes="192x192" href="/icons/icon-192.png" />
+    <link rel="apple-touch-icon" sizes="180x180" href="/icons/apple-touch-icon-180.png" />
+    <!-- No font preloads: after the first visit the service worker serves the fonts from the precache, where
+         Chromium reports the preload as unused; the stylesheet discovers them just as early. -->
+    <title>كوتش</title>
+    <!-- Before the script runs: the app icon centred (the script swaps in the trainer's logo splash). -->
+    <style>
+      #root:empty { min-height: 100vh; min-height: 100dvh; background: #ededea url(/icons/icon-512.png) center / min(36vw, 180px) no-repeat; }
+      @media (prefers-color-scheme: dark) { #root:empty { background-color: #0b0c0c; } }
+    </style>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>

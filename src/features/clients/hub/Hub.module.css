@@ -1,0 +1,355 @@
+/* Client hub: tab strip, overview facts, quick actions, program days, history. Direction B tokens. */
+
+.tabs {
+  position: sticky;
+  inset-block-start: 0;
+  z-index: 5;
+  display: flex;
+  gap: 6px;
+  overflow-x: auto;
+  padding: var(--sp-2) var(--gutter);
+  margin-block-start: var(--sp-3);
+  background: var(--bg);
+  scrollbar-width: none;
+  overscroll-behavior-inline: contain;
+}
+
+.tabs::-webkit-scrollbar {
+  display: none;
+}
+
+.tab {
+  flex: none;
+  min-block-size: var(--tap);
+  padding-inline: var(--sp-4);
+  border-radius: var(--r-full);
+  background: var(--surface);
+  color: var(--text-2);
+  font: 600 15px/1 var(--font-ui);
+  white-space: nowrap;
+}
+
+.tabOn {
+  background: var(--text);
+  color: var(--bg);
+}
+
+.panel {
+  padding-block-end: var(--sp-6);
+}
+
+/* ---------- facts (overview) ---------- */
+.factValue {
+  font: 700 17px/1.3 var(--font-num);
+}
+
+.quick {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: var(--sp-2);
+  padding-inline: var(--gutter);
+  margin-block-start: var(--sp-4);
+}
+
+.quickBtn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  min-block-size: 64px;
+  padding: var(--sp-2) 4px;
+  border-radius: var(--r-md);
+  background: var(--surface);
+  color: var(--text);
+  font: 500 13px/1.2 var(--font-ui);
+  text-align: center;
+}
+
+.quickBtn svg {
+  inline-size: 22px;
+  block-size: 22px;
+}
+
+.quickBtn:disabled {
+  opacity: 0.45;
+}
+
+/* ---------- program days ---------- */
+.day {
+  border-block-start: var(--hairline) solid var(--line);
+}
+
+.day:first-child {
+  border-block-start: 0;
+}
+
+.dayHead {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-2);
+  padding: var(--sp-2) var(--sp-4);
+  min-block-size: var(--row-h);
+}
+
+.daySummary {
+  flex: 1;
+  min-inline-size: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-block-size: var(--tap);
+  justify-content: center;
+  cursor: pointer;
+  list-style: none;
+}
+
+.daySummary::-webkit-details-marker {
+  display: none;
+}
+
+.dayName {
+  font: 600 17px/1.3 var(--font-ui);
+}
+
+.daySub {
+  font: var(--t-sub);
+  color: var(--text-2);
+}
+
+.dayItems {
+  margin: 0;
+  padding: 0 0 var(--sp-2);
+  list-style: none;
+}
+
+.exRow {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-3);
+  inline-size: 100%;
+  min-block-size: var(--tap);
+  padding: 6px var(--sp-4);
+  padding-inline-start: var(--sp-6);
+  text-align: start;
+  color: var(--text);
+  font: var(--t-body);
+}
+
+.exName {
+  flex: 1;
+  min-inline-size: 0;
+}
+
+.exSpec {
+  font: var(--t-sub);
+  color: var(--text-2);
+}
+
+.startBtn {
+  flex: none;
+}
+
+.trend {
+  font: var(--t-caption);
+}
+
+.upTrend {
+  color: var(--ok);
+}
+
+.downTrend {
+  color: var(--danger);
+}
+
+.actionsRow {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--sp-2);
+  padding: var(--sp-3) var(--gutter) 0;
+}
+
+/* ---------- exercise history sheet ---------- */
+.stats {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--sp-2);
+  margin: 0 0 var(--sp-4);
+}
+
+.stats > div {
+  padding: var(--sp-3);
+  border-radius: var(--r-md);
+  background: var(--surface-2);
+}
+
+.stats dt {
+  font: var(--t-caption);
+  color: var(--text-2);
+}
+
+.stats dd {
+  margin: 4px 0 0;
+  font: 800 22px/1.2 var(--font-num);
+}
+
+.stats dd small {
+  font: var(--t-caption);
+  color: var(--text-2);
+  margin-inline-start: 4px;
+}
+
+.entries {
+  margin: var(--sp-3) 0;
+  padding: 0;
+  list-style: none;
+}
+
+.entry {
+  padding-block: var(--sp-2);
+  border-block-start: var(--hairline) solid var(--line);
+}
+
+.entryHead {
+  display: flex;
+  justify-content: space-between;
+  gap: var(--sp-2);
+  font: 600 15px/1.4 var(--font-ui);
+}
+
+.entrySets {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  margin-block-start: 6px;
+}
+
+.setChip {
+  padding: 2px 8px;
+  border-radius: var(--r-full);
+  background: var(--surface-2);
+  font: 600 14px/1.6 var(--font-num);
+}
+
+.bestChip {
+  background: var(--brand-tint);
+}
+
+/* ---------- nutrition ---------- */
+.targets {
+  display: block;
+  inline-size: 100%;
+  padding: var(--sp-4);
+  text-align: start;
+  color: var(--text);
+}
+
+.kcal {
+  font: 800 34px/1.1 var(--font-num);
+}
+
+.kcal small {
+  font: var(--t-sub);
+  color: var(--text-2);
+  margin-inline-start: 6px;
+}
+
+.macros {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: var(--sp-2);
+  margin: var(--sp-3) 0 0;
+}
+
+.macros dt {
+  font: var(--t-caption);
+  color: var(--text-2);
+}
+
+.macros dd {
+  margin: 2px 0 0;
+  font: 700 17px/1.3 var(--font-num);
+}
+
+.macros dd small {
+  font: var(--t-caption);
+  color: var(--text-2);
+  margin-inline-start: 2px;
+}
+
+.emptyTile {
+  padding: var(--sp-4);
+}
+
+.emptyTitle {
+  font: 700 17px/1.3 var(--font-display);
+}
+
+.emptyBody {
+  margin-block: 4px var(--sp-3);
+  font: var(--t-sub);
+  color: var(--text-2);
+}
+
+.delta {
+  font: var(--t-caption);
+  color: var(--text-2);
+}
+
+/* ---------- sessions ---------- */
+.counts {
+  padding: 0 var(--gutter);
+  margin-block-start: var(--sp-3);
+  font: var(--t-sub);
+  color: var(--text-2);
+}
+
+.pastRow {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--sp-2);
+  padding: var(--sp-2) var(--sp-4);
+  border-block-start: var(--hairline) solid var(--line);
+}
+
+.pastRow:first-child {
+  border-block-start: 0;
+}
+
+.pastText {
+  display: flex;
+  flex-direction: column;
+  min-inline-size: 0;
+}
+
+.more {
+  display: flex;
+  justify-content: center;
+  padding: var(--sp-2);
+}
+
+.splitRow {
+  display: flex;
+  align-items: center;
+  border-block-start: var(--hairline) solid var(--line);
+}
+
+.splitRow:first-child {
+  border-block-start: 0;
+}
+
+.splitMain {
+  flex: 1;
+  min-inline-size: 0;
+}
+
+.splitAction {
+  flex: none;
+  margin-inline-end: var(--sp-3);
+}
+
+.chooser {
+  margin-inline: calc(var(--gutter) * -1);
+}

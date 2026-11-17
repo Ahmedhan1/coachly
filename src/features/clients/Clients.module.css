@@ -1,0 +1,14 @@
+.body {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-4);
+  padding-block-start: var(--sp-3);
+}
+
+.body > [role='search'] {
+  margin-inline: var(--gutter);
+}
+
+.list {
+  margin-block-start: 0;
+}

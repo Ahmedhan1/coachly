@@ -1,0 +1,21 @@
+PT Coach superficial muscles model (muscles.glb and accompanying files)
+
+This work is licensed under the Creative Commons Attribution-ShareAlike 4.0 International License (CC BY-SA 4.0).
+
+  Human-readable summary (deed): https://creativecommons.org/licenses/by-sa/4.0/
+  Full legal code:               https://creativecommons.org/licenses/by-sa/4.0/legalcode
+  Plain-text legal code:         https://creativecommons.org/licenses/by-sa/4.0/legalcode.txt
+
+The full legal code at the links above is the binding licence text; it is not reproduced here.
+
+Attribution required for this work and its sources:
+
+  - "Z-Anatomy - The libre 3D atlas of anatomy - CC-BY-SA 4.0"
+    https://github.com/Z-Anatomy/Models-of-human-anatomy
+  - "BodyParts3D - The Database Center for Life Science - CC-BY-SA 2.1 Japan"
+    https://dbarchive.biosciencedbc.jp/en/bodyparts3d/download.html
+
+Modified from the original: superficial muscles selected, grouped, decimated, re-materialed, rescaled and
+exported to glTF binary (see README.md, "Changes made").
+
+No warranties are given. The licence may not give you all of the permissions necessary for your intended use.

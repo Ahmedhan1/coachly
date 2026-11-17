@@ -1,0 +1,29 @@
+{
+  "name": "pt-coach-license-worker",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "scripts": {
+    "dev": "wrangler dev",
+    "deploy": "wrangler deploy",
+    "db:migrate:local": "wrangler d1 migrations apply pt-coach-licenses --local",
+    "db:migrate:remote": "wrangler d1 migrations apply pt-coach-licenses --remote",
+    "test": "vitest run",
+    "typecheck": "tsc --noEmit",
+    "bench": "node bench/sign-benchmark.mjs",
+    "bench:push": "node bench/push-benchmark.mjs",
+    "test:viewer": "node test-browser/viewer.test.mjs",
+    "test:e2e": "node test-browser/e2e-dev.test.mjs",
+    "vapid:keys": "node scripts/vapid-keys.mjs"
+  },
+  "dependencies": {
+    "@noble/ed25519": "3.2.0"
+  },
+  "devDependencies": {
+    "@cloudflare/vitest-plugin": "1.8.3",
+    "@cloudflare/workers-types": "5.20261117.1",
+    "typescript": "6.0.3",
+    "vitest": "5.1.0",
+    "wrangler": "4.163.0"
+  }
+}

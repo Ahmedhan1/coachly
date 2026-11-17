@@ -1,0 +1,60 @@
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-2);
+}
+
+.label {
+  font: var(--t-label);
+  color: var(--text-2);
+}
+
+/* 48pt, --surface, radius 14, no border in light; 1px --line-strong in dark (DESIGN.md §5). */
+.input {
+  min-block-size: var(--field-h);
+  padding-inline: var(--sp-4);
+  border: var(--field-border, 0);
+  border-radius: var(--r-md);
+  background: var(--field-bg, var(--surface));
+  font: var(--t-body); /* 16px so iOS does not zoom on focus */
+  inline-size: 100%;
+}
+
+textarea.input {
+  padding-block: var(--sp-3);
+  min-block-size: 120px;
+  resize: vertical;
+  word-break: break-all;
+}
+
+.input::placeholder {
+  color: var(--text-3);
+}
+
+.input:focus {
+  outline: none;
+  box-shadow: 0 0 0 3px var(--focus-ring);
+}
+
+.ltr {
+  text-align: start;
+  font-family: var(--font-num);
+  letter-spacing: 0.04em;
+}
+
+.invalid {
+  box-shadow: 0 0 0 2px var(--danger);
+}
+
+.hint,
+.error {
+  font: var(--t-caption);
+}
+
+.hint {
+  color: var(--text-2);
+}
+
+.error {
+  color: var(--danger);
+}

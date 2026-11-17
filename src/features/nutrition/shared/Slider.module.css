@@ -1,0 +1,43 @@
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--sp-2);
+}
+
+.label {
+  font: var(--t-label);
+  color: var(--text-2);
+}
+
+.value :global(.num) {
+  font: 800 20px/1 var(--font-num);
+}
+
+.unit {
+  margin-inline-start: 4px;
+  font: var(--t-caption);
+  color: var(--text-2);
+}
+
+.range {
+  inline-size: 100%;
+  block-size: var(--tap);
+  margin: 0;
+  accent-color: var(--brand);
+  background: transparent;
+  cursor: pointer;
+}
+
+.ends {
+  display: flex;
+  justify-content: space-between;
+  font: 500 11px/1 var(--font-num);
+  color: var(--text-3);
+}

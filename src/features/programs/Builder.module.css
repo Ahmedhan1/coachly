@@ -1,0 +1,424 @@
+/* Program builder and programs list (direction B): day pills, day tile with muscle map, exercise cards. */
+
+.screen {
+  padding-block-end: var(--sp-6);
+}
+
+.statusOk {
+  color: var(--text-3);
+}
+
+.statusError {
+  color: var(--danger);
+}
+
+.notice,
+.selectHint {
+  margin: var(--sp-3) var(--gutter) 0;
+  padding: var(--sp-3) var(--sp-4);
+  border-radius: var(--r-md);
+  background: var(--warn-tint);
+  color: var(--warn);
+  font: var(--t-callout);
+}
+
+.selectHint {
+  background: var(--brand-tint);
+  color: var(--brand-ink);
+}
+
+/* Day pills */
+.pills {
+  display: flex;
+  gap: var(--sp-2);
+  margin-block-start: var(--sp-3);
+  padding-inline: var(--gutter);
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+
+.pill {
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  gap: var(--sp-2);
+  min-block-size: var(--tap);
+  padding-inline: var(--sp-3) var(--sp-4);
+  border: 1px solid var(--line);
+  border-radius: var(--r-full);
+  background: var(--surface);
+  color: var(--text);
+  font: var(--t-label);
+}
+
+.pill b {
+  display: grid;
+  place-items: center;
+  inline-size: 24px;
+  block-size: 24px;
+  border-radius: var(--r-full);
+  background: var(--surface-2);
+  font: 700 13px/1 var(--font-num);
+}
+
+.pill[aria-current='true'] {
+  border-color: var(--text);
+  background: var(--text);
+  color: var(--bg);
+}
+
+.pill[aria-current='true'] b {
+  background: var(--brand);
+  color: var(--brand-on);
+}
+
+.pillAdd {
+  justify-content: center;
+  inline-size: var(--tap);
+  padding: 0;
+  color: var(--text-2);
+}
+
+.pillAdd svg {
+  inline-size: 20px;
+  block-size: 20px;
+}
+
+/* Day tile */
+.dayTile {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-3);
+  margin: var(--sp-4) var(--gutter) 0;
+  padding: var(--sp-4);
+  border-radius: var(--r-lg);
+  background: var(--surface);
+}
+
+.dayText {
+  flex: 1;
+  min-inline-size: 0;
+}
+
+.dayName {
+  font: var(--t-title);
+}
+
+.dayStats {
+  margin-block-start: var(--sp-1);
+  color: var(--text-2);
+  font: var(--t-sub);
+}
+
+.dayMap {
+  flex: none;
+}
+
+.muscleChips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--sp-1);
+  margin: var(--sp-2) 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.mChip {
+  padding: 2px var(--sp-2);
+  border-radius: var(--r-xs);
+  background: var(--surface-2);
+  color: var(--text-2);
+  font: var(--t-caption);
+}
+
+.mChipBrand {
+  background: var(--brand-tint);
+  color: var(--brand-ink);
+}
+
+/* Empty day */
+.emptyDay {
+  margin: var(--sp-4) var(--gutter) 0;
+  padding: var(--sp-6) var(--sp-4);
+  border: 1px dashed var(--line-strong);
+  border-radius: var(--r-lg);
+  text-align: center;
+}
+
+.emptyDay h2 {
+  font: var(--t-headline);
+}
+
+.emptyDay p {
+  margin-block-start: var(--sp-1);
+  color: var(--text-2);
+  font: var(--t-sub);
+}
+
+/* Exercise cards */
+.tile {
+  margin: var(--sp-3) var(--gutter) 0;
+}
+
+.superset {
+  padding: var(--sp-2);
+  border-radius: var(--r-lg);
+  background: var(--brand-tint);
+}
+
+.superset .card + .card {
+  margin-block-start: var(--sp-2);
+}
+
+.ssHead {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-2);
+  padding: var(--sp-1) var(--sp-2) var(--sp-2);
+  color: var(--brand-ink);
+  font: var(--t-label);
+}
+
+.ssRest {
+  margin-inline-start: auto;
+  color: var(--text-2);
+  font: var(--t-caption);
+}
+
+.card {
+  position: relative;
+  display: flex;
+  align-items: stretch;
+  border-radius: var(--r-lg);
+  background: var(--surface);
+  touch-action: manipulation;
+}
+
+.dragging {
+  z-index: 5;
+  box-shadow: var(--shadow-raise);
+}
+
+.cardMain {
+  display: flex;
+  flex: 1;
+  gap: var(--sp-3);
+  min-inline-size: 0;
+  padding: var(--sp-3);
+  border: 0;
+  background: none;
+  color: var(--text);
+  text-align: start;
+}
+
+.cardMain[aria-pressed='true'] {
+  border-radius: var(--r-lg);
+  outline: 2px solid var(--brand);
+}
+
+.cardText {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: 2px;
+  min-inline-size: 0;
+}
+
+.cardName {
+  overflow: hidden;
+  font: var(--t-headline);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.cardSub {
+  overflow: hidden;
+  color: var(--text-2);
+  font: var(--t-caption);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.sets {
+  display: flex;
+  align-items: baseline;
+  gap: 4px;
+  margin-block-start: var(--sp-1);
+  font: var(--t-num);
+}
+
+.sets small {
+  color: var(--text-2);
+  font: var(--t-caption);
+}
+
+.times {
+  color: var(--text-3);
+}
+
+.meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--sp-1);
+  margin-block-start: var(--sp-1);
+}
+
+.chip {
+  padding: 1px var(--sp-2);
+  border-radius: var(--r-xs);
+  background: var(--surface-2);
+  color: var(--text-2);
+  font: var(--t-caption);
+}
+
+.grip {
+  display: grid;
+  flex: none;
+  place-items: center;
+  inline-size: var(--tap);
+  border: 0;
+  background: none;
+  color: var(--text-3);
+  cursor: grab;
+  touch-action: none;
+}
+
+.check {
+  display: grid;
+  flex: none;
+  place-items: center;
+  align-self: center;
+  inline-size: 28px;
+  block-size: 28px;
+  margin-inline-end: var(--sp-3);
+  border: 2px solid var(--line-strong);
+  border-radius: var(--r-full);
+}
+
+.checkOn {
+  border-color: var(--brand);
+  background: var(--brand);
+  color: var(--brand-on);
+}
+
+.check svg {
+  inline-size: 16px;
+  block-size: 16px;
+}
+
+/* Weekly summary */
+.week {
+  margin: var(--sp-6) var(--gutter) 0;
+  padding: var(--sp-4);
+  border-radius: var(--r-lg);
+  background: var(--surface);
+}
+
+.weekTitle {
+  font: var(--t-headline);
+}
+
+.weekHint {
+  margin-block-start: var(--sp-1);
+  color: var(--text-2);
+  font: var(--t-caption);
+}
+
+.weekList {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-2);
+  margin: var(--sp-3) 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.weekRow {
+  display: grid;
+  grid-template-columns: 6.5em 1fr auto;
+  align-items: center;
+  gap: var(--sp-2);
+}
+
+.weekName {
+  font: var(--t-sub);
+}
+
+.weekBar {
+  overflow: hidden;
+  block-size: 6px;
+  border-radius: var(--r-full);
+  background: var(--surface-2);
+}
+
+.weekBar i {
+  display: block;
+  block-size: 100%;
+  border-radius: inherit;
+  background: var(--brand);
+}
+
+.weekValue {
+  font: var(--t-caption);
+  white-space: nowrap;
+}
+
+.weekValue small {
+  color: var(--text-3);
+}
+
+/* Bottom action bar */
+.actionbar {
+  position: fixed;
+  inset-inline: 0;
+  inset-block-end: 0;
+  z-index: 40;
+  display: flex;
+  gap: var(--sp-2);
+  padding: var(--sp-3) calc(var(--gutter) + var(--safe-right)) calc(var(--safe-bottom) + var(--sp-2)) calc(var(--gutter) + var(--safe-left));
+  border-block-start: var(--hairline) solid var(--line);
+  background: var(--bg);
+}
+
+.stack {
+  display: flex;
+  flex: none;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 3px;
+  inline-size: 64px;
+  min-block-size: 52px;
+  border: 0;
+  border-radius: var(--r-md);
+  background: var(--surface);
+  color: var(--text);
+  font: 500 11.5px/1 var(--font-ui);
+}
+
+.stack:disabled {
+  opacity: 0.4;
+}
+
+.stack svg {
+  inline-size: 22px;
+  block-size: 22px;
+}
+
+.primary {
+  flex: 1;
+}
+
+.clientLink {
+  position: relative;
+  color: var(--brand-ink);
+  font: inherit;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.clientLink::after {
+  content: '';
+  position: absolute;
+  inset: -12px -6px;
+}

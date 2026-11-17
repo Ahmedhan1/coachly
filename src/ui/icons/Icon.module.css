@@ -1,0 +1,10 @@
+.icon {
+  inline-size: var(--icon);
+  block-size: var(--icon);
+  flex: none;
+  stroke-width: var(--icon-stroke);
+}
+
+:global([dir='rtl']) .mirror {
+  transform: scaleX(-1);
+}

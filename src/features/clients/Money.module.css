@@ -1,0 +1,61 @@
+/* Package + payment sheets and the money rows on client detail. */
+
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-5);
+}
+
+.save {
+  position: relative;
+  min-block-size: 36px;
+  padding-inline: var(--sp-4);
+  border-radius: var(--r-sm);
+  background: var(--brand);
+  color: var(--brand-on);
+  font: 600 15px/1 var(--font-ui);
+}
+
+.save::after {
+  content: '';
+  position: absolute;
+  inset: -4px 0;
+}
+
+.pair {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--sp-3);
+}
+
+.pair input {
+  min-inline-size: 0;
+}
+
+.payRow {
+  display: flex;
+  align-items: center;
+  background: var(--surface);
+  padding-inline-end: var(--sp-3);
+}
+
+.payMain {
+  flex: 1;
+  min-inline-size: 0;
+}
+
+.amount {
+  font: 700 18px/1.2 var(--font-num);
+}
+
+.pkgActions {
+  display: flex;
+  gap: var(--sp-2);
+  margin-block-start: var(--sp-3);
+}
+
+.hint {
+  margin-block-start: calc(-1 * var(--sp-3));
+  font: var(--t-sub);
+  color: var(--warn);
+}

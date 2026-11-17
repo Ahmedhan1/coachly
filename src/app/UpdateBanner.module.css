@@ -1,0 +1,25 @@
+.banner {
+  position: fixed;
+  z-index: 90;
+  inset-inline: var(--gutter);
+  inset-block-start: calc(var(--safe-top) + var(--sp-2));
+  max-inline-size: var(--content-max);
+  margin-inline: auto;
+  display: flex;
+  align-items: center;
+  gap: var(--sp-2);
+  padding-block: var(--sp-2);
+  padding-inline: var(--sp-4) var(--sp-2);
+  border-radius: var(--r-md);
+  background: var(--surface);
+  border: var(--hairline) solid var(--line-strong);
+  box-shadow: 0 6px 24px rgb(0 0 0 / 0.12);
+}
+
+.text {
+  flex: 1;
+  min-inline-size: 0;
+  margin: 0;
+  font: var(--t-callout);
+  color: var(--text);
+}

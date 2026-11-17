@@ -1,0 +1,49 @@
+.header {
+  padding-block: calc(var(--safe-top) + var(--sp-2)) var(--sp-1);
+  padding-inline: var(--gutter) 8px;
+}
+
+.top,
+.bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--sp-2);
+  min-block-size: 52px;
+}
+
+.bar {
+  margin-inline-start: -8px;
+}
+
+.back {
+  display: inline-grid;
+  place-items: center;
+  inline-size: var(--tap);
+  block-size: var(--tap);
+  border-radius: var(--r-full);
+  background: var(--surface);
+  color: var(--text);
+}
+
+.actions {
+  display: flex;
+  gap: var(--sp-2);
+}
+
+.title {
+  font: var(--t-display);
+  overflow-wrap: anywhere;
+  min-inline-size: 0;
+}
+
+.bar + .title {
+  margin-block-start: var(--sp-2);
+}
+
+.subtitle {
+  margin-block-start: var(--sp-1);
+  padding-inline-end: var(--sp-2);
+  font: var(--t-callout);
+  color: var(--text-2);
+}

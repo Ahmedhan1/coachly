@@ -1,0 +1,39 @@
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-2);
+}
+
+.label {
+  font: var(--t-label);
+  color: var(--text-2);
+}
+
+.wrap {
+  position: relative;
+}
+
+.select {
+  appearance: none;
+  inline-size: 100%;
+  min-block-size: var(--field-h);
+  padding-inline: var(--sp-4) calc(var(--sp-4) + var(--icon));
+  border: var(--field-border, 0);
+  border-radius: var(--r-md);
+  background: var(--field-bg, var(--surface));
+  font: var(--t-body);
+}
+
+.select:focus {
+  outline: none;
+  box-shadow: 0 0 0 3px var(--focus-ring);
+}
+
+.chevron {
+  position: absolute;
+  inset-inline-end: var(--sp-3);
+  inset-block-start: 50%;
+  translate: 0 -50%;
+  color: var(--text-3);
+  pointer-events: none;
+}

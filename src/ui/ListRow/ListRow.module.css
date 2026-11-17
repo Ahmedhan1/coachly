@@ -1,0 +1,59 @@
+.row {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-3);
+  inline-size: 100%;
+  min-block-size: var(--row-h);
+  padding: var(--sp-3) var(--sp-4);
+  background: var(--surface);
+  text-align: start;
+  color: var(--text);
+}
+
+.interactive:active {
+  background: var(--surface-2);
+}
+
+.leading {
+  flex: none;
+  display: grid;
+  place-items: center;
+}
+
+.text {
+  flex: 1;
+  min-inline-size: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.title {
+  font: var(--t-headline);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.subtitle {
+  font: var(--t-sub);
+  color: var(--text-2);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.trailing {
+  flex: none;
+  display: flex;
+  align-items: center;
+  gap: var(--sp-2);
+  font: var(--t-sub);
+  color: var(--text-2);
+}
+
+.chevron {
+  flex: none;
+  color: var(--text-3);
+  inline-size: 20px;
+  block-size: 20px;
+}
