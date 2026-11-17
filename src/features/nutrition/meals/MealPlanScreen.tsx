@@ -7,6 +7,7 @@ import { recipeIconHex, compareToTarget, dayTotals, duplicateMeals, nextDayNumbe
 import type { IngredientEntry } from '@/domain/meals';
 import type { Client, Meal, MealPlan } from '@/domain/models';
 import { t } from '@/i18n';
+import { pick } from '@/i18n/locale';
 import { Button, EmptyState, Icon, PageHeader, TextArea } from '@/ui';
 import { ClientNav } from '../shared/ClientNav';
 import { useBackTo, useClient } from '../shared/useClient';
@@ -73,7 +74,7 @@ function MealPlanView({ client, plans, saved, tolerance, recipes, foods, back }:
   const day = plans.find((p) => p.id === selectedId) ?? plans[0];
   const lookup = useMemo(() => new Map<string, MacroTotals>(recipes.map((r) => [r.recipe.id, r.perServing])), [recipes]);
   const images = useMemo(() => new Map(recipes.map((r) => [r.recipe.id, { imageId: r.recipe.imageId, icon: recipeIconHex(r.recipe.ingredients, foods) }])), [recipes, foods]);
-  const names = useMemo(() => new Map(recipes.map((r) => [r.recipe.id, r.recipe.name])), [recipes]);
+  const names = useMemo(() => new Map(recipes.map((r) => [r.recipe.id, pick(r.recipe.name, r.recipe.nameEn)])), [recipes]);
   const target = saved?.targetKcal ?? day?.targetKcal ?? null;
 
   const defaultMeals = (): Meal[] =>

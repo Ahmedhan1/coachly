@@ -10,3 +10,9 @@
 - `supplements.ar.json` — names only. The app never suggests doses.
 - Bump `version` in a file when its content grows; `NutritionStore` then merges the new rows into existing installs
   without touching the trainer's edits or deletions.
+- Foods carry an optional `nameEn`, `unitG` (+ `unitHalf`) for counted foods (eggs, loaves, slices) and English
+  portion labels (`labelEn`). Names say raw or cooked (ني / مطبوخ). `renamed` (id → former Arabic name) lets an
+  install rename an untouched row; a name the trainer changed is kept.
+- Recipes carry `nameEn` and `instructionsEn`, and every recipe has at least one meal-slot tag (فطار، غدا، عشا، سناك).
+  Untouched starter recipes on existing installs get new tags / English on the next data version (see
+  `NutritionStore.refreshStarterRecipes`).

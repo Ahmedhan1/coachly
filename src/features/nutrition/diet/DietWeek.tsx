@@ -3,24 +3,30 @@ import { useRepos } from '@/app/services';
 import { useUiStore } from '@/app/uiStore';
 import { useLive } from '@/app/useLive';
 import {
+  dishAlternatives,
   nextDayNumber,
+  nudgeStep,
   recipeIconHex,
-  recomputeDay,
-  slotAlternatives,
-  type DietDay,
-  type DietGoal,
-  type DietItem,
-  type DietMeal,
-  type DietRecipe,
+  retargetDay,
+  savedDish,
+  setLineGrams,
+  swapDish,
+  toggleLineLock,
   type DietSettings,
-  type DietStyle,
+  type GramDay,
+  type GramLine,
+  type GramPlanOptions,
+  type GramRecipe,
+  type IngredientEntry,
+  type LineRef,
   type MacroTargets,
 } from '@/domain/meals';
 import type { Client, Meal } from '@/domain/models';
 import { t } from '@/i18n';
-import { Badge, Button, Num, Sheet } from '@/ui';
+import { pick } from '@/i18n/locale';
+import { Badge, Button, Icon, Sheet, Tx } from '@/ui';
 import { FoodImage } from '../shared/FoodImage';
-import { kcalText } from '../shared/numbers';
+import { parseDecimal } from '../shared/numbers';
 import { useNutritionStore } from '../shared/useNutritionStore';
 import type { RecipeWithNutrition } from '../meals/useRecipeLookup';
 import common from '../shared/common.module.css';
@@ -29,51 +35,54 @@ import styles from './Diet.module.css';
 
 interface Props {
   client: Client;
-  week: DietDay[];
-  book: DietRecipe[];
+  week: GramDay[];
+  book: GramRecipe[];
   recipes: RecipeWithNutrition[];
+  foods: IngredientEntry[];
+  /** Per-serving calories by recipe id (for the servings number older readers use). */
+  perServing: ReadonlyMap<string, number>;
   targets: MacroTargets;
-  goal: DietGoal;
-  style: DietStyle;
-  vegetarian: boolean;
+  options: GramPlanOptions;
   ds: DietSettings;
   noteKeys: string[];
   onSaved: () => void;
 }
 
 const newId = () => crypto.randomUUID();
-const whole = (n: number) => String(Math.round(n));
+const sameTargets = (a: MacroTargets, b: MacroTargets) => a.kcal === b.kcal && a.proteinG === b.proteinG && a.carbG === b.carbG && a.fatG === b.fatG;
 
-/** The generated week: per-day totals and checks, a swap per main dish, the nutritionist notes, and save. */
-export function DietWeek({ client, week, book, recipes, targets, goal, style, vegetarian, ds, noteKeys, onSaved }: Props) {
+/** The generated week in exact grams: every food with its weight, calories and macros, editable, then save. */
+export function DietWeek({ client, week, book, recipes, foods, perServing, targets, options, ds, noteKeys, onSaved }: Props) {
   const repos = useRepos();
   const store = useNutritionStore();
   const showToast = useUiStore((s) => s.showToast);
-  const foods = useLive(() => store.getIngredients(), [store]);
+  const icons = useLive(() => store.getIngredients(), [store]);
   const [selected, setSelected] = useState(0);
-  const [edit, setEdit] = useState<{ week: DietDay[]; days: Map<number, DietDay> }>({ week, days: new Map() });
-  const [swapping, setSwapping] = useState<{ day: number; meal: number } | null>(null);
+  const [edits, setEdits] = useState<ReadonlyMap<number, GramDay>>(new Map());
+  const [swapping, setSwapping] = useState<{ meal: number; dish: number } | null>(null);
   const [replace, setReplace] = useState(true);
   const [busy, setBusy] = useState(false);
   const existing = useLive(() => repos.mealPlans.listByClient(client.id), [repos, client.id]);
 
-  const edits = edit.week === week ? edit.days : new Map<number, DietDay>();
-  const days = week.map((d, i) => edits.get(i) ?? d);
+  // A day the trainer edited keeps its dishes and locked amounts; new targets re-balance the rest.
+  const days = useMemo(
+    () =>
+      week.map((d, i) => {
+        const e = edits.get(i);
+        if (!e) return d;
+        return sameTargets(e.target, targets) ? e : retargetDay(e, targets, ds);
+      }),
+    [week, edits, targets, ds],
+  );
   const day = days[selected] ?? days[0];
   const byId = useMemo(() => new Map(recipes.map((r) => [r.recipe.id as string, r.recipe])), [recipes]);
-  const iconOf = (id: string) => {
-    const r = byId.get(id);
-    return r ? { imageId: r.imageId, icon: recipeIconHex(r.ingredients, foods ?? []) } : { imageId: null, icon: undefined };
-  };
+  const foodByName = useMemo(() => new Map(foods.map((f) => [f.name, f])), [foods]);
   if (!day) return null;
 
-  const swapIn = (dayIndex: number, mealIndex: number, item: DietItem) => {
-    const current = days[dayIndex];
-    if (!current) return;
-    const mealsNext = current.meals.map((m, i) => (i === mealIndex ? { slot: m.slot, items: [item, ...m.items.slice(1)] } : { slot: m.slot, items: m.items }));
-    const next = recomputeDay(mealsNext, book, targets, ds);
-    setEdit({ week, days: new Map(edits).set(dayIndex, next) });
-    setSwapping(null);
+  const change = (next: GramDay) => setEdits(new Map(edits).set(selected, next));
+  const recipeName = (id: string) => {
+    const r = byId.get(id);
+    return r ? pick(r.name, r.nameEn) : t('nutrition.plan.missingRecipe');
   };
 
   const save = async () => {
@@ -85,20 +94,23 @@ export function DietWeek({ client, week, book, recipes, targets, goal, style, ve
       const created: string[] = [];
       const notes = noteKeys.map((k) => `• ${t(`nutrition.diet.notes.${k}` as 'nutrition.diet.notes.water')}`).join('\n');
       for (const [index, d] of days.entries()) {
-        const meals: Meal[] = d.meals.map((m: DietMeal) => ({
+        const meals: Meal[] = d.meals.map((m) => ({
           id: newId() as Meal['id'],
           name: t(`nutrition.diet.slot.${m.slot.label}`),
           time: m.slot.time as Meal['time'],
-          items: m.items.map((i) => ({ recipeId: i.recipeId as Meal['items'][number]['recipeId'], text: '', servings: i.servings })),
+          items: m.dishes.map((dish) => {
+            const s = savedDish(dish, perServing.get(dish.recipeId) ?? 0);
+            return { recipeId: s.recipeId as Meal['items'][number]['recipeId'], text: '', servings: s.servings, lines: s.lines };
+          }),
         }));
-        const plan = await repos.mealPlans.create({
+        const created1 = await repos.mealPlans.create({
           clientId: client.id,
           name: t('nutrition.plan.dayName', { n: n++ }),
           targetKcal: Math.round(targets.kcal),
           meals,
           notes: index === 0 ? notes : '',
         });
-        created.push(plan.id);
+        created.push(created1.id);
       }
       showToast({
         message: t('nutrition.diet.saved', { n: created.length, name: client.name }),
@@ -112,7 +124,9 @@ export function DietWeek({ client, week, book, recipes, targets, goal, style, ve
     }
   };
 
-  const swapMeal = swapping ? days[swapping.day]?.meals[swapping.meal] : undefined;
+  const tg = day.target;
+  const swapMeal = swapping ? day.meals[swapping.meal] : undefined;
+  const swapCurrent = swapping ? swapMeal?.dishes[swapping.dish] : undefined;
 
   return (
     <>
@@ -126,10 +140,31 @@ export function DietWeek({ client, week, book, recipes, targets, goal, style, ve
             </button>
           ))}
         </div>
-        <p className={styles.dayTotal}>
-          <Badge tone={day.check.ok ? 'ok' : 'warning'}>{day.check.ok ? t('nutrition.diet.onTarget') : t('nutrition.diet.offTarget')}</Badge>{' '}
-          <Num>{t('nutrition.diet.dayTotal', { kcal: whole(day.totals.kcal), p: whole(day.totals.proteinG), c: whole(day.totals.carbG), f: whole(day.totals.fatG) })}</Num>
-        </p>
+        <div className={styles.dayBox} role="status" aria-label={t('nutrition.diet.dayTotalsTitle')}>
+          <div className={styles.dayBoxHead}>
+            <span className={styles.dayBoxTitle}>{t('nutrition.diet.dayTotalsTitle')}</span>
+            <Badge tone={day.check.ok ? 'ok' : 'warning'}>{day.check.ok ? t('nutrition.diet.onTarget') : t('nutrition.diet.offTarget')}</Badge>
+          </div>
+          <dl className={styles.dayGrid}>
+            {(
+              [
+                ['kcal', t('nutrition.diet.kcal'), day.totals.kcal, tg.kcal, day.check.kcal],
+                ['p', t('nutrition.macros.protein'), day.totals.proteinG, tg.proteinG, day.check.protein],
+                ['c', t('nutrition.macros.carb'), day.totals.carbG, tg.carbG, day.check.carb],
+                ['f', t('nutrition.macros.fat'), day.totals.fatG, tg.fatG, day.check.fat],
+              ] as const
+            ).map(([k, label, value, target, status]) => (
+              <div key={k} data-status={status}>
+                <dt>{label}</dt>
+                <dd className="num">{value}</dd>
+                <dd className={styles.of}>
+                  <Tx k="nutrition.diet.targetShort" params={{ n: Math.round(target) }} />
+                </dd>
+              </div>
+            ))}
+          </dl>
+        </div>
+        <p className={common.caption}>{t('nutrition.diet.lockHint')}</p>
         <div className={plan.meals}>
           {day.meals.map((m, mi) => (
             <section key={mi} className={plan.meal} aria-label={t(`nutrition.diet.slot.${m.slot.label}`)}>
@@ -139,32 +174,41 @@ export function DietWeek({ client, week, book, recipes, targets, goal, style, ve
                   <bdi className="num">{m.slot.time}</bdi>
                 </div>
                 <p className={plan.mealKcal}>
-                  <Num>{kcalText(m.totals.kcal)}</Num> {t('nutrition.units.kcal')}
+                  <Tx k="nutrition.diet.mealOf" params={{ kcal: m.totals.kcal, target: Math.round(m.target.kcal) }} />
                 </p>
               </header>
-              <ul className={plan.items}>
-                {m.items.map((item, ii) => {
-                  const r = byId.get(item.recipeId);
-                  const icon = iconOf(item.recipeId);
-                  return (
-                    <li key={`${item.recipeId}-${ii}`} className={plan.item}>
-                      <FoodImage imageId={icon.imageId} icon={icon.icon} className={plan.itemImg} />
-                      <div className={plan.itemText}>
-                        <p className={plan.itemName}>{r?.name ?? t('nutrition.plan.missingRecipe')}</p>
-                        <p className={plan.itemSub}>{t('nutrition.diet.servings', { n: item.servings })}</p>
-                      </div>
-                      {ii === 0 && (
-                        <button type="button" className={plan.swap} onClick={() => setSwapping({ day: selected, meal: mi })} aria-label={t('nutrition.plan.swapLabel', { name: r?.name ?? '' })}>
-                          {t('nutrition.diet.swap')}
-                        </button>
-                      )}
-                    </li>
-                  );
-                })}
-              </ul>
+              {m.dishes.map((dish, di) => {
+                const r = byId.get(dish.recipeId);
+                const name = recipeName(dish.recipeId);
+                return (
+                  <div key={`${dish.recipeId}-${di}`} className={styles.dish}>
+                    <div className={styles.dishHead}>
+                      <FoodImage imageId={r?.imageId} icon={r ? recipeIconHex(r.ingredients, icons ?? foods) : undefined} className={styles.dishImg} />
+                      <p className={styles.dishName}>{name}</p>
+                      <span className={`${styles.dishKcal} num`}>{dish.totals.kcal}</span>
+                      <button type="button" className={plan.swap} onClick={() => setSwapping({ meal: mi, dish: di })} aria-label={t('nutrition.diet.swapDish', { name })}>
+                        <Icon name="undo" />
+                        {t('nutrition.diet.swap')}
+                      </button>
+                    </div>
+                    <ul className={styles.lines}>
+                      {dish.lines.map((line, li) => (
+                        <LineRow
+                          key={`${line.src.name}-${li}`}
+                          line={line}
+                          food={foodByName.get(line.src.name)}
+                          onSet={(grams) => change(setLineGrams(day, { meal: mi, dish: di, line: li }, grams, ds))}
+                          onLock={() => change(toggleLineLock(day, { meal: mi, dish: di, line: li } satisfies LineRef, ds))}
+                        />
+                      ))}
+                    </ul>
+                  </div>
+                );
+              })}
             </section>
           ))}
         </div>
+        <p className={common.caption}>{t('nutrition.diet.weightsNote')}</p>
       </section>
 
       <section className={common.section}>
@@ -193,69 +237,105 @@ export function DietWeek({ client, week, book, recipes, targets, goal, style, ve
         </div>
       </section>
 
-      {swapping && swapMeal && (
-        <SwapDietSheet
-          meal={swapMeal}
-          book={book}
-          names={byId}
-          targets={targets}
-          goal={goal}
-          style={style}
-          vegetarian={vegetarian}
-          ds={ds}
+      {swapping && swapMeal && swapCurrent && (
+        <Sheet
+          open
           onClose={() => setSwapping(null)}
-          onPick={(item) => swapIn(swapping.day, swapping.meal, item)}
-        />
+          title={t('nutrition.diet.swapDishTitle', { name: recipeName(swapCurrent.recipeId), slot: t(`nutrition.diet.slot.${swapMeal.slot.label}`) })}
+          cancelLabel={t('common.cancel')}
+        >
+          <SwapList
+            alts={dishAlternatives(book, day, swapping.meal, swapping.dish, options, 10)}
+            name={recipeName}
+            onPick={(id) => {
+              change(swapDish(day, book, swapping.meal, swapping.dish, id, ds));
+              setSwapping(null);
+            }}
+          />
+        </Sheet>
       )}
     </>
   );
 }
 
-function SwapDietSheet({
-  meal,
-  book,
-  names,
-  targets,
-  goal,
-  style,
-  vegetarian,
-  ds,
-  onClose,
-  onPick,
-}: {
-  meal: DietMeal;
-  book: DietRecipe[];
-  names: ReadonlyMap<string, { name: string }>;
-  targets: MacroTargets;
-  goal: DietGoal;
-  style: DietStyle;
-  vegetarian: boolean;
-  ds: DietSettings;
-  onClose: () => void;
-  onPick: (item: DietItem) => void;
-}) {
-  const k = meal.slot.sharePercent / 100;
-  const mealTarget = { kcal: targets.kcal * k, proteinG: targets.proteinG * k, carbG: targets.carbG * k, fatG: targets.fatG * k };
-  const current = meal.items[0]?.recipeId ?? null;
-  // The meal's own calories (main dish plus its sides) are what the new main should roughly replace.
-  const sides = meal.items.slice(1).reduce((acc, i) => acc + (book.find((b) => b.id === i.recipeId)?.perServing.kcal ?? 0) * i.servings, 0);
-  const wanted = { ...mealTarget, kcal: Math.max(mealTarget.kcal - sides, mealTarget.kcal * 0.4) };
-  const alts = slotAlternatives(book, wanted, meal.slot.kind, goal, ds, current, 8, { vegetarian, style });
+function SwapList({ alts, name, onPick }: { alts: { recipeId: string; kcal: number }[]; name: (id: string) => string; onPick: (id: string) => void }) {
+  if (alts.length === 0) return <p className={common.muted}>{t('nutrition.diet.swapNone')}</p>;
   return (
-    <Sheet open onClose={onClose} title={t('nutrition.diet.swapTitle', { name: names.get(current ?? '')?.name ?? '' })} cancelLabel={t('common.cancel')}>
-      {alts.length === 0 && <p className={common.muted}>{t('nutrition.diet.swapNone')}</p>}
-      <ul className={styles.alts}>
-        {alts.map((a) => {
-          const per = book.find((b) => b.id === a.recipeId)?.perServing.kcal ?? 0;
-          return (
-            <li key={a.recipeId}>
-              <button type="button" className={styles.alt} onClick={() => onPick(a)}>
-                <Num>{t('nutrition.diet.swapPick', { name: names.get(a.recipeId)?.name ?? '', servings: a.servings, kcal: whole(per * a.servings) })}</Num>
-              </button>
-            </li>
-          );
-        })}
-      </ul>
-    </Sheet>
+    <ul className={styles.alts}>
+      {alts.map((a) => (
+        <li key={a.recipeId}>
+          <button type="button" className={styles.alt} onClick={() => onPick(a.recipeId)}>
+            <span>{name(a.recipeId)}</span>
+            <span className={styles.altKcal}>
+              <Tx k="nutrition.diet.swapKcal" params={{ kcal: a.kcal }} />
+            </span>
+          </button>
+        </li>
+      ))}
+    </ul>
+  );
+}
+
+/** One food: name, exact grams (or units + grams), its calories and macros, − / typed grams / + and a lock. */
+function LineRow({ line, food, onSet, onLock }: { line: GramLine; food: IngredientEntry | undefined; onSet: (grams: number) => void; onLock: () => void }) {
+  const [text, setText] = useState<string | null>(null);
+  const name = pick(line.src.name, line.src.nameEn);
+  const fixed = line.role === 'fixed';
+  const step = nudgeStep(line);
+  const amount =
+    line.units !== null && line.src.unitLabel ? (
+      <Tx k="nutrition.diet.unitGrams" params={{ n: line.units, unit: pick(line.src.unitLabel, line.src.unitLabelEn), g: line.grams }} />
+    ) : (
+      <Tx k="nutrition.diet.grams" params={{ g: line.grams }} />
+    );
+  const commit = () => {
+    if (text === null) return;
+    const n = parseDecimal(text);
+    setText(null);
+    if (Number.isFinite(n) && n > 0 && n !== line.grams) onSet(n);
+  };
+  return (
+    <li className={styles.line} data-locked={line.locked || undefined}>
+      <FoodImage imageId={food?.imageId} food={food} className={styles.lineImg} />
+      <div className={styles.lineText}>
+        <p className={styles.lineName}>{name}</p>
+        <p className={styles.lineSub}>
+          {amount}
+          {' · '}
+          <Tx k="nutrition.diet.lineMacros" params={{ kcal: line.shown.kcal, p: line.shown.proteinG, c: line.shown.carbG, f: line.shown.fatG }} />
+        </p>
+      </div>
+      {!fixed && (
+        <div className={styles.lineControls}>
+          <button type="button" className={styles.stepBtn} aria-label={t('nutrition.diet.less', { name })} onClick={() => onSet(Math.max(step, line.grams - step))}>
+            −
+          </button>
+          <input
+            className={`${styles.gramsInput} num`}
+            inputMode="decimal"
+            aria-label={t('nutrition.diet.gramsLabel', { name })}
+            value={text ?? String(line.grams)}
+            onFocus={(e) => e.currentTarget.select()}
+            onChange={(e) => setText(e.target.value)}
+            onBlur={commit}
+            onKeyDown={(e) => {
+              if (e.key === 'Enter') e.currentTarget.blur();
+            }}
+          />
+          <button type="button" className={styles.stepBtn} aria-label={t('nutrition.diet.more', { name })} onClick={() => onSet(line.grams + step)}>
+            +
+          </button>
+          <button
+            type="button"
+            className={styles.lockBtn}
+            aria-pressed={line.locked}
+            aria-label={line.locked ? t('nutrition.diet.unlock', { name }) : t('nutrition.diet.lock', { name })}
+            onClick={onLock}
+          >
+            <Icon name="key" />
+          </button>
+        </div>
+      )}
+    </li>
   );
 }

@@ -3,6 +3,7 @@ import { assistant } from './assistant';
 import { core } from './core';
 import { exercises } from './exercises';
 import { hub } from './hub';
+import { nutrition } from './nutrition';
 import { outbox } from './outbox';
 import { pdf } from './pdf';
 import { schedule } from './schedule';
@@ -29,4 +30,5 @@ export const en: DeepPartial<StringShape<Strings>> = {
   schedule,
   assistant,
   hub,
+  nutrition,
 };

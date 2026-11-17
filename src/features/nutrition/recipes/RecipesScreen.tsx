@@ -6,6 +6,7 @@ import { searchItems } from '@/data';
 import { recipeIconHex } from '@/domain/meals';
 import type { Recipe } from '@/domain/models';
 import { t } from '@/i18n';
+import { pick } from '@/i18n/locale';
 import { Badge, Button, EmptyState, IconButton, ListRow, ListSection, PageHeader, SearchField, SwipeRow } from '@/ui';
 import { useRecipesWithNutrition } from '../meals/useRecipeLookup';
 import { kcalText } from '../shared/numbers';
@@ -26,7 +27,7 @@ export function RecipesScreen() {
   const starter = useLive(() => store.getStarterRecipeIds(), [store]);
   const [query, setQuery] = useState('');
   const [editing, setEditing] = useState<Recipe | 'new' | null>(null);
-  const shown = searchItems(recipes ?? [], query, (r) => [r.recipe.name, ...r.recipe.tags]);
+  const shown = searchItems(recipes ?? [], query, (r) => [r.recipe.name, r.recipe.nameEn ?? '', ...r.recipe.tags]);
   const starterSet = new Set(starter ?? []);
   const hasStarter = (recipes ?? []).some((r) => starterSet.has(r.recipe.id));
 
@@ -69,7 +70,7 @@ export function RecipesScreen() {
             <SwipeRow key={recipe.id} onDelete={() => void remove(recipe)} deleteLabel={t('common.delete')} deleteAccessibleLabel={t('nutrition.book.deleteLabel', { name: recipe.name })}>
               <ListRow
                 leading={<FoodImage imageId={recipe.imageId} icon={recipeIconHex(recipe.ingredients, foods ?? [])} className={styles.thumb} />}
-                title={recipe.name}
+                title={pick(recipe.name, recipe.nameEn)}
                 subtitle={t('nutrition.book.perServing', { kcal: kcalText(perServing.kcal) })}
                 trailing={starterSet.has(recipe.id) ? <Badge>{t('nutrition.book.starter')}</Badge> : undefined}
                 onClick={() => setEditing(recipe)}

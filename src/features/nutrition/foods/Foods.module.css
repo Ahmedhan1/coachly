@@ -23,3 +23,38 @@
   background: var(--text);
   color: var(--bg);
 }
+
+.subLine {
+  display: block;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.portions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--sp-2);
+}
+
+.calcResult {
+  padding: var(--sp-4);
+  border-radius: var(--r-lg);
+  background: var(--surface);
+  text-align: center;
+}
+
+.calcFood {
+  margin: 0;
+  color: var(--text-2);
+  font: var(--t-callout);
+}
+
+.calcKcal {
+  margin: var(--sp-1) 0;
+  font: var(--t-title);
+}
+
+.portions button {
+  border: 1px solid var(--line);
+}

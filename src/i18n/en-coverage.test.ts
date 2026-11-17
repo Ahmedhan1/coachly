@@ -45,6 +45,8 @@ describe('English strings', () => {
     expect(checkedAreas.length).toBeGreaterThan(10);
     const missing = checkedKeys.filter((key) => typeof get(en, key) !== 'string' || (get(en, key) as string).trim() === '');
     if (missing.length > 0) console.error(`Missing English keys (${missing.length}):\n${missing.join('\n')}`);
+    const all = leaves(arTree).length;
+    console.info(`English coverage: ${checkedKeys.length - missing.length} of ${all} Arabic keys (${checkedAreas.length} areas checked), missing ${missing.length}`);
     expect(missing).toEqual([]);
   });
 

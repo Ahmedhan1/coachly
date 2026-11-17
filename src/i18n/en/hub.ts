@@ -175,9 +175,9 @@ export const hub: EnArea<'hub'> = {
     suggestAddWeight: 'Try {w}',
     suggestAddReps: 'Try {w}',
     suggestion: 'Suggestion',
-    attendanceSaved: '{name}’s attendance recorded',
+    attendanceSaved: 'Attendance recorded for {name}',
     leftOf: '{left} of {total} sessions left',
     noPackage: 'No package',
-    openClient: '{name}’s file',
+    openClient: 'Client file: {name}',
   },
 };

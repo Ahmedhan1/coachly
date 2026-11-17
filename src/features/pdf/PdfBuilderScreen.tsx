@@ -52,11 +52,17 @@ export function PdfBuilderScreen() {
   const [title, setTitle] = useState('');
   const [subtitle, setSubtitle] = useState('');
   const [notes, setNotes] = useState('');
-  const [status, setStatus] = useState<Status>({ kind: 'idle' });
+  const [rawStatus, setStatus] = useState<Status>({ kind: 'idle' });
+  /** The options the current file was made from. */
+  const [madeFor, setMadeFor] = useState<string | null>(null);
   const [sheet, setSheet] = useState<null | 'branding' | 'saveTemplate'>(null);
   const abort = useRef<AbortController | null>(null);
 
   const client = clients?.find((c) => c.id === clientId) ?? null;
+  const sections = order.filter((s) => enabled.includes(s));
+  // A change of client, sections, texts or design makes a ready (or failed) file stale: «اعمل الملف» shows again.
+  const optionsKey = JSON.stringify([clientId, sections, title, subtitle, notes, brandingVersion]);
+  const status: Status = (rawStatus.kind === 'ready' || rawStatus.kind === 'failed') && madeFor !== optionsKey ? { kind: 'idle' } : rawStatus;
   const programs = useLive(() => (client ? repos.programs.listByClient(client.id) : Promise.resolve([])), [repos, client]);
   const program = [...(programs ?? [])].sort((a, b) => b.updatedAt - a.updatedAt)[0] ?? null;
 
@@ -99,14 +105,16 @@ export function PdfBuilderScreen() {
     });
   };
 
-  const sections = order.filter((s) => enabled.includes(s));
-
   const generate = async () => {
     if (!settings || !branding) return;
     if (sections.length === 0) return showToast({ message: t('pdf.noSections') });
+    // Without a program the exercise sections are dropped; nothing left would only end in a vague failure.
+    const usable = program ? sections : sections.filter((s) => s !== 'program' && s !== 'muscle_map');
+    if (usable.length === 0) return showToast({ message: t('pdf.noProgram') });
     abort.current?.abort();
     const ctrl = new AbortController();
     abort.current = ctrl;
+    setMadeFor(optionsKey);
     setStatus({ kind: 'working', progress: null });
     const store = new NutritionStore(meta, repos);
     const [calculation, mealPlans, recipes, supplementRows, allSupplements, progress] = await Promise.all([
@@ -130,7 +138,7 @@ export function PdfBuilderScreen() {
     const muscleMaps = program && sections.includes('muscle_map') ? await muscleMapRefs(usedExercises, settings.primaryColor) : undefined;
     const input = buildPdfInput({
       muscleMaps,
-      sections: program ? sections : sections.filter((s) => s !== 'program' && s !== 'muscle_map'),
+      sections: usable,
       title: title.trim() || (client ? t('pdf.defaultTitle', { name: client.name }) : t('pdf.defaultTitleNoClient')),
       subtitle: subtitle.trim(),
       notes: notes.trim(),

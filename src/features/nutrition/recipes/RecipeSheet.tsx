@@ -7,6 +7,7 @@ import type { IngredientEntry } from '@/domain/meals';
 import { searchItems } from '@/data';
 import { useLive } from '@/app/useLive';
 import { t } from '@/i18n';
+import { pick } from '@/i18n/locale';
 import { Icon, IconButton, Num, SearchField, Sheet, TextArea, TextField } from '@/ui';
 import { FoodImage } from '../shared/FoodImage';
 import { fieldText, gramsText, kcalText, parseDecimal } from '../shared/numbers';
@@ -208,7 +209,7 @@ export function RecipeSheet({ recipe, onClose }: { recipe: Recipe | null; onClos
 
 function FoodPicker({ foods, onClose, onPick }: { foods: IngredientEntry[]; onClose: () => void; onPick: (f: IngredientEntry) => void }) {
   const [query, setQuery] = useState('');
-  const shown = searchItems([...foods].sort((a, b) => a.name.localeCompare(b.name, 'ar')), query, (f) => [f.name]).slice(0, 80);
+  const shown = searchItems([...foods].sort((a, b) => a.name.localeCompare(b.name, 'ar')), query, (f) => [f.name, f.nameEn ?? '']).slice(0, 80);
   return (
     <Sheet open onClose={onClose} title={t('nutrition.foods.pickTitle')} cancelLabel={t('common.cancel')}>
       <SearchField value={query} onChange={setQuery} label={t('nutrition.foods.search')} placeholder={t('nutrition.foods.search')} clearLabel={t('common.clearSearch')} />
@@ -217,7 +218,7 @@ function FoodPicker({ foods, onClose, onPick }: { foods: IngredientEntry[]; onCl
           <li key={f.id}>
             <button type="button" className={styles.foodRow} onClick={() => onPick(f)}>
               <FoodImage imageId={f.imageId} food={f} className={styles.ingIcon} />
-              <span className={styles.foodName}>{f.name}</span>
+              <span className={styles.foodName}>{pick(f.name, f.nameEn)}</span>
               <small>
                 <Num>{Math.round(f.per100g.kcal)}</Num> {t('nutrition.units.kcal')} / 100 {t('nutrition.units.g')}
               </small>
