@@ -1,6 +1,8 @@
 import { Outlet, useMatch } from 'react-router-dom';
 import { AddClientSheet } from '@/features/clients/AddClientSheet';
+import { GlobalSearchSheet } from '@/features/home/search/GlobalSearchSheet';
 import { QuickAddSheet } from '@/features/quickAdd/QuickAddSheet';
+import { AppStorageProblemToasts } from '@/features/storage/StorageProblemToasts';
 import { t } from '@/i18n';
 import { cx, TabBar, ToastHost, type TabItem } from '@/ui';
 import { useUiStore } from './uiStore';
@@ -33,6 +35,8 @@ export function AppShell() {
       <ToastHost toasts={toasts} onDismiss={dismissToast} />
       <QuickAddSheet />
       <AddClientSheet />
+      <GlobalSearchSheet />
+      <AppStorageProblemToasts />
     </div>
   );
 }
