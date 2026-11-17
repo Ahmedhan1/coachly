@@ -14,7 +14,7 @@
     "check": "npm run typecheck && npm run lint && npm run test && npm run check:words"
   },
   "dependencies": {
-    "@anthropic-ai/sdk": "1.4.0",
+    "@anthropic-ai/sdk": "1.9.0",
     "@dnd-kit/core": "6.3.1",
     "@dnd-kit/sortable": "10.0.0",
     "@noble/ed25519": "3.2.0",
@@ -46,7 +46,7 @@
     "globals": "17.14.0",
     "jsdom": "31.0.1",
     "typescript": "6.0.3",
-    "typescript-eslint": "8.72.2",
+    "typescript-eslint": "8.73.0",
     "vite": "8.3.8",
     "vite-plugin-pwa": "2.0.0",
     "vitest": "5.1.0"

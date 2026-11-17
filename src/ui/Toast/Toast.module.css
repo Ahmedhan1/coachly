@@ -27,7 +27,15 @@
 
 .message {
   flex: 1;
+  min-inline-size: 0;
+  padding-block: var(--sp-2);
   font: var(--t-callout);
+  /* A very long client name must not turn the toast into a wall of text over the content. */
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  overflow: hidden;
+  overflow-wrap: anywhere;
 }
 
 .action {

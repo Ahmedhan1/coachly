@@ -4,7 +4,8 @@ import { useServices } from '@/app/services';
 import { useUiStore } from '@/app/uiStore';
 import { NutritionStore } from '@/data/nutritionStore';
 import { MEAL_DRAFT_JSON_SCHEMA, mealDraftSchema, mealsFromDraft, parseDraft, PROGRAM_DRAFT_JSON_SCHEMA, programDraftSchema, programFromDraft } from '@/domain/ai';
-import type { Client } from '@/domain/models';
+import { ageInYears } from '@/domain/meals';
+import { toIsoDate, type Client } from '@/domain/models';
 import { t } from '@/i18n';
 import { Button, SegmentedControl, Select, Sheet, TextArea } from '@/ui';
 import { AnthropicAiService } from '@/services/ai/aiService';
@@ -18,9 +19,9 @@ Write all names in Egyptian Arabic. Gym and muscle terms are transliterated, nev
 Never suggest supplements or medication doses. Respect injuries by avoiding exercises that load them.`;
 
 /** Client facts without the name (privacy): goal, sex, age, injuries, measurements. */
-function clientFacts(c: Client): string {
+function clientFacts(c: Client, now: Date): string {
   const m = c.measurements;
-  const age = c.birthDate ? new Date().getFullYear() - Number(c.birthDate.slice(0, 4)) : null;
+  const age = ageInYears(c.birthDate, toIsoDate(now));
   return [
     `goal: ${c.goal}${c.goalNote ? ` (${c.goalNote})` : ''}`,
     c.gender ? `sex: ${c.gender}` : null,
@@ -61,7 +62,7 @@ export function AiDraftSheet({ client, onClose }: { client: Client; onClose: () 
           {
             system: SYSTEM,
             schema: PROGRAM_DRAFT_JSON_SCHEMA,
-            prompt: `Draft a ${days}-day weekly training program.\nClient:\n${clientFacts(client)}\nTrainer notes: ${notes || '-'}\n\nUse ONLY exerciseId values from this list (id|name|muscles|equipment):\n${list}`,
+            prompt: `Draft a ${days}-day weekly training program.\nClient:\n${clientFacts(client, new Date())}\nTrainer notes: ${notes || '-'}\n\nUse ONLY exerciseId values from this list (id|name|muscles|equipment):\n${list}`,
           },
           abort.current.signal,
         );
@@ -83,7 +84,7 @@ export function AiDraftSheet({ client, onClose }: { client: Client; onClose: () 
           {
             system: SYSTEM,
             schema: MEAL_DRAFT_JSON_SCHEMA,
-            prompt: `Draft one day of Egyptian meals (time as HH:MM, items with rough grams).\nClient:\n${clientFacts(client)}\n${target}\nTrainer notes: ${notes || '-'}\nTrainer's recipes you may use by name: ${recipes.map((x) => x.name).join('، ') || '-'}`,
+            prompt: `Draft one day of Egyptian meals (time as HH:MM, items with rough grams).\nClient:\n${clientFacts(client, new Date())}\n${target}\nTrainer notes: ${notes || '-'}\nTrainer's recipes you may use by name: ${recipes.map((x) => x.name).join('، ') || '-'}`,
           },
           abort.current.signal,
         );

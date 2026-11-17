@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { lazy, Suspense, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useRepos, useServices } from '@/app/services';
 import { readAiKey } from '@/features/online/integrations';
@@ -10,7 +10,6 @@ import { Badge, Button, EmptyState, Icon, IconButton, ListRow, ListSection, Mone
 import { formatIsoDate, formatNumber, timeParts } from '@/ui/format';
 import { attentionLabel, attentionTone } from './attention';
 import { telUrl, whatsappUrl } from './contact';
-import { AiDraftSheet } from './AiDraftSheet';
 import { ClientPageSheet } from './ClientPageSheet';
 import { EditClientSheet } from './EditClientSheet';
 import { PackageSheet } from './PackageSheet';
@@ -18,6 +17,9 @@ import { PaymentSheet } from './PaymentSheet';
 import { useDeletePayment, useRenewPackage } from './useMoneyActions';
 import { useDeleteClient } from './useDeleteClient';
 import styles from './ClientDetail.module.css';
+
+/** The AI sheet pulls in the Anthropic SDK (~300 kB); load it only when the trainer opens it. */
+const AiDraftSheet = lazy(() => import('./AiDraftSheet').then((m) => ({ default: m.AiDraftSheet })));
 
 const BACK = { to: '/clients', label: t('clientDetail.back') };
 
@@ -179,7 +181,11 @@ function ClientDetail({ client, payments, sessions, programs, currency }: Client
         </Button>
       </nav>
 
-      {sheet === 'ai' && <AiDraftSheet client={client} onClose={() => setSheet(null)} />}
+      {sheet === 'ai' && (
+        <Suspense fallback={null}>
+          <AiDraftSheet client={client} onClose={() => setSheet(null)} />
+        </Suspense>
+      )}
       {sheet === 'page' && <ClientPageSheet client={client} onClose={() => setSheet(null)} />}
       {sheet === 'edit' && <EditClientSheet client={client} onClose={() => setSheet(null)} />}
       {sheet === 'package' && <PackageSheet client={client} currency={currency} onClose={() => setSheet(null)} />}

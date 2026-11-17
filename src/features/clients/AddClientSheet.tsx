@@ -42,7 +42,7 @@ function AddClientForm({ onClose }: { onClose: () => void }) {
       const total = Number.parseInt(sessions, 10);
       const hasPackage = Number.isFinite(total) && total > 0;
       const client = await repos.clients.create({
-        name,
+        name: name.trim(),
         phone: phone.trim(),
         gender: null,
         birthDate: null,
@@ -90,6 +90,7 @@ function AddClientForm({ onClose }: { onClose: () => void }) {
             setError(null);
           }}
           error={error}
+          maxLength={120}
           autoComplete="off"
           enterKeyHint="done"
           required
@@ -98,6 +99,7 @@ function AddClientForm({ onClose }: { onClose: () => void }) {
           label={`${t('addClient.phone')} (${t('common.optional')})`}
           type="tel"
           inputMode="tel"
+          maxLength={20}
           value={phone}
           onChange={(e) => setPhone(e.target.value.replace(/[^0-9+\s-]/g, ''))}
           autoComplete="off"

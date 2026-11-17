@@ -4,23 +4,28 @@ import type { AppServices } from '@/app/services';
 import { useServices } from '@/app/services';
 import { useLive } from '@/app/useLive';
 import { toIsoDate, type Client } from '@/domain/models';
-import { buildOutbox, OUTBOX_KINDS, type OutboxItem, type OutboxKind } from '@/domain/outbox';
+import { buildOutbox, OUTBOX_KINDS, SENT_LOG_MAX_ENTRIES, updateSentLog, type OutboxItem, type OutboxKind, type SentEntry } from '@/domain/outbox';
 import type { MetaStore } from '@/services/license/metaStore';
 import { deviceZone } from '@/features/schedule/zone';
 
 const SENT_KEY = 'outbox.sent';
 const KINDS_KEY = 'outbox.kinds';
-const sentSchema = z.array(z.object({ id: z.string(), at: z.number() })).max(5000);
+const sentEntrySchema = z.object({ id: z.string(), at: z.number() });
 
-export async function readSent(meta: MetaStore): Promise<{ id: string; at: number }[]> {
-  const r = sentSchema.safeParse(await meta.get(SENT_KEY));
-  return r.success ? r.data : [];
+/** Tolerant read: bad entries are skipped and only the newest entries are kept, never the whole log dropped. */
+export async function readSent(meta: MetaStore): Promise<SentEntry[]> {
+  const raw: unknown = await meta.get(SENT_KEY);
+  if (!Array.isArray(raw)) return [];
+  const entries: SentEntry[] = [];
+  for (const item of raw) {
+    const r = sentEntrySchema.safeParse(item);
+    if (r.success) entries.push(r.data);
+  }
+  return entries.length > SENT_LOG_MAX_ENTRIES ? entries.slice(entries.length - SENT_LOG_MAX_ENTRIES) : entries;
 }
 
-export async function markSent(meta: MetaStore, id: string, sent: boolean): Promise<void> {
-  const now = Date.now();
-  const list = (await readSent(meta)).filter((x) => x.id !== id && now - x.at < 120 * 86_400_000);
-  await meta.set(SENT_KEY, sent ? [...list, { id, at: now }] : list);
+export async function markSent(meta: MetaStore, id: string, sent: boolean, now: Date): Promise<void> {
+  await meta.set(SENT_KEY, updateSentLog(await readSent(meta), id, sent, now.getTime()));
 }
 
 export async function readKinds(meta: MetaStore): Promise<Set<OutboxKind>> {

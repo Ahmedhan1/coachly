@@ -98,3 +98,22 @@ test('placeholder routes render through the tab bar and More', async ({ page }) 
   await page.getByRole('link', { name: /المكملات والمنتجات/ }).click();
   await expect(page.getByRole('heading', { level: 1, name: 'المكملات والمنتجات' })).toBeVisible();
 });
+
+test('package sheet rejects a bad price and more remaining sessions than the total', async ({ page }) => {
+  await openApp(page, '/clients');
+  await page.getByRole('link', { name: /أحمد علي/ }).click();
+  await page.getByRole('button', { name: /عدّل الباقة/ }).click();
+  const sheet = page.getByRole('dialog');
+  await sheet.getByLabel(/^السعر/).fill('-50');
+  await sheet.getByLabel('الحصص الباقية').fill('99');
+  await sheet.getByRole('button', { name: 'حفظ' }).click();
+  await expect(sheet.getByRole('alert')).toHaveText(['الباقي مينفعش يكون أكتر من عدد الحصص.', 'اكتب السعر أرقام بس، أو سيبه فاضي.']);
+});
+
+test('the add-client name field stops at the stored length limit', async ({ page }) => {
+  await openApp(page, '/clients');
+  await page.getByRole('button', { name: 'إضافة عميل' }).click();
+  const name = page.getByRole('dialog').getByLabel('الاسم');
+  await name.fill('ا'.repeat(300));
+  await expect(name).toHaveValue('ا'.repeat(120));
+});

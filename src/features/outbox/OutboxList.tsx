@@ -18,12 +18,12 @@ export function OutboxList({ items, clients, onChange, limit }: { items: OutboxI
   const shown = limit ? items.slice(0, limit) : items;
 
   const mark = async (item: OutboxItem, name: string) => {
-    await markSent(meta, item.id, true);
+    await markSent(meta, item.id, true, new Date());
     onChange();
     showToast({
       message: `${t('outbox.sent')} · ${name}`,
       actionLabel: t('outbox.undo'),
-      onAction: () => void markSent(meta, item.id, false).then(onChange),
+      onAction: () => void markSent(meta, item.id, false, new Date()).then(onChange),
       duration: 5000,
     });
   };

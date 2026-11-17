@@ -202,6 +202,7 @@ export const settings = {
     webhookTitle: 'Webhook',
     webhookBody: 'التطبيق يبعت JSON لعنوانك (n8n أو Make) لما يتضاف عميل جديد أو اشتراك يقرّب يخلص. البيانات دي فيها اسم العميل وموبايله، فاستخدم عنوان إنت متحكم فيه بس.',
     webhookUrl: 'عنوان الـ webhook (https)',
+    webhookPrivacy: 'خلي بالك: لما تشغّله، اسم العميل وموبايله بيتبعتوا للعنوان ده بس، مش لينا.',
     webhookEnabled: 'شغّال',
     clientCreated: 'عميل جديد',
     subscriptionEnding: 'اشتراك قرّب يخلص',

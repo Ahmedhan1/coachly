@@ -59,6 +59,7 @@ function WebhookCard({ initial }: { initial: WebhookSettings }) {
       <p className={styles.body}>{t('settings.integrations.webhookBody')}</p>
       <TextField
         label={t('settings.integrations.webhookUrl')}
+        hint={t('settings.integrations.webhookPrivacy')}
         inputMode="url"
         value={w.url}
         error={error}

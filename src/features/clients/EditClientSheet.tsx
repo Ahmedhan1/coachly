@@ -71,8 +71,8 @@ export function EditClientSheet({ client, onClose }: { client: Client; onClose: 
       }
     >
       <form id={FORM_ID} className={styles.form} onSubmit={(e) => void submit(e)} noValidate>
-        <TextField label={t('addClient.name')} value={name} error={error} onChange={(e) => (setName(e.target.value), setError(null))} autoComplete="off" />
-        <TextField label={t('addClient.phone')} type="tel" inputMode="tel" value={phone} onChange={(e) => setPhone(e.target.value)} ltr />
+        <TextField label={t('addClient.name')} value={name} error={error} maxLength={120} onChange={(e) => (setName(e.target.value), setError(null))} autoComplete="off" />
+        <TextField label={t('addClient.phone')} type="tel" inputMode="tel" maxLength={20} value={phone} onChange={(e) => setPhone(e.target.value.replace(/[^0-9+\s-]/g, ''))} ltr />
         <SegmentedControl
           label={t('clientDetail.gender')}
           value={gender}

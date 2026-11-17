@@ -49,8 +49,13 @@ export function PaymentSheet({ client, payment, currency, onClose, onDelete }: P
       dueOn: status === 'due' ? date : (payment?.dueOn ?? null),
       note: note.trim(),
     };
-    if (payment) await repos.payments.update(payment.id, fields);
-    else await repos.payments.create({ clientId: client.id, ...fields });
+    try {
+      if (payment) await repos.payments.update(payment.id, fields);
+      else await repos.payments.create({ clientId: client.id, ...fields });
+    } catch {
+      setError(t('schedule.pay.saveFailed'));
+      return;
+    }
     showToast({ message: t('schedule.pay.saved') });
     onClose();
   };

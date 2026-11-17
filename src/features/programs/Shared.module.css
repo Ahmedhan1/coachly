@@ -243,11 +243,13 @@
   gap: var(--sp-2);
   margin-inline: calc(var(--gutter) * -1);
   padding-inline: var(--gutter);
+  padding-block: 4px;
   overflow-x: auto;
   scrollbar-width: none;
 }
 
 .filterChip {
+  position: relative;
   flex: none;
   min-block-size: 36px;
   padding-inline: var(--sp-3);
@@ -256,6 +258,12 @@
   background: var(--surface);
   color: var(--text);
   font: var(--t-label);
+}
+
+.filterChip::after {
+  content: '';
+  position: absolute;
+  inset: -4px 0;
 }
 
 .filterChipOn {

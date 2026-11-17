@@ -24,7 +24,7 @@ condition or risk to manage · **RED** = do not ship.
 
 | Package | Version | License | Verified | Verdict |
 | --- | --- | --- | --- | --- |
-| @anthropic-ai/sdk | 1.4.0 | Apache-2.0 | installed (LICENSE: Apache License 2.0) | OK — optional AI assistant, loaded only when used |
+| @anthropic-ai/sdk | 1.9.0 | Apache-2.0 | installed (LICENSE: Apache License 2.0) | OK — optional AI assistant, loaded only when used |
 | @noble/ed25519 | 3.2.0 | MIT | installed (LICENSE: "The MIT License (MIT)") | OK |
 | dexie | 4.4.7 | Apache-2.0 | installed (LICENSE: Apache License) | OK — keep NOTICE/attribution in "About" |
 | dexie-react-hooks | 4.4.0 | Apache-2.0 | installed | OK |
@@ -46,7 +46,7 @@ condition or risk to manage · **RED** = do not ship.
 | globals | 17.14.0 | MIT | installed | OK (dev only) |
 | jsdom | 31.0.1 | MIT | installed (LICENSE.txt) | OK (dev only) |
 | typescript | 6.0.3 | Apache-2.0 | installed (LICENSE.txt) | OK (dev only) |
-| typescript-eslint | 8.72.2 | MIT | installed | OK (dev only) |
+| typescript-eslint | 8.73.0 | MIT | installed | OK (dev only) |
 | vite | 8.3.8 | MIT | installed (LICENSE.md) | OK (dev only; its bundled-deps notice is in the file) |
 | vite-plugin-pwa | 2.0.0 | MIT | installed | OK (dev only; Workbox runtime code it injects is MIT) |
 | vitest | 5.1.0 | MIT | installed (LICENSE.md) | OK (dev only) |
@@ -73,7 +73,7 @@ Apache-2.0.
 | --- | --- | --- | --- | --- |
 | @noble/ed25519 | 3.2.0 | MIT | installed | OK |
 | @cloudflare/vitest-plugin | 1.8.3 | MIT | installed | OK (dev only) |
-| @cloudflare/workers-types | 5.20261116.1 | MIT OR Apache-2.0 | installed | OK (dev only) |
+| @cloudflare/workers-types | 5.20261117.1 | MIT OR Apache-2.0 | installed | OK (dev only) |
 | typescript | 6.0.3 | Apache-2.0 | installed | OK (dev only) |
 | vitest | 5.1.0 | MIT | installed | OK (dev only) |
 | wrangler | 4.163.0 | MIT OR Apache-2.0 | installed | OK (dev only) |

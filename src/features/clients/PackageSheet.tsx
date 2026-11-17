@@ -23,27 +23,36 @@ export function PackageSheet({ client, currency, onClose }: { client: Client; cu
   const [price, setPrice] = useState(pkg ? moneyInputValue(pkg.priceMinor) : '');
   const [start, setStart] = useState<IsoDate>(client.startDate ?? today);
   const [end, setEnd] = useState<IsoDate>(client.endDate ?? addDays(client.startDate ?? today, 30));
-  const [errors, setErrors] = useState<{ total?: string; end?: string }>({});
+  const [errors, setErrors] = useState<{ total?: string; remaining?: string; price?: string; end?: string }>({});
   const cur = pkg?.currency ?? currency;
 
   const submit = async (e: FormEvent) => {
     e.preventDefault();
     const totalN = Number.parseInt(total, 10);
+    const remainingN = pkg ? Number.parseInt(remaining, 10) : totalN;
+    const priceMinor = price.trim() ? parseMoneyInput(price) : 0;
+    const totalOk = Number.isFinite(totalN) && totalN > 0;
     const next = {
-      total: Number.isFinite(totalN) && totalN > 0 ? undefined : t('schedule.pkg.sessionsRequired'),
+      total: totalOk ? undefined : t('schedule.pkg.sessionsRequired'),
+      remaining: totalOk && Number.isFinite(remainingN) && remainingN > totalN ? t('schedule.pkg.remainingTooMany') : undefined,
+      price: priceMinor === null ? t('schedule.pkg.priceInvalid') : undefined,
       end: end >= start ? undefined : t('schedule.pkg.endBeforeStart'),
     };
-    if (next.total || next.end) {
+    if (next.total || next.remaining || next.price || next.end || priceMinor === null) {
       setErrors(next);
       return;
     }
-    const remainingN = pkg ? Number.parseInt(remaining, 10) : totalN;
-    await repos.clients.update(client.id, {
-      package: { name: name.trim(), totalSessions: totalN, priceMinor: parseMoneyInput(price) ?? 0, currency: cur },
-      startDate: start,
-      endDate: end,
-      remainingSessions: Number.isFinite(remainingN) ? Math.max(0, remainingN) : totalN,
-    });
+    try {
+      await repos.clients.update(client.id, {
+        package: { name: name.trim(), totalSessions: totalN, priceMinor, currency: cur },
+        startDate: start,
+        endDate: end,
+        remainingSessions: Number.isFinite(remainingN) ? Math.max(0, remainingN) : totalN,
+      });
+    } catch {
+      setErrors({ total: t('schedule.pkg.saveFailed') });
+      return;
+    }
     showToast({ message: t('schedule.pkg.saved') });
     onClose();
   };
@@ -65,6 +74,7 @@ export function PackageSheet({ client, currency, onClose }: { client: Client; cu
           label={`${t('schedule.pkg.name')} (${t('common.optional')})`}
           placeholder={t('schedule.pkg.namePlaceholder')}
           value={name}
+          maxLength={200}
           onChange={(e) => setName(e.target.value)}
           autoComplete="off"
         />
@@ -87,7 +97,11 @@ export function PackageSheet({ client, currency, onClose }: { client: Client; cu
               inputMode="numeric"
               pattern="[0-9]*"
               value={remaining}
-              onChange={(e) => setRemaining(digits(e.target.value))}
+              error={errors.remaining}
+              onChange={(e) => {
+                setRemaining(digits(e.target.value));
+                setErrors((x) => ({ ...x, remaining: undefined }));
+              }}
               ltr
             />
           )}
@@ -96,7 +110,11 @@ export function PackageSheet({ client, currency, onClose }: { client: Client; cu
           label={`${t('schedule.pkg.price')} (${currencyLabel(cur)})`}
           inputMode="decimal"
           value={price}
-          onChange={(e) => setPrice(e.target.value)}
+          error={errors.price}
+          onChange={(e) => {
+            setPrice(e.target.value);
+            setErrors((x) => ({ ...x, price: undefined }));
+          }}
           ltr
         />
         <div className={styles.pair}>

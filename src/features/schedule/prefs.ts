@@ -10,6 +10,8 @@ import type { MetaStore } from '@/services/license/metaStore';
 export const SCHEDULE_PREFS_KEY = 'schedule.prefs';
 /** Session ids whose "missed" status is a late cancellation (اعتذر متأخر). */
 export const LATE_CANCEL_KEY = 'schedule.lateCancelIds';
+/** About four years of late cancellations at a busy trainer's pace; older sessions never change status again. */
+export const LATE_CANCEL_MAX = 1000;
 /** Set once the one-time reminders explanation was shown after the first booking. */
 export const REMINDERS_PROMPT_KEY = 'schedule.remindersPromptShownAt';
 
@@ -45,7 +47,9 @@ export async function setLateCancel(meta: MetaStore, sessionId: string, on: bool
   if (on === ids.has(sessionId)) return;
   if (on) ids.add(sessionId);
   else ids.delete(sessionId);
-  await meta.set(LATE_CANCEL_KEY, [...ids]);
+  const list = [...ids];
+  // Insertion order = oldest first. Only recent sessions can still change status, so keep the newest ids.
+  await meta.set(LATE_CANCEL_KEY, list.length > LATE_CANCEL_MAX ? list.slice(list.length - LATE_CANCEL_MAX) : list);
 }
 
 export function useSchedulePrefs(): SchedulePrefs | undefined {
