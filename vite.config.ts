@@ -67,7 +67,8 @@ export default defineConfig({
         // Precache the whole app (every lazy route chunk and the bundled fonts) so it runs fully offline after
         // first load. Exercise photos (~21 MB) are NOT precached: they are cached on first view (route below).
         globPatterns: ['**/*.{js,css,html,png,svg,ico,woff2,json,webmanifest,glb}'],
-        globIgnores: ['exercise-pack/img/**'],
+        // Draco decoders: the shipped model is not Draco-compressed, so never precache them (~0.8 MB).
+        globIgnores: ['exercise-pack/img/**', 'assets/draco_*', 'draco/**'],
         maximumFileSizeToCacheInBytes: 15 * 1024 * 1024,
         importScripts: ['push-sw.js'],
         navigateFallback: '/index.html',

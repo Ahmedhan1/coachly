@@ -704,7 +704,7 @@
   {
     "id": "Barbell_Curls_Lying_Against_An_Incline",
     "en": "Barbell Curls Lying Against An Incline",
-    "ar": "بار كيرل لاينج أجينست إنكلاين",
+    "ar": "بار كيرل لاينج على إنكلاين",
     "primaryMuscles": [
       "بايسبس"
     ],
@@ -947,7 +947,7 @@
   {
     "id": "Barbell_Shrug_Behind_The_Back",
     "en": "Barbell Shrug Behind The Back",
-    "ar": "بار شراج بيهايند باك",
+    "ar": "بار شراج ورا الضهر",
     "primaryMuscles": [
       "ترابس"
     ],
@@ -1013,7 +1013,7 @@
   {
     "id": "Barbell_Squat_To_A_Bench",
     "en": "Barbell Squat To A Bench",
-    "ar": "بار سكوات تو بنش",
+    "ar": "بار سكوات لحد بنش",
     "primaryMuscles": [
       "كوادز"
     ],
@@ -1099,7 +1099,7 @@
   {
     "id": "Behind_Head_Chest_Stretch",
     "en": "Behind Head Chest Stretch",
-    "ar": "بيهايند هيد تشيست ستريتش",
+    "ar": "ورا الراس تشيست ستريتش",
     "primaryMuscles": [
       "تشيست"
     ],
@@ -1232,7 +1232,7 @@
   {
     "id": "Bent_Over_Dumbbell_Rear_Delt_Raise_With_Head_On_Bench",
     "en": "Bent Over Dumbbell Rear Delt Raise With Head On Bench",
-    "ar": "بنت أوفر دامبل رير ديلت ريز مع هيد على بنش",
+    "ar": "بنت أوفر دامبل رير ديلت ريز والراس على البنش",
     "primaryMuscles": [
       "شولدرز"
     ],
@@ -1296,7 +1296,7 @@
   {
     "id": "Bent_Over_Two-Dumbbell_Row",
     "en": "Bent Over Two-Dumbbell Row",
-    "ar": "بنت أوفر تو دامبل رو",
+    "ar": "بنت أوفر دامبلين رو",
     "primaryMuscles": [
       "ميدل باك"
     ],
@@ -1313,7 +1313,7 @@
   {
     "id": "Bent_Over_Two-Dumbbell_Row_With_Palms_In",
     "en": "Bent Over Two-Dumbbell Row With Palms In",
-    "ar": "بنت أوفر تو دامبل رو مع بالمز إن",
+    "ar": "بنت أوفر دامبلين رو مع الكفوف لجوه",
     "primaryMuscles": [
       "ميدل باك"
     ],
@@ -1414,7 +1414,7 @@
   {
     "id": "Bicycling_Stationary",
     "en": "Bicycling, Stationary",
-    "ar": "بايسكلينج، ستيشنري",
+    "ar": "بايسكلينج، ثابتة",
     "primaryMuscles": [
       "كوادز"
     ],
@@ -2136,7 +2136,7 @@
   {
     "id": "Calf_Stretch_Elbows_Against_Wall",
     "en": "Calf Stretch Elbows Against Wall",
-    "ar": "كالف ستريتش إلبوز أجينست وول",
+    "ar": "كالف ستريتش إلبوز على الحيطة",
     "primaryMuscles": [
       "كالفز"
     ],
@@ -2149,7 +2149,7 @@
   {
     "id": "Calf_Stretch_Hands_Against_Wall",
     "en": "Calf Stretch Hands Against Wall",
-    "ar": "كالف ستريتش هاندز أجينست وول",
+    "ar": "كالف ستريتش هاندز على الحيطة",
     "primaryMuscles": [
       "كالفز"
     ],
@@ -2304,7 +2304,7 @@
   {
     "id": "Chair_Leg_Extended_Stretch",
     "en": "Chair Leg Extended Stretch",
-    "ar": "تشير ليج إكستندد ستريتش",
+    "ar": "كرسي ليج إكستندد ستريتش",
     "primaryMuscles": [
       "هامسترينج"
     ],
@@ -2319,7 +2319,7 @@
   {
     "id": "Chair_Lower_Back_Stretch",
     "en": "Chair Lower Back Stretch",
-    "ar": "تشير لوور باك ستريتش",
+    "ar": "كرسي لوور باك ستريتش",
     "primaryMuscles": [
       "لاتس"
     ],
@@ -2334,7 +2334,7 @@
   {
     "id": "Chair_Squat",
     "en": "Chair Squat",
-    "ar": "تشير سكوات",
+    "ar": "كرسي سكوات",
     "primaryMuscles": [
       "كوادز"
     ],
@@ -2351,7 +2351,7 @@
   {
     "id": "Chair_Upper_Body_Stretch",
     "en": "Chair Upper Body Stretch",
-    "ar": "تشير أبر بودي ستريتش",
+    "ar": "كرسي أبر بودي ستريتش",
     "primaryMuscles": [
       "شولدرز"
     ],
@@ -2479,7 +2479,7 @@
   {
     "id": "Chin_To_Chest_Stretch",
     "en": "Chin To Chest Stretch",
-    "ar": "تشين تو تشيست ستريتش",
+    "ar": "تشين لحد تشيست ستريتش",
     "primaryMuscles": [
       "نيك"
     ],
@@ -3080,7 +3080,7 @@
   {
     "id": "Decline_Close-Grip_Bench_To_Skull_Crusher",
     "en": "Decline Close-Grip Bench To Skull Crusher",
-    "ar": "ديكلاين كلوز جريب بنش تو سكال كراشر",
+    "ar": "ديكلاين كلوز جريب بنش لحد سكال كراشر",
     "primaryMuscles": [
       "ترايسبس"
     ],
@@ -3887,7 +3887,7 @@
   {
     "id": "Dumbbell_Squat_To_A_Bench",
     "en": "Dumbbell Squat To A Bench",
-    "ar": "دامبل سكوات تو بنش",
+    "ar": "دامبل سكوات لحد بنش",
     "primaryMuscles": [
       "كوادز"
     ],
@@ -3978,7 +3978,7 @@
   {
     "id": "Elbow_to_Knee",
     "en": "Elbow to Knee",
-    "ar": "إلبو تو ني",
+    "ar": "إلبو لحد ني",
     "primaryMuscles": [
       "أبس"
     ],
@@ -4461,7 +4461,7 @@
   {
     "id": "Front_Barbell_Squat_To_A_Bench",
     "en": "Front Barbell Squat To A Bench",
-    "ar": "فرونت بار سكوات تو بنش",
+    "ar": "فرونت بار سكوات لحد بنش",
     "primaryMuscles": [
       "كوادز"
     ],
@@ -4631,7 +4631,7 @@
   {
     "id": "Front_Two-Dumbbell_Raise",
     "en": "Front Two-Dumbbell Raise",
-    "ar": "فرونت تو دامبل ريز",
+    "ar": "فرونت دامبلين ريز",
     "primaryMuscles": [
       "شولدرز"
     ],
@@ -5143,7 +5143,7 @@
   {
     "id": "Hug_Knees_To_Chest",
     "en": "Hug Knees To Chest",
-    "ar": "هاج نيز تو تشيست",
+    "ar": "هاج نيز لحد تشيست",
     "primaryMuscles": [
       "لوور باك"
     ],
@@ -5297,7 +5297,7 @@
   {
     "id": "Incline_Dumbbell_Bench_With_Palms_Facing_In",
     "en": "Incline Dumbbell Bench With Palms Facing In",
-    "ar": "إنكلاين دامبل بنش مع بالمز فيسينج إن",
+    "ar": "إنكلاين دامبل بنش مع الكفوف لجوه",
     "primaryMuscles": [
       "تشيست"
     ],
@@ -6797,7 +6797,7 @@
   {
     "id": "Low_Pulley_Row_To_Neck",
     "en": "Low Pulley Row To Neck",
-    "ar": "لو بولي رو تو نيك",
+    "ar": "لو بولي رو لحد نيك",
     "primaryMuscles": [
       "شولدرز"
     ],
@@ -6930,7 +6930,7 @@
   {
     "id": "Lying_Close-Grip_Barbell_Triceps_Extension_Behind_The_Head",
     "en": "Lying Close-Grip Barbell Triceps Extension Behind The Head",
-    "ar": "لاينج كلوز جريب بار ترايسبس إكستنشن بيهايند هيد",
+    "ar": "لاينج كلوز جريب بار ترايسبس إكستنشن ورا الراس",
     "primaryMuscles": [
       "ترايسبس"
     ],
@@ -6943,7 +6943,7 @@
   {
     "id": "Lying_Close-Grip_Barbell_Triceps_Press_To_Chin",
     "en": "Lying Close-Grip Barbell Triceps Press To Chin",
-    "ar": "لاينج كلوز جريب بار ترايسبس برس تو تشين",
+    "ar": "لاينج كلوز جريب بار ترايسبس برس لحد تشين",
     "primaryMuscles": [
       "ترايسبس"
     ],
@@ -7582,7 +7582,7 @@
   {
     "id": "One_Arm_Against_Wall",
     "en": "One Arm Against Wall",
-    "ar": "ون آرم أجينست وول",
+    "ar": "ون آرم على الحيطة",
     "primaryMuscles": [
       "لاتس"
     ],
@@ -7731,7 +7731,7 @@
   {
     "id": "One_Knee_To_Chest",
     "en": "One Knee To Chest",
-    "ar": "ون ني تو تشيست",
+    "ar": "ون ني لحد تشيست",
     "primaryMuscles": [
       "جلوتس"
     ],
@@ -7883,7 +7883,7 @@
   {
     "id": "One-Arm_Kettlebell_Military_Press_To_The_Side",
     "en": "One-Arm Kettlebell Military Press To The Side",
-    "ar": "ون آرم كيتل بل ميليتري برس تو سايد",
+    "ar": "ون آرم كيتل بل ميليتري برس لحد سايد",
     "primaryMuscles": [
       "شولدرز"
     ],
@@ -8299,7 +8299,7 @@
   {
     "id": "Palms-Down_Dumbbell_Wrist_Curl_Over_A_Bench",
     "en": "Palms-Down Dumbbell Wrist Curl Over A Bench",
-    "ar": "بالمز داون دامبل ريست كيرل أوفر بنش",
+    "ar": "الكفوف لتحت دامبل ريست كيرل أوفر بنش",
     "primaryMuscles": [
       "فورآرمز"
     ],
@@ -8312,7 +8312,7 @@
   {
     "id": "Palms-Down_Wrist_Curl_Over_A_Bench",
     "en": "Palms-Down Wrist Curl Over A Bench",
-    "ar": "بالمز داون ريست كيرل أوفر بنش",
+    "ar": "الكفوف لتحت ريست كيرل أوفر بنش",
     "primaryMuscles": [
       "فورآرمز"
     ],
@@ -8325,7 +8325,7 @@
   {
     "id": "Palms-Up_Barbell_Wrist_Curl_Over_A_Bench",
     "en": "Palms-Up Barbell Wrist Curl Over A Bench",
-    "ar": "بالمز أب بار ريست كيرل أوفر بنش",
+    "ar": "الكفوف لفوق بار ريست كيرل أوفر بنش",
     "primaryMuscles": [
       "فورآرمز"
     ],
@@ -8338,7 +8338,7 @@
   {
     "id": "Palms-Up_Dumbbell_Wrist_Curl_Over_A_Bench",
     "en": "Palms-Up Dumbbell Wrist Curl Over A Bench",
-    "ar": "بالمز أب دامبل ريست كيرل أوفر بنش",
+    "ar": "الكفوف لفوق دامبل ريست كيرل أوفر بنش",
     "primaryMuscles": [
       "فورآرمز"
     ],
@@ -8847,7 +8847,7 @@
   {
     "id": "Push_Up_to_Side_Plank",
     "en": "Push Up to Side Plank",
-    "ar": "بوش أب تو سايد بلانك",
+    "ar": "بوش أب لحد سايد بلانك",
     "primaryMuscles": [
       "تشيست"
     ],
@@ -9620,7 +9620,7 @@
   {
     "id": "Rowing_Stationary",
     "en": "Rowing, Stationary",
-    "ar": "روينج، ستيشنري",
+    "ar": "روينج، ثابتة",
     "primaryMuscles": [
       "كوادز"
     ],
@@ -9952,7 +9952,7 @@
   {
     "id": "Seated_Dumbbell_Palms-Down_Wrist_Curl",
     "en": "Seated Dumbbell Palms-Down Wrist Curl",
-    "ar": "سيتد دامبل بالمز داون ريست كيرل",
+    "ar": "سيتد دامبل الكفوف لتحت ريست كيرل",
     "primaryMuscles": [
       "فورآرمز"
     ],
@@ -9965,7 +9965,7 @@
   {
     "id": "Seated_Dumbbell_Palms-Up_Wrist_Curl",
     "en": "Seated Dumbbell Palms-Up Wrist Curl",
-    "ar": "سيتد دامبل بالمز أب ريست كيرل",
+    "ar": "سيتد دامبل الكفوف لفوق ريست كيرل",
     "primaryMuscles": [
       "فورآرمز"
     ],
@@ -10152,7 +10152,7 @@
   {
     "id": "Seated_One-Arm_Dumbbell_Palms-Down_Wrist_Curl",
     "en": "Seated One-Arm Dumbbell Palms-Down Wrist Curl",
-    "ar": "سيتد ون آرم دامبل بالمز داون ريست كيرل",
+    "ar": "سيتد ون آرم دامبل الكفوف لتحت ريست كيرل",
     "primaryMuscles": [
       "فورآرمز"
     ],
@@ -10165,7 +10165,7 @@
   {
     "id": "Seated_One-Arm_Dumbbell_Palms-Up_Wrist_Curl",
     "en": "Seated One-Arm Dumbbell Palms-Up Wrist Curl",
-    "ar": "سيتد ون آرم دامبل بالمز أب ريست كيرل",
+    "ar": "سيتد ون آرم دامبل الكفوف لفوق ريست كيرل",
     "primaryMuscles": [
       "فورآرمز"
     ],
@@ -10204,7 +10204,7 @@
   {
     "id": "Seated_Palms-Down_Barbell_Wrist_Curl",
     "en": "Seated Palms-Down Barbell Wrist Curl",
-    "ar": "سيتد بالمز داون بار ريست كيرل",
+    "ar": "سيتد الكفوف لتحت بار ريست كيرل",
     "primaryMuscles": [
       "فورآرمز"
     ],
@@ -10243,7 +10243,7 @@
   {
     "id": "Seated_Two-Arm_Palms-Up_Low-Pulley_Wrist_Curl",
     "en": "Seated Two-Arm Palms-Up Low-Pulley Wrist Curl",
-    "ar": "سيتد تو آرم بالمز أب لو بولي ريست كيرل",
+    "ar": "سيتد تو آرم الكفوف لفوق لو بولي ريست كيرل",
     "primaryMuscles": [
       "فورآرمز"
     ],
@@ -10405,7 +10405,7 @@
   {
     "id": "Side_Laterals_to_Front_Raise",
     "en": "Side Laterals to Front Raise",
-    "ar": "سايد لاتيرال تو فرونت ريز",
+    "ar": "سايد لاتيرال لحد فرونت ريز",
     "primaryMuscles": [
       "شولدرز"
     ],
@@ -10478,7 +10478,7 @@
   {
     "id": "Side_to_Side_Box_Shuffle",
     "en": "Side to Side Box Shuffle",
-    "ar": "سايد تو سايد بوكس شافل",
+    "ar": "سايد لحد سايد بوكس شافل",
     "primaryMuscles": [
       "كوادز"
     ],
@@ -10496,7 +10496,7 @@
   {
     "id": "Side_To_Side_Chins",
     "en": "Side To Side Chins",
-    "ar": "سايد تو سايد تشين أب",
+    "ar": "سايد لحد سايد تشين أب",
     "primaryMuscles": [
       "لاتس"
     ],
@@ -10929,7 +10929,7 @@
   {
     "id": "Smith_Machine_Behind_the_Back_Shrug",
     "en": "Smith Machine Behind the Back Shrug",
-    "ar": "سميث ماشين بيهايند باك شراج",
+    "ar": "سميث ماشين ورا الضهر شراج",
     "primaryMuscles": [
       "ترابس"
     ],
@@ -12213,7 +12213,7 @@
   {
     "id": "Standing_Palms-In_Dumbbell_Press",
     "en": "Standing Palms-In Dumbbell Press",
-    "ar": "ستاندينج بالمز إن دامبل برس",
+    "ar": "ستاندينج الكفوف لجوه دامبل برس",
     "primaryMuscles": [
       "شولدرز"
     ],
@@ -12228,7 +12228,7 @@
   {
     "id": "Standing_Palms-Up_Barbell_Behind_The_Back_Wrist_Curl",
     "en": "Standing Palms-Up Barbell Behind The Back Wrist Curl",
-    "ar": "ستاندينج بالمز أب بار بيهايند باك ريست كيرل",
+    "ar": "ستاندينج الكفوف لفوق بار ورا الضهر ريست كيرل",
     "primaryMuscles": [
       "فورآرمز"
     ],

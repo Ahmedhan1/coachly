@@ -58,7 +58,14 @@ describe('transliterateExerciseName', () => {
 
   it('attaches "and" to the next word and drops articles', () => {
     expect(transliterateExerciseName('Close and Wide').arabic).toBe('كلوز ووايد');
-    expect(transliterateExerciseName('Barbell Shrug Behind The Back').arabic).toBe('بار شراج بيهايند باك');
+    expect(transliterateExerciseName('Barbell Squat To A Bench').arabic).toBe('بار سكوات لحد بنش');
+  });
+
+  it('says body positions the way Egyptian trainers do', () => {
+    expect(transliterateExerciseName('Barbell Shrug Behind The Back').arabic).toBe('بار شراج ورا الضهر');
+    expect(transliterateExerciseName('Behind Head Chest Stretch').arabic).toBe('ورا الراس تشيست ستريتش');
+    expect(transliterateExerciseName('Calf Stretch Hands Against Wall').arabic).toBe('كالف ستريتش هاندز على الحيطة');
+    expect(transliterateExerciseName('Bent Over Two-Dumbbell Row With Palms In').arabic).toBe('بنت أوفر دامبلين رو مع الكفوف لجوه');
   });
 
   it('handles possessives', () => {

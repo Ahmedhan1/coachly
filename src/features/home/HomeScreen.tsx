@@ -6,6 +6,7 @@ import { toIsoDate } from '@/domain/models';
 import { useUiStore } from '@/app/uiStore';
 import { whatsappUrl } from '@/features/clients/contact';
 import { OutboxCard } from '@/features/outbox/OutboxCard';
+import { ActiveSessionBanner } from '@/features/session/ActiveSessionBanner';
 import { t } from '@/i18n';
 import { Avatar, Badge, Button, Icon, IconButton, ListRow, ListSection, Money, Num, PageHeader, SectionLink, Tx, cx } from '@/ui';
 import { formatIsoDate, formatLongDate, formatTime, timeParts } from '@/ui/format';
@@ -28,6 +29,7 @@ export function HomeScreen() {
   return (
     <>
       <PageHeader title={t('home.title')} actions={actions} subtitle={<DateLine home={home} />} />
+      <ActiveSessionBanner />
       {home.hasDemo && <DemoNotice />}
       {home.plan.next ? <Hero next={home.plan.next} /> : <NoNext />}
       <OutboxCard />
