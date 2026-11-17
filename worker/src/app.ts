@@ -31,7 +31,13 @@ export async function handleRequest(request: Request, deps: Deps, hooks: AdminHo
       if (!(await deps.localLimiter.hit(RULES.preflight, clientKey, deps.now()))) return json({ error: 'rate_limited' }, 429);
       return new Response(null, { status: 204, headers: cors });
     }
-    const response = await routeApi(request, url.pathname, deps, clientKey);
+    let response: Response;
+    try {
+      response = await routeApi(request, url.pathname, deps, clientKey);
+    } catch {
+      // D1/R2 hiccup or a bug: a generic error the app treats as "offline, retry later". Never the message.
+      response = json({ error: 'server_error' }, 500);
+    }
     return withHeaders(response, cors);
   }
 

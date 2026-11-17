@@ -21,6 +21,8 @@ export const DEFAULT_CLOUD_CONFIG: CloudConfig = {
   checkinMaxBytes: 3 * MiB,
   maxPendingCheckins: 20,
   maxSharesPerLicense: 200,
+  // ~40 clients x (page + a few photo check-ins); bounds one license to ~2% of the 10 GB free R2.
+  pagesLicenseMaxBytes: 200 * MiB,
   pushBatchSize: PUSH_BATCH_SIZE,
 };
 

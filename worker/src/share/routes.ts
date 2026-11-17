@@ -8,6 +8,7 @@ import { json } from '../http';
 import type { Deps } from '../ports';
 import { RULES } from '../rateLimit';
 import { constantTimeEqual } from '../serverCrypto';
+import { overPagesQuota } from './quota';
 
 export const SHARE_ID = /^[A-Za-z0-9_-]{22,64}$/;
 const HASH_B64 = /^[A-Za-z0-9_-]{43}$/;
@@ -80,6 +81,7 @@ async function putShare(request: Request, deps: Deps, lid: string, shareId: stri
     if ((count?.n ?? 0) >= cloud.config.maxSharesPerLicense) return json({ error: 'too_many_shares' }, 409);
   }
   if (await wouldOverfill(cloud, check.length, existing?.size ?? 0)) return storageFull();
+  if (await overPagesQuota(cloud.db, lid, check.length, existing?.size ?? 0, cloud.config.pagesLicenseMaxBytes)) return storageFull();
 
   const body = request.body;
   if (body === null) return json({ error: 'length_required' }, 411);
@@ -125,8 +127,10 @@ function etagOf(row: ShareRow): string {
 /** GET /api/share/:shareId (public) — the encrypted page content. */
 async function readShare(request: Request, deps: Deps, clientKey: string, shareId: string): Promise<Response> {
   const now = deps.now();
-  if (!(await deps.limiter.hit(RULES.shareReadIp, clientKey, now))) return json({ error: 'rate_limited' }, 429);
-  if (!(await deps.limiter.hit(RULES.shareReadPage, shareId, now))) return json({ error: 'rate_limited' }, 429);
+  // Memory only: two D1 writes per page view would be the largest D1 write cost at 500 trainers (LIMITS.md).
+  // A read needs the unguessable 128-bit page id, R2 reads are cheap (10 M Class B / month), and 304s cost none.
+  if (!(await deps.localLimiter.hit(RULES.shareReadIp, clientKey, now))) return json({ error: 'rate_limited' }, 429);
+  if (!(await deps.localLimiter.hit(RULES.shareReadPage, shareId, now))) return json({ error: 'rate_limited' }, 429);
   const row = await getShare(deps.cloud.db, shareId);
   if (row === null || row.revoked === 1) return json({ error: 'not_found' }, 404);
   const headers = { 'Cache-Control': 'private, no-cache', ETag: etagOf(row), 'X-Content-Type-Options': 'nosniff' };
@@ -157,6 +161,9 @@ async function postCheckin(request: Request, deps: Deps, clientKey: string, shar
   if (!check.ok) return json(check.status === 413 ? { error: check.error, maxBytes: cloud.config.checkinMaxBytes } : { error: check.error }, check.status);
   const pending = await cloud.db.prepare('SELECT COUNT(*) AS n FROM checkins WHERE share_id = ?').bind(shareId).first<{ n: number }>();
   if ((pending?.n ?? 0) >= cloud.config.maxPendingCheckins) return json({ error: 'too_many_pending' }, 429);
+  if (await overPagesQuota(cloud.db, row.lid, check.length, 0, cloud.config.pagesLicenseMaxBytes)) {
+    return json({ error: 'too_many_pending' }, 429);
+  }
   if (await wouldOverfill(cloud, check.length, 0)) return storageFull();
 
   const body = request.body;

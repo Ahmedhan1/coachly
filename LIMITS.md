@@ -185,6 +185,24 @@ not guarantee it.
 6. If the business outgrows this, options are the owner's call: a second free Cloudflare account for new
    trainers, or paid R2 — both outside the zero-cost rule today.
 
+### D1 writes and storage rules from the 2026-11-17 worker audit
+
+- **D1 rows written is the tightest daily number once client pages are used.** Every durable rate-limit hit is
+  one row write (plus check-in posts: 3 limiter rows + insert + usage). Measures taken: public client-page reads
+  (`GET /api/share/:id`) and anonymous `/admin` page views are limited **in memory only** (0 D1 writes; before:
+  2 per page view = up to 80/trainer/day heavy). `PUT /api/push/schedule` writes only the **difference** from
+  the stored schedule (before: delete + re-insert up to 100 rows, plus index rows, on every calendar change).
+- **Push backlog:** each cron run first deletes reminders more than 1 h late (one indexed `DELETE`, one extra
+  subrequest), so a backlog never fills the 20-message batch with stale rows. Capacity stays 20/minute =
+  28,800/day; if many trainers book the same minute, the app's slot spreading still matters.
+- **Client pages per license:** pages + pending check-ins are capped at **200 MiB per license**
+  (`pagesLicenseMaxBytes`); above it publishing answers `507 storage_full` and a client check-in answers
+  `429 too_many_pending`. Without it one license could hold ~13 GB (200 pages × 5 MiB + 200 × 20 × 3 MiB) and
+  push the whole bucket over the global guard for every trainer.
+- Known, accepted: the global activation limit (300/h) and global login limit (30/h) can be exhausted on
+  purpose by a few IPs (temporary lock-out, not a breach; the offline long code still activates). Revoked
+  `shares` rows are kept forever so an id is never reused (tiny rows).
+
 ## 4. Re-verify
 
 These numbers change. Re-read every URL above on release day and update this file and the budget if anything

@@ -82,6 +82,7 @@ export function viewerHeaders(nonce: string, imageOrigin: string | null): Record
     ].join('; '),
     'Referrer-Policy': 'no-referrer',
     'X-Content-Type-Options': 'nosniff',
+    'X-Frame-Options': 'DENY',
     'X-Robots-Tag': 'noindex, nofollow',
     'Permissions-Policy': 'camera=(), microphone=(), geolocation=()',
   };

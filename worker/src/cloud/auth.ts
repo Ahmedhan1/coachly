@@ -42,6 +42,9 @@ export async function authenticate(
 
   const record = await deps.store.findById(lid);
   if (record !== null && (record.status === 'revoked' || record.status === 'replaced')) return fail('revoked', 403);
+  // Device binding: a token for a D1 license must name the device it was activated on. Only a leaked signing
+  // key could produce such a token, but then the damage stays limited to tokens for unactivated/offline ids.
+  if (record !== null && record.deviceFp !== null && record.deviceFp !== dev) return fail('invalid', 401);
   if (exp !== null && now >= exp) return fail('expired', 403);
 
   const deviceKey = `${lid}:${dev}`;

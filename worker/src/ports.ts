@@ -72,6 +72,8 @@ export interface CloudConfig {
   checkinMaxBytes: number;
   maxPendingCheckins: number;
   maxSharesPerLicense: number;
+  /** Largest total of client pages + pending check-ins one license may keep in R2. */
+  pagesLicenseMaxBytes: number;
   /** Push messages sent per cron invocation (CPU and subrequest budget, see docs/CLOUD.md). */
   pushBatchSize: number;
 }

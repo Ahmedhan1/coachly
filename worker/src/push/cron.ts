@@ -1,6 +1,6 @@
 // Cron sender: every run sends at most `pushBatchSize` due notifications, oldest first, then deletes them.
-// Budget per run (Free plan): 10 ms CPU and 50 subrequests. Subrequests here = 1 select + N push fetches +
-// 1 D1 batch, so N <= 47; CPU is the tighter bound (see docs/CLOUD.md "Push CPU budget").
+// Budget per run (Free plan): 10 ms CPU and 50 subrequests. Subrequests here = 1 stale delete + 1 select +
+// N push fetches + 1 D1 batch, so N <= 46; CPU is the tighter bound (see docs/CLOUD.md "Push CPU budget").
 import type { CloudDeps } from '../ports';
 import { base64UrlDecode, utf8 } from './bytes';
 import { audienceOf, signVapidJwt, vapidAuthorization } from './vapid';
@@ -18,6 +18,8 @@ const CONCURRENCY = 6;
 export const DUE_QUERY = `SELECT i.device_key, i.item_id, i.due_at, i.title, i.body, i.attempts, s.endpoint, s.p256dh, s.auth
   FROM push_items i JOIN push_subscriptions s ON s.device_key = i.device_key
   WHERE i.due_at <= ? ORDER BY i.due_at LIMIT ?`;
+
+export const STALE_DELETE = 'DELETE FROM push_items WHERE due_at < ?';
 
 interface DueRow {
   device_key: string;
@@ -101,6 +103,11 @@ export async function runPushCron(cloud: CloudDeps, now: number): Promise<CronRe
   const keys = await cloud.vapid.keys();
   if (keys === null) return report;
 
+  // Stale reminders go first, in one indexed DELETE: after an outage or a peak minute they would otherwise
+  // fill the batch (oldest first) and push due reminders past the stale line too, run after run.
+  const purged = await cloud.db.prepare(STALE_DELETE).bind(now - STALE_AFTER_SECONDS).run();
+  report.stale += purged.meta.changes ?? 0;
+
   const { results } = await cloud.db.prepare(DUE_QUERY).bind(now, cloud.config.pushBatchSize).all<DueRow>();
   if (results.length === 0) return report;
 
@@ -116,10 +123,7 @@ export async function runPushCron(cloud: CloudDeps, now: number): Promise<CronRe
   };
 
   const goneDevices = new Set<string>();
-  const outcomes = await mapLimited(results, CONCURRENCY, async (row): Promise<Outcome> => {
-    if (row.due_at < now - STALE_AFTER_SECONDS) return 'stale';
-    return sendOne(cloud, row, auth);
-  });
+  const outcomes = await mapLimited(results, CONCURRENCY, (row) => sendOne(cloud, row, auth));
 
   const { db } = cloud;
   const statements: D1PreparedStatement[] = [];

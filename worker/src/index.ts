@@ -23,7 +23,12 @@ export default {
       return json({ error: 'server_not_configured' }, 503);
     }
     const { deps, d1Limiter } = built;
-    return handleRequest(request, deps, { prune: (now) => d1Limiter.prune(now - 2 * 86_400) });
+    try {
+      return await handleRequest(request, deps, { prune: (now) => d1Limiter.prune(now - 2 * 86_400) });
+    } catch {
+      // Last resort for /admin and /c/ (API errors are already answered inside handleRequest, with CORS).
+      return json({ error: 'server_error' }, 500);
+    }
   },
 
   /** Cron (wrangler.toml [triggers]): sends due push notifications, one bounded batch per run. */

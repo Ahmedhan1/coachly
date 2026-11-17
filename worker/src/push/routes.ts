@@ -112,20 +112,55 @@ async function subscribe(request: Request, deps: Deps, lid: string, deviceKey: s
   return json({ ok: true });
 }
 
+interface StoredItem {
+  item_id: string;
+  due_at: number;
+  title: string;
+  body: string;
+}
+
+/**
+ * Replaces the device's schedule as a whole, but writes only the difference: the app re-sends the full list on
+ * every calendar change, and rewriting up to 100 rows (plus their index) each time would dominate the D1
+ * write budget. Unchanged items keep their row (and their retry state).
+ */
+function scheduleDiff(db: D1Database, deviceKey: string, stored: readonly StoredItem[], items: readonly ScheduleItem[]): D1PreparedStatement[] {
+  const before = new Map(stored.map((row) => [row.item_id, row]));
+  const wanted = new Set(items.map((item) => item.id));
+  const statements: D1PreparedStatement[] = [];
+  for (const row of stored) {
+    if (!wanted.has(row.item_id)) {
+      statements.push(db.prepare('DELETE FROM push_items WHERE device_key = ? AND item_id = ?').bind(deviceKey, row.item_id));
+    }
+  }
+  for (const item of items) {
+    const old = before.get(item.id);
+    if (old !== undefined && old.due_at === item.at && old.title === item.title && old.body === item.body) continue;
+    statements.push(
+      db
+        .prepare(
+          `INSERT INTO push_items (device_key, item_id, due_at, title, body) VALUES (?, ?, ?, ?, ?)
+           ON CONFLICT (device_key, item_id) DO UPDATE SET due_at = excluded.due_at, title = excluded.title,
+             body = excluded.body, attempts = 0`,
+        )
+        .bind(deviceKey, item.id, item.at, item.title, item.body),
+    );
+  }
+  return statements;
+}
+
 async function schedule(request: Request, deps: Deps, deviceKey: string): Promise<Response> {
   const parsed = parseSchedule(parseJson(await readLimitedText(request, MAX_SCHEDULE_BODY)), deps.now());
   if (!parsed.ok) return json({ error: parsed.error }, 400);
   const { db } = deps.cloud;
   const sub = await db.prepare('SELECT 1 AS one FROM push_subscriptions WHERE device_key = ?').bind(deviceKey).first();
   if (sub === null) return json({ error: 'no_subscription' }, 409);
-  await db.batch([
-    db.prepare('DELETE FROM push_items WHERE device_key = ?').bind(deviceKey),
-    ...parsed.items.map((item) =>
-      db
-        .prepare('INSERT INTO push_items (device_key, item_id, due_at, title, body) VALUES (?, ?, ?, ?, ?)')
-        .bind(deviceKey, item.id, item.at, item.title, item.body),
-    ),
-  ]);
+  const { results } = await db
+    .prepare('SELECT item_id, due_at, title, body FROM push_items WHERE device_key = ?')
+    .bind(deviceKey)
+    .all<StoredItem>();
+  const statements = scheduleDiff(db, deviceKey, results, parsed.items);
+  if (statements.length > 0) await db.batch(statements);
   return json({ ok: true, count: parsed.items.length });
 }
 

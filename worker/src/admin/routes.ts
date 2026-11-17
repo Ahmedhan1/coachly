@@ -20,6 +20,7 @@ const SECURITY_HEADERS: Record<string, string> = {
   'Content-Security-Policy':
     "default-src 'none'; style-src 'unsafe-inline'; form-action 'self'; frame-ancestors 'none'; base-uri 'none'",
   'X-Content-Type-Options': 'nosniff',
+  'X-Frame-Options': 'DENY',
   'Referrer-Policy': 'same-origin',
   'X-Robots-Tag': 'noindex, nofollow',
 };
@@ -168,9 +169,13 @@ export async function handleAdmin(request: Request, deps: Deps, clientKey: strin
   if (method === 'POST' && !sameOrigin(request)) return html(messagePage('ممنوع', 'الطلب ده جاي من مكان غريب.'), 403);
   if (method === 'POST' && path === '/admin/login') return handleLogin(request, deps, clientKey);
 
-  if (!(await deps.limiter.hit(RULES.admin, clientKey, now))) return html(messagePage('استنى شوية', 'طلبات كتير.'), 429);
-
   const authed = await hasValidSession(request, deps.crypto, now);
+  // Anonymous visitors only ever get the login page or a redirect: count them in memory, so a crawler or a
+  // flood cannot spend the D1 daily write budget that licenses and backups depend on. Login has its own
+  // durable limit above.
+  const limiter = authed ? deps.limiter : deps.localLimiter;
+  if (!(await limiter.hit(RULES.admin, clientKey, now))) return html(messagePage('استنى شوية', 'طلبات كتير.'), 429);
+
   if (method === 'POST' && path === '/admin/logout') return redirect('/admin', { 'Set-Cookie': clearSessionCookie() });
   if (!authed) return method === 'GET' && path === '/admin' ? html(loginPage(null)) : redirect('/admin');
 
