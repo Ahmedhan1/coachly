@@ -1,0 +1,10 @@
+.results {
+  margin-inline: calc(var(--gutter) * -1);
+  min-block-size: 40vh;
+}
+
+.hint {
+  padding: var(--sp-4) var(--gutter);
+  font: var(--t-sub);
+  color: var(--text-2);
+}
