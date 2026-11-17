@@ -13,7 +13,7 @@ export type ShareFailure = 'not_allowed' | 'unsupported' | 'error';
  */
 export type ShareResult =
   | { outcome: 'shared' | 'cancelled' }
-  | { outcome: 'downloaded'; fallback?: true }
+  | { outcome: 'downloaded'; fallback?: true; fileName?: string }
   | { outcome: 'failed'; reason: ShareFailure };
 
 export interface ShareFileRequest {
@@ -22,6 +22,11 @@ export interface ShareFileRequest {
   mimeType: string;
   title?: string;
   text?: string;
+  /**
+   * ASCII name for the download fallback. Android Chrome saves a download whose name has non-Latin letters as
+   * "download" with no extension; the Arabic title stays inside the document and the share title.
+   */
+  downloadName?: string;
 }
 
 export interface ShareService {
@@ -79,6 +84,18 @@ export function safeFileName(name: string, fallback = 'file'): string {
   return (cleaned || fallback).slice(0, 120);
 }
 
+/** An ASCII-only file name for downloads: Latin parts kept, otherwise `fallbackBase` + the extension. */
+export function asciiFileName(name: string, fallbackBase = 'file'): string {
+  const dot = name.lastIndexOf('.');
+  const ext = dot > 0 ? name.slice(dot).replace(/[^A-Za-z0-9.]/g, '') : '';
+  const base = (dot > 0 ? name.slice(0, dot) : name)
+    .normalize('NFKD')
+    .replace(/[^A-Za-z0-9._-]+/g, '-')
+    .replace(/-{2,}/g, '-')
+    .replace(/^[-.]+|[-.]+$/g, '');
+  return `${/[A-Za-z0-9]/.test(base) ? base.slice(0, 80) : fallbackBase}${ext}`;
+}
+
 /**
  * Web Share API with files when `navigator.canShare({ files })` says yes (iOS share sheet → WhatsApp,
  * Files, Calendar…); otherwise a download through an object URL. Never throws.
@@ -126,15 +143,15 @@ export class BrowserShareService implements ShareService {
         }
       }
     }
-    return this.download(file, options.prefer !== 'download');
+    return this.download(file, asciiFileName(request.downloadName ?? file.name), options.prefer !== 'download');
   }
 
-  private download(file: File, fallback: boolean): ShareResult {
+  private download(file: File, name: string, fallback: boolean): ShareResult {
     try {
       const url = this.env.createObjectURL(file);
-      this.env.clickDownload(url, file.name);
+      this.env.clickDownload(url, name);
       this.env.defer(() => this.env.revokeObjectURL(url), 60_000);
-      return fallback ? { outcome: 'downloaded', fallback: true } : { outcome: 'downloaded' };
+      return fallback ? { outcome: 'downloaded', fallback: true, fileName: name } : { outcome: 'downloaded', fileName: name };
     } catch {
       return { outcome: 'failed', reason: 'unsupported' };
     }

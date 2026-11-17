@@ -161,12 +161,21 @@ export function PdfBuilderScreen() {
 
   const send = async (prefer: 'share' | 'download') => {
     if (status.kind !== 'ready') return;
-    const r = await share.shareFile({ data: status.pdf.blob, fileName: status.pdf.fileName, mimeType: 'application/pdf', title: title || status.pdf.fileName }, { prefer });
+    const r = await share.shareFile(
+      {
+        data: status.pdf.blob,
+        fileName: status.pdf.fileName,
+        mimeType: 'application/pdf',
+        title: title || status.pdf.fileName,
+        downloadName: `pt-program-${toIsoDate(new Date())}.pdf`,
+      },
+      { prefer },
+    );
     if (r.outcome === 'shared') {
       setSent(null);
       showToast({ message: t('pdf.shared'), duration: 2500 });
     } else if (r.outcome === 'downloaded') {
-      setSent({ kind: r.fallback ? 'fallback' : 'downloaded', fileName: status.pdf.fileName });
+      setSent({ kind: r.fallback ? 'fallback' : 'downloaded', fileName: r.fileName ?? status.pdf.fileName });
       showToast({ message: t('pdf.downloaded'), duration: 2500 });
     } else if (r.outcome === 'failed') showToast({ message: t('pdf.shareFailed') });
   };
