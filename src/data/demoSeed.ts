@@ -50,9 +50,14 @@ const TODAY_SESSIONS: ReadonlyArray<readonly [number, number, number]> = [
   [4, 20, 0],
 ];
 
+/**
+ * The seed writes DEMO_META_KEY and removeDemoData deletes it (the key also travels inside backups), so once the
+ * demo is gone this reads one meta row instead of scanning years of sessions on every Home render.
+ */
 export async function hasDemoData(db: AppDatabase): Promise<boolean> {
+  if ((await db.meta.get(DEMO_META_KEY)) === undefined) return false;
   for (const name of ENTITY_TABLES) {
-    if ((await db.table<{ demo: boolean }>(name).filter((r) => r.demo).count()) > 0) return true;
+    if ((await db.table<{ demo: boolean }>(name).filter((r) => r.demo).first()) !== undefined) return true;
   }
   return false;
 }

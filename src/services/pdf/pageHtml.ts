@@ -21,7 +21,13 @@ function img(url: string | null, cls: string, alt = ''): string {
 /** Isolates a value so numbers/Latin inside Arabic keep their order. */
 const bdi = (t: string) => `<bdi>${esc(t)}</bdi>`;
 
-function chartSvg(points: { date: string; kg: number }[], color: string): string {
+/** Colors reach SVG attributes and CSS unquoted: anything but #rrggbb falls back to the default. */
+function safeHex(color: string, fallback = '#2F6F5E'): string {
+  return /^#[0-9a-f]{6}$/i.test(color) ? color : fallback;
+}
+
+function chartSvg(points: { date: string; kg: number }[], rawColor: string): string {
+  const color = safeHex(rawColor);
   const W = 700;
   const H = 240;
   const pad = { x: 40, top: 16, bottom: 30 };
@@ -119,10 +125,10 @@ export function fontStack(family: string): string {
 }
 
 function pageVars(doc: PdfDocument): string {
-  const hex = (c: string, d: string) => (/^#[0-9a-f]{6}$/i.test(c) ? c : d);
+  const px = (n: number) => (Number.isFinite(n) ? Math.max(0, Math.round(n)) : 0);
   return (
-    `--c1:${hex(doc.theme.primaryColor, '#2F6F5E')};--c2:${hex(doc.theme.secondaryColor, '#3A3A3C')};` +
-    `--hlogo:${doc.theme.headerLogoPx}px;--clogo:${doc.theme.coverLogoPx}px;font-family:${esc(fontStack(doc.theme.fontFamily))};`
+    `--c1:${safeHex(doc.theme.primaryColor)};--c2:${safeHex(doc.theme.secondaryColor, '#3A3A3C')};` +
+    `--hlogo:${px(doc.theme.headerLogoPx)}px;--clogo:${px(doc.theme.coverLogoPx)}px;font-family:${esc(fontStack(doc.theme.fontFamily))};`
   );
 }
 
@@ -138,7 +144,7 @@ function footerHtml(doc: PdfDocument, page: PdfPage, withNumber: boolean): strin
 /** Full HTML of one A4 page (794 × 1123 CSS px). */
 export function pageHtml(doc: PdfDocument, page: PdfPage, urlOf: UrlOf, title: string): string {
   const t = doc.theme;
-  const color = /^#[0-9a-f]{6}$/i.test(t.primaryColor) ? t.primaryColor : '#2F6F5E';
+  const color = safeHex(t.primaryColor);
   const logoUrl = urlOf(t.logo);
   if (page.kind === 'cover') {
     const c = page.cover;
@@ -146,7 +152,7 @@ export function pageHtml(doc: PdfDocument, page: PdfPage, urlOf: UrlOf, title: s
     return (
       `<div class="ptpdf-page ptpdf-cover" dir="rtl" lang="ar" style="${pageVars(doc)}">` +
       (coverUrl ? `${img(coverUrl, 'cimg')}<div class="shade"></div>` : '<div class="plain"></div>') +
-      `<div class="inner">${logoUrl ? `<div class="logo ${t.logoPlacement}">${img(logoUrl, '', t.trainerName)}</div>` : ''}<div class="spacer"></div>` +
+      `<div class="inner">${logoUrl ? `<div class="logo ${esc(t.logoPlacement)}">${img(logoUrl, '', t.trainerName)}</div>` : ''}<div class="spacer"></div>` +
       `<h1>${esc(c.title)}</h1>${c.subtitle ? `<div class="sub">${esc(c.subtitle)}</div>` : ''}` +
       `<dl>${c.clientName ? `<dt>${esc(c.clientLabel)}</dt><dd>${esc(c.clientName)}</dd>` : ''}` +
       `${c.trainerName ? `<dt>${esc(c.preparedByLabel)}</dt><dd>${esc(c.trainerName)}</dd>` : ''}` +
@@ -157,7 +163,7 @@ export function pageHtml(doc: PdfDocument, page: PdfPage, urlOf: UrlOf, title: s
   const bgUrl = t.background ? urlOf(t.background.image) : null;
   return (
     `<div class="ptpdf-page${bgUrl ? ' ptpdf-onbg' : ''}" dir="rtl" lang="ar" style="${pageVars(doc)}">` +
-    (bgUrl ? `<img class="ptpdf-bg" src="${esc(safeUrl(bgUrl) ?? '')}" alt="" style="opacity:${t.background!.opacity}">` : '') +
+    (bgUrl ? `<img class="ptpdf-bg" src="${esc(safeUrl(bgUrl) ?? '')}" alt="" style="opacity:${Math.min(1, Math.max(0, Number(t.background!.opacity) || 0))}">` : '') +
     `<header class="ptpdf-hdr">${logoUrl ? img(logoUrl, '', t.trainerName) : ''}<span class="who">${esc(t.trainerName)}</span><span class="doc">${esc(title)}</span></header>` +
     `<main class="ptpdf-content">${page.blocks.map((b) => blockHtml(b, urlOf, color)).join('')}</main>` +
     `${footerHtml(doc, page, true)}</div>`

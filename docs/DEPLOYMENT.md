@@ -59,3 +59,13 @@ UPLOAD_KEY=<مفتاح الرفع> python3 deploy/app/upload.py
 المفتاح الخاص للتراخيص وكلمة سر اللوحة ومفاتيح الإشعارات اتسلّموا ليك خارج الريبو. خد منهم نسخة أوفلاين
 (فلاشة أو ورقة). المفتاح الخاص هو اللي بتستخدمه أداة `tools/sign-offline-code.mjs` لما Cloudflare يكون واقع.
 لو ضاع، كل التراخيص الجديدة محتاجة مفتاح جديد ونسخة جديدة من التطبيق.
+
+## Security headers and updates (app Worker)
+
+- Every response from `deploy/app` carries the CSP, Permissions-Policy, HSTS and anti-framing headers defined in
+  `shared/appHeaders.ts`. `vite preview` sends the same headers, so e2e runs under the real policy. If a new
+  feature needs another origin (a CDN, a new API), change it there, and test with zero `Refused to …` lines.
+- `deploy/app/upload.py` uploads `index.html`, `sw.js` and the manifest **last**, so a phone checking for an update
+  mid-deploy never gets a new service worker whose files are missing. Old hashed assets are never deleted.
+- A new version does not take over an open app by itself: the trainer sees «فيه نسخة جديدة» and taps update,
+  or it activates on the next cold start (`src/app/swUpdate.ts`).

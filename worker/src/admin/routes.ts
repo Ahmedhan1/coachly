@@ -1,5 +1,6 @@
 import { MAX_FORM_BODY_BYTES, readLimitedText } from '../http';
 import type { Deps, LicenseRecord } from '../ports';
+import { dropLicensePush } from '../push/cleanup';
 import { RULES } from '../rateLimit';
 import { codeIssuedPage, confirmPage, dashboardPage, loginPage, messagePage, DURATION_OPTIONS } from './html';
 import { clearSessionCookie, createSessionCookie, hasValidSession } from './session';
@@ -57,13 +58,22 @@ function parseDuration(value: string | null): { ok: true; days: number | null } 
 
 async function issueCode(
   deps: Deps,
-  input: { name: string; durationDays: number | null; windowDays: number; expiresAt: number | null; feat: string[] },
+  input: {
+    name: string;
+    durationDays: number | null;
+    windowDays: number;
+    expiresAt: number | null;
+    feat: string[];
+    /** Set by "move to new device": the license being replaced, whose account the new one joins. */
+    replaces?: LicenseRecord;
+  },
 ): Promise<{ code: string; record: LicenseRecord }> {
   const now = deps.now();
   for (let attempt = 0; ; attempt++) {
     const code = deps.newCode();
+    const lid = deps.newId();
     const record: LicenseRecord = {
-      lid: deps.newId(),
+      lid,
       codeHash: await deps.crypto.hashCode(code),
       customerName: input.name,
       durationDays: input.durationDays,
@@ -76,6 +86,8 @@ async function issueCode(
       revokedAt: null,
       replacedBy: null,
       feat: input.feat,
+      previousLid: input.replaces?.lid ?? null,
+      rootLid: input.replaces?.rootLid ?? lid,
     };
     try {
       await deps.store.insert(record);
@@ -133,6 +145,7 @@ async function handleLicenseAction(request: Request, deps: Deps, action: 'move' 
   const now = deps.now();
   if (action === 'revoke') {
     await deps.store.end(record.lid, 'revoked', now, null);
+    await dropLicensePush(deps.cloud.db, record.lid);
     await deps.store.audit('revoked', record.lid, now);
     return redirect('/admin?done=revoked');
   }
@@ -147,11 +160,15 @@ async function handleLicenseAction(request: Request, deps: Deps, action: 'move' 
     windowDays,
     expiresAt: carriedExpiry,
     feat: record.feat,
+    replaces: record,
   });
   if (!(await deps.store.end(record.lid, 'replaced', now, next.lid))) {
     await deps.store.end(next.lid, 'revoked', now, null);
     return html(messagePage('خلاص', 'الترخيص ده اتغيّر في نفس اللحظة. افتح اللوحة تاني.'), 409);
   }
+  // Cloud data stays under the account id (rootLid) and so follows the trainer; only the old device's push
+  // subscription is tied to the old license, and it goes.
+  await dropLicensePush(deps.cloud.db, record.lid);
   await deps.store.audit('moved', record.lid, now);
   return html(
     codeIssuedPage({ code, name: record.customerName, actBy: next.actBy, durationDays: next.durationDays, moved: true }),

@@ -16,9 +16,11 @@ export function IncomeScreen() {
   const { data } = useServices();
   const settings = useLive(() => data.repos.settings.get(), [data]);
   const clients = useLive(() => data.repos.clients.list(), [data]);
-  const payments = useLive(() => data.repos.payments.list(), [data]);
   const renewalLink = useWhatsappLinkBuilder('renewal');
   const today = toIsoDate(new Date());
+  // Only the charges this month's dashboard can use (by index), not years of payment history.
+  const payments = useLive(() => data.repos.payments.listForIncome(today), [data, today]);
+  const anyPayments = useLive(() => data.repos.payments.hasAny(), [data]);
 
   const dash = useMemo(() => (clients && payments ? buildIncome(clients, payments, today) : undefined), [clients, payments, today]);
   const byId = useMemo(() => new Map<string, Client>((clients ?? []).map((c) => [c.id, c])), [clients]);
@@ -34,7 +36,7 @@ export function IncomeScreen() {
       </>
     );
   }
-  const nothing = payments?.length === 0 && dash.expectedRenewals.length === 0;
+  const nothing = anyPayments === false && dash.expectedRenewals.length === 0;
   const share = dash.expectedThisMonthMinor > 0 ? Math.min(1, dash.paidThisMonthMinor / dash.expectedThisMonthMinor) : 0;
 
   return (

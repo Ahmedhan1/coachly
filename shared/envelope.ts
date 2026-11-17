@@ -12,7 +12,9 @@ const KEY_MAGIC = 'PTK1';
 const PASSWORD_MAGIC = 'PTP1';
 const IV_LENGTH = 12;
 const SALT_LENGTH = 16;
-export const DEFAULT_PBKDF2_ITERATIONS = 310_000;
+// OWASP Password Storage Cheat Sheet figure for PBKDF2-HMAC-SHA-256 (SECURITY.md §3). Stored per envelope, so
+// older 310k backups still open. Measure on the oldest supported iPhone (docs/MANUAL_QA.md).
+export const DEFAULT_PBKDF2_ITERATIONS = 600_000;
 export const MIN_PBKDF2_ITERATIONS = 100_000;
 
 export type EnvelopeError = 'malformed' | 'decrypt_failed';

@@ -29,7 +29,8 @@ export async function purgeExpired(db: AppDatabase, now: Date): Promise<PurgeRep
     let rows = 0;
     for (const name of ENTITY_TABLES) {
       const table = db.table<{ id: string; deletedAt: number | null }, string>(name);
-      const ids = (await table.filter((r) => r.deletedAt !== null && r.deletedAt < cutoff).primaryKeys()) as string[];
+      // `deletedAt` index (v2) holds only soft-deleted rows, so live history is never read here.
+      const ids = (await table.where('deletedAt').below(cutoff).primaryKeys()) as string[];
       if (ids.length > 0) await table.bulkDelete(ids);
       rows += ids.length;
     }

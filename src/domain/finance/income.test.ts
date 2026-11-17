@@ -107,3 +107,36 @@ describe('incomeDashboard edge cases', () => {
     expect(incomeDashboard({ payments: [], subscriptions: [], today: 'today' })).toEqual({ ok: false, error: 'invalid_date' });
   });
 });
+
+describe('incomeDashboard at scale and with extreme amounts', () => {
+  it('expected renewals: a charge of the same client due on/after the end date covers it, others do not', () => {
+    const r = incomeDashboard({
+      payments: [pay('p1', 'a', 1, '2026-11-20', null), pay('p2', 'b', 1, '2026-11-19', '2026-11-01'), pay('p3', 'z', 1, '2026-12-30', null)],
+      subscriptions: [sub('sa', 'a', '2026-11-20', 10), sub('sb', 'b', '2026-11-20', 20), sub('sc', 'c', '2026-11-25', 30)],
+      today: '2026-11-16',
+    });
+    expect(r.ok && r.value.expectedRenewals.map((s) => s.id)).toEqual(['sb', 'sc']);
+  });
+
+  it('10,000 payments and 500 subscriptions stay fast (no payments × subscriptions scan)', () => {
+    const many: PaymentRecord[] = [];
+    for (let i = 0; i < 10_000; i++) many.push(pay(`p${i}`, `c${i % 500}`, 100_000, '2024-01-01', '2024-01-01'));
+    const subs: PricedSubscription[] = [];
+    for (let i = 0; i < 500; i++) subs.push(sub(`s${i}`, `c${i}`, '2026-11-20', 300_000));
+    const started = performance.now();
+    for (let k = 0; k < 20; k++) incomeDashboard({ payments: many, subscriptions: subs, today: '2026-11-16' });
+    expect((performance.now() - started) / 20).toBeLessThan(40);
+    const r = incomeDashboard({ payments: many, subscriptions: subs, today: '2026-11-16' });
+    expect(r.ok && r.value.expectedRenewals).toHaveLength(500);
+  });
+
+  it('rejects totals that would lose precision (sum beyond Number.MAX_SAFE_INTEGER)', () => {
+    const big = Number.MAX_SAFE_INTEGER - 10;
+    const r = incomeDashboard({
+      payments: [pay('p1', 'a', big, '2026-11-02', '2026-11-02'), pay('p2', 'b', big, '2026-11-03', '2026-11-03')],
+      subscriptions: [],
+      today: '2026-11-16',
+    });
+    expect(r).toEqual({ ok: false, error: 'invalid_amount' });
+  });
+});

@@ -1,6 +1,6 @@
 import { strToU8 } from 'fflate';
 import { describe, expect, it } from 'vitest';
-import { MIGRATIONS, type Migration } from '@/data/schema';
+import { LATEST_VERSION, MIGRATIONS, type Migration } from '@/data/schema';
 import { memoryBackupMetaStore } from '@/data/backupMeta';
 import { exportArchive } from './exporter';
 import { importArchive } from './importer';
@@ -24,7 +24,7 @@ describe('backup export → import', () => {
     const archive = await exported(source);
     expect(archive.manifest.counts).toMatchObject({ clients: 2, deletions: 1, images: 3, progress: 1, settings: 1 });
     expect(archive.manifest.imageFiles).toBe(3);
-    expect(archive.manifest.schemaVersion).toBe(1);
+    expect(archive.manifest.schemaVersion).toBe(LATEST_VERSION);
 
     const target = f.open();
     await seedDatabase(target, { start: 5, images: 1 }); // different existing data, must be replaced
@@ -108,14 +108,28 @@ describe('backup export → import', () => {
     expect(await importArchive(target, missing)).toEqual({ ok: false, error: 'missing_file' });
   });
 
+  it('restores a backup written at schema version 1 into the current schema', async () => {
+    const f = testDbFactory();
+    const source = f.open(MIGRATIONS.filter((m) => m.version === 1));
+    await seedDatabase(source);
+    const archive = await exported(source);
+    expect(archive.manifest.schemaVersion).toBe(1);
+    const target = f.open();
+    const r = await importArchive(target, archive.blob, { openTemp: f.openTemp });
+    expect(r.ok && r.value.migratedFrom).toBe(1);
+    expect(r.ok && r.value.schemaVersion).toBe(LATEST_VERSION);
+    expect(await target.clients.count()).toBe(2);
+    expect(await target.images.count()).toBe(3);
+  });
+
   it('migrates an older-schema backup through the migration path', async () => {
     const f = testDbFactory();
     const source = f.open(MIGRATIONS);
     await seedDatabase(source);
     const archive = await exported(source);
     const v2: Migration = {
-      version: 2,
-      stores: { clients: 'id, name, endDate, updatedAt, archived' },
+      version: LATEST_VERSION + 1,
+      stores: { clients: 'id, name, endDate, updatedAt, deletedAt, archived' },
       upgrade: async (tx) => {
         await tx.table('clients').toCollection().modify((c: { archived?: number }) => {
           c.archived = 0;
@@ -125,8 +139,8 @@ describe('backup export → import', () => {
     const migrations = [...MIGRATIONS, v2];
     const target = f.open(migrations);
     const r = await importArchive(target, archive.blob, { migrations, openTemp: f.openTemp });
-    expect(r.ok && r.value.migratedFrom).toBe(1);
-    expect(r.ok && r.value.schemaVersion).toBe(2);
+    expect(r.ok && r.value.migratedFrom).toBe(LATEST_VERSION);
+    expect(r.ok && r.value.schemaVersion).toBe(LATEST_VERSION + 1);
     expect(await target.table('clients').where('archived').equals(0).count()).toBe(2);
     const blobs = await target.images.toArray();
     expect(blobs).toHaveLength(3);

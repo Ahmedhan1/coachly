@@ -32,3 +32,25 @@ export function matchesQuery(fields: readonly string[], query: string): boolean 
 export function searchItems<T>(items: readonly T[], query: string, fields: (item: T) => readonly string[]): T[] {
   return items.filter((item) => matchesQuery(fields(item), query));
 }
+
+/** Items with their fields normalised once, so typing in a search box only does substring checks. */
+export interface PreparedSearch<T> {
+  readonly items: readonly T[];
+  readonly haystacks: readonly (readonly string[])[];
+}
+
+export function prepareSearch<T>(items: readonly T[], fields: (item: T) => readonly string[]): PreparedSearch<T> {
+  return { items, haystacks: items.map((item) => fields(item).map(normalizeForSearch)) };
+}
+
+/** Same rule as `matchesQuery` (every word in some field), over a prepared list. Empty query returns all. */
+export function filterPrepared<T>(prepared: PreparedSearch<T>, query: string): T[] {
+  const words = normalizeForSearch(query).split(' ').filter(Boolean);
+  if (words.length === 0) return [...prepared.items];
+  const out: T[] = [];
+  prepared.items.forEach((item, i) => {
+    const hay = prepared.haystacks[i] ?? [];
+    if (words.every((w) => hay.some((f) => f.includes(w)))) out.push(item);
+  });
+  return out;
+}

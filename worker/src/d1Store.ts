@@ -14,6 +14,9 @@ interface LicenseRow {
   revoked_at: number | null;
   replaced_by: string | null;
   feat: string;
+  previous_lid: string | null;
+  /** NULL only for rows written before migration 0003 that its backfill has not seen. */
+  root_lid: string | null;
 }
 
 function parseFeatures(json: string): string[] {
@@ -40,6 +43,8 @@ function fromRow(row: LicenseRow): LicenseRecord {
     revokedAt: row.revoked_at,
     replacedBy: row.replaced_by,
     feat: parseFeatures(row.feat),
+    previousLid: row.previous_lid,
+    rootLid: row.root_lid ?? row.lid,
   };
 }
 
@@ -50,8 +55,8 @@ export class D1LicenseStore implements LicenseStore {
     await this.db
       .prepare(
         `INSERT INTO licenses (lid, code_hash, customer_name, duration_days, act_by, status, device_fp,
-           created_at, activated_at, expires_at, revoked_at, replaced_by, feat)
-         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+           created_at, activated_at, expires_at, revoked_at, replaced_by, feat, previous_lid, root_lid)
+         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
       )
       .bind(
         r.lid,
@@ -67,6 +72,8 @@ export class D1LicenseStore implements LicenseStore {
         r.revokedAt,
         r.replacedBy,
         JSON.stringify(r.feat),
+        r.previousLid,
+        r.rootLid,
       )
       .run();
   }

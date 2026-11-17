@@ -1,5 +1,7 @@
 // Cloud backup (feature 13). The body is an opaque PTP1 envelope (encrypted on the iPhone with the trainer's
-// password); the Worker checks the 4-byte magic and the size, never the content.
+// password); the Worker checks the 4-byte magic and the size, never the content. Everything here is indexed by
+// the account id (`who.account`, the root license of a move chain), so a backup follows the trainer to a new
+// device. The `lid` parameters below are that account id.
 import { authenticate } from '../cloud/auth';
 import { checkedStream, declaredLength } from '../cloud/stream';
 import { storageFull, wouldOverfill } from '../cloud/usage';
@@ -9,11 +11,11 @@ import { RULES } from '../rateLimit';
 import {
   abortPendingUpload,
   BACKUP_MAGIC,
-  backupKey,
   deleteAllBackups,
   getBackup,
   getUpload,
   recordNewLatest,
+  rowKey,
   targetSlot,
   type BackupRow,
 } from './store';
@@ -54,7 +56,7 @@ async function putBackup(request: Request, deps: Deps, lid: string): Promise<Res
   if (!checked.ok) return json({ error: 'bad_format' }, 400);
 
   await abortPendingUpload(deps.cloud, lid);
-  if (!(await putObject(deps, backupKey(lid, targetSlot(row)), checked.stream, checked.done))) {
+  if (!(await putObject(deps, rowKey(row ?? { lid, key_lid: null }, targetSlot(row)), checked.stream, checked.done))) {
     return json({ error: 'upload_failed' }, 400);
   }
   const now = deps.now();
@@ -73,7 +75,7 @@ async function getBackupBody(request: Request, deps: Deps, lid: string): Promise
   const row = await getBackup(deps.cloud.db, lid);
   const slot = row === null ? null : slotFor(row, which);
   if (row === null || slot === null) return json({ error: 'not_found' }, 404);
-  const object = await deps.cloud.bucket.get(backupKey(lid, slot));
+  const object = await deps.cloud.bucket.get(rowKey(row, slot));
   if (object === null) return json({ error: 'not_found' }, 404);
   const at = slot === row.latest_slot ? row.latest_at : row.previous_at;
   return new Response(object.body, {
@@ -120,15 +122,18 @@ async function createUpload(request: Request, deps: Deps, lid: string): Promise<
 
   await abortPendingUpload(deps.cloud, lid);
   const slot = targetSlot(row);
-  const upload = await deps.cloud.bucket.createMultipartUpload(backupKey(lid, slot), { httpMetadata: { contentType: OCTET } });
+  const keyLid = row?.key_lid ?? null;
+  const upload = await deps.cloud.bucket.createMultipartUpload(rowKey({ lid, key_lid: keyLid }, slot), {
+    httpMetadata: { contentType: OCTET },
+  });
   const uploadId = deps.cloud.newId();
   const partSize = config.backupPartBytes;
   await deps.cloud.db
     .prepare(
-      `INSERT INTO backup_uploads (upload_id, lid, r2_upload_id, slot, size, part_size, created_at)
-       VALUES (?, ?, ?, ?, ?, ?, ?)`,
+      `INSERT INTO backup_uploads (upload_id, lid, r2_upload_id, slot, size, part_size, created_at, key_lid)
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
     )
-    .bind(uploadId, lid, upload.uploadId, slot, size, partSize, deps.now())
+    .bind(uploadId, lid, upload.uploadId, slot, size, partSize, deps.now(), keyLid)
     .run();
   return json({ uploadId, partSize, partCount: Math.ceil(size / partSize) }, 201);
 }
@@ -150,7 +155,7 @@ async function uploadPart(request: Request, deps: Deps, lid: string, uploadId: s
   const checked = await checkedStream(body, expected, n === 1 ? BACKUP_MAGIC : '');
   if (!checked.ok) return json({ error: 'bad_format' }, 400);
   try {
-    const multipart = deps.cloud.bucket.resumeMultipartUpload(backupKey(lid, up.slot), up.r2_upload_id);
+    const multipart = deps.cloud.bucket.resumeMultipartUpload(rowKey(up, up.slot), up.r2_upload_id);
     const [part] = await Promise.all([multipart.uploadPart(n, checked.stream), checked.done]);
     return json({ partNumber: part.partNumber, etag: part.etag });
   } catch {
@@ -185,7 +190,7 @@ async function completeUpload(request: Request, deps: Deps, lid: string, uploadI
   if (parts === null) return json({ error: 'invalid' }, 400);
   let size: number;
   try {
-    const object = await deps.cloud.bucket.resumeMultipartUpload(backupKey(lid, up.slot), up.r2_upload_id).complete(parts);
+    const object = await deps.cloud.bucket.resumeMultipartUpload(rowKey(up, up.slot), up.r2_upload_id).complete(parts);
     size = object.size;
   } catch {
     return json({ error: 'upload_incomplete' }, 400);
@@ -203,42 +208,42 @@ export async function routeBackup(request: Request, path: string, deps: Deps, cl
   if (path === '/api/backup') {
     if (method === 'PUT') {
       const auth = await authenticate(request, deps, clientKey, RULES.backupWrite);
-      return auth.ok ? putBackup(request, deps, auth.who.lid) : auth.response;
+      return auth.ok ? putBackup(request, deps, auth.who.account) : auth.response;
     }
     if (method === 'GET' || method === 'HEAD') {
       const auth = await authenticate(request, deps, clientKey, RULES.backupRead);
       if (!auth.ok) return auth.response;
-      return method === 'GET' ? getBackupBody(request, deps, auth.who.lid) : headBackup(deps, auth.who.lid);
+      return method === 'GET' ? getBackupBody(request, deps, auth.who.account) : headBackup(deps, auth.who.account);
     }
     if (method === 'DELETE') {
       const auth = await authenticate(request, deps, clientKey, RULES.backupWrite);
       if (!auth.ok) return auth.response;
-      return (await deleteAllBackups(deps.cloud, auth.who.lid)) ? json({ ok: true }) : json({ error: 'not_found' }, 404);
+      return (await deleteAllBackups(deps.cloud, auth.who.account)) ? json({ ok: true }) : json({ error: 'not_found' }, 404);
     }
     return json({ error: 'method_not_allowed' }, 405);
   }
 
   if (path === '/api/backup/uploads' && method === 'POST') {
     const auth = await authenticate(request, deps, clientKey, RULES.backupWrite);
-    return auth.ok ? createUpload(request, deps, auth.who.lid) : auth.response;
+    return auth.ok ? createUpload(request, deps, auth.who.account) : auth.response;
   }
   const part = /^\/api\/backup\/uploads\/([A-Za-z0-9_-]{16,64})\/parts\/(\d{1,5})$/.exec(path);
   if (part !== null && method === 'PUT') {
     const auth = await authenticate(request, deps, clientKey, RULES.backupPart);
-    return auth.ok ? uploadPart(request, deps, auth.who.lid, part[1] ?? '', part[2] ?? '') : auth.response;
+    return auth.ok ? uploadPart(request, deps, auth.who.account, part[1] ?? '', part[2] ?? '') : auth.response;
   }
   const complete = /^\/api\/backup\/uploads\/([A-Za-z0-9_-]{16,64})\/complete$/.exec(path);
   if (complete !== null && method === 'POST') {
     const auth = await authenticate(request, deps, clientKey, RULES.backupPart);
-    return auth.ok ? completeUpload(request, deps, auth.who.lid, complete[1] ?? '') : auth.response;
+    return auth.ok ? completeUpload(request, deps, auth.who.account, complete[1] ?? '') : auth.response;
   }
   const abort = /^\/api\/backup\/uploads\/([A-Za-z0-9_-]{16,64})$/.exec(path);
   if (abort !== null && method === 'DELETE') {
     const auth = await authenticate(request, deps, clientKey, RULES.backupWrite);
     if (!auth.ok) return auth.response;
-    const up = await getUpload(deps.cloud.db, abort[1] ?? '', auth.who.lid);
+    const up = await getUpload(deps.cloud.db, abort[1] ?? '', auth.who.account);
     if (up === null) return json({ error: 'not_found' }, 404);
-    await abortPendingUpload(deps.cloud, auth.who.lid);
+    await abortPendingUpload(deps.cloud, auth.who.account);
     return json({ ok: true });
   }
   return null;

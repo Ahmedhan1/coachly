@@ -19,6 +19,13 @@ export interface LicenseRecord {
   revokedAt: number | null;
   replacedBy: string | null;
   feat: string[];
+  /** The license this one replaced ("move to new device"); null for a first license. */
+  previousLid: string | null;
+  /**
+   * First license of the move chain: the trainer's stable account id. Cloud data (backups, client pages,
+   * check-ins) is stored under it, so it follows the trainer to every new device. Equals `lid` when never moved.
+   */
+  rootLid: string;
 }
 
 export type AuditAction = 'code_issued' | 'activated' | 'reactivated' | 'revoked' | 'moved' | 'login_ok' | 'login_failed';

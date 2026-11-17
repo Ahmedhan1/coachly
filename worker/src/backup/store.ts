@@ -2,7 +2,10 @@ import type { CloudDeps } from '../ports';
 import { adjustUsage, storedBytes } from '../cloud/usage';
 
 export interface BackupRow {
+  /** Account id (root license id, see LicenseRecord.rootLid). */
   lid: string;
+  /** Lid used in this row's R2 keys when it differs from `lid` (backups written before migration 0003). */
+  key_lid: string | null;
   latest_slot: 0 | 1;
   latest_size: number;
   latest_at: number;
@@ -12,7 +15,10 @@ export interface BackupRow {
 
 export interface UploadRow {
   upload_id: string;
+  /** Account id. */
   lid: string;
+  /** Lid in the R2 key the upload writes to, when it differs from `lid`. */
+  key_lid: string | null;
   r2_upload_id: string;
   slot: 0 | 1;
   size: number;
@@ -25,6 +31,11 @@ export const BACKUP_MAGIC = 'PTP1';
 /** Two slots per license; D1 says which one is the latest. R2 has no rename/copy, so we flip a pointer instead. */
 export function backupKey(lid: string, slot: 0 | 1): string {
   return `backups/${encodeURIComponent(lid)}/${slot}`;
+}
+
+/** R2 key of one slot of an indexed backup (or pending upload): old rows keep the key they were written under. */
+export function rowKey(row: { lid: string; key_lid: string | null }, slot: 0 | 1): string {
+  return backupKey(row.key_lid ?? row.lid, slot);
 }
 
 export function getBackup(db: D1Database, lid: string): Promise<BackupRow | null> {
@@ -40,12 +51,12 @@ export function getUpload(db: D1Database, uploadId: string, lid: string): Promis
   return db.prepare('SELECT * FROM backup_uploads WHERE upload_id = ? AND lid = ?').bind(uploadId, lid).first<UploadRow>();
 }
 
-/** Aborts this license's unfinished multipart upload, if any (one at a time per license). */
+/** Aborts this account's unfinished multipart upload, if any (one at a time per license). */
 export async function abortPendingUpload(cloud: CloudDeps, lid: string): Promise<void> {
   const pending = await cloud.db.prepare('SELECT * FROM backup_uploads WHERE lid = ?').bind(lid).first<UploadRow>();
   if (pending === null) return;
   try {
-    await cloud.bucket.resumeMultipartUpload(backupKey(lid, pending.slot), pending.r2_upload_id).abort();
+    await cloud.bucket.resumeMultipartUpload(rowKey(pending, pending.slot), pending.r2_upload_id).abort();
   } catch {
     // Already completed/aborted or expired on R2's side: nothing left to free.
   }
@@ -89,7 +100,7 @@ export async function recordNewLatest(
       .bind(lid, slot, newSize, now, keep ? row?.latest_size ?? null : null, keep ? row?.latest_at ?? null : null),
     adjustUsage(cloud.db, newSize - overwritten - dropped),
   ]);
-  if (row !== null && !keep) await cloud.bucket.delete(backupKey(lid, row.latest_slot));
+  if (row !== null && !keep) await cloud.bucket.delete(rowKey(row, row.latest_slot));
   return { previousKept: keep };
 }
 
@@ -97,7 +108,7 @@ export async function deleteAllBackups(cloud: CloudDeps, lid: string): Promise<b
   await abortPendingUpload(cloud, lid);
   const row = await getBackup(cloud.db, lid);
   if (row === null) return false;
-  await cloud.bucket.delete([backupKey(lid, 0), backupKey(lid, 1)]);
+  await cloud.bucket.delete([rowKey(row, 0), rowKey(row, 1)]);
   await cloud.db.batch([
     cloud.db.prepare('DELETE FROM backups WHERE lid = ?').bind(lid),
     adjustUsage(cloud.db, -(row.latest_size + (row.previous_size ?? 0))),

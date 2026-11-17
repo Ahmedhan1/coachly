@@ -1,4 +1,4 @@
-import type { Table } from 'dexie';
+import Dexie, { type Table } from 'dexie';
 import { AppDatabase, type ImageRecord, type MetaRecord } from './db';
 import { MIGRATIONS, TABLES, type Migration } from './schema';
 
@@ -99,7 +99,7 @@ export function rowsLookValid(db: AppDatabase, tables: RestoreTables): string | 
  * of this install are kept. Tables missing from `tables` end up empty.
  */
 export async function replaceAllData(db: AppDatabase, tables: RestoreTables): Promise<void> {
-  await db.transaction('rw', db.tables, async () => {
+  await db.transaction('rw', db.tables, async (tx) => {
     for (const table of db.tables) {
       const rows = tables[table.name] ?? [];
       if (table.name === TABLES.meta) {
@@ -107,10 +107,25 @@ export async function replaceAllData(db: AppDatabase, tables: RestoreTables): Pr
         await db.meta.bulkDelete(keys);
         await db.meta.bulkAdd((rows as MetaRecord[]).filter((r) => !isDeviceLocalMetaKey(r.key)));
       } else {
-        await table.clear();
+        await clearStore(tx.idbtrans, table.name);
         if (rows.length > 0) await table.bulkAdd(rows);
       }
     }
+  });
+}
+
+/**
+ * Empties one object store with a native IndexedDB `clear()` inside the Dexie transaction. Dexie's own `clear()`
+ * turns into "read every row, then delete it" as soon as any `deleting` hook is subscribed (the backup change
+ * watcher subscribes one), which made restoring 30,000 sessions spend most of its time reading rows it was about
+ * to throw away. A restore is always followed by a reload, so skipping per-row change events here is safe; the
+ * `bulkAdd` that follows still reports the new rows.
+ */
+function clearStore(idbtrans: IDBTransaction, name: string): Promise<void> {
+  return new Dexie.Promise<void>((resolve, reject) => {
+    const req = idbtrans.objectStore(name).clear();
+    req.onsuccess = () => resolve();
+    req.onerror = () => reject(req.error);
   });
 }
 

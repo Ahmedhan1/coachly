@@ -240,4 +240,9 @@ export const settings = {
     },
     review: 'دي مسودة من الـ AI: راجع كل حاجة قبل ما تبعتها للعميل.',
   },
+  /** "New version" banner (src/app/UpdateBanner.tsx). */
+  update: {
+    available: 'فيه نسخة جديدة من التطبيق.',
+    apply: 'حدّث دلوقتي',
+  },
 } as const;

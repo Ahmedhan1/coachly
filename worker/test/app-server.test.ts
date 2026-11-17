@@ -38,6 +38,26 @@ describe('deploy/app serving', () => {
     expect(res.headers.get('X-Content-Type-Options')).toBe('nosniff');
   });
 
+  it('sends the strict app CSP, Permissions-Policy and HSTS on files and on errors', async () => {
+    for (const res of [await call('/'), await call('/assets/app-1.js'), await call('/missing.png')]) {
+      const csp = res.headers.get('Content-Security-Policy') ?? '';
+      const directives = new Map(csp.split(';').map((d) => d.trim().split(/\s+/)).map(([name = '', ...values]) => [name, values]));
+      expect(directives.get('default-src')).toEqual(["'self'"]);
+      // Scripts: only our own files plus WebAssembly compilation (Draco decoder). Never inline or eval.
+      expect(directives.get('script-src')).toEqual(["'self'", "'wasm-unsafe-eval'"]);
+      expect(csp).not.toContain("'unsafe-eval'");
+      expect(directives.get('object-src')).toEqual(["'none'"]);
+      expect(directives.get('base-uri')).toEqual(["'none'"]);
+      expect(directives.get('frame-ancestors')).toEqual(["'none'"]);
+      expect(directives.get('connect-src')).not.toContain('http:');
+      expect(directives.get('connect-src')).not.toContain('*');
+      expect(res.headers.get('Permissions-Policy')).toContain('camera=()');
+      expect(res.headers.get('Strict-Transport-Security')).toMatch(/^max-age=\d{8,}$/);
+      expect(res.headers.get('Cross-Origin-Opener-Policy')).toBe('same-origin');
+      expect(res.headers.get('Referrer-Policy')).toBe('no-referrer');
+    }
+  });
+
   it('answers 400 (not an exception) for a malformed percent-encoded path', async () => {
     const res = await call('/assets/%E0%A4%A');
     expect(res.status).toBe(400);

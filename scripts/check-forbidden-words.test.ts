@@ -57,6 +57,23 @@ describe('check-forbidden-words', () => {
     expect(result.stderr).toContain('exercise-names.ar.json:');
   });
 
+  it('fails on Arabic text in the worker client page and admin dashboard', () => {
+    for (const path of ['worker/src/share/page.ts', 'worker/src/admin/html.ts']) {
+      const root = makeRoot({ [path]: `export const label = 'تمام';\nexport const bad = '${planted}';\n` });
+      const result = run(root);
+      expect(result.status, path).toBe(1);
+      expect(result.stderr).toContain(`${path.split('/').pop() ?? ''}:2`);
+    }
+  });
+
+  it('ignores worker tests and other worker folders', () => {
+    const root = makeRoot({
+      'worker/src/share/page.test.ts': `'${planted}'\n`,
+      'worker/src/backup/routes.ts': `'${planted}'\n`,
+    });
+    expect(run(root).status).toBe(0);
+  });
+
   it('fails on public data JSON too', () => {
     const root = makeRoot({ 'public/data/exercises.json': `{"name": "${planted}"}` });
     expect(run(root).status).toBe(1);

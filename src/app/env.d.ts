@@ -1,4 +1,5 @@
 /// <reference types="vite/client" />
+/// <reference types="vite-plugin-pwa/vanillajs" />
 
 interface ImportMetaEnv {
   /** "1" in the e2e build: enables the ?standalone=1 install-gate bypass and the fake activation service. */

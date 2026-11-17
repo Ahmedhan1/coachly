@@ -117,7 +117,7 @@ export class EntityRepository<T extends StoredEntity> {
   async purgeDeleted(before: number): Promise<number> {
     const { db } = this.ctx;
     return db.transaction('rw', this.table, db.deletions, async () => {
-      const ids = (await this.table.filter((r) => r.deletedAt !== null && r.deletedAt < before).primaryKeys()) as string[];
+      const ids = (await this.table.where('deletedAt').below(before).primaryKeys()) as string[];
       await this.table.bulkDelete(ids);
       await db.deletions.where('entityId').anyOf(ids).delete();
       return ids.length;

@@ -1,3 +1,4 @@
+import './zodConfig';
 import { useEffect, useState } from 'react';
 import { RouterProvider } from 'react-router-dom';
 import { AppDatabase, createDataLayer } from '@/data';
@@ -21,6 +22,7 @@ import { CLOUD_PASSWORD_KEY, IDENTITY_SETUP_KEY, ServicesProvider, useServices, 
 const LICENSE_TOKEN_KEY = META_KEYS.token;
 const APP_VERSION = import.meta.env.VITE_APP_VERSION ?? '0.1.0';
 import { browserStandaloneEnv, bypassAllowedInThisBuild, canSkipInstallGate } from './standalone';
+import { UpdateBanner } from './UpdateBanner';
 import { useBrandTheme } from './useBrandTheme';
 import { useOnlineSync } from '@/features/online/useOnlineSync';
 import { useLive } from './useLive';
@@ -131,10 +133,18 @@ function Boot() {
 export function App({ services }: { services?: AppServices }) {
   const [installed] = useState(() => canSkipInstallGate(browserStandaloneEnv(), bypassAllowedInThisBuild));
   const [appServices] = useState(() => services ?? createBrowserServices());
-  if (!installed) return <InstallGateScreen />;
+  // The service worker is registered on the install gate too, so the app is cached before "Add to Home Screen".
+  if (!installed)
+    return (
+      <>
+        <InstallGateScreen />
+        <UpdateBanner />
+      </>
+    );
   return (
     <ServicesProvider services={appServices}>
       <Boot />
+      <UpdateBanner />
     </ServicesProvider>
   );
 }

@@ -3,6 +3,8 @@
  * the files are uploaded with the plain API token (deploy/app/upload.py). Responses are cached at the edge;
  * the service worker then keeps everything on the phone, so D1 is read rarely.
  */
+import { APP_SECURITY_HEADERS } from '../../../shared/appHeaders';
+
 export interface Env {
   APP: D1Database;
   /** Secret: lets deploy/app/upload.py write files (POST /__deploy/files, /__deploy/hashes). */
@@ -80,13 +82,8 @@ async function deploy(request: Request, env: Env, path: string): Promise<Respons
   return new Response('Not found', { status: 404 });
 }
 
-/** On every response: the PWA must never be framed (clickjacking of the trainer's data screens). */
-const SECURITY_HEADERS: Record<string, string> = {
-  'X-Content-Type-Options': 'nosniff',
-  'Referrer-Policy': 'no-referrer',
-  'X-Frame-Options': 'DENY',
-  'Content-Security-Policy': "frame-ancestors 'none'",
-};
+/** On every response: strict CSP, no framing (clickjacking of the trainer's data screens), HSTS. */
+const SECURITY_HEADERS = APP_SECURITY_HEADERS;
 
 const NO_CACHE = new Set(['/index.html', '/sw.js', '/registerSW.js', '/push-sw.js', '/manifest.webmanifest']);
 
@@ -96,7 +93,7 @@ function edgeCacheable(path: string): boolean {
 }
 
 /** Bump to drop every edge-cached response after a change in caching rules. */
-const CACHE_VERSION = 'v3';
+const CACHE_VERSION = 'v4';
 
 function cacheControl(path: string): string {
   if (NO_CACHE.has(path)) return 'no-cache';

@@ -4,6 +4,12 @@ import { RULES } from '../rateLimit';
 
 export interface Licensee {
   lid: string;
+  /**
+   * Stable account id for cloud data: the first license of a "move to new device" chain (the license's own lid
+   * when never moved, or when it was issued offline and is not in D1). Backups, client pages and check-ins are
+   * stored under it.
+   */
+  account: string;
   /** License device fingerprint (first 32 hex of SHA-256(deviceId)); never the raw device id. */
   dev: string;
   /** Key for per-device rows (push): lid + ':' + dev. */
@@ -49,5 +55,5 @@ export async function authenticate(
 
   const deviceKey = `${lid}:${dev}`;
   if (!(await deps.limiter.hit(rule, scope === 'device' ? deviceKey : lid, now))) return fail('rate_limited', 429);
-  return { ok: true, who: { lid, dev, deviceKey } };
+  return { ok: true, who: { lid, account: record?.rootLid ?? lid, dev, deviceKey } };
 }

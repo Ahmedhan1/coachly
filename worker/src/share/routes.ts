@@ -17,7 +17,10 @@ const OCTET = 'application/octet-stream';
 
 interface ShareRow {
   share_id: string;
+  /** Account id (root license id), so the page follows the trainer to a new device. */
   lid: string;
+  /** Lid in this page's R2 keys (page and check-ins) when it differs from `lid` (pages from before migration 0003). */
+  key_lid: string | null;
   size: number;
   updated_at: number;
   revoked: number;
@@ -38,6 +41,11 @@ export function shareKey(lid: string, shareId: string): string {
 
 export function checkinKey(lid: string, shareId: string, id: string): string {
   return `checkins/${encodeURIComponent(lid)}/${shareId}/${id}`;
+}
+
+/** The lid that names this page's blobs in R2. */
+function keyLidOf(row: ShareRow): string {
+  return row.key_lid ?? row.lid;
 }
 
 function getShare(db: D1Database, shareId: string): Promise<ShareRow | null> {
@@ -87,7 +95,8 @@ async function putShare(request: Request, deps: Deps, lid: string, shareId: stri
   if (body === null) return json({ error: 'length_required' }, 411);
   const checked = await checkedStream(body, check.length, KEY_MAGIC);
   if (!checked.ok) return json({ error: 'bad_format' }, 400);
-  if (!(await putStream(deps, shareKey(lid, shareId), checked.stream, checked.done))) return json({ error: 'upload_failed' }, 400);
+  const key = shareKey(existing === null ? lid : keyLidOf(existing), shareId);
+  if (!(await putStream(deps, key, checked.stream, checked.done))) return json({ error: 'upload_failed' }, 400);
 
   const now = deps.now();
   await cloud.db.batch([
@@ -110,7 +119,8 @@ async function revokeShare(deps: Deps, lid: string, shareId: string): Promise<Re
   if (owned.row.revoked === 1) return json({ ok: true });
   const { db, bucket } = deps.cloud;
   const { results } = await db.prepare('SELECT * FROM checkins WHERE share_id = ?').bind(shareId).all<CheckinRow>();
-  await bucket.delete([shareKey(lid, shareId), ...results.map((c) => checkinKey(lid, shareId, c.id))]);
+  const keyLid = keyLidOf(owned.row);
+  await bucket.delete([shareKey(keyLid, shareId), ...results.map((c) => checkinKey(keyLid, shareId, c.id))]);
   const freed = owned.row.size + results.reduce((n, c) => n + c.size, 0);
   await db.batch([
     db.prepare('UPDATE shares SET revoked = 1, size = 0, updated_at = ? WHERE share_id = ?').bind(deps.now(), shareId),
@@ -135,7 +145,7 @@ async function readShare(request: Request, deps: Deps, clientKey: string, shareI
   if (row === null || row.revoked === 1) return json({ error: 'not_found' }, 404);
   const headers = { 'Cache-Control': 'private, no-cache', ETag: etagOf(row), 'X-Content-Type-Options': 'nosniff' };
   if (request.headers.get('If-None-Match') === etagOf(row)) return new Response(null, { status: 304, headers });
-  const object = await deps.cloud.bucket.get(shareKey(row.lid, shareId));
+  const object = await deps.cloud.bucket.get(shareKey(keyLidOf(row), shareId));
   if (object === null) return json({ error: 'not_found' }, 404);
   return new Response(object.body, { headers: { ...headers, 'Content-Type': OCTET, 'Content-Length': String(object.size) } });
 }
@@ -171,7 +181,7 @@ async function postCheckin(request: Request, deps: Deps, clientKey: string, shar
   const checked = await checkedStream(body, check.length, KEY_MAGIC);
   if (!checked.ok) return json({ error: 'bad_format' }, 400);
   const id = cloud.newId();
-  if (!(await putStream(deps, checkinKey(row.lid, shareId, id), checked.stream, checked.done))) return json({ error: 'upload_failed' }, 400);
+  if (!(await putStream(deps, checkinKey(keyLidOf(row), shareId, id), checked.stream, checked.done))) return json({ error: 'upload_failed' }, 400);
   await cloud.db.batch([
     cloud.db
       .prepare('INSERT INTO checkins (id, share_id, lid, size, created_at) VALUES (?, ?, ?, ?, ?)')
@@ -188,7 +198,7 @@ function listJson(rows: CheckinRow[]): Response {
 async function getCheckin(deps: Deps, row: ShareRow, id: string): Promise<Response> {
   const c = await deps.cloud.db.prepare('SELECT * FROM checkins WHERE id = ? AND share_id = ?').bind(id, row.share_id).first<CheckinRow>();
   if (c === null) return json({ error: 'not_found' }, 404);
-  const object = await deps.cloud.bucket.get(checkinKey(row.lid, row.share_id, id));
+  const object = await deps.cloud.bucket.get(checkinKey(keyLidOf(row), row.share_id, id));
   if (object === null) return json({ error: 'not_found' }, 404);
   return new Response(object.body, {
     headers: { 'Content-Type': OCTET, 'Content-Length': String(object.size), 'Cache-Control': 'no-store', 'X-Created-At': String(c.created_at) },
@@ -199,7 +209,7 @@ async function deleteCheckin(deps: Deps, row: ShareRow, id: string): Promise<Res
   const { db, bucket } = deps.cloud;
   const c = await db.prepare('SELECT * FROM checkins WHERE id = ? AND share_id = ?').bind(id, row.share_id).first<CheckinRow>();
   if (c === null) return json({ error: 'not_found' }, 404);
-  await bucket.delete(checkinKey(row.lid, row.share_id, id));
+  await bucket.delete(checkinKey(keyLidOf(row), row.share_id, id));
   await db.batch([db.prepare('DELETE FROM checkins WHERE id = ?').bind(id), adjustUsage(db, -c.size)]);
   return json({ ok: true });
 }
@@ -211,7 +221,7 @@ export async function routeShare(request: Request, path: string, deps: Deps, cli
     if (!auth.ok) return auth.response;
     const { results } = await deps.cloud.db
       .prepare('SELECT * FROM checkins WHERE lid = ? ORDER BY created_at LIMIT 500')
-      .bind(auth.who.lid)
+      .bind(auth.who.account)
       .all<CheckinRow>();
     return listJson(results);
   }
@@ -228,7 +238,7 @@ export async function routeShare(request: Request, path: string, deps: Deps, cli
     if (method === 'PUT' || method === 'DELETE') {
       const auth = await authenticate(request, deps, clientKey, RULES.shareWrite);
       if (!auth.ok) return auth.response;
-      return method === 'PUT' ? putShare(request, deps, auth.who.lid, shareId) : revokeShare(deps, auth.who.lid, shareId);
+      return method === 'PUT' ? putShare(request, deps, auth.who.account, shareId) : revokeShare(deps, auth.who.account, shareId);
     }
     return json({ error: 'method_not_allowed' }, 405);
   }
@@ -239,7 +249,7 @@ export async function routeShare(request: Request, path: string, deps: Deps, cli
 
   const auth = await authenticate(request, deps, clientKey, RULES.checkinOwner);
   if (!auth.ok) return auth.response;
-  const owned = await ownedShare(deps, shareId, auth.who.lid);
+  const owned = await ownedShare(deps, shareId, auth.who.account);
   if (!owned.ok) return owned.response;
   if (checkinId === undefined) {
     const { results } = await deps.cloud.db

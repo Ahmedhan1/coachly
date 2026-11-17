@@ -3,6 +3,7 @@ import { fileURLToPath, URL } from 'node:url';
 import react from '@vitejs/plugin-react';
 import { defineConfig, type Plugin } from 'vite';
 import { VitePWA } from 'vite-plugin-pwa';
+import { APP_SECURITY_HEADERS } from './shared/appHeaders';
 
 /** Fails loudly (but does not stop the build) while the license public key is still the placeholder. */
 function licenseKeyWarning(): Plugin {
@@ -24,12 +25,17 @@ function licenseKeyWarning(): Plugin {
 
 export default defineConfig({
   resolve: { alias: { '@': fileURLToPath(new URL('./src', import.meta.url)) } },
+  // Same headers as production (deploy/app), so e2e and manual checks run under the real CSP. Not on the dev
+  // server: Vite's HMR client needs inline scripts.
+  preview: { headers: { ...APP_SECURITY_HEADERS } },
   plugins: [
     react(),
     licenseKeyWarning(),
     VitePWA({
-      registerType: 'autoUpdate',
-      injectRegister: 'script-defer',
+      // A new version waits until the trainer taps "update" (src/app/swUpdate.ts) or closes the app: the open
+      // page never mixes old code with a new precache. Registration is done by the app itself.
+      registerType: 'prompt',
+      injectRegister: false,
       includeAssets: ['icons/*.png'],
       manifest: {
         id: '/',
@@ -61,8 +67,9 @@ export default defineConfig({
         navigateFallback: '/index.html',
         navigateFallbackDenylist: [/^\/exercise-pack\//],
         cleanupOutdatedCaches: true,
+        // clientsClaim: the very first install controls the open page at once (offline right after install).
+        // No skipWaiting: updates activate on the trainer's tap (SKIP_WAITING message) or on the next cold start.
         clientsClaim: true,
-        skipWaiting: true,
         runtimeCaching: [
           {
             urlPattern: ({ url, sameOrigin }) => sameOrigin && url.pathname.startsWith('/exercise-pack/img/'),

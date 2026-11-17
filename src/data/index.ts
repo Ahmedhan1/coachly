@@ -6,6 +6,7 @@ import { ensureFirstRun, hasDemoData, removeDemoData } from './demoSeed';
 import { runDailyPurge, type PurgeReport } from './purge';
 import { renewPackage, undoRenewal, type RenewPackageResult } from './renewal';
 import type { IsoDate } from '@/domain/models';
+import type { StorageProblemListener } from './storageProblems';
 
 /** The data layer as the app sees it: repositories plus whole-database actions. */
 export interface DataLayer {
@@ -19,6 +20,8 @@ export interface DataLayer {
   undoRenewal(clientId: string, result: RenewPackageResult): Promise<void>;
   /** Housekeeping at startup: purges expired deleted rows/orphan photos at most once a day. */
   runDailyPurge(now: Date): Promise<PurgeReport | null>;
+  /** Storage full, refused writes, or a newer version opened in another tab. Returns an unsubscribe. */
+  onStorageProblem(listener: StorageProblemListener): () => void;
   close(): void;
 }
 
@@ -33,13 +36,15 @@ export function createDataLayer(db: AppDatabase = new AppDatabase(), clock: Cloc
     renewPackage: (clientId, today) => renewPackage(db, repos, clientId, today),
     undoRenewal: (clientId, result) => undoRenewal(db, repos, clientId, result),
     runDailyPurge: (now) => runDailyPurge(db, now),
+    onStorageProblem: (listener) => db.problems.subscribe(listener),
     close: () => db.close(),
   };
 }
 
 export { AppDatabase } from './db';
-export { normalizeForSearch, matchesQuery, searchItems } from './search';
+export { normalizeForSearch, matchesQuery, searchItems, prepareSearch, filterPrepared, type PreparedSearch } from './search';
 export type { Repositories, NewEntity, EntityPatch, SettingsPatch } from './repositories';
 export type { UndoneDelete } from './undo';
 export type { PurgeReport } from './purge';
+export type { StorageProblem, StorageProblemListener } from './storageProblems';
 export type { RenewPackageResult } from './renewal';

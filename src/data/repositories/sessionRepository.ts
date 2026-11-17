@@ -16,11 +16,12 @@ export class SessionRepository extends EntityRepository<Session> {
       .sortBy('startsAt');
   }
 
+  /** A client's sessions in time order, straight from the [clientId+startsAt] index (no in-memory sort). */
   async listByClient(clientId: string): Promise<Session[]> {
     return this.table
-      .where('clientId')
-      .equals(clientId)
+      .where('[clientId+startsAt]')
+      .between([clientId, -Infinity], [clientId, Infinity])
       .filter((s) => s.deletedAt === null)
-      .sortBy('startsAt');
+      .toArray();
   }
 }

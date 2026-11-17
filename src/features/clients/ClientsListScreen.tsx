@@ -1,10 +1,11 @@
-import { useState } from 'react';
+import { useDeferredValue, useMemo, useState } from 'react';
 import { useRepos } from '@/app/services';
 import { useUiStore } from '@/app/uiStore';
 import { useLive } from '@/app/useLive';
+import { filterPrepared, prepareSearch } from '@/data';
 import { subscriptionAttention, toIsoDate, type Client } from '@/domain/models';
 import { t } from '@/i18n';
-import { Avatar, Badge, Button, EmptyState, IconButton, ListRow, ListSection, PageHeader, SearchField, SwipeRow, Tx } from '@/ui';
+import { Avatar, Badge, Button, EmptyState, IconButton, ListRow, ListSection, PageHeader, SearchField, SwipeRow, Tx, useIncrementalList } from '@/ui';
 import { attentionLabel, attentionTone } from './attention';
 import { useDeleteClient } from './useDeleteClient';
 import styles from './Clients.module.css';
@@ -14,8 +15,12 @@ export function ClientsListScreen() {
   const openAddClient = useUiStore((s) => s.openAddClient);
   const deleteClient = useDeleteClient();
   const [query, setQuery] = useState('');
+  // One live read of the list; searching filters it in memory (fields normalised once per change, not per keystroke).
   const all = useLive(() => repos.clients.list(), [repos]);
-  const results = useLive(() => repos.clients.search(query), [repos, query]);
+  const prepared = useMemo(() => (all ? prepareSearch(all, (c) => [c.name, c.phone, c.goalNote, c.notes]) : null), [all]);
+  const deferredQuery = useDeferredValue(query);
+  const results = useMemo(() => (prepared ? filterPrepared(prepared, deferredQuery) : undefined), [prepared, deferredQuery]);
+  const { visible, sentinel } = useIncrementalList(results ?? [], { resetKey: deferredQuery });
   const [today] = useState(() => toIsoDate(new Date()));
 
   return (
@@ -52,7 +57,7 @@ export function ClientsListScreen() {
         )}
         {results && results.length > 0 && (
           <ListSection className={styles.list} label={t('clients.title')}>
-            {results.map((client) => (
+            {visible.map((client) => (
               <SwipeRow
                 key={client.id}
                 onDelete={() => void deleteClient(client)}
@@ -62,6 +67,7 @@ export function ClientsListScreen() {
                 <ClientRow client={client} today={today} />
               </SwipeRow>
             ))}
+            {sentinel}
           </ListSection>
         )}
       </div>

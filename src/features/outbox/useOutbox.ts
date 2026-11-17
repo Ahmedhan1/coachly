@@ -45,7 +45,7 @@ export async function computeOutbox(services: Pick<AppServices, 'data' | 'meta'>
   const [clients, sessions, payments, lastCheckIn, sent, kinds] = await Promise.all([
     repos.clients.list(),
     repos.sessions.listBetween(start, now.getTime() + 3 * 86_400_000),
-    repos.payments.list(),
+    repos.payments.listDue(), // the outbox only ever reminds about unpaid charges
     repos.progress.lastCheckInByClient(),
     readSent(services.meta),
     readKinds(services.meta),

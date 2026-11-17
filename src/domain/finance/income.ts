@@ -60,6 +60,14 @@ export type IncomeError = 'invalid_amount' | 'invalid_date';
 const validAmount = (n: number): boolean => Number.isSafeInteger(n) && n >= 0;
 const sum = (xs: readonly number[]): number => xs.reduce((a, b) => a + b, 0);
 
+class UnsafeTotal extends Error {}
+/** Sum that refuses to lose precision (money is integer minor units). */
+const safeSum = (xs: readonly number[]): number => {
+  const total = sum(xs);
+  if (!Number.isSafeInteger(total)) throw new UnsafeTotal();
+  return total;
+};
+
 function validate(input: IncomeInput): IncomeError | null {
   if (!isIsoDate(input.today)) return 'invalid_date';
   for (const p of input.payments) {
@@ -76,32 +84,49 @@ function validate(input: IncomeInput): IncomeError | null {
 export function incomeDashboard(input: IncomeInput): Result<IncomeDashboard, IncomeError> {
   const invalid = validate(input);
   if (invalid) return err(invalid);
+  try {
+    return ok(compute(input));
+  } catch (e) {
+    if (e instanceof UnsafeTotal) return err('invalid_amount');
+    throw e;
+  }
+}
+
+function compute(input: IncomeInput): IncomeDashboard {
   const { payments, subscriptions, today } = input;
   const monthStart = startOfMonth(today);
   const monthEnd = endOfMonth(today);
   const inMonth = (d: IsoDate): boolean => d >= monthStart && d <= monthEnd;
 
-  const paidThisMonthMinor = sum(payments.filter((p) => p.paidOn !== null && inMonth(p.paidOn)).map((p) => p.amountMinor));
+  const paidThisMonthMinor = safeSum(payments.filter((p) => p.paidOn !== null && inMonth(p.paidOn)).map((p) => p.amountMinor));
   const unpaid = payments.filter((p) => p.paidOn === null);
   const overdue = unpaid.filter((p) => p.dueDate < today).sort((a, b) => (a.dueDate < b.dueDate ? -1 : a.dueDate > b.dueDate ? 1 : 0));
-  const dueRestOfMonthMinor = sum(unpaid.filter((p) => p.dueDate >= today && p.dueDate <= monthEnd).map((p) => p.amountMinor));
-  const unpaidDueThisMonthMinor = sum(unpaid.filter((p) => inMonth(p.dueDate)).map((p) => p.amountMinor));
+  const dueRestOfMonthMinor = safeSum(unpaid.filter((p) => p.dueDate >= today && p.dueDate <= monthEnd).map((p) => p.amountMinor));
+  const unpaidDueThisMonthMinor = safeSum(unpaid.filter((p) => inMonth(p.dueDate)).map((p) => p.amountMinor));
 
-  const expectedRenewals = subscriptions.filter(
-    (s) => s.endDate >= today && s.endDate <= monthEnd && !payments.some((p) => p.clientId === s.clientId && p.dueDate >= s.endDate),
-  );
-  const expectedRenewalsMinor = sum(expectedRenewals.map((s) => s.priceMinor));
+  // Latest due date per client, so each subscription is checked in O(1) instead of scanning every payment.
+  const latestDue = new Map<string, IsoDate>();
+  for (const p of payments) {
+    const prev = latestDue.get(p.clientId);
+    if (prev === undefined || p.dueDate > prev) latestDue.set(p.clientId, p.dueDate);
+  }
+  const expectedRenewals = subscriptions.filter((s) => {
+    const last = latestDue.get(s.clientId);
+    return s.endDate >= today && s.endDate <= monthEnd && !(last !== undefined && last >= s.endDate);
+  });
+  const expectedRenewalsMinor = safeSum(expectedRenewals.map((s) => s.priceMinor));
+  const overdueMinor = safeSum(overdue.map((p) => p.amountMinor));
 
-  return ok({
+  return {
     monthStart,
     monthEnd,
     paidThisMonthMinor,
     overdue,
-    overdueMinor: sum(overdue.map((p) => p.amountMinor)),
+    overdueMinor,
     dueRestOfMonthMinor,
     expectedRenewals,
     expectedRenewalsMinor,
-    expectedThisMonthMinor: paidThisMonthMinor + unpaidDueThisMonthMinor + expectedRenewalsMinor,
+    expectedThisMonthMinor: safeSum([paidThisMonthMinor, unpaidDueThisMonthMinor, expectedRenewalsMinor]),
     renewingSoon: expiringWithin(subscriptions, today, input.renewWithinDays ?? DEFAULT_RENEW_WITHIN_DAYS),
-  });
+  };
 }

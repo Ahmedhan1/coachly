@@ -73,6 +73,25 @@ export const MIGRATIONS: readonly Migration[] = [
       [TABLES.deletions]: '++seq, entityId, at',
     },
   },
+  {
+    // Scale (years of data): `deletedAt` indexes only soft-deleted rows (null is not an IndexedDB key), so purge
+    // reads just those; `[clientId+startsAt]` gives a client's sessions in time order without a sort.
+    // Index-only change: IndexedDB builds the new indexes from the existing rows, nothing to rewrite.
+    version: 2,
+    stores: {
+      [TABLES.clients]: 'id, name, endDate, updatedAt, deletedAt',
+      [TABLES.payments]: 'id, clientId, status, paidOn, dueOn, deletedAt',
+      [TABLES.sessions]: 'id, clientId, startsAt, seriesId, deletedAt, [clientId+startsAt]',
+      [TABLES.exercises]: 'id, name, source, builtinRef, deletedAt',
+      [TABLES.programs]: 'id, clientId, name, deletedAt',
+      [TABLES.workoutLogs]: 'id, clientId, date, [clientId+date], deletedAt',
+      [TABLES.recipes]: 'id, name, deletedAt',
+      [TABLES.mealPlans]: 'id, clientId, deletedAt',
+      [TABLES.supplements]: 'id, name, deletedAt',
+      [TABLES.progress]: 'id, clientId, date, [clientId+date], deletedAt',
+      [TABLES.pdfTemplates]: 'id, name, deletedAt',
+    },
+  },
 ];
 
 export const LATEST_VERSION = MIGRATIONS[MIGRATIONS.length - 1]?.version ?? 0;

@@ -19,3 +19,4 @@ export { Num, Tx } from './Num/Num';
 export { Money } from './Num/Money';
 export { PackageRing } from './PackageRing/PackageRing';
 export { cx } from './cx';
+export { useIncrementalList } from './List/useIncrementalList';

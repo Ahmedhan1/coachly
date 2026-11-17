@@ -6,6 +6,8 @@
 //   - src/i18n/**            (.ts .tsx .js .mjs .json .md), excluding *.test.* / *.spec.*
 //   - src/**/*.ar.json, data-src/**/*.ar.json
 //   - public/**/*.json       (public data shipped with the app, incl. future exercise data)
+//   - worker/src/share/**, worker/src/admin/** (.ts .js .mjs .html), excluding tests: the Arabic client
+//     page and owner dashboard rendered by the Cloudflare Worker
 // Lines between "forbidden-words:begin" and "forbidden-words:end" are skipped (the list itself).
 //
 // Usage: node scripts/check-forbidden-words.mjs [--root <dir>]
@@ -20,6 +22,7 @@ const rootFlag = process.argv.indexOf('--root');
 const root = rootFlag >= 0 && process.argv[rootFlag + 1] ? resolve(process.argv[rootFlag + 1]) : repoRoot;
 
 const TEXT_EXT = /\.(ts|tsx|js|mjs|json|md)$/;
+const WORKER_PAGE_EXT = /\.(ts|js|mjs|html)$/;
 const TEST_FILE = /\.(test|spec)\.[a-z]+$/;
 
 function listFiles(dir) {
@@ -36,6 +39,9 @@ const targets = new Set([
   ...listFiles('src').filter((p) => p.endsWith('.ar.json')),
   ...listFiles('data-src').filter((p) => p.endsWith('.ar.json')),
   ...listFiles('public').filter((p) => p.endsWith('.json')),
+  ...['worker/src/share', 'worker/src/admin'].flatMap((dir) =>
+    listFiles(dir).filter((p) => WORKER_PAGE_EXT.test(p) && !TEST_FILE.test(p)),
+  ),
 ]);
 
 const hits = [];
