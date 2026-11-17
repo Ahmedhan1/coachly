@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { catalogById, catalogFromPack, mergeCatalog } from './catalog';
+import { catalogById, catalogFromPack, mergeCatalog, popularFirst } from './catalog';
 import type { ExercisePack, PackExercise } from './pack';
 
 const entry = (id: string, extra: Partial<PackExercise> = {}): PackExercise => ({
@@ -99,5 +99,25 @@ describe('mergeCatalog', () => {
 
   it('indexes by id', () => {
     expect(catalogById(builtin).get('Plank')?.primaryMuscles).toEqual(['abs']);
+  });
+});
+
+describe('popular first («الأشهر»)', () => {
+  it('puts ranked exercises first by rank and keeps the rest in pack order', () => {
+    const ranked: ExercisePack = {
+      ...pack,
+      count: 4,
+      exercises: [entry('A'), entry('B', { popular: 2 }), entry('C'), entry('D', { popular: 1 })],
+    };
+    const catalog = catalogFromPack(ranked, '');
+    expect(catalog.map((e) => e.id)).toEqual(['D', 'B', 'A', 'C']);
+    expect(catalog[0]?.popularRank).toBe(1);
+    expect(catalog[2]).not.toHaveProperty('popularRank');
+  });
+
+  it('popularFirst is stable and does not mutate', () => {
+    const list = [{ id: 'x' }, { id: 'y', popularRank: 3 }, { id: 'z' }];
+    expect(popularFirst(list).map((e) => e.id)).toEqual(['y', 'x', 'z']);
+    expect(list.map((e) => e.id)).toEqual(['x', 'y', 'z']);
   });
 });

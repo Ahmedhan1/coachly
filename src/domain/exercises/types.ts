@@ -27,6 +27,8 @@ export interface CatalogExercise {
   mechanic: ExerciseMechanic | null;
   images: readonly ExerciseImage[];
   isCustom: boolean;
+  /** 1-based rank in the «الأشهر» (most common) set; undefined for the rest. Lower = more common. */
+  popularRank?: number;
 }
 
 /** A trainer-created exercise (stored in the data layer). */

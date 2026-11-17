@@ -34,7 +34,7 @@ export const PDF_TEST_LABELS: PdfLabels = {
     progress: 'التقدم',
     notes: 'تعليمات وملاحظات',
   },
-  cover: { client: 'العميل', preparedBy: 'إعداد', date: 'التاريخ' },
+  cover: { client: 'العميل', preparedBy: 'إعداد', date: 'التاريخ', planFor: 'برنامج مخصص لـ', contact: 'للتواصل' },
   client: {
     name: 'الاسم',
     gender: 'النوع',
@@ -68,11 +68,20 @@ export const PDF_TEST_LABELS: PdfLabels = {
     fat: 'دهون',
     water: 'المياه',
   },
-  program: { sets: 'مجموعات', reps: 'عدات', rest: 'راحة', tempo: 'تمبو', rpe: 'RPE', superset: 'سوبر سِت', notes: 'ملاحظة' },
-  meals: { servings: 'حصة', ingredients: 'المكونات', perServing: 'للحصة' },
+  program: { sets: 'مجموعات', reps: 'عدات', rest: 'راحة', tempo: 'تمبو', rpe: 'RPE', superset: 'سوبر سِت', notes: 'ملاحظة', setsReps: 'سيتات × عدات', exerciseCount: 'عدد التمارين' },
+  meals: {
+      servings: 'حصة',
+      ingredients: 'المكونات',
+      perServing: 'للحصة',
+      mealTotal: 'الوجبة',
+      dailyTotal: 'إجمالي اليوم',
+      recipesTitle: 'الوصفات',
+      partialTotals: 'الأصناف اللي من غير ماكروز مش محسوبة في الإجمالي.',
+      water: 'المياه في اليوم',
+    },
   supplements: { dose: 'الجرعة', timing: 'الميعاد' },
   progress: { weightChart: 'الوزن', before: 'قبل', after: 'بعد', first: 'أول قياس', latest: 'آخر قياس', change: 'التغيير' },
-  notes: { contact: 'للتواصل' },
+  notes: { contact: 'للتواصل', closing: 'بالتوفيق! أي سؤال أنا معاك.' },
   units: { kg: 'كجم', cm: 'سم', kcal: 'سعرة', g: 'جم', ml: 'مل', sec: 'ث', years: 'سنة', percent: '%' },
 };
 

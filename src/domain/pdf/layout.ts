@@ -3,26 +3,37 @@ import type { PdfBlock } from './types';
 /** A4 at 96 CSS px per inch: 210 × 297 mm → 794 × 1123 px. */
 export const PAGE_WIDTH_PX = 794;
 export const PAGE_HEIGHT_PX = 1123;
-export const PAGE_MARGIN_X_PX = 44;
-export const PAGE_MARGIN_TOP_PX = 32;
-export const PAGE_MARGIN_BOTTOM_PX = 20;
-export const HEADER_HEIGHT_PX = 64;
-export const FOOTER_HEIGHT_PX = 74;
-export const BLOCK_GAP_PX = 12;
+export const PAGE_MARGIN_X_PX = 40;
+/** Includes the 8 px brand strip across the top edge. */
+export const PAGE_MARGIN_TOP_PX = 26;
+export const PAGE_MARGIN_BOTTOM_PX = 18;
+export const HEADER_HEIGHT_PX = 78;
+export const FOOTER_HEIGHT_PX = 64;
+export const BLOCK_GAP_PX = 10;
 export const CONTENT_WIDTH_PX = PAGE_WIDTH_PX - 2 * PAGE_MARGIN_X_PX;
 export const CONTENT_HEIGHT_PX =
   PAGE_HEIGHT_PX - PAGE_MARGIN_TOP_PX - HEADER_HEIGHT_PX - FOOTER_HEIGHT_PX - PAGE_MARGIN_BOTTOM_PX;
 
 export const MIN_LOGO_PX = 24;
 export const MAX_LOGO_PX = 160;
-export const HEADER_LOGO_MAX_PX = 44;
+/** Header logo height: big enough to read on every page, still a header. */
+export const HEADER_LOGO_MAX_PX = 52;
+/**
+ * Cover logo box (object-fit: contain). The trainer's size setting (MIN..MAX_LOGO_PX) scales it between
+ * these bounds, so even the smallest setting is ~38 % of the page width and never a corner stamp.
+ */
+export const COVER_LOGO_MIN = { width: 300, height: 190 } as const;
+export const COVER_LOGO_MAX = { width: 460, height: 300 } as const;
 
 /** Image box sizes the renderer uses (kept here so estimates match). */
-export const EXERCISE_IMAGE_PX = 112;
-export const RECIPE_IMAGE_PX = 120;
-export const SUPPLEMENT_IMAGE_PX = 72;
-export const CHART_HEIGHT_PX = 240;
+export const EXERCISE_IMAGE_PX = 96;
+export const MUSCLE_MAP_PX = 84;
+export const EXERCISE_RX_PX = 150;
+export const RECIPE_IMAGE_PX = 132;
+export const SUPPLEMENT_IMAGE_PX = 80;
+export const CHART_HEIGHT_PX = 230;
 export const PHOTO_PAIR_HEIGHT_PX = 340;
+export const CLOSING_LOGO_PX = 120;
 
 export const FONT = { body: 14, small: 12, sub: 17, title: 21, name: 16 } as const;
 const LINE = 1.6;
@@ -46,11 +57,16 @@ export function estimateBlockHeight(block: PdfBlock): number {
   let h: number;
   switch (block.type) {
     case 'sectionTitle':
-      h = textHeight(block.text, FONT.title, W) + 14;
+      h = textHeight(block.text, FONT.title, W - 90) + 22;
       break;
     case 'subTitle':
-      h = textHeight(`${block.text}  ${block.meta}`, FONT.sub, W) + 10;
+      h = textHeight(`${block.text}  ${block.meta}`, FONT.sub, W - 40) + 16;
       break;
+    case 'clientCard': {
+      const tiles = Math.ceil(block.tiles.length / 4) * 78;
+      h = textHeight(block.name, 24, W - 32) + (block.chips.length > 0 ? 40 : 0) + tiles + 40;
+      break;
+    }
     case 'keyValues': {
       const half = W / 2 - 16;
       let rows = 0;
@@ -62,25 +78,29 @@ export function estimateBlockHeight(block: PdfBlock): number {
       break;
     }
     case 'stats':
-      h = Math.ceil(block.items.length / 4) * 96;
+      h = Math.ceil(block.items.length / 5) * 92;
       break;
     case 'macroBar':
-      h = 64;
+      h = 72;
       break;
     case 'paragraph':
       h = textHeight(block.text, FONT.body, W) + 4;
       break;
     case 'exercise': {
-      const images = (block.image ? 1 : 0) + (block.muscleMap ? 1 : 0);
-      const textW = W - images * (EXERCISE_IMAGE_PX + 12) - 48;
+      const textW =
+        W - 44 - EXERCISE_RX_PX - (block.image ? EXERCISE_IMAGE_PX + 12 : 0) - (block.muscleMap ? MUSCLE_MAP_PX + 12 : 0) - 24;
       const text =
         textHeight(block.name, FONT.name, textW) +
         (block.secondaryName ? textHeight(block.secondaryName, FONT.small, textW) : 0) +
         (block.muscles ? textHeight(block.muscles, FONT.small, textW) : 0) +
-        textHeight(block.prescription.map((p) => `${p.label} ${p.value}`).join('   '), FONT.body, textW) +
-        (block.notes ? textHeight(block.notes, FONT.small, textW) : 0) +
-        8;
-      h = Math.max(images > 0 ? EXERCISE_IMAGE_PX : 0, text) + 24;
+        (block.notes ? textHeight(block.notes, FONT.small, textW) + 6 : 0);
+      const rx = 64 + Math.ceil(block.extras.length / 2) * 22;
+      h = Math.max(block.image ? EXERCISE_IMAGE_PX : 0, block.muscleMap ? MUSCLE_MAP_PX : 0, text, rx) + 20;
+      break;
+    }
+    case 'mealCard': {
+      const rows = block.items.reduce((n, i) => n + textHeight(i.text, FONT.body, W - 220) + 10, 0);
+      h = 52 + rows + (block.totals ? 48 : 0) + 8;
       break;
     }
     case 'mealItem':
@@ -102,17 +122,22 @@ export function estimateBlockHeight(block: PdfBlock): number {
         textHeight(block.name, FONT.name, textW) +
         block.rows.reduce((n, r) => n + textHeight(`${r.label}: ${r.value}`, FONT.body, textW), 0) +
         (block.notes ? textHeight(block.notes, FONT.small, textW) : 0);
-      h = Math.max(block.image ? SUPPLEMENT_IMAGE_PX : 0, text) + 24;
+      h = Math.max(block.image ? SUPPLEMENT_IMAGE_PX : 0, text) + 28;
       break;
     }
     case 'weightChart':
-      h = CHART_HEIGHT_PX + 36;
+      h = CHART_HEIGHT_PX + 52;
       break;
     case 'photoPair':
       h = PHOTO_PAIR_HEIGHT_PX + 32;
       break;
     case 'contact':
-      h = textHeight(block.title, FONT.sub, W) + block.lines.reduce((n, l) => n + textHeight(l, FONT.body, W - 32), 0) + 28;
+      h =
+        CLOSING_LOGO_PX +
+        textHeight(block.closing, 20, W - 64) +
+        textHeight(block.title, FONT.sub, W) +
+        Math.ceil(block.lines.length / 2) * 44 +
+        96;
       break;
   }
   return h + BLOCK_GAP_PX;

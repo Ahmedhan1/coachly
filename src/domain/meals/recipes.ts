@@ -1,7 +1,34 @@
 import { z } from 'zod';
 import { err, ok, recipeMacros, type Per100g, type RecipeError, type Result } from '@/domain/nutrition';
 
-/** One row of the trainer's ingredient table: nutrition per 100 g. */
+/** Food-table groups (labels live in i18n under nutrition.foodCats). */
+export const FOOD_CATEGORIES = [
+  'grains',
+  'legumes',
+  'poultry',
+  'meat',
+  'fish',
+  'eggs',
+  'dairy',
+  'veg',
+  'fruit',
+  'nuts',
+  'fats',
+  'sweets',
+  'drinks',
+  'fastfood',
+  'dishes',
+  'condiments',
+  'protein',
+] as const;
+export const foodCategorySchema = z.enum(FOOD_CATEGORIES);
+export type FoodCategory = z.infer<typeof foodCategorySchema>;
+
+/** A household measure: "رغيف" = 90 g. */
+export const portionSchema = z.object({ label: z.string().trim().min(1).max(40), grams: z.number().positive().max(5000) });
+export type Portion = z.infer<typeof portionSchema>;
+
+/** One row of the trainer's ingredient table: nutrition per 100 g. Category, fibre, portions and photo are optional. */
 export const ingredientEntrySchema = z.object({
   id: z.string().min(1).max(64),
   name: z.string().trim().min(1).max(120),
@@ -10,7 +37,12 @@ export const ingredientEntrySchema = z.object({
     proteinG: z.number().min(0).max(100),
     carbG: z.number().min(0).max(100),
     fatG: z.number().min(0).max(100),
+    fiberG: z.number().min(0).max(100).optional(),
   }),
+  category: foodCategorySchema.optional(),
+  portions: z.array(portionSchema).max(8).optional(),
+  /** Trainer's own photo (images table id); falls back to the category illustration. */
+  imageId: z.string().min(1).max(64).nullable().optional(),
 });
 export type IngredientEntry = z.infer<typeof ingredientEntrySchema>;
 

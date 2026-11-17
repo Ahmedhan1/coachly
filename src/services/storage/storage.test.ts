@@ -62,3 +62,24 @@ describe('fakes', () => {
     expect(out.blob.type).toBe('image/jpeg');
   });
 });
+
+describe('canvas downscaler choices', () => {
+  it('keeps a small original only when it is not bigger than the re-encode', async () => {
+    const { pickStoredBlob } = await import('./canvasImageDownscaler');
+    const small = new Blob(['12345'], { type: 'image/png' });
+    const encoded = new Blob(['1234567890'], { type: 'image/png' });
+    expect(pickStoredBlob(small, encoded, true)).toBe(small);
+    expect(pickStoredBlob(small, encoded, false)).toBe(encoded);
+    expect(pickStoredBlob(new Blob(['1'], { type: 'image/heic' }), encoded, true)).toBe(encoded);
+    expect(pickStoredBlob(new Blob(['x'.repeat(20)], { type: 'image/png' }), encoded, true)).toBe(encoded);
+  });
+
+  it('detects transparency in RGBA pixels', async () => {
+    const { hasTransparency } = await import('./canvasImageDownscaler');
+    const opaque = new Uint8ClampedArray(4 * 16).fill(255);
+    expect(hasTransparency(opaque, 1)).toBe(false);
+    const clear = opaque.slice();
+    clear[3] = 0;
+    expect(hasTransparency(clear, 1)).toBe(true);
+  });
+});

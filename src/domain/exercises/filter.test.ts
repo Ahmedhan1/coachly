@@ -74,3 +74,11 @@ describe('favourites', () => {
     expect([...pruneFavourites(new Set(['a', 'gone', 'b']), ['a', 'b', 'c'])]).toEqual(['a', 'b']);
   });
 });
+
+describe('filterExercises – popularOnly', () => {
+  it('keeps only the «الأشهر» set', () => {
+    const items = [ex('a', { popularRank: 1 }), ex('b')];
+    expect(filterExercises(items, { popularOnly: true }).map((e) => e.id)).toEqual(['a']);
+    expect(filterExercises(items, {}).map((e) => e.id)).toEqual(['a', 'b']);
+  });
+});

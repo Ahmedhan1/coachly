@@ -74,6 +74,8 @@ export interface ImportOptions {
 export interface BackupService {
   exportFile(options?: ExportOptions): Promise<Result<BackupFile, ExportError>>;
   detectFile(file: Blob): Promise<BackupFileKind>;
+  /** Integrity check of a finished file (decrypt + every checksum), writing nothing. */
+  verifyFile(file: Blob, password: string | null): Promise<Result<ImportSummary, ImportError>>;
   /** Replaces ALL data with the backup's (all-or-nothing). Ask the trainer to confirm first. */
   importFile(file: Blob, options?: ImportOptions): Promise<Result<ImportSummary, ImportError>>;
   /** Call after the share sheet / download reported success, so the weekly reminder resets. */

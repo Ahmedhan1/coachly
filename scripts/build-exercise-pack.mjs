@@ -11,7 +11,7 @@
 //
 // Usage: node scripts/build-exercise-pack.mjs [--offline] [--size 480] [--quality 60] [--format webp|jpeg]
 //        [--concurrency 8] [--retries 3] [--limit N] [--budget-mb 40]
-//        [--source <exercises.json>] [--names <exercise-names.ar.json>] [--cache <dir>] [--out <dir>]
+//        [--source <exercises.json>] [--names <exercise-names.ar.json>] [--overrides <json>] [--extras <json>] [--cache <dir>] [--out <dir>]
 // Requires Node >= 22.18 (imports the TypeScript pack module directly; Node strips the types).
 // Details and the app loading strategy: docs/EXERCISE_PACK.md.
 import { execFile } from 'node:child_process';
@@ -31,6 +31,8 @@ export const SOURCE_LABEL = 'yuhonas/free-exercise-db';
 export const DEFAULTS = Object.freeze({
   source: 'data-src/free-exercise-db/exercises.json',
   names: 'data-src/exercise-names.ar.json',
+  overrides: 'data-src/exercise-names.overrides.ar.json',
+  extras: 'data-src/exercise-extras.json',
   cache: 'data-src/free-exercise-db/images',
   out: 'public/exercise-pack',
   size: 480,
@@ -62,6 +64,8 @@ export function parseArgs(argv, root = repoRoot) {
       case '--offline': opts.offline = true; break;
       case '--source': opts.source = value(); break;
       case '--names': opts.names = value(); break;
+      case '--overrides': opts.overrides = value(); break;
+      case '--extras': opts.extras = value(); break;
       case '--cache': opts.cache = value(); break;
       case '--out': opts.out = value(); break;
       case '--size': opts.size = Math.round(num(flag, value())); break;
@@ -79,7 +83,7 @@ export function parseArgs(argv, root = repoRoot) {
       default: throw new Error(`unknown option ${flag}`);
     }
   }
-  for (const key of ['source', 'names', 'cache', 'out']) opts[key] = resolve(root, opts[key]);
+  for (const key of ['source', 'names', 'overrides', 'extras', 'cache', 'out']) opts[key] = resolve(root, opts[key]);
   return opts;
 }
 
@@ -217,6 +221,13 @@ export async function buildPack(opts, log = console.log) {
   const sources = JSON.parse(readFileSync(opts.source, 'utf8'));
   const names = JSON.parse(readFileSync(opts.names, 'utf8'));
   const arabicNames = new Map(names.map((n) => [n.id, n.ar]));
+  const readOptional = (file, fallback) => (existsSync(file) ? JSON.parse(readFileSync(file, 'utf8')) : fallback);
+  const popular = readOptional(opts.overrides, {}).popular ?? [];
+  const extras = readOptional(opts.extras, {}).exercises ?? [];
+  const sourceIds = new Set(sources.map((s) => s.id));
+  for (const x of extras) {
+    if (x.imagesFrom !== undefined && !sourceIds.has(x.imagesFrom)) throw new Error(`extra ${x.id}: imagesFrom ${x.imagesFrom} is not a dataset exercise`);
+  }
   const imgDir = join(opts.out, 'img');
   const manifestFile = join(opts.out, 'exercises.json');
   mkdirSync(imgDir, { recursive: true });
@@ -275,7 +286,7 @@ export async function buildPack(opts, log = console.log) {
     imagesById.set(p.id, [...(imagesById.get(p.id) ?? []), p.outName]);
   }
   const imgBytes = dirSize(imgDir);
-  const pack = buildExercisePack({ sources, arabicNames, imagesById, image: settings, source: SOURCE_LABEL, imageBytes: imgBytes });
+  const pack = buildExercisePack({ sources, arabicNames, imagesById, image: settings, source: SOURCE_LABEL, imageBytes: imgBytes, popular, extras });
   writeFileSync(manifestFile, serializePack(pack));
 
   // 4. report
@@ -286,7 +297,7 @@ export async function buildPack(opts, log = console.log) {
   const total = jsonBytes + imgBytes;
   const noImage = pack.exercises.filter((e) => e.images.length === 0).length;
   log(`encoder: ${encoder.name} → ${opts.format}, max ${opts.size}px, quality ${opts.quality}`);
-  log(`exercises: ${pack.count} (${noImage} without any image)`);
+  log(`exercises: ${pack.count} (${extras.length} built-in extras, ${popular.length} + extras popular; ${noImage} without any image)`);
   log(`images: ${imageCount}/${totalImages} in pack, ${fetched} downloaded now, ${encoded} encoded now, ${missing} missing`);
   for (const f of [...failures, ...encodeFailures].slice(0, 20)) log(`  failed: ${f}`);
   log(`size: exercises.json ${formatBytes(jsonBytes)} + img ${formatBytes(imgBytes)} = ${formatBytes(total)} (budget ${opts.budgetMb} MB)`);

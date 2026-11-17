@@ -132,6 +132,19 @@ export interface PackExercise {
   mechanic: ExerciseMechanic | null;
   /** File names relative to `ExercisePack.image.base`. Empty when no image could be fetched. */
   images: string[];
+  /** 1-based rank in the hand-picked «الأشهر» (most common) set; absent for the rest. */
+  popular?: number;
+  /** True for the app's own built-in additions (data-src/exercise-extras.json), not from the dataset. */
+  extra?: boolean;
+}
+
+/**
+ * A built-in exercise the dataset lacks (data-src/exercise-extras.json). `imagesFrom` names a dataset
+ * exercise whose photos truly show the same movement; without it the app draws the muscle map.
+ */
+export interface ExtraExercise extends Omit<PackExercise, 'images' | 'popular' | 'extra'> {
+  imagesFrom?: string;
+  popular?: boolean;
 }
 
 export interface PackImageSettings {
@@ -232,12 +245,45 @@ export interface BuildExercisePackInput {
   image: PackImageSettings;
   source: string;
   imageBytes?: number;
+  /** Exercise ids of the «الأشهر» set, most common first. */
+  popular?: readonly string[];
+  extras?: readonly ExtraExercise[];
+}
+
+function extraToPack(extra: ExtraExercise, imagesById: ReadonlyMap<string, readonly string[]>): PackExercise {
+  const { imagesFrom, ...withPopular } = extra;
+  const rest: Omit<ExtraExercise, 'imagesFrom' | 'popular'> & { popular?: boolean } = { ...withPopular };
+  delete rest.popular;
+  const primary = [...new Set(rest.primary)];
+  return {
+    ...rest,
+    primary,
+    secondary: [...new Set(rest.secondary)].filter((id) => !primary.includes(id)),
+    images: imagesFrom === undefined ? [] : [...(imagesById.get(imagesFrom) ?? [])],
+    extra: true,
+  };
 }
 
 export function buildExercisePack(input: BuildExercisePackInput): ExercisePack {
-  const exercises = [...input.sources]
-    .sort((a, b) => (a.id < b.id ? -1 : a.id > b.id ? 1 : 0))
-    .map((source) => buildPackExercise(source, input.arabicNames.get(source.id), input.imagesById.get(source.id) ?? []));
+  const fromDataset = input.sources.map((source) =>
+    buildPackExercise(source, input.arabicNames.get(source.id), input.imagesById.get(source.id) ?? []),
+  );
+  const datasetIds = new Set(fromDataset.map((e) => e.id));
+  const extras = (input.extras ?? [])
+    .filter((x) => !datasetIds.has(x.id))
+    .map((x) => extraToPack(x, input.imagesById));
+  const popularIds = [
+    ...(input.popular ?? []),
+    ...(input.extras ?? []).filter((x) => x.popular === true).map((x) => x.id),
+  ];
+  const rank = new Map<string, number>();
+  for (const id of popularIds) if (!rank.has(id)) rank.set(id, rank.size + 1);
+  const exercises = [...fromDataset, ...extras]
+    .map((e) => {
+      const r = rank.get(e.id);
+      return r === undefined ? e : { ...e, popular: r };
+    })
+    .sort((a, b) => (a.id < b.id ? -1 : a.id > b.id ? 1 : 0));
   return {
     version: 1,
     source: input.source,

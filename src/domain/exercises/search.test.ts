@@ -72,3 +72,19 @@ describe('searchExercises', () => {
     expect(searchExercises(list, 'برس', 1)).toHaveLength(1);
   });
 });
+
+describe('searchExercises – «الأشهر» tie-break', () => {
+  it('ranks the more common exercise first when scores tie', () => {
+    const list = [
+      ex('a', 'بنش برس بالدامبل', 'Dumbbell Bench Press'),
+      ex('b', 'بنش برس بالبار', 'Barbell Bench Press', { popularRank: 1 }),
+      ex('c', 'بنش برس على السميث', 'Smith Bench Press', { popularRank: 5 }),
+    ];
+    expect(searchExercises(list, 'بنش').map((e) => e.id)).toEqual(['b', 'c', 'a']);
+  });
+
+  it('still finds exercises by their English name', () => {
+    const list = [ex('b', 'بنش برس بالبار', 'Barbell Bench Press - Medium Grip')];
+    expect(searchExercises(list, 'barbell bench').map((e) => e.id)).toEqual(['b']);
+  });
+});

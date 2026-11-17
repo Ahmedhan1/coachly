@@ -1,3 +1,4 @@
+import { assistant } from './features/assistant';
 import { nutrition } from './features/nutrition';
 import { outbox } from './features/outbox';
 import { pdf } from './features/pdf';
@@ -438,6 +439,7 @@ export const ar = {
   outbox,
   pdf,
   settings,
+  assistant,
   units: {
     mb: '{n} ميجا',
     gb: '{n} جيجا',

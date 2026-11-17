@@ -4,6 +4,7 @@ import {
   FITNESS_TERMS,
   FORBIDDEN_TERMS,
   findForbiddenTerms,
+  naturalExerciseName,
   normalizeArabic,
   transliterateExerciseName,
 } from './fitness-terms';
@@ -28,7 +29,7 @@ describe('transliterateExerciseName', () => {
     ['Lat Pulldown', 'لات بول داون'],
     ['Barbell Squat', 'بار سكوات'],
     ['Incline Dumbbell Flyes', 'إنكلاين دامبل فلاي'],
-    ['Seated Cable Rows', 'سيتد كيبل رو'],
+    ['Seated Cable Rows', 'سيتد كابل رو'],
   ])('%s → %s', (english, arabic) => {
     expect(transliterateExerciseName(english)).toEqual({ arabic, unknownTokens: [] });
   });
@@ -50,7 +51,7 @@ describe('transliterateExerciseName', () => {
   });
 
   it('keeps slashes between words and parentheses', () => {
-    expect(transliterateExerciseName('Knee/Hip Raise').arabic).toBe('ني / هيب ريز');
+    expect(transliterateExerciseName('Knee/Hip Raise').arabic).toBe('ني / هيب رايز');
     expect(transliterateExerciseName('Machine Shoulder (Military) Press').arabic).toBe(
       'ماشين شولدر (ميليتري) برس',
     );
@@ -124,5 +125,38 @@ describe('findForbiddenTerms', () => {
 
   it('normalizes alef forms', () => {
     expect(normalizeArabic('أإآا')).toBe('اااا');
+  });
+});
+
+describe('naturalExerciseName (Egyptian gym-floor order)', () => {
+  it.each([
+    ['Barbell Bench Press - Medium Grip', 'بنش برس بالبار'],
+    ['Incline Dumbbell Press', 'برس بالدامبل عالي (إنكلاين)'],
+    ['Dumbbell Shoulder Press', 'شولدر برس بالدامبل'],
+    ['Barbell Squat', 'سكوات بالبار'],
+    ['Wide-Grip Lat Pulldown', 'لات بول داون - قبضة واسعة'],
+    ['Seated Cable Rows', 'رو على الكابل قاعد'],
+    ['Smith Machine Close-Grip Bench Press', 'بنش برس على السميث - قبضة ضيقة'],
+    ['One-Arm Dumbbell Row', 'رو بالدامبل بإيد واحدة'],
+    ['Decline EZ Bar Triceps Extension', 'ترايسبس إكستنشن بالبار الزجزاج واطي (ديكلاين)'],
+    ['Ab Crunch Machine', 'أب كرانش على الماشين'],
+    ['Narrow Stance Leg Press', 'ليج برس - رجل ضيقة'],
+    ['Dips - Triceps Version', 'ديبس ترايسبس'],
+  ])('%s → %s', (english, arabic) => {
+    expect(naturalExerciseName(english)).toEqual({ arabic, unknownTokens: [] });
+  });
+
+  it('never repeats the cable when the pulley height is given', () => {
+    expect(naturalExerciseName('One-Arm High-Pulley Cable Side Bends').arabic).toBe('سايد بيند على الكابل من فوق بإيد واحدة');
+  });
+
+  it('falls back to plain transliteration when the name is only a tool', () => {
+    expect(naturalExerciseName('Barbell').arabic).toBe('بار');
+  });
+
+  it('never yields a forbidden word', () => {
+    for (const name of ['Barbell Deadlift', 'Barbell Hip Thrust', 'Dumbbell Lunges', 'Seated Cable Rows', 'Side Lateral Raise']) {
+      expect(findForbiddenTerms(naturalExerciseName(name).arabic)).toEqual([]);
+    }
   });
 });

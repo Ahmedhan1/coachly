@@ -6,7 +6,7 @@ import type { BackupMetaStore, BackupStatus } from '@/data/backupMeta';
 import type { TempDatabaseFactory } from '@/data/backupIO';
 import type { Migration } from '@/data/schema';
 import { exportArchive } from './exporter';
-import { importArchive } from './importer';
+import { importArchive, verifyArchive } from './importer';
 import {
   MIN_BACKUP_PASSWORD_LENGTH,
   type BackupFile,
@@ -100,25 +100,38 @@ export class LocalBackupService implements BackupService {
     return detectBackupKind(file);
   }
 
-  async importFile(file: Blob, options: ImportOptions = {}): Promise<Result<ImportSummary, ImportError>> {
+  /**
+   * Re-opens a finished backup file exactly as a restore would (decrypt with the password, check every
+   * file's SHA-256 against the manifest) without writing anything. Success is only shown after this passes.
+   */
+  async verifyFile(file: Blob, password: string | null): Promise<Result<ImportSummary, ImportError>> {
+    const zip = await this.openFile(file, { password });
+    if (!zip.ok) return zip;
+    return verifyArchive(this.deps.db, zip.value, { migrations: this.deps.migrations });
+  }
+
+  private async openFile(file: Blob, options: ImportOptions): Promise<Result<Blob, ImportError>> {
     const kind = await detectBackupKind(file);
     if (kind === 'unknown') return err('not_a_backup');
-    let zip = file;
-    if (kind === 'encrypted') {
-      if (!options.password) return err('password_required');
-      options.onProgress?.({ phase: 'decrypt', done: 0, total: 1 });
-      let envelope: Uint8Array;
-      try {
-        envelope = new Uint8Array(await file.arrayBuffer());
-      } catch {
-        return err('malformed');
-      }
-      const opened = await openBackup(envelope, options.password);
-      if (!opened.ok) return opened;
-      zip = opened.value;
-      options.onProgress?.({ phase: 'decrypt', done: 1, total: 1 });
+    if (kind === 'zip') return ok(file);
+    if (!options.password) return err('password_required');
+    options.onProgress?.({ phase: 'decrypt', done: 0, total: 1 });
+    let envelope: Uint8Array;
+    try {
+      envelope = new Uint8Array(await file.arrayBuffer());
+    } catch {
+      return err('malformed');
     }
-    return importArchive(this.deps.db, zip, {
+    const opened = await openBackup(envelope, options.password);
+    if (!opened.ok) return opened;
+    options.onProgress?.({ phase: 'decrypt', done: 1, total: 1 });
+    return opened;
+  }
+
+  async importFile(file: Blob, options: ImportOptions = {}): Promise<Result<ImportSummary, ImportError>> {
+    const opened = await this.openFile(file, options);
+    if (!opened.ok) return opened;
+    return importArchive(this.deps.db, opened.value, {
       migrations: this.deps.migrations,
       openTemp: this.deps.openTemp,
       onProgress: options.onProgress,

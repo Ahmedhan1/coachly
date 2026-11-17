@@ -22,7 +22,7 @@ export interface HtmlPdfRendererOptions {
   downscaler?: ImageDownscaler;
   /** Where readex-pro-*.woff2 / alexandria-*.woff2 live. Default '/fonts/'. */
   fontBaseUrl?: string;
-  /** Canvas pixels per CSS px. 1.75 → 1390 × 1965 px per page ≈ 168 dpi. */
+  /** Canvas pixels per CSS px. 2 → 1588 × 2246 px per page ≈ 192 dpi (crisp logo and small text). */
   pixelRatio?: number;
   jpegQuality?: number;
   /** Longest side for embedded pictures before rendering (spec: ~1200 px). */
@@ -132,7 +132,8 @@ export class HtmlPdfRenderer implements PdfRenderer {
       measure.dir = 'rtl';
       measure.lang = 'ar';
       measure.style.fontFamily = fontStack(input.branding.fontFamily);
-      measure.innerHTML = blocks.map((b) => blockHtml(b, urlOf, input.branding.primaryColor)).join('');
+      const ctx = { logoUrl: urlOf(input.branding.logo), trainerName: input.branding.trainerName };
+      measure.innerHTML = blocks.map((b) => blockHtml(b, urlOf, input.branding.primaryColor, ctx)).join('');
       host.appendChild(measure);
       await imagesReady(measure);
       // Each block carries margin-block-end = BLOCK_GAP_PX; measure the border box and add the gap.
@@ -143,8 +144,8 @@ export class HtmlPdfRenderer implements PdfRenderer {
       if (doc.pages.length === 0) return err('no_pages');
 
       const pdf = new jsPDF({ unit: 'mm', format: 'a4', orientation: 'portrait', compress: true });
-      const ratio = this.o.pixelRatio ?? 1.75;
-      const quality = this.o.jpegQuality ?? 0.8;
+      const ratio = this.o.pixelRatio ?? 2;
+      const quality = this.o.jpegQuality ?? 0.82;
       const previewWidth = this.o.previewWidth ?? 360;
       const previews: Blob[] = [];
       for (let i = 0; i < doc.pages.length; i++) {
