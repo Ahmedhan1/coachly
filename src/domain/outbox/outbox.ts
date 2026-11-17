@@ -1,4 +1,5 @@
 import { addDays, toDayNumber, type IsoDate } from '../schedule';
+import { isBirthdayOn } from './birthday';
 
 /**
  * The trainer's daily "messages to send" list: a free automation (no WhatsApp API). Each item becomes a
@@ -91,7 +92,7 @@ export function buildOutbox(input: OutboxInput): OutboxItem[] {
       if (byDate) push({ id: `renewal:${c.id}:${c.endDate}`, kind: 'renewal', clientId: c.id, daysLeft: left });
       else if (lowSessions && left >= 0) push({ id: `renewal:${c.id}:${c.endDate}`, kind: 'renewal', clientId: c.id, sessionsLeft: Math.max(0, c.remainingSessions) });
     }
-    if (on('birthday') && c.birthDate && c.birthDate.slice(5) === input.today.slice(5)) push({ id: `birthday:${c.id}:${input.today.slice(0, 4)}`, kind: 'birthday', clientId: c.id });
+    if (on('birthday') && c.birthDate && isBirthdayOn(c.birthDate, input.today)) push({ id: `birthday:${c.id}:${input.today.slice(0, 4)}`, kind: 'birthday', clientId: c.id });
     if (on('welcome') && !c.isDemo && toDayNumber(input.today) - toDayNumber(c.createdOn) <= 2) push({ id: `welcome:${c.id}`, kind: 'welcome', clientId: c.id });
     if (on('checkin_reminder') && c.hasPackage && (c.endDate === null || c.endDate >= input.today)) {
       const every = input.checkinEveryDays ?? 7;

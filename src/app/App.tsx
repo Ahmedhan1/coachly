@@ -74,6 +74,7 @@ function Boot() {
     let cancelled = false;
     const afterActivation = async () => {
       await services.data.ensureFirstRun(new Date());
+      void services.data.runDailyPurge(new Date()).catch(() => undefined);
       const done = await services.meta.get(IDENTITY_SETUP_KEY);
       if (!cancelled) setBoot(done ? { phase: 'ready' } : { phase: 'setup' });
     };

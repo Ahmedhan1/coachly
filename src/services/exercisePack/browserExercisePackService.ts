@@ -18,6 +18,8 @@ export interface PackServiceDeps {
   requestPersistence?: () => Promise<unknown>;
 }
 
+const DEFAULT_FILE_TIMEOUT_MS = 30_000;
+
 const browserDeps = (): PackServiceDeps => ({
   fetch: (input, init) => globalThis.fetch(input, init),
   caches: typeof caches === 'undefined' ? null : caches,
@@ -106,16 +108,24 @@ export class BrowserExercisePackService implements ExercisePackService {
       while (next < todo.length && !signal?.aborted) {
         const url = todo[next++];
         if (url === undefined) break;
+        const controller = new AbortController();
+        const abort = () => controller.abort();
+        signal?.addEventListener('abort', abort);
+        const timer = setTimeout(abort, options.fileTimeoutMs ?? DEFAULT_FILE_TIMEOUT_MS);
         try {
-          const res = await this.deps.fetch(url, { signal });
+          const res = await this.deps.fetch(url, { signal: controller.signal });
           if (!res.ok) throw new Error(`HTTP ${res.status}`);
           const blob = await res.blob();
+          clearTimeout(timer);
           await cache.put(url, new Response(blob, { headers: { 'Content-Type': blob.type || 'image/webp' } }));
           progress.doneFiles++;
           progress.doneBytes += blob.size;
         } catch {
           if (signal?.aborted) break;
           progress.failedFiles++;
+        } finally {
+          clearTimeout(timer);
+          signal?.removeEventListener('abort', abort);
         }
         report();
       }

@@ -37,4 +37,18 @@ describe('demo seed', () => {
     expect(await db.deletions.count()).toBe(0);
     expect(await ensureFirstRun(repos, db, now)).toBe(false);
   });
+
+  it('also removes rows the trainer added to a demo client, so nothing is left pointing at a removed client', async () => {
+    const { repos, db } = createTestData();
+    await ensureFirstRun(repos, db, now);
+    const demoClient = (await repos.clients.list()).find((c) => c.demo);
+    if (!demoClient) throw new Error('no demo client');
+    await repos.payments.create({ clientId: demoClient.id, amountMinor: 100, currency: 'EGP', status: 'due', paidOn: null, dueOn: '2026-11-20', method: 'cash', note: '' });
+    await repos.sessions.create({ clientId: demoClient.id, startsAt: now.getTime(), durationMin: 60, recurrence: null, seriesId: null, attendance: 'scheduled', programId: null, notes: '' });
+    await repos.progress.create({ clientId: demoClient.id, date: '2026-11-16', measurements: {}, photoIds: [], notes: '', source: 'trainer' });
+    await removeDemoData(db);
+    expect(await db.payments.where('clientId').equals(demoClient.id).count()).toBe(0);
+    expect(await db.sessions.where('clientId').equals(demoClient.id).count()).toBe(0);
+    expect(await db.progress.where('clientId').equals(demoClient.id).count()).toBe(0);
+  });
 });

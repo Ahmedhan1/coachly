@@ -116,6 +116,26 @@ describe('LicenseActivationService — short code', () => {
     expect(store.dump()[META_KEYS.token]).toBeUndefined();
   });
 
+  it('short code copied with invisible direction marks still activates', async () => {
+    const { service, fetchMock } = setup();
+    fetchMock.mockResolvedValue(json(200, { license: await token() }));
+    expect(await service.activate(`\u200F${CODE}\u200E`)).toMatchObject({ ok: true });
+  });
+
+  it('gives up when the server sends headers but the body stalls past the timeout', async () => {
+    const { service, fetchMock } = setup({ activateTimeoutMs: 30 });
+    fetchMock.mockImplementation(async (_url, init) => {
+      const body = new ReadableStream<Uint8Array>({
+        start(controller) {
+          controller.enqueue(new TextEncoder().encode('{"license":'));
+          init?.signal?.addEventListener('abort', () => controller.error(new DOMException('aborted', 'AbortError')));
+        },
+      });
+      return new Response(body, { status: 200 });
+    });
+    expect(await service.activate(CODE)).toEqual({ ok: false, error: 'offline' });
+  });
+
   it('does not touch the network when the device says it is offline', async () => {
     const { service, fetchMock } = setup({ isOnline: () => false });
     expect(await service.activate(CODE)).toEqual({ ok: false, error: 'offline' });
@@ -138,6 +158,8 @@ describe('LicenseActivationService — short code', () => {
     fetchMock.mockResolvedValue(new Response('oops', { status: 502 }));
     expect(await service.activate(CODE)).toEqual({ ok: false, error: 'unavailable' });
     fetchMock.mockResolvedValue(json(200, { nope: true }));
+    expect(await service.activate(CODE)).toEqual({ ok: false, error: 'unavailable' });
+    fetchMock.mockResolvedValue(new Response('<html>', { status: 200 }));
     expect(await service.activate(CODE)).toEqual({ ok: false, error: 'unavailable' });
   });
 
@@ -175,6 +197,19 @@ describe('LicenseActivationService — offline long code', () => {
     expect(result).toMatchObject({ ok: true, state: { status: 'active', expiresAt: null } });
     expect(fetchMock).not.toHaveBeenCalled();
     expect(store.dump()[META_KEYS.dataKey]).toBeUndefined();
+  });
+
+  it('activates a long code copied from an Arabic chat with invisible direction marks', async () => {
+    const { service } = setup();
+    const code = wrapOfflineCode(await token({ exp: null }));
+    const pasted = `\u200F\u2067${code.slice(0, 30)}\u200B${code.slice(30, 60)}\u200E\uFEFF${code.slice(60)}\u2069\u202C`;
+    expect(await service.activate(pasted)).toMatchObject({ ok: true, state: { status: 'active' } });
+  });
+
+  it('accepts the PT1. prefix typed in lower case (auto-correct), keeping the token itself exact', async () => {
+    const { service } = setup();
+    const code = wrapOfflineCode(await token({ exp: null }));
+    expect(await service.activate(`pt1.${code.slice(4)}`)).toMatchObject({ ok: true });
   });
 
   it('rejects a long code made for another device', async () => {

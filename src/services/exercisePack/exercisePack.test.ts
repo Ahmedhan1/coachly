@@ -118,4 +118,17 @@ describe('BrowserExercisePackService', () => {
     expect(await svc.offlineStatus(PACK)).toEqual({ totalFiles: 4, cachedFiles: 0, totalBytes: 400 });
     expect((await svc.downloadAll(PACK)).failedFiles).toBe(4);
   });
+
+  it('gives up on a photo whose request stalls, so the download always finishes', async () => {
+    const { d } = deps();
+    const stalled = '/exercise-pack/img/A-1.webp';
+    const base = d.fetch;
+    d.fetch = (url, init) =>
+      url === stalled
+        ? new Promise<Response>((_resolve, reject) => init?.signal?.addEventListener('abort', () => reject(new DOMException('aborted', 'AbortError'))))
+        : base(url, init);
+    const svc = new BrowserExercisePackService(d);
+    const result = await svc.downloadAll(PACK, { concurrency: 2, fileTimeoutMs: 30 });
+    expect(result).toMatchObject({ doneFiles: 3, failedFiles: 1, cancelled: false });
+  });
 });

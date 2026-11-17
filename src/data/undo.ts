@@ -1,6 +1,7 @@
 import type { AppDatabase } from './db';
 import type { Clock } from './clock';
-import type { EntityTableName } from './schema';
+import { cascadeRestore } from './clientCascade';
+import { TABLES, type EntityTableName } from './schema';
 
 export interface UndoneDelete {
   table: EntityTableName;
@@ -19,7 +20,9 @@ export async function undoLastDelete(db: AppDatabase, clock: Clock): Promise<Und
     const table = db.table<{ deletedAt: number | null; updatedAt: number }, string>(last.table);
     const row = await table.get(last.entityId);
     if (row && row.deletedAt !== null) {
-      await table.put({ ...row, deletedAt: null, updatedAt: clock() });
+      const now = clock();
+      if (last.table === TABLES.clients) await cascadeRestore(db, last.entityId, row.deletedAt, now);
+      await table.put({ ...row, deletedAt: null, updatedAt: now });
     }
     await db.deletions.delete(last.seq);
     return { table: last.table, entityId: last.entityId };

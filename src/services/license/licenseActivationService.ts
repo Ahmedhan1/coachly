@@ -42,6 +42,23 @@ function errorFor(reason: LicenseInvalidReason): ActivationError {
   }
 }
 
+/** Invisible format characters (bidi marks/isolates, zero-width, BOM) that Arabic chat apps add when copying. */
+const INVISIBLE = /[\u00AD\u061C\u200B-\u200F\u202A-\u202E\u2060-\u2069\uFEFF]/g;
+
+/** Cleans a pasted code before parsing: drops invisible marks and upper-cases the `PT1.` prefix only. */
+export function cleanPastedCode(input: string): string {
+  const visible = input.replace(INVISIBLE, '').replace(/\s+/g, '');
+  return /^pt1\./i.test(visible) ? `PT1.${visible.slice(4)}` : visible;
+}
+
+function parseJson(text: string): unknown {
+  try {
+    return JSON.parse(text) as unknown;
+  } catch {
+    return null;
+  }
+}
+
 const isRecord = (v: unknown): v is Record<string, unknown> => typeof v === 'object' && v !== null && !Array.isArray(v);
 
 /**
@@ -94,26 +111,32 @@ export class LicenseActivationService implements ActivationService {
   }
 
   async activate(input: string): Promise<ActivationResult> {
-    const offlineToken = unwrapOfflineCode(input);
+    const cleaned = cleanPastedCode(input);
+    const offlineToken = unwrapOfflineCode(cleaned);
     if (offlineToken !== null) return this.accept(offlineToken, null);
 
-    const code = normalizeShortCode(input);
+    const code = normalizeShortCode(cleaned);
     if (code === null) return { ok: false, error: 'malformed' };
     if (!this.d.workerUrl) return { ok: false, error: 'unavailable' };
     if (!this.d.isOnline()) return { ok: false, error: 'offline' };
 
-    let response: Response;
+    let reply: { ok: boolean; body: unknown };
     try {
-      response = await this.request('/api/activate', this.d.activateTimeoutMs, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ code, deviceId: await this.getDeviceId() }),
-      });
+      reply = await this.request(
+        '/api/activate',
+        this.d.activateTimeoutMs,
+        {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ code, deviceId: await this.getDeviceId() }),
+        },
+        async (res) => ({ ok: res.ok, body: parseJson(await res.text()) }),
+      );
     } catch {
       return { ok: false, error: 'offline' };
     }
-    const body = await response.json().catch(() => null);
-    if (!response.ok) {
+    const { body } = reply;
+    if (!reply.ok) {
       const error = isRecord(body) && typeof body.error === 'string' && SERVER_ERRORS.has(body.error) ? body.error : 'unavailable';
       return { ok: false, error: error as ActivationError };
     }
@@ -125,12 +148,12 @@ export class LicenseActivationService implements ActivationService {
     try {
       const token = await this.d.store.get(META_KEYS.token);
       if (typeof token !== 'string' || !this.d.workerUrl || !this.d.isOnline()) return null;
-      const response = await this.request('/api/license/status', this.d.statusTimeoutMs, {
-        method: 'GET',
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      if (!response.ok) return null;
-      const body: unknown = await response.json();
+      const body = await this.request(
+        '/api/license/status',
+        this.d.statusTimeoutMs,
+        { method: 'GET', headers: { Authorization: `Bearer ${token}` } },
+        async (res): Promise<unknown> => (res.ok ? res.json() : null),
+      );
       if (!isRecord(body) || typeof body.revoked !== 'boolean') return null;
       const wasRevoked = (await this.d.store.get(META_KEYS.revoked)) === true;
       if (body.revoked === wasRevoked) return null;
@@ -168,12 +191,14 @@ export class LicenseActivationService implements ActivationService {
     return typeof value === 'number' && Number.isFinite(value) ? new Date(value) : null;
   }
 
-  private async request(path: string, timeoutMs: number, init: RequestInit): Promise<Response> {
+  /** One request whose timeout also covers reading the body (a stalled body must not hang the UI). */
+  private async request<T>(path: string, timeoutMs: number, init: RequestInit, read: (res: Response) => Promise<T>): Promise<T> {
     const controller = new AbortController();
     const timer = setTimeout(() => controller.abort(), timeoutMs);
     try {
       const base = (this.d.workerUrl ?? '').replace(/\/+$/, '');
-      return await this.d.fetch(`${base}${path}`, { ...init, signal: controller.signal });
+      const res = await this.d.fetch(`${base}${path}`, { ...init, signal: controller.signal });
+      return await read(res);
     } finally {
       clearTimeout(timer);
     }

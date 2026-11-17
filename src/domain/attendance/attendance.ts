@@ -1,5 +1,6 @@
 import type { Attendance } from '../models/session';
 import { packageUsage, type AttendanceStatus, type AttendanceRecord } from '../schedule/packages';
+import { MAX_REMAINING_SESSIONS } from './renewal';
 
 /**
  * Bridges the stored session attendance (`scheduled | attended | missed | cancelled`) and the schedule
@@ -33,7 +34,7 @@ export function toggleMark(current: MarkStatus | null, tapped: MarkStatus): Mark
 }
 
 /** Storage limit of `Client.remainingSessions`. */
-const MAX_REMAINING = 1000;
+const MAX_REMAINING = MAX_REMAINING_SESSIONS;
 
 function usedBy(status: AttendanceStatus | null, consuming?: readonly AttendanceStatus[]): number {
   if (status === null) return 0;

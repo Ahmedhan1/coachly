@@ -31,6 +31,8 @@ export interface DownloadOptions {
   onProgress?: (progress: DownloadProgress) => void;
   /** Requests in flight (default 6). */
   concurrency?: number;
+  /** Per-photo timeout (default 30 s): a stalled request counts as failed instead of hanging the download. */
+  fileTimeoutMs?: number;
 }
 
 /** Loads the bundled exercise pack and manages its photos in Cache Storage. */

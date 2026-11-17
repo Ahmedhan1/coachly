@@ -1,5 +1,6 @@
 import { addDays, toIsoDate, type Client, type ClientId, type IsoDate } from '@/domain/models';
 import type { AppDatabase } from './db';
+import { CASCADE_TABLES } from './clientCascade';
 import { ENTITY_TABLES } from './schema';
 import type { Repositories } from './repositories';
 
@@ -106,12 +107,18 @@ export async function removeDemoData(db: AppDatabase): Promise<number> {
   return db.transaction('rw', db.tables, async () => {
     let removed = 0;
     const removedIds: string[] = [];
+    const demoClientIds = (await db.clients.filter((c) => c.demo).primaryKeys()) as string[];
     for (const name of ENTITY_TABLES) {
       const table = db.table<{ id: string; demo: boolean }, string>(name);
-      const ids = (await table.filter((r) => r.demo).primaryKeys()) as string[];
-      await table.bulkDelete(ids);
+      const ids = new Set((await table.filter((r) => r.demo).primaryKeys()) as string[]);
+      // Rows the trainer added to a demo client go with it, so nothing points at a removed client.
+      if (demoClientIds.length > 0 && (CASCADE_TABLES as readonly string[]).includes(name)) {
+        const owned = (await table.where('clientId').anyOf(demoClientIds).primaryKeys()) as string[];
+        for (const id of owned) ids.add(id);
+      }
+      await table.bulkDelete([...ids]);
       removedIds.push(...ids);
-      removed += ids.length;
+      removed += ids.size;
     }
     const imageIds = (await db.images.filter((i) => i.demo).primaryKeys()) as string[];
     await db.images.bulkDelete(imageIds);

@@ -42,6 +42,32 @@ export class WorkerApi {
   }
 
   async send(req: WorkerRequest): Promise<Result<Response, CloudError | 'not_activated'>> {
+    return this.exchange(req, async (res) => ok(res));
+  }
+
+  async json<T>(req: WorkerRequest): Promise<Result<T, CloudError | 'not_activated'>> {
+    return this.exchange(req, async (res) => {
+      const text = await res.text();
+      try {
+        return ok(JSON.parse(text) as T);
+      } catch {
+        return err('server');
+      }
+    });
+  }
+
+  async bytes(req: WorkerRequest): Promise<Result<Uint8Array, CloudError | 'not_activated'>> {
+    return this.exchange(req, async (res) => ok(new Uint8Array(await res.arrayBuffer())));
+  }
+
+  /**
+   * One request whose timeout covers the whole exchange, body included: a connection that delivers headers
+   * and then stalls must not hang a sync forever.
+   */
+  private async exchange<T>(
+    req: WorkerRequest,
+    read: (res: Response) => Promise<Result<T, CloudError>>,
+  ): Promise<Result<T, CloudError | 'not_activated'>> {
     if (!this.configured) return err('network');
     if (this.o.network && !this.o.network.isOnline()) return err('offline');
     const headers: Record<string, string> = { ...req.headers };
@@ -66,7 +92,7 @@ export class WorkerApi {
     }, this.o.timeoutMs ?? 10_000);
     try {
       const res = await this.fetchFn(this.url(req.path), { method: req.method, headers, body, signal: controller.signal, cache: 'no-store' });
-      if (res.ok) return ok(res);
+      if (res.ok) return await read(res);
       let code: string | null = null;
       try {
         const j = (await res.json()) as { error?: unknown };
@@ -79,26 +105,6 @@ export class WorkerApi {
       return err(timedOut ? 'timeout' : 'network');
     } finally {
       clearTimeout(timer);
-    }
-  }
-
-  async json<T>(req: WorkerRequest): Promise<Result<T, CloudError | 'not_activated'>> {
-    const r = await this.send(req);
-    if (!r.ok) return r;
-    try {
-      return ok((await r.value.json()) as T);
-    } catch {
-      return err('server');
-    }
-  }
-
-  async bytes(req: WorkerRequest): Promise<Result<Uint8Array, CloudError | 'not_activated'>> {
-    const r = await this.send(req);
-    if (!r.ok) return r;
-    try {
-      return ok(new Uint8Array(await r.value.arrayBuffer()));
-    } catch {
-      return err('network');
     }
   }
 }
