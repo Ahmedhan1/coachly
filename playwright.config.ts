@@ -1,8 +1,9 @@
 import { defineConfig, devices } from '@playwright/test';
 
-const PORT = 4319;
+/** Agents working in parallel set E2E_PORT / E2E_OUT so their servers and builds never collide. */
+const PORT = Number(process.env.E2E_PORT ?? 4319);
 /** e2e build lives under node_modules so git and eslint never see it. */
-const OUT_DIR = 'node_modules/.e2e-dist';
+const OUT_DIR = process.env.E2E_OUT ?? 'node_modules/.e2e-dist';
 
 /**
  * Runs against a production build (service worker included) served by `vite preview`.
