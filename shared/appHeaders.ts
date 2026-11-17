@@ -6,7 +6,7 @@
 // - style-src 'unsafe-inline': React `style` props are CSSOM (allowed anyway), but the PDF renderer builds pages
 //   as HTML strings with style="" attributes and one <style> element (src/services/pdf). Scripts stay strict.
 // - img-src data: blob:: photos and logos are object URLs; html-to-image snapshots PDF pages via data: SVG.
-// - connect-src https: blob: data:: the license Worker and api.anthropic.com (AI helper, browser-direct) are
+// - connect-src https: blob: data:: the license Worker and api.groq.com (AI assistant, browser-direct) are
 //   https, and the trainer's own webhook (n8n/Make) can be any https host, so hosts cannot be listed. blob:/data:
 //   because html-to-image fetches page images to inline them. Plain http and ws are still refused.
 // - worker-src/child-src blob:: three's DRACOLoader starts its decoder worker from a blob: URL (child-src is the

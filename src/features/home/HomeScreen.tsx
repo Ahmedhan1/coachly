@@ -2,18 +2,16 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useGo } from '@/app/nav';
 import { useServices } from '@/app/services';
-import { useLive } from '@/app/useLive';
 import type { FollowUpReason } from '@/domain/clientHub';
 import { bookUrl, clientUrl, sessionUrl } from '@/features/clients/hub/links';
-import { backupReminder } from '@/domain/backup/reminder';
-import { toIsoDate } from '@/domain/models';
+import { BackupReminderCard } from '@/features/storage/BackupReminderCard';
 import { useUiStore } from '@/app/uiStore';
 import { whatsappUrl } from '@/features/clients/contact';
 import { OutboxCard } from '@/features/outbox/OutboxCard';
 import { ActiveSessionBanner } from '@/features/session/ActiveSessionBanner';
 import { t } from '@/i18n';
 import { Avatar, Badge, Button, Icon, IconButton, ListRow, ListSection, Money, Num, PageHeader, SectionLink, Tx, cx } from '@/ui';
-import { formatIsoDate, formatLongDate, formatTime, timeParts } from '@/ui/format';
+import { formatLongDate, timeParts } from '@/ui/format';
 import type { AgendaItem, NextSession } from './homeModel';
 import { useHomeData, type HomeData } from './useHomeData';
 import styles from './HomeScreen.module.css';
@@ -41,7 +39,7 @@ export function HomeScreen() {
       <RestOfDay items={home.plan.rest} plans={home.sessionPlans} />
       <EndingSoon home={home} />
       <FollowUp home={home} />
-      <BackupLine now={home.now} />
+      <BackupReminderCard now={home.now} />
     </>
   );
 }
@@ -309,32 +307,3 @@ function FollowUp({ home }: { home: HomeData }) {
   );
 }
 
-function BackupLine({ now }: { now: Date }) {
-  const { backup } = useServices();
-  const status = useLive(async () => (backup ? backup.local.status() : null), [backup]);
-  if (status === undefined) return null;
-  const local = status?.lastLocalAt ?? null;
-  const cloud = status?.lastCloudAt ?? null;
-  const latest = Math.max(local ?? 0, cloud ?? 0) || null;
-  const reminder = backupReminder({ lastBackupAt: latest, firstUseAt: null, now });
-  const when = (ms: number) => `${formatIsoDate(toIsoDate(new Date(ms)))} ${formatTime(ms)}`;
-  return (
-    <ListSection title={t('home.lastBackup')}>
-      <ListRow
-        to="/more/settings/backup"
-        className={cx(styles.backupRow, reminder.due && styles.backupDue)}
-        leading={<Icon name={reminder.due ? 'alert' : 'cloudOk'} />}
-        title={latest === null ? t('home.noBackupYet') : when(latest)}
-        subtitle={
-          latest === null
-            ? t('home.backupHint')
-            : reminder.due
-              ? t('home.backupDue', { n: reminder.daysSince ?? 0 })
-              : cloud !== null && cloud === latest
-                ? t('home.backupCloud')
-                : t('home.backupLocal')
-        }
-      />
-    </ListSection>
-  );
-}

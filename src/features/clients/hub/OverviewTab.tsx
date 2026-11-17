@@ -1,7 +1,7 @@
 import type { Client, Session } from '@/domain/models';
 import { t } from '@/i18n';
 import { Icon, ListRow, ListSection, Money, Num, Tx, type IconName } from '@/ui';
-import { formatIsoDate, timeParts } from '@/ui/format';
+import { formatIsoDate, formatMoney, timeParts } from '@/ui/format';
 import { toIsoDate } from '@/domain/models';
 import { programDayName } from '@/features/programs/names';
 import { InjuriesSection, MeasurementsSection, PackageSection } from './sections';
@@ -106,11 +106,7 @@ export function OverviewTab({ client, hub, actions, go }: { client: Client; hub:
         <ListRow
           leading={<Icon name="wallet" />}
           title={
-            overview.owedMinor > 0 ? (
-              <Tx k="hub.overview.owed" params={{ amount: <Money minor={overview.owedMinor} currency={hub.currency} className={base.amount} /> }} />
-            ) : (
-              t('hub.overview.settled')
-            )
+            overview.owedMinor > 0 ? t('schedule.pay.balance', { amount: formatMoney(overview.owedMinor, hub.currency) }) : t('hub.overview.settled')
           }
           subtitle={
             overview.overdueMinor > 0 ? (

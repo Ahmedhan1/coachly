@@ -54,6 +54,7 @@ export function SettingsScreen() {
       </ListSection>
       <ListSection title={t('settings.page.backupTitle')}>
         <ListRow to="/more/settings/backup" leading={<Icon name="database" />} title={t('settings.backup.title')} subtitle={t('settings.backup.hint')} />
+        <ListRow to="/more/settings/storage" leading={<Icon name="database" />} title={t('storage.screen.title')} subtitle={t('storage.screen.hint')} />
       </ListSection>
       <ListSection title={t('settings.page.online')}>
         <ListRow to="/more/settings/notifications" leading={<Icon name="clock" />} title={t('settings.notifications.title')} subtitle={t('settings.notifications.hint')} />

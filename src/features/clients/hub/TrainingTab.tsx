@@ -5,7 +5,7 @@ import { displayReps, kgToUnit } from '@/domain/programs';
 import { t } from '@/i18n';
 import { Badge, Button, Icon, ListRow, ListSection, Num, Tx, cx } from '@/ui';
 import { formatNumber } from '@/ui/format';
-import type { ExerciseCatalog } from '@/features/programs/catalog';
+import { useExerciseCatalog } from '@/features/programs/catalog';
 import { exerciseName, programDayName } from '@/features/programs/names';
 import { programUrl, sessionUrl } from './links';
 import type { HubData } from './useHubData';
@@ -14,7 +14,6 @@ import styles from './Hub.module.css';
 export interface TrainingTabProps {
   client: Client;
   hub: HubData;
-  catalog: ExerciseCatalog | null | undefined;
   scheduleId: string | null;
   go: (to: string) => void;
   onChooseProgram: () => void;
@@ -25,13 +24,17 @@ export interface TrainingTabProps {
 
 const HISTORY_STEP = 12;
 
+const daysLabel = (n: number) => (n === 1 ? t('training.programs.oneDay') : t('training.programs.days', { n }));
+
 function TrendText({ trend }: { trend: Trend | null }) {
   if (!trend) return null;
   return <span className={cx(styles.trend, trend === 'up' && styles.upTrend, trend === 'down' && styles.downTrend)}>{t(`hub.training.trend.${trend}`)}</span>;
 }
 
-export function TrainingTab({ client, hub, catalog, scheduleId, go, onChooseProgram, onNewProgram, onMakeActive, onOpenExercise }: TrainingTabProps) {
+export function TrainingTab({ client, hub, scheduleId, go, onChooseProgram, onNewProgram, onMakeActive, onOpenExercise }: TrainingTabProps) {
   const program = hub.programs.active;
+  // The exercise pack is big: it is read only when this tab opens, not with the client screen.
+  const catalog = useExerciseCatalog();
   const byId = catalog?.byId;
   const name = (id: string) => exerciseName(byId?.get(id), id);
   const [open, setOpen] = useState<ReadonlySet<string>>(() => new Set(hub.nextDay ? [hub.nextDay.dayId] : []));
@@ -61,7 +64,7 @@ export function TrainingTab({ client, hub, catalog, scheduleId, go, onChooseProg
           <ListRow
             leading={<Icon name="list" />}
             title={program.name}
-            subtitle={t('training.programs.days', { n: program.days.length })}
+            subtitle={daysLabel(program.days.length)}
             to={programUrl(program.id)}
           />
           <ol className={styles.dayItems} aria-label={t('hub.training.days')}>
@@ -133,7 +136,7 @@ export function TrainingTab({ client, hub, catalog, scheduleId, go, onChooseProg
         <ListSection title={t('hub.training.past')} count={hub.programs.past.length}>
           {hub.programs.past.map((p) => (
             <div key={p.id} className={styles.splitRow}>
-              <ListRow leading={<Icon name="list" />} title={p.name} subtitle={t('training.programs.days', { n: p.days.length })} to={programUrl(p.id)} className={styles.splitMain} />
+              <ListRow leading={<Icon name="list" />} title={p.name} subtitle={daysLabel(p.days.length)} to={programUrl(p.id)} className={styles.splitMain} />
               <Button size="small" variant="secondary" className={styles.splitAction} aria-label={t('hub.training.makeActiveFor', { name: p.name })} onClick={() => onMakeActive(p)}>
                 {t('hub.training.makeActive')}
               </Button>
@@ -144,7 +147,7 @@ export function TrainingTab({ client, hub, catalog, scheduleId, go, onChooseProg
 
       <ListSection title={t('hub.training.history')} count={history.length || undefined}>
         {history.length === 0 ? (
-          <ListRow leading={<Icon name="dumbbell" />} title={t('hub.training.historyEmpty')} />
+          <p className={styles.emptyTile}>{t('hub.training.historyEmpty')}</p>
         ) : (
           history.slice(0, historyShown).map((h) => (
             <ListRow

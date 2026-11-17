@@ -20,7 +20,7 @@ export function ProgramChooserSheet({ client, activeId, onClose, onPick }: { cli
   const own = programs.filter((p) => !p.isTemplate && p.clientId === client.id && p.id !== activeId);
   const sub = (days: ReadonlyArray<{ items: readonly unknown[] }>) => (
     <>
-      {t('training.programs.days', { n: days.length })} · <Tx k="training.programs.exercisesCount" params={{ n: exercisesIn(days) }} />
+      {days.length === 1 ? t('training.programs.oneDay') : t('training.programs.days', { n: days.length })} · <Tx k="training.programs.exercisesCount" params={{ n: exercisesIn(days) }} />
     </>
   );
   const row = (p: Program, choice: ProgramChoice) => <ListRow key={p.id} leading={<Icon name="list" />} title={p.name} subtitle={sub(p.days)} onClick={() => onPick(choice)} />;

@@ -4,11 +4,12 @@ import { kgToUnit } from '@/domain/programs';
 import { t } from '@/i18n';
 import { Button, LineChart, Num, Sheet, Tx, cx } from '@/ui';
 import { formatIsoDate, formatNumber } from '@/ui/format';
+import { useExerciseCatalog } from '@/features/programs/catalog';
+import { exerciseName } from '@/features/programs/names';
 import styles from './Hub.module.css';
 
 export interface ExerciseHistorySheetProps {
   exerciseId: string;
-  name: string;
   logs: readonly WorkoutLog[];
   unit: 'kg' | 'lb';
   onClose: () => void;
@@ -16,7 +17,9 @@ export interface ExerciseHistorySheetProps {
 }
 
 /** One client's history of one exercise: best 1RM and weight, the 1RM trend, and every session's sets. */
-export function ExerciseHistorySheet({ exerciseId, name, logs, unit, onClose, onOpenDetail }: ExerciseHistorySheetProps) {
+export function ExerciseHistorySheet({ exerciseId, logs, unit, onClose, onOpenDetail }: ExerciseHistorySheetProps) {
+  const catalog = useExerciseCatalog();
+  const name = exerciseName(catalog?.byId.get(exerciseId), exerciseId);
   const h = exerciseHistory(logs, exerciseId);
   const unitLabel = t(`training.session.units.${unit}`);
   const shown = (kg: number) => formatNumber(Math.round(kgToUnit(kg, unit) * 10) / 10);

@@ -24,7 +24,6 @@ condition or risk to manage · **RED** = do not ship.
 
 | Package | Version | License | Verified | Verdict |
 | --- | --- | --- | --- | --- |
-| @anthropic-ai/sdk | 1.9.0 | Apache-2.0 | installed (LICENSE: Apache License 2.0) | OK — optional AI assistant, loaded only when used |
 | @noble/ed25519 | 3.2.0 | MIT | installed (LICENSE: "The MIT License (MIT)") | OK |
 | dexie | 4.4.7 | Apache-2.0 | installed (LICENSE: Apache License) | OK — keep NOTICE/attribution in "About" |
 | dexie-react-hooks | 4.4.0 | Apache-2.0 | installed | OK |

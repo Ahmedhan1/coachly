@@ -16,7 +16,6 @@ export const hub = {
     upcomingCount: '{n} حصة محجوزة',
     lastSession: 'آخر حصة حضرها',
     neverAttended: 'لسه ما حضرش',
-    owed: 'عليه {amount}',
     overdue: 'منهم {amount} متأخرين',
     settled: 'مفيش فلوس عليه',
     lastCheckIn: 'آخر متابعة',

@@ -226,10 +226,13 @@ it differs.
 
 ## Optional extras (off by default)
 
-- **AI assistant.** The trainer's own Anthropic API key is stored on the phone only (meta key `backup.ai.apiKey`,
-  device-local: never inside a backup file or sent to our Worker). A draft request goes from the phone straight to
-  `api.anthropic.com` and carries the client's goal, sex, age, injuries and measurements and the trainer's notes —
-  never the client's name or phone. Every draft is saved as an editable program/meal day for the trainer to review.
+- **AI assistant (Groq).** The trainer's own free Groq API key is stored on the phone only (meta key
+  `backup.ai.apiKey`, device-local: never inside a backup file). A request goes from the phone straight to
+  `api.groq.com`; only if the browser cannot reach it (network/CORS error) does it retry through our Worker relay
+  `POST /api/ai/relay`, which requires a valid license token, forwards the key in `X-Groq-Key` without logging or
+  storing it, caps the body at 64 KB and rate-limits per license. Read tools send first names only, never phone
+  numbers. The assistant only proposes changes: every write is shown as an approval card and runs only when the
+  trainer taps «نفّذ», with undo. A filter blocks supplement doses in any AI output.
 - **Webhook.** When the trainer turns it on, the phone POSTs JSON to the trainer's own HTTPS address (n8n, Make) for
   "new client" and "subscription ending". This payload includes the client's name and phone, because that is what such
   automations need; the setting says so plainly. Nothing goes through our Worker.
