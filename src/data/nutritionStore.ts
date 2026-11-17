@@ -13,7 +13,7 @@ import {
 } from '@/domain/meals';
 import { DEFAULT_CURRENCY } from '@/domain/models';
 import type { Repositories } from './repositories';
-import { STARTER_FOOD_VERSION, STARTER_RECIPE_VERSION, starterIngredients, starterRecipes, starterSupplements } from './seeds/starter';
+import { STARTER_FOOD_VERSION, STARTER_RECIPE_VERSION, starterFoodRenames, starterIngredients, starterRecipes, starterSupplements, type StarterRecipe } from './seeds/starter';
 
 /**
  * Nutrition, supplements and progress data that has no column in the entity tables lives in the `meta`
@@ -30,6 +30,10 @@ export const NUTRITION_KEYS = {
   foodsVersion: 'nutrition.foodsVersion',
   recipesVersion: 'nutrition.recipesVersion',
   starterRecipeKeys: 'nutrition.starterRecipeKeys',
+  /** Starter recipe id → shipped key, so later data versions can refresh untouched starter recipes. */
+  starterRecipeKeyById: 'nutrition.starterRecipeKeyById',
+  /** Data version whose tags / English / steps were last applied to untouched starter recipes. */
+  recipesRefreshed: 'nutrition.recipesRefreshedVersion',
   ingredients: 'nutrition.ingredients',
   removedIngredients: 'nutrition.removedIngredients',
   favourites: 'nutrition.favouriteRecipes',
@@ -55,6 +59,23 @@ export const entryPhotoSchema = z.object({ imageId: z.string().min(1), thumbId: 
 export type EntryPhoto = z.infer<typeof entryPhotoSchema>;
 
 const idList = z.array(z.string());
+const keyById = z.record(z.string(), z.string());
+
+/** The stored fields of a starter recipe (English name and steps only when shipped). */
+function starterRecipeFields(r: StarterRecipe) {
+  return {
+    name: r.name,
+    ...(r.nameEn ? { nameEn: r.nameEn } : {}),
+    servings: r.servings,
+    ingredients: r.ingredients,
+    instructions: r.instructions,
+    ...(r.instructionsEn ? { instructionsEn: r.instructionsEn } : {}),
+    tags: r.tags,
+  };
+}
+
+const samePortions = (a: readonly { label: string; grams: number }[], b: readonly { label: string; grams: number }[]) =>
+  a.length === b.length && a.every((p, i) => p.label === b[i]?.label && p.grams === b[i]?.grams);
 
 function parseOr<T>(schema: z.ZodType<T>, raw: unknown, fallback: T): T {
   const r = schema.safeParse(raw);
@@ -183,17 +204,24 @@ export class NutritionStore {
     const shipped = new Map(starterIngredients().map((i) => [i.id, i]));
     const ids = new Set(current.map((i) => i.id));
     const removed = new Set(parseOr(idList, await this.kv.get(NUTRITION_KEYS.removedIngredients), []));
+    const renames = starterFoodRenames();
     const enriched = current.map((row) => {
       const fresh = shipped.get(row.id);
       if (!fresh) return row;
       const per100g = { ...row.per100g };
       if (per100g.fiberG === undefined && fresh.per100g.fiberG !== undefined) per100g.fiberG = fresh.per100g.fiberG;
+      // Portions the trainer never changed take the shipped ones (they now carry English labels).
+      const portions = row.portions === undefined || (fresh.portions !== undefined && samePortions(row.portions, fresh.portions)) ? fresh.portions : row.portions;
       return {
         ...row,
+        // A shipped name that changed (e.g. now says "raw") follows only if the trainer kept the old one.
+        ...(renames[row.id] !== undefined && row.name === renames[row.id] ? { name: fresh.name } : {}),
         per100g,
+        ...(row.nameEn === undefined && fresh.nameEn !== undefined ? { nameEn: fresh.nameEn } : {}),
         ...(row.category === undefined && fresh.category !== undefined ? { category: fresh.category } : {}),
-        ...(row.portions === undefined && fresh.portions !== undefined ? { portions: fresh.portions } : {}),
+        ...(portions !== undefined ? { portions } : {}),
         ...(row.icon === undefined && fresh.icon !== undefined ? { icon: fresh.icon } : {}),
+        ...(row.unitG === undefined && fresh.unitG !== undefined ? { unitG: fresh.unitG, ...(fresh.unitHalf ? { unitHalf: true } : {}) } : {}),
       };
     });
     const missing = [...shipped.values()].filter((i) => !ids.has(i.id) && !removed.has(i.id));
@@ -211,15 +239,39 @@ export class NutritionStore {
     const all = starterRecipes();
     const known = new Set(parseOr(idList, await this.kv.get(NUTRITION_KEYS.starterRecipeKeys), all.filter((r) => r.since <= 1).map((r) => r.key)));
     const ids = await this.getStarterRecipeIds();
+    const keys = parseOr(keyById, await this.kv.get(NUTRITION_KEYS.starterRecipeKeyById), {});
+    await this.refreshStarterRecipes(all, ids, keys);
     for (const r of all) {
       if (known.has(r.key)) continue;
-      const created = await this.repos.recipes.create({ name: r.name, servings: r.servings, ingredients: r.ingredients, instructions: r.instructions, imageId: null, tags: r.tags });
+      const created = await this.repos.recipes.create({ ...starterRecipeFields(r), imageId: null });
       ids.push(created.id);
+      keys[created.id] = r.key;
       known.add(r.key);
     }
     await this.kv.set(NUTRITION_KEYS.starterRecipes, ids);
+    await this.kv.set(NUTRITION_KEYS.starterRecipeKeyById, keys);
     await this.kv.set(NUTRITION_KEYS.starterRecipeKeys, [...known]);
     await this.kv.set(NUTRITION_KEYS.recipesVersion, STARTER_RECIPE_VERSION);
+  }
+
+  /**
+   * Brings untouched starter recipes (still listed as starter, i.e. never edited) up to the shipped data: meal
+   * slot tags, English name and steps, ingredient names. Older installs have no id → key map, so recipes are
+   * matched by their (unique) shipped name. Edited recipes are the trainer's own and are never touched.
+   */
+  private async refreshStarterRecipes(all: readonly StarterRecipe[], ids: readonly string[], keys: Record<string, string>): Promise<void> {
+    if ((await this.kv.get(NUTRITION_KEYS.recipesRefreshed)) === STARTER_RECIPE_VERSION) return;
+    const byKey = new Map(all.map((r) => [r.key, r]));
+    const byName = new Map(all.map((r) => [r.name, r]));
+    for (const id of ids) {
+      const stored = await this.repos.recipes.get(id);
+      if (!stored) continue;
+      const shipped = (keys[id] !== undefined ? byKey.get(keys[id]) : undefined) ?? byName.get(stored.name);
+      if (!shipped) continue;
+      keys[id] = shipped.key;
+      await this.repos.recipes.update(id, starterRecipeFields(shipped));
+    }
+    await this.kv.set(NUTRITION_KEYS.recipesRefreshed, STARTER_RECIPE_VERSION);
   }
 
   /** Remembers a starter row the trainer deleted, so a later app version does not bring it back. */
@@ -238,17 +290,12 @@ export class NutritionStore {
     if ((await this.kv.get(NUTRITION_KEYS.ingredients)) === undefined) await this.saveIngredients(table);
     const recipeIds: string[] = [];
     const recipeKeys: string[] = [];
+    const keyMap: Record<string, string> = {};
     for (const r of starterRecipes(table)) {
-      const created = await this.repos.recipes.create({
-        name: r.name,
-        servings: r.servings,
-        ingredients: r.ingredients,
-        instructions: r.instructions,
-        imageId: null,
-        tags: r.tags,
-      });
+      const created = await this.repos.recipes.create({ ...starterRecipeFields(r), imageId: null });
       recipeIds.push(created.id);
       recipeKeys.push(r.key);
+      keyMap[created.id] = r.key;
     }
     const settings = await this.repos.settings.get();
     const supplementIds: string[] = [];
@@ -266,7 +313,9 @@ export class NutritionStore {
     }
     await this.kv.set(NUTRITION_KEYS.starterRecipes, recipeIds);
     await this.kv.set(NUTRITION_KEYS.starterRecipeKeys, recipeKeys);
+    await this.kv.set(NUTRITION_KEYS.starterRecipeKeyById, keyMap);
     await this.kv.set(NUTRITION_KEYS.recipesVersion, STARTER_RECIPE_VERSION);
+    await this.kv.set(NUTRITION_KEYS.recipesRefreshed, STARTER_RECIPE_VERSION);
     await this.kv.set(NUTRITION_KEYS.foodsVersion, STARTER_FOOD_VERSION);
     await this.kv.set(NUTRITION_KEYS.starterSupplements, supplementIds);
     await this.kv.set(NUTRITION_KEYS.starterSeeded, Date.now());

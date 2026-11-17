@@ -80,6 +80,7 @@ export function useCatalog(): CatalogState {
       return {
         id: e.id,
         defaultNameAr: e.nameAr,
+        defaultNameEn: e.nameEn,
         primaryMuscles: e.primaryMuscles,
         secondaryMuscles: e.secondaryMuscles,
         equipment: e.equipment,

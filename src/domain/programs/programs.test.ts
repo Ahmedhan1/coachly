@@ -3,6 +3,7 @@ import { describe, expect, it } from 'vitest';
 import { catalogById, catalogFromPack, type ExercisePack } from '../exercises';
 import { programSchema, type ExerciseId, type ProgramDay, type ProgramItem } from '../models';
 import {
+  localizeTemplateDayName,
   BUILTIN_TEMPLATES,
   addDay,
   addItem,
@@ -229,5 +230,18 @@ describe('muscle volume', () => {
   });
   it('day primary muscles', () => {
     expect(dayPrimaryMuscles(ppl.days[2]!, catalog)[0]).toBe('quads');
+  });
+});
+
+describe('localizeTemplateDayName', () => {
+  const labels = { ar: { full: 'فول بادي', push: 'بوش' }, en: { full: 'Full Body', push: 'Push' } };
+  it('shows a stored template day name in the app language, either way', () => {
+    expect(localizeTemplateDayName('فول بادي', labels, 'en')).toBe('Full Body');
+    expect(localizeTemplateDayName('Push', labels, 'ar')).toBe('بوش');
+    expect(localizeTemplateDayName('فول بادي', labels, 'ar')).toBe('فول بادي');
+  });
+  it("keeps the trainer's own day names", () => {
+    expect(localizeTemplateDayName('يوم الرجل', labels, 'en')).toBe('يوم الرجل');
+    expect(localizeTemplateDayName('', labels, 'en')).toBe('');
   });
 });

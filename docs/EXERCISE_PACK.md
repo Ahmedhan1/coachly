@@ -30,7 +30,17 @@ dataset at all), `exercises.json` 288 KB + images 21.1 MB = **21.4 MB** total. A
 ```sh
 node scripts/build-exercise-pack.mjs            # download (resumable) + encode + manifest
 node scripts/build-exercise-pack.mjs --offline  # rebuild from the local cache only, no network
+node scripts/build-exercise-pack.mjs --manifest-only  # rewrite exercises.json only (names, cues, English)
 ```
+
+`--manifest-only` rebuilds `exercises.json` from the `data-src/` files and keeps the image list, image settings
+and `imageBytes` of the existing manifest. It never downloads, encodes or deletes images, so image paths and
+sizes stay exactly the same. Use it after editing names or cues.
+
+English data (shown when the app language is English): `en` is the dataset name cleaned by
+`cleanEnglishName()` (src/domain/exercises/pack.ts), overridden by `data-src/exercise-names.en.json`;
+`cuesEn` comes from `data-src/exercise-cues.en.json` (same count as the Arabic cues). Flags: `--names-en`,
+`--cues-en`.
 
 Options: `--size 480 --quality 60 --format webp|jpeg --concurrency 8 --retries 3 --limit N --budget-mb 40`.
 

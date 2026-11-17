@@ -14,4 +14,10 @@ export const exercises: EnArea<'exercises'> = {
     clientsPrograms: 'In program: {programs}',
     alternativesHint: 'Same primary muscle; closest movement and equipment first.',
   },
+  names: {
+    nameAr: 'Arabic name',
+    nameEn: 'English name (optional)',
+    nameEnHint: 'Shown when the app language is English.',
+    nameEnDefault: 'Leave empty for the original name: {name}',
+  },
 };

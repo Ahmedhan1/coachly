@@ -1,4 +1,4 @@
-import { dayTotals, type PerServingLookup, type PlanMeal } from './totals';
+import { dayTotals, type PerServingLookup, type PlanItem, type PlanItemLine, type PlanMeal } from './totals';
 
 /** Servings are rounded to quarters so portions stay practical ("1¼ حصة"). */
 const roundQuarter = (n: number) => Math.round(n * 4) / 4;
@@ -27,9 +27,25 @@ export function scaleDayToTarget<M extends PlanMeal>(
   const factor = Math.min(opts.maxFactor ?? 3, Math.max(opts.minFactor ?? 0.25, targetKcal / before));
   const scaled = meals.map((m) => ({
     ...m,
-    items: m.items.map((it) => (it.recipeId && lookup.has(it.recipeId) ? { ...it, servings: Math.max(0.25, roundQuarter(it.servings * factor)) } : it)),
+    items: m.items.map((it) => {
+      if (it.lines && it.lines.length > 0) return scaleLines(it, factor);
+      return it.recipeId && lookup.has(it.recipeId) ? { ...it, servings: Math.max(0.25, roundQuarter(it.servings * factor)) } : it;
+    }),
   }));
   return { meals: scaled, factor, beforeKcal: before, afterKcal: dayTotals(scaled, lookup).totals.kcal };
+}
+
+/** Scales an item's gram lines (5 g steps, never zero) and its servings; values follow the grams. */
+function scaleLines<I extends PlanItem>(item: I, factor: number): I {
+  const lines = (item.lines ?? []).map((l): PlanItemLine => {
+    const grams = Math.max(1, Math.round((l.grams * factor) / (l.grams >= 20 ? 5 : 1)) * (l.grams >= 20 ? 5 : 1));
+    const k = l.grams > 0 ? grams / l.grams : 0;
+    const next: PlanItemLine & { units?: number } = { ...l, grams, kcal: Math.round(l.kcal * k), proteinG: Math.round(l.proteinG * k), carbG: Math.round(l.carbG * k), fatG: Math.round(l.fatG * k) };
+    // A unit count (2 eggs) no longer matches scaled grams.
+    delete next.units;
+    return next;
+  });
+  return { ...item, lines, servings: Math.min(20, Math.max(0.01, Math.round(item.servings * factor * 100) / 100)) };
 }
 
 export interface ShoppingRecipe {
@@ -58,6 +74,14 @@ export function shoppingList(
   for (const plan of plans) {
     for (const meal of plan.meals) {
       for (const item of meal.items) {
+        if (item.lines && item.lines.length > 0) {
+          for (const l of item.lines) {
+            const key = `${l.name}|g`;
+            const prev = totals.get(key);
+            totals.set(key, { name: l.name, unit: 'g', quantity: (prev?.quantity ?? 0) + l.grams * repeat });
+          }
+          continue;
+        }
         const recipe = item.recipeId ? recipes.get(item.recipeId) : undefined;
         if (!recipe) {
           const text = item.text.trim();

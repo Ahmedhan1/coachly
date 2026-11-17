@@ -26,8 +26,11 @@ describe('starter recipe data', () => {
       const { kcal, proteinG, carbG, fatG } = i.per100g;
       expect(proteinG + carbG + fatG, i.id).toBeLessThanOrEqual(100);
       const atwater = proteinG * 4 + carbG * 4 + fatG * 9;
+      // Label carbs include fibre (about 2 kcal/g, not 4): very fibrous foods (spices) are checked that way.
+      const fibre = i.per100g.fiberG ?? 0;
+      const fibreAware = proteinG * 4 + Math.max(0, carbG - fibre) * 4 + fibre * 2 + fatG * 9;
       // fibre and rounding make labels differ from Atwater; a large gap means a typo
-      expect(Math.abs(atwater - kcal), i.id).toBeLessThanOrEqual(Math.max(25, kcal * 0.2));
+      expect(Math.min(Math.abs(atwater - kcal), Math.abs(fibreAware - kcal)), i.id).toBeLessThanOrEqual(Math.max(25, kcal * 0.2));
     }
   });
 

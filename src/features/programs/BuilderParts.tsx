@@ -1,5 +1,6 @@
 import type { CatalogExercise } from '@/domain/exercises';
 import { muscleName } from '@/features/exercises/localized';
+import { dayLabel } from './names';
 import type { ProgramDay } from '@/domain/models';
 import { dayMuscleLoad, estimateDayMinutes, totalSets, weeklySetsPerMuscle, type ProgramBody } from '@/domain/programs';
 import { t } from '@/i18n';
@@ -29,7 +30,7 @@ export function DayPills({
           onClick={() => onSelect(d.id)}
         >
           <b className="num">{i + 1}</b>
-          {d.name || t('training.programs.builder.dayDefault', { n: i + 1 })}
+          {dayLabel(d.name) || t('training.programs.builder.dayDefault', { n: i + 1 })}
         </button>
       ))}
       {days.length < 14 && (
@@ -48,7 +49,7 @@ export function DayTile({ day, index, catalog }: { day: ProgramDay; index: numbe
   return (
     <section className={styles.dayTile} aria-label={t('training.programs.builder.muscles')}>
       <div className={styles.dayText}>
-        <h2 className={styles.dayName}>{day.name || t('training.programs.builder.dayDefault', { n: index + 1 })}</h2>
+        <h2 className={styles.dayName}>{dayLabel(day.name) || t('training.programs.builder.dayDefault', { n: index + 1 })}</h2>
         <p className={styles.dayStats}>
           <Tx
             k="training.programs.builder.dayStats"

@@ -30,6 +30,7 @@ export function AddExerciseSheet({ onClose, initialMuscle }: { onClose: () => vo
   const showToast = useUiStore((s) => s.showToast);
   const photos = usePhotoDrafts();
   const [name, setName] = useState('');
+  const [nameEn, setNameEn] = useState('');
   const [primary, setPrimary] = useState<MuscleGroupId[]>(initialMuscle ? [initialMuscle] : []);
   const [secondary, setSecondary] = useState<MuscleGroupId[]>([]);
   const [equipment, setEquipment] = useState<EquipmentId>('body_only');
@@ -48,7 +49,7 @@ export function AddExerciseSheet({ onClose, initialMuscle }: { onClose: () => vo
     setSaving(true);
     try {
       const imageIds = await photos.save(photos.drafts);
-      const id = await store.createCustom({ nameAr: name, primaryMuscles: primary, secondaryMuscles: secondary, equipment, level, imageIds });
+      const id = await store.createCustom({ nameAr: name, nameEn, primaryMuscles: primary, secondaryMuscles: secondary, equipment, level, imageIds });
       onClose();
       showToast({ message: t('training.library.add.saved', { name: name.trim() }) });
       navigate(`/exercises/${encodeURIComponent(id)}`);
@@ -85,6 +86,16 @@ export function AddExerciseSheet({ onClose, initialMuscle }: { onClose: () => vo
           autoComplete="off"
           enterKeyHint="done"
           required
+        />
+        <TextField
+          label={t('exercises.names.nameEn')}
+          hint={t('exercises.names.nameEnHint')}
+          value={nameEn}
+          ltr
+          lang="en"
+          onChange={(e) => setNameEn(e.target.value)}
+          autoComplete="off"
+          enterKeyHint="done"
         />
         <ChipGroup label={t('training.library.add.primary')}>
           {MUSCLE_GROUPS.map((g) => (

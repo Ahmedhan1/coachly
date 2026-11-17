@@ -160,3 +160,22 @@ export function instantiateTemplate(
 export function templateExerciseIds(): string[] {
   return [...new Set(BUILTIN_TEMPLATES.flatMap((tpl) => tpl.days.flatMap((d) => d.items.map((i) => i.exerciseId))))];
 }
+
+/**
+ * A day name stored when a ready template was used ("فول بادي" or "Full Body") shown in the app language.
+ * `labels` maps each language to its template day labels (key → label); names the trainer typed stay as typed.
+ */
+export function localizeTemplateDayName(
+  name: string,
+  labels: Readonly<Record<string, Readonly<Record<string, string>> | undefined>>,
+  locale: string,
+): string {
+  const trimmed = name.trim();
+  if (trimmed === '') return name;
+  for (const set of Object.values(labels)) {
+    if (set === undefined) continue;
+    const key = Object.keys(set).find((k) => set[k] === trimmed);
+    if (key !== undefined) return labels[locale]?.[key] ?? name;
+  }
+  return name;
+}

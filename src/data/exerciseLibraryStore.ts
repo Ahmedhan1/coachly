@@ -28,6 +28,8 @@ export interface LibraryChanges {
 
 export interface NewCustomExercise {
   nameAr: string;
+  /** Optional English name (shown when the app language is English). */
+  nameEn?: string;
   primaryMuscles: readonly MuscleGroupId[];
   secondaryMuscles: readonly MuscleGroupId[];
   equipment: EquipmentId;
@@ -39,6 +41,8 @@ export interface NewCustomExercise {
 export interface BuiltinRef {
   id: string;
   defaultNameAr: string;
+  /** The pack's English name (shown as the placeholder of the English-name field). */
+  defaultNameEn?: string;
   primaryMuscles: readonly MuscleGroupId[];
   secondaryMuscles: readonly MuscleGroupId[];
   equipment: EquipmentId;
@@ -72,7 +76,15 @@ export class ExerciseLibraryStore {
       if (catalogId === null) continue;
       if (row.favorite) favourites.add(catalogId);
       if (row.source === 'custom') custom.push(rowToCustom(row));
-      else overrides.push({ exerciseId: catalogId, nameAr: row.name, imageIds: row.imageIds, hidden: hidden.has(catalogId) });
+      else {
+        overrides.push({
+          exerciseId: catalogId,
+          nameAr: row.name,
+          ...(row.nameEn ? { nameEn: row.nameEn } : {}),
+          imageIds: row.imageIds,
+          hidden: hidden.has(catalogId),
+        });
+      }
     }
     for (const id of hidden) {
       if (!overrides.some((o) => o.exerciseId === id)) overrides.push({ exerciseId: id, hidden: true });
@@ -85,6 +97,7 @@ export class ExerciseLibraryStore {
       source: 'custom',
       builtinRef: null,
       name: input.nameAr,
+      ...(input.nameEn?.trim() ? { nameEn: input.nameEn.trim() } : {}),
       primaryMuscles: [...input.primaryMuscles],
       secondaryMuscles: input.secondaryMuscles.filter((m) => !input.primaryMuscles.includes(m)),
       equipment: input.equipment,
@@ -112,6 +125,12 @@ export class ExerciseLibraryStore {
     await this.patch(catalogId, builtin, { name });
   }
 
+  /** The trainer's English name, kept next to the Arabic one. Empty / whitespace clears it. */
+  async setEnglishName(catalogId: string, builtin: BuiltinRef | null, nameEn: string): Promise<void> {
+    const name = nameEn.trim();
+    await this.patch(catalogId, builtin, { nameEn: name === '' ? undefined : name });
+  }
+
   /** Empty list restores the pack photos (built-in) or removes the photos (custom). */
   async setPhotos(catalogId: string, builtin: BuiltinRef | null, imageIds: readonly string[]): Promise<void> {
     await this.patch(catalogId, builtin, { imageIds: [...imageIds] as ImageId[] });
@@ -133,7 +152,7 @@ export class ExerciseLibraryStore {
   private async patch(
     catalogId: string,
     builtin: BuiltinRef | null,
-    patch: Partial<Pick<Exercise, 'name' | 'favorite' | 'imageIds'>>,
+    patch: Partial<Pick<Exercise, 'name' | 'nameEn' | 'favorite' | 'imageIds'>>,
   ): Promise<void> {
     const row = await this.findRow(catalogId, builtin);
     if (row) {
@@ -161,6 +180,7 @@ function rowToCustom(row: Exercise): CustomExerciseInput {
   return {
     id: row.id,
     nameAr: row.name,
+    ...(row.nameEn ? { nameEn: row.nameEn } : {}),
     primaryMuscles: row.primaryMuscles.filter(isMuscleGroupId),
     secondaryMuscles: row.secondaryMuscles.filter(isMuscleGroupId),
     equipment: (EQUIPMENT_IDS as readonly string[]).includes(row.equipment) ? (row.equipment as EquipmentId) : 'other',

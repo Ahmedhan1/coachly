@@ -3,6 +3,7 @@ import { useNavigate, useParams } from 'react-router-dom';
 import { useServices } from '@/app/services';
 import { useUiStore } from '@/app/uiStore';
 import {
+  exerciseName,
   illustrationSpec,
   type CatalogExercise,
   type MuscleGroupId,
@@ -255,11 +256,15 @@ function ExerciseDetail({ exercise, catalog }: { exercise: CatalogExercise; cata
 
       {renaming && (
         <RenameSheet
-          current={exercise.nameAr}
-          defaultName={ref?.defaultNameAr ?? null}
+          currentAr={exercise.nameAr}
+          shownEn={exerciseName(exercise, 'en')}
+          trainerEn={exercise.isCustom || exercise.renamedEn === true ? exercise.nameEn : ''}
+          defaultNameAr={ref?.defaultNameAr ?? null}
+          defaultNameEn={ref?.defaultNameEn ?? null}
           onClose={() => setRenaming(false)}
-          onSave={async (name) => {
-            await store.rename(exercise.id, ref, name);
+          onSave={async ({ nameAr, nameEn }) => {
+            if (nameAr !== undefined) await store.rename(exercise.id, ref, nameAr);
+            if (nameEn !== undefined) await store.setEnglishName(exercise.id, ref, nameEn);
             setRenaming(false);
             showToast({ message: t('training.library.detail.renamed') });
           }}

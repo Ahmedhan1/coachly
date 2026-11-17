@@ -75,3 +75,19 @@ describe('localised labels and cues', () => {
     expect(equipmentLabel('barbell', 'ar')).toBe('بار');
   });
 });
+
+describe("the trainer's English name", () => {
+  it('wins in English and leaves the Arabic name (and an Arabic rename) alone', () => {
+    const [en] = mergeCatalog(builtin, { overrides: [{ exerciseId: 'Barbell_Squat', nameAr: 'سكوات بالبار', nameEn: 'Coach Squat' }] });
+    expect(exerciseName(en!, 'en')).toBe('Coach Squat');
+    expect(exerciseName(en!, 'ar')).toBe('سكوات بالبار');
+    const [both] = mergeCatalog(builtin, { overrides: [{ exerciseId: 'Barbell_Squat', nameAr: 'سكوات الكابتن', nameEn: 'Coach Squat' }] });
+    expect(exerciseName(both!, 'en')).toBe('Coach Squat');
+    expect(exerciseName(both!, 'ar')).toBe('سكوات الكابتن');
+  });
+
+  it('an empty English override keeps the pack name', () => {
+    const [same] = mergeCatalog(builtin, { overrides: [{ exerciseId: 'Barbell_Squat', nameEn: '  ' }] });
+    expect(exerciseName(same!, 'en')).toBe('Barbell Back Squat');
+  });
+});

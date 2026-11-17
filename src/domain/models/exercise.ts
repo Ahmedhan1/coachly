@@ -15,6 +15,8 @@ export const exerciseSchema = z
     /** Id in the bundled exercise library; required for builtin, null for custom. */
     builtinRef: z.string().min(1).max(120).nullable(),
     name: requiredNameSchema,
+    /** Optional English name the trainer typed (shown when the app language is English). */
+    nameEn: z.string().trim().max(120).optional(),
     primaryMuscles: z.array(shortTextSchema).max(20),
     secondaryMuscles: z.array(shortTextSchema).max(20),
     equipment: shortTextSchema,

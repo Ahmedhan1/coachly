@@ -1,5 +1,5 @@
 import type { FoodLineSource } from './foodLines';
-import type { GramRecipe } from './gramPlanner';
+import type { GramDish, GramRecipe } from './gramPlanner';
 import type { IngredientEntry } from './recipes';
 
 export interface StoredRecipeForPlan {
@@ -34,4 +34,45 @@ export function gramRecipe(recipe: StoredRecipeForPlan, table: readonly Ingredie
     });
   }
   return { id: recipe.id, tags: recipe.tags, lines };
+}
+
+export interface SavedLine {
+  name: string;
+  nameEn?: string;
+  grams: number;
+  units?: number;
+  unitLabel?: string;
+  unitLabelEn?: string;
+  kcal: number;
+  proteinG: number;
+  carbG: number;
+  fatG: number;
+}
+
+export interface SavedDish {
+  recipeId: string;
+  /** For older readers: the dish's calories ÷ the recipe's per-serving calories (0.01–20). */
+  servings: number;
+  lines: SavedLine[];
+}
+
+/** A planned dish as a meal-plan item: exact gram lines plus an equivalent servings number. */
+export function savedDish(dish: GramDish, perServingKcal: number): SavedDish {
+  const servings = perServingKcal > 0 ? Math.min(20, Math.max(0.01, Math.round((dish.totals.kcal / perServingKcal) * 100) / 100)) : 1;
+  return {
+    recipeId: dish.recipeId,
+    servings,
+    lines: dish.lines.map((l) => ({
+      name: l.src.name,
+      ...(l.src.nameEn ? { nameEn: l.src.nameEn } : {}),
+      grams: l.grams,
+      ...(l.units !== null && l.units > 0 ? { units: l.units } : {}),
+      ...(l.units !== null && l.src.unitLabel ? { unitLabel: l.src.unitLabel } : {}),
+      ...(l.units !== null && l.src.unitLabelEn ? { unitLabelEn: l.src.unitLabelEn } : {}),
+      kcal: l.shown.kcal,
+      proteinG: l.shown.proteinG,
+      carbG: l.shown.carbG,
+      fatG: l.shown.fatG,
+    })),
+  };
 }

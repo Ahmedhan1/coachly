@@ -37,6 +37,8 @@ export function pick<T>(arValue: T, enValue: T | undefined | null): T {
 export function applyDocumentLocale(doc: Document = document): void {
   doc.documentElement.lang = current;
   doc.documentElement.dir = localeDir();
+  // index.html carries the Arabic app name; the English one is the same word in Latin letters.
+  if (current === 'en') doc.title = 'Coach';
 }
 
 /** Saves the choice and reloads so the whole UI switches. Tests may pass reload = false. */

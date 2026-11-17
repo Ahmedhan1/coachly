@@ -75,6 +75,25 @@ test("a trainer's rename wins in English too", async ({ page }) => {
   await expect(page.getByRole('heading', { level: 1, name: 'آر دي إل الكابتن' })).toBeVisible();
 });
 
+test('renaming in English sets the English name and keeps the Arabic one', async ({ page }) => {
+  await openApp(page, '/exercises/Barbell_Squat');
+  await switchToEnglish(page);
+  await page.getByRole('button', { name: 'Rename', exact: true }).click();
+  const sheet = page.getByRole('dialog', { name: 'Exercise name' });
+  const field = sheet.getByLabel('Name the client will see');
+  await expect(field).toHaveValue('Barbell Back Squat');
+  await expect(sheet.getByLabel('Arabic name')).toHaveValue('سكوات بالبار');
+  await page.screenshot({ path: `${SHOTS}/rename.png` });
+  await field.fill('Coach Back Squat');
+  await sheet.getByRole('button', { name: 'Save', exact: true }).click();
+  await expect(page.getByRole('heading', { level: 1, name: 'Coach Back Squat' })).toBeVisible();
+  await expect(page.getByText('سكوات بالبار', { exact: true })).toBeVisible();
+  await page.evaluate(() => localStorage.setItem('pt.locale', 'ar'));
+  await page.reload();
+  await settle(page);
+  await expect(page.getByRole('heading', { level: 1, name: 'سكوات بالبار' })).toBeVisible();
+});
+
 test('program builder picker and session show English exercise names', async ({ page }) => {
   test.setTimeout(60_000);
   await openApp(page);
@@ -85,6 +104,7 @@ test('program builder picker and session show English exercise names', async ({ 
   await expect(page.getByTestId('exercise-card').first()).toBeVisible();
 
   await switchToEnglish(page);
+  await expect(page.getByRole('button', { name: /Full Body/ }).first()).toBeVisible();
   const card = page.getByTestId('exercise-card').first();
   await expect(card).toBeVisible();
   const cardText = (await card.innerText()).split('\n')[0] ?? '';

@@ -44,10 +44,13 @@ function applyOverride(exercise: CatalogExercise, override: ExerciseOverride | u
   if (override === undefined) return exercise;
   const name = override.nameAr?.trim();
   const renamed = name !== undefined && name !== '' && name !== exercise.nameAr;
+  const nameEn = override.nameEn?.trim();
+  const renamedEn = nameEn !== undefined && nameEn !== '' && nameEn !== exercise.nameEn;
   return {
     ...exercise,
     nameAr: renamed ? name : exercise.nameAr,
     ...(renamed ? { renamed: true } : {}),
+    ...(renamedEn ? { nameEn, renamedEn: true } : {}),
     images: override.imageIds !== undefined && override.imageIds.length > 0 ? stored(override.imageIds) : exercise.images,
   };
 }

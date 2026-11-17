@@ -62,3 +62,23 @@ export function styleTargets(base: MacroTargets, style: DietStyle, weightKg: num
   const proteinG = Math.max(0, (base.kcal - capped * kpg.carb) / kpg.protein);
   return { kcal: base.kcal, proteinG, carbG: capped, fatG: 0 };
 }
+
+/**
+ * The trainer typed the day's calories by hand: protein and fat stay, carbs take the difference (and fat gives
+ * way only when protein and fat alone are already over the new calories).
+ */
+export function withKcal(base: MacroTargets, kcal: number, kpg: KcalPerGramLike): MacroTargets {
+  return fillCarbs(Math.max(0, Math.round(kcal)), base.proteinG, base.fatG, kpg);
+}
+
+/** Calorie shares of protein, carbs and fat in whole percent (summing to 100 when there are calories). */
+export function macroSplit(t: MacroTargets, kpg: KcalPerGramLike): { p: number; c: number; f: number } {
+  const p = t.proteinG * kpg.protein;
+  const c = t.carbG * kpg.carb;
+  const f = t.fatG * kpg.fat;
+  const sum = p + c + f;
+  if (!(sum > 0)) return { p: 0, c: 0, f: 0 };
+  const pp = Math.round((p / sum) * 100);
+  const ff = Math.round((f / sum) * 100);
+  return { p: pp, c: 100 - pp - ff, f: ff };
+}

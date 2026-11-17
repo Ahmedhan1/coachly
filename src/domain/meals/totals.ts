@@ -4,10 +4,22 @@ export type MacroTotals = Per100g;
 
 export const ZERO_TOTALS: MacroTotals = { kcal: 0, proteinG: 0, carbG: 0, fatG: 0 };
 
+/** A food of a planned item in exact grams (shown integer values). */
+export interface PlanItemLine {
+  name: string;
+  grams: number;
+  kcal: number;
+  proteinG: number;
+  carbG: number;
+  fatG: number;
+}
+
 export interface PlanItem {
   recipeId: string | null;
   text: string;
   servings: number;
+  /** Present on items from the gram planner: totals are the sum of these lines. */
+  lines?: readonly PlanItemLine[];
 }
 
 export interface PlanMeal {
@@ -22,6 +34,9 @@ export function addTotals(a: MacroTotals, b: MacroTotals): MacroTotals {
 }
 
 export function itemTotals(item: PlanItem, lookup: PerServingLookup): { totals: MacroTotals; counted: boolean } {
+  if (item.lines && item.lines.length > 0) {
+    return { totals: item.lines.reduce<MacroTotals>((a, l) => ({ kcal: a.kcal + l.kcal, proteinG: a.proteinG + l.proteinG, carbG: a.carbG + l.carbG, fatG: a.fatG + l.fatG }), ZERO_TOTALS), counted: true };
+  }
   const per = item.recipeId ? lookup.get(item.recipeId) : undefined;
   if (!per || !(item.servings > 0)) return { totals: ZERO_TOTALS, counted: false };
   const k = item.servings;

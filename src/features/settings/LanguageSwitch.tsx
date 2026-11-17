@@ -8,7 +8,7 @@ export function LanguageSwitch({ label = t('settings.language.title') }: { label
     { value: 'en' as const, label: t('settings.language.en') },
   ];
   return (
-    <div data-testid="language-switch">
+    <div data-testid="language-switch" data-bilingual>
       <SegmentedControl<Locale>
         label={label}
         options={options}

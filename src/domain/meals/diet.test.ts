@@ -12,6 +12,8 @@ import {
   slotAlternatives,
   slotsFor,
   styleTargets,
+  withKcal,
+  macroSplit,
   type DietRecipe,
 } from '.';
 
@@ -194,5 +196,28 @@ describe('swaps and checks', () => {
     expect(dietNoteKeys('bulk', 'high_protein', 'ramadan')).toContain('ramadan');
     expect(dietNoteKeys('maintain', 'low_carb', 'if_16_8')).toContain('if');
     expect(dietNoteKeys('cut', 'balanced', 'normal').join(' ')).not.toMatch(/dose|supplement/);
+  });
+});
+
+describe('withKcal and macroSplit', () => {
+  it('typed calories move carbs only', () => {
+    const t = withKcal({ kcal: 2000, proteinG: 150, carbG: 200, fatG: 66.7 }, 2400, KPG);
+    expect(t.kcal).toBe(2400);
+    expect(t.proteinG).toBe(150);
+    expect(t.fatG).toBe(66.7);
+    expect(t.carbG).toBeCloseTo(300, 0);
+  });
+
+  it('fat gives way when the calories cannot hold protein and fat', () => {
+    const t = withKcal({ kcal: 2000, proteinG: 200, carbG: 100, fatG: 80 }, 1000, KPG);
+    expect(t.carbG).toBe(0);
+    expect(t.proteinG * 4 + t.fatG * 9).toBeCloseTo(1000, 5);
+  });
+
+  it('splits calories into whole percents that sum to 100', () => {
+    const s = macroSplit({ kcal: 2000, proteinG: 150, carbG: 200, fatG: 66.7 }, KPG);
+    expect(s.p + s.c + s.f).toBe(100);
+    expect(s).toEqual({ p: 30, c: 40, f: 30 });
+    expect(macroSplit({ kcal: 0, proteinG: 0, carbG: 0, fatG: 0 }, KPG)).toEqual({ p: 0, c: 0, f: 0 });
   });
 });
