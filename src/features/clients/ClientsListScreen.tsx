@@ -20,7 +20,7 @@ export function ClientsListScreen() {
   const prepared = useMemo(() => (all ? prepareSearch(all, (c) => [c.name, c.phone, c.goalNote, c.notes]) : null), [all]);
   const deferredQuery = useDeferredValue(query);
   const results = useMemo(() => (prepared ? filterPrepared(prepared, deferredQuery) : undefined), [prepared, deferredQuery]);
-  const { visible, sentinel } = useIncrementalList(results ?? [], { resetKey: deferredQuery });
+  const { visible, sentinel } = useIncrementalList(results ?? [], { resetKey: deferredQuery, step: 30, rootMargin: '1200px 0px' });
   const [today] = useState(() => toIsoDate(new Date()));
 
   return (

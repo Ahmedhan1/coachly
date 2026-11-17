@@ -200,7 +200,6 @@ async function scrollThrough(page: Page): Promise<{ totalMs: number; longestFram
 
 test('scale: multi-year data on a throttled iPhone 13 viewport', async ({ page }, testInfo) => {
   test.setTimeout(600_000);
-  page.on('console', (m) => { if (m.text().startsWith('PERF')) console.log(m.text()); });
   await openApp(page);
   await page.evaluate(async () => {
     await navigator.serviceWorker.ready;
@@ -221,7 +220,7 @@ test('scale: multi-year data on a throttled iPhone 13 viewport', async ({ page }
   }
   results.coldStartHomeMs = Math.round(cold.sort((a, b) => a - b)[1] ?? 0);
 
-  results.clientsListMs = Math.round(await timeUntil(page, { navigate: '/clients' }, 'section[aria-label="العملاء"] a', '0000'));
+  results.clientsListMs = Math.round(await timeUntil(page, { navigate: '/clients' }, 'section[aria-label="العملاء"] a', ''));
   const scroll = await scrollThrough(page);
   results.clientsScrollMs = Math.round(scroll.totalMs);
   results.clientsScrollLongestFrameMs = Math.round(scroll.longestFrameMs);

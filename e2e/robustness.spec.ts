@@ -53,20 +53,30 @@ test('a backup from this version restores (round trip through the screen)', asyn
   await expect(page.getByRole('link', { name: /سارة محمود/ })).toBeVisible();
 });
 
-test('a full disk: saving a client reports the failure instead of losing it silently', async ({ page, browserName }) => {
-  test.skip(browserName !== 'chromium', 'quota override needs the Chrome DevTools Protocol');
+test('a full disk: saving a client reports the failure instead of losing it silently', async ({ page }) => {
   await openApp(page, '/clients');
-  const cdp = await page.context().newCDPSession(page);
-  const origin = new URL(page.url()).origin;
-  const usage = await page.evaluate(async () => (await navigator.storage.estimate()).usage ?? 0);
-  await cdp.send('Storage.overrideQuotaForOrigin', { origin, quotaSize: usage + 1 });
+  // Simulates a full disk: every IndexedDB write fails the way Safari/Chrome report it.
+  await page.evaluate(() => {
+    const w = window as unknown as { __diskFull: boolean };
+    w.__diskFull = true;
+    for (const method of ['add', 'put'] as const) {
+      const original = IDBObjectStore.prototype[method];
+      IDBObjectStore.prototype[method] = function (this: IDBObjectStore, ...args: Parameters<IDBObjectStore['add']>) {
+        if (w.__diskFull && this.name !== 'meta') throw new DOMException('The quota has been exceeded.', 'QuotaExceededError');
+        return original.apply(this, args);
+      };
+    }
+  });
   await page.getByRole('button', { name: 'إضافة عميل' }).click();
   const sheet = page.getByRole('dialog');
   await sheet.getByLabel('الاسم').fill('عميل 💪 مساحة خلصانة');
   await sheet.getByRole('button', { name: 'حفظ' }).click();
-  // The sheet stays open with an error (and, once the shell mounts the storage toasts, a "storage full" toast).
-  await expect(sheet.getByRole('alert').or(page.getByText('مساحة الموبايل خلصت'))).toBeVisible();
-  await cdp.send('Storage.overrideQuotaForOrigin', { origin });
+  // The sheet stays open with its error (plus a "storage full" toast once the shell mounts the storage toasts).
+  await expect(sheet.getByRole('alert').or(page.getByText('مساحة الموبايل خلصت')).first()).toBeVisible();
+  await expect(sheet.getByLabel('الاسم')).toHaveValue('عميل 💪 مساحة خلصانة');
+  await page.evaluate(() => {
+    (window as unknown as { __diskFull: boolean }).__diskFull = false;
+  });
   await sheet.getByRole('button', { name: 'حفظ' }).click();
   await expect(page.getByRole('heading', { level: 1, name: 'عميل 💪 مساحة خلصانة' })).toBeVisible();
 });
