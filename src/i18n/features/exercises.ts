@@ -8,6 +8,7 @@ export const exercises = {
     illustrationAlt: 'رسمة العضلات المستهدفة في {name}',
     illustrationLegend: 'الغامق: العضلة الأساسية، الفاتح: العضلات المساعدة',
     illustrationSlide: 'رسمة العضلات',
+    photoCredit: 'صورة: {credit}',
     clients: 'عملاؤك اللي عندهم التمرين ده',
     clientsHint: 'العملاء اللي التمرين ده موجود في برنامجهم.',
     clientsPrograms: 'في برنامج: {programs}',

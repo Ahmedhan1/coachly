@@ -33,6 +33,14 @@ describe('catalogFromPack cues', () => {
     expect(list.find((e) => e.id === 'B')).not.toHaveProperty('cues');
   });
 
+  it('passes the photo credit through and drops it when the trainer uses own photos', () => {
+    const list = catalogFromPack({ ...pack, exercises: [entry('A', { imageCredit: 'Everkinetic, CC BY-SA 4.0' })] }, 'exercise-pack/');
+    expect(list[0]?.imageCredit).toBe('Everkinetic, CC BY-SA 4.0');
+    const merged = mergeCatalog(list, { overrides: [{ exerciseId: 'A', imageIds: ['img1'] }] });
+    expect(merged[0]).not.toHaveProperty('imageCredit');
+    expect(mergeCatalog(list, { overrides: [{ exerciseId: 'A', nameAr: 'x' }] })[0]?.imageCredit).toBe('Everkinetic, CC BY-SA 4.0');
+  });
+
   it('keeps the joint data from the pack and derives it when an older pack lacks it', () => {
     const js = { knee: 'high', shoulder: 'low', lowerBack: 'low' } as const;
     const list = catalogFromPack({ ...pack, exercises: [entry('A', { jointStress: js, homeFriendly: true }), entry('B')] }, 'exercise-pack/');

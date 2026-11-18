@@ -16,3 +16,7 @@
 - Recipes carry `nameEn` and `instructionsEn`, and every recipe has at least one meal-slot tag (فطار، غدا، عشا، سناك).
   Untouched starter recipes on existing installs get new tags / English on the next data version (see
   `NutritionStore.refreshStarterRecipes`).
+- Recipes also carry `prepMin` (minutes), `cuisine` (egyptian / levantine / gulf / mediterranean / asian /
+  international) and, like foods, an optional `photo`: the file stem of a bundled Wikimedia Commons photo in
+  `public/food-img/photos/` (sources and licenses in `docs/FOOD_PHOTOS.md`). Photos are cached at run time; the
+  icon shows when a photo is missing or fails to load. Data versions: foods v5, recipes v4 (`since: 4`).

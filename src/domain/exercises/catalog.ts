@@ -27,6 +27,7 @@ export function catalogFromPack(pack: ExercisePack, packUrl: string): CatalogExe
     ...(e.cues !== undefined && e.cues.length > 0 ? { cues: e.cues } : {}),
     ...(e.cuesEn !== undefined && e.cuesEn.length > 0 ? { cuesEn: e.cuesEn } : {}),
     ...(e.popular !== undefined ? { popularRank: e.popular } : {}),
+    ...(e.imageCredit !== undefined && e.images.length > 0 ? { imageCredit: e.imageCredit } : {}),
     jointStress: e.jointStress ?? deriveJointStress(e),
     homeFriendly: e.homeFriendly ?? deriveHomeFriendly(e),
   }));
@@ -49,12 +50,15 @@ function applyOverride(exercise: CatalogExercise, override: ExerciseOverride | u
   const renamed = name !== undefined && name !== '' && name !== exercise.nameAr;
   const nameEn = override.nameEn?.trim();
   const renamedEn = nameEn !== undefined && nameEn !== '' && nameEn !== exercise.nameEn;
+  const ownPhotos = override.imageIds !== undefined && override.imageIds.length > 0;
+  const { imageCredit: _credit, ...rest } = exercise;
+  void _credit;
   return {
-    ...exercise,
+    ...(ownPhotos ? rest : exercise),
     nameAr: renamed ? name : exercise.nameAr,
     ...(renamed ? { renamed: true } : {}),
     ...(renamedEn ? { nameEn, renamedEn: true } : {}),
-    images: override.imageIds !== undefined && override.imageIds.length > 0 ? stored(override.imageIds) : exercise.images,
+    images: ownPhotos ? stored(override.imageIds ?? []) : exercise.images,
   };
 }
 

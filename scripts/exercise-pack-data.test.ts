@@ -78,6 +78,15 @@ describe('shipped exercise pack', () => {
     expect(bad.map((e) => e.id)).toEqual([]);
   });
 
+  it('credits every own (non-dataset) photo of an extra, and suspension exercises are home-friendly', () => {
+    const own = list.filter((e) => e.extra === true && e.images.some((f) => f.startsWith(`${e.id}-`)));
+    expect(own.length).toBeGreaterThan(0);
+    expect(own.filter((e) => !e.imageCredit?.includes('CC BY-SA')).map((e) => e.id)).toEqual([]);
+    const trx = list.filter((e) => e.equipment === 'suspension');
+    expect(trx.length).toBeGreaterThanOrEqual(14);
+    expect(trx.filter((e) => e.homeFriendly !== true).map((e) => e.id)).toEqual([]);
+  });
+
   it('keeps a useful spread of joint-friendly and home exercises', () => {
     const gentle = list.filter((e) => e.jointStress?.knee === 'low' && e.jointStress.lowerBack === 'low' && e.category !== 'stretching');
     expect(gentle.length).toBeGreaterThan(200);

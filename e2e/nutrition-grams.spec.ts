@@ -14,6 +14,8 @@ async function openDiet(page: Page): Promise<void> {
   await page.getByRole('link', { name: 'الوجبات' }).click();
   await page.getByRole('button', { name: 'اعمل دايت أسبوع' }).first().click();
   await expect(page.getByRole('heading', { level: 1, name: 'دايت أوتوماتيك' })).toBeVisible();
+  // The starter cookbook may still be seeding on a fresh install.
+  await expect(page.getByRole('region', { name: 'فطار' }).first()).toBeVisible({ timeout: 30_000 });
 }
 
 const dayTotal = (page: Page) => page.getByRole('status', { name: 'مجموع اليوم' });
@@ -98,7 +100,8 @@ test('English: the diet shows English food names, slots and units', async ({ pag
   await page.getByRole('button', { name: 'Save for client' }).click();
   await page.goto(`/clients/${id}/diet?standalone=1`);
   const breakfast = page.getByRole('region', { name: 'Breakfast' }).first();
-  await expect(breakfast).toBeVisible();
+  // The starter cookbook may still be seeding on a fresh install.
+  await expect(breakfast).toBeVisible({ timeout: 30_000 });
   await expect(breakfast.getByText(/\d+ kcal · P \d+ · C \d+ · F \d+/).first()).toBeVisible();
   // Food names in the plan are the English ones (no Arabic letters in the meal cards).
   const text = await page.getByRole('region', { name: 'Lunch' }).first().innerText();

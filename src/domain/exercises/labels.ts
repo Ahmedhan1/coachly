@@ -89,6 +89,7 @@ const EQUIPMENT_DICT_KEY: Readonly<Record<EquipmentId, string>> = {
   exercise_ball: 'exercise ball',
   ez_bar: 'e-z curl bar',
   foam_roll: 'foam roll',
+  suspension: 'suspension',
   other: 'other',
 };
 

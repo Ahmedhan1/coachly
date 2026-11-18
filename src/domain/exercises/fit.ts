@@ -230,4 +230,4 @@ export function swapChoices(target: CatalogExercise, catalog: readonly CatalogEx
 }
 
 /** Equipment a home client can tick (the rest only exist in a gym). */
-export const HOME_EQUIPMENT: readonly EquipmentId[] = ['dumbbell', 'kettlebell', 'bands', 'barbell', 'ez_bar', 'exercise_ball', 'medicine_ball', 'foam_roll', 'cable', 'machine', 'other'];
+export const HOME_EQUIPMENT: readonly EquipmentId[] = ['dumbbell', 'kettlebell', 'bands', 'barbell', 'ez_bar', 'exercise_ball', 'medicine_ball', 'foam_roll', 'suspension', 'cable', 'machine', 'other'];

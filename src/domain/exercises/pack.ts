@@ -67,6 +67,8 @@ export const EQUIPMENT_IDS = [
   'exercise_ball',
   'ez_bar',
   'foam_roll',
+  /** Suspension trainer (TRX). Added in wave 5; never in the dataset. */
+  'suspension',
   'other',
 ] as const;
 export type EquipmentId = (typeof EQUIPMENT_IDS)[number];
@@ -157,6 +159,8 @@ export interface PackExercise {
   extra?: boolean;
   /** Joint load (knee / shoulder / lower back). Present on every built-in exercise. */
   jointStress?: JointStress;
+  /** Credit line for photos from a CC BY-SA source, e.g. "Everkinetic, CC BY-SA 4.0" (shown under the photo). */
+  imageCredit?: string;
   /** True when it can be done at home with body weight, bands, dumbbells, a kettlebell, a ball or a mat. */
   homeFriendly?: boolean;
 }
@@ -167,6 +171,11 @@ export interface PackExercise {
  */
 export interface ExtraExercise extends Omit<PackExercise, 'images' | 'popular' | 'extra' | 'cuesEn' | 'jointStress'> {
   imagesFrom?: string;
+  /**
+   * Our own pack files for this extra (e.g. converted Everkinetic drawings, `pt_X-0.webp`), relative to the
+   * image folder. Needs `imageCredit` when the source asks for attribution. Wins over `imagesFrom`.
+   */
+  ownImages?: string[];
   /** Hand-set joint load; unset parts come from the rules. */
   jointStress?: Partial<JointStress>;
   popular?: boolean;
@@ -388,7 +397,7 @@ export function applyExerciseFix(e: PackExercise, fix: ExerciseFix | undefined):
 }
 
 function extraToPack(extra: ExtraExercise, imagesById: ReadonlyMap<string, readonly string[]>): PackExercise {
-  const { imagesFrom, popular, jointStress, ...rest } = extra;
+  const { imagesFrom, ownImages, popular, jointStress, ...rest } = extra;
   void popular; // the rank is computed in buildExercisePack
   void jointStress; // merged with the rules in buildExercisePack
   const primary = [...new Set(rest.primary)];
@@ -396,7 +405,12 @@ function extraToPack(extra: ExtraExercise, imagesById: ReadonlyMap<string, reado
     ...rest,
     primary,
     secondary: [...new Set(rest.secondary)].filter((id) => !primary.includes(id)),
-    images: imagesFrom === undefined ? [] : [...(imagesById.get(imagesFrom) ?? [])],
+    images:
+      ownImages !== undefined && ownImages.length > 0
+        ? [...ownImages]
+        : imagesFrom === undefined
+          ? []
+          : [...(imagesById.get(imagesFrom) ?? [])],
     extra: true,
   };
 }
