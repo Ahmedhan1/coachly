@@ -142,7 +142,10 @@ describe('NutritionStore', () => {
   it('a data-v3 install gets the new recipes, prep times, cuisines and photos; edited recipes keep their text', async () => {
     const { repos } = createTestData();
     const kv = memoryKv();
-    await kv.set(NUTRITION_KEYS.ingredients, starterIngredients().map((f) => ({ ...f, photo: undefined })));
+    await kv.set(NUTRITION_KEYS.ingredients, starterIngredients().map(({ photo: _p, ...f }) => {
+        void _p;
+        return f;
+      }));
     await kv.set(NUTRITION_KEYS.starterSeeded, 1);
     await kv.set(NUTRITION_KEYS.foodsVersion, 4);
     await kv.set(NUTRITION_KEYS.recipesVersion, 3);

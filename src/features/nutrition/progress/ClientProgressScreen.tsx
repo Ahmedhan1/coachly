@@ -45,7 +45,7 @@ function summary(e: ProgressEntry): string {
   const m = e.measurements;
   const parts = [
     m.weightKg !== undefined ? `${formatNumber(m.weightKg)} ${t('clientDetail.kg')}` : null,
-    m.bodyFatPercent !== undefined ? `${formatNumber(m.bodyFatPercent)}%` : null,
+    m.bodyFatPercent !== undefined ? `${formatNumber(m.bodyFatPercent)}%${e.bodyFatSource === 'navy' ? ` (${t('nutrition.progress.navyBadge')})` : ''}` : null,
     m.waistCm !== undefined ? `${t('clientDetail.waist')} ${formatNumber(m.waistCm)}` : null,
   ];
   return parts.filter(Boolean).join(' · ');

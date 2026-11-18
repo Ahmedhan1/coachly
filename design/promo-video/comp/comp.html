@@ -1,0 +1,431 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<title>PT Coach promo</title>
+<style>
+@font-face { font-family: 'Readex'; src: url('/comp/fonts/readex-pro-arabic.woff2') format('woff2'); font-weight: 160 700; }
+@font-face { font-family: 'Readex'; src: url('/comp/fonts/readex-pro-latin.woff2') format('woff2'); font-weight: 160 700; unicode-range: U+0000-00FF; }
+@font-face { font-family: 'Alex'; src: url('/comp/fonts/alexandria-arabic.woff2') format('woff2'); font-weight: 100 900; }
+@font-face { font-family: 'Alex'; src: url('/comp/fonts/alexandria-latin.woff2') format('woff2'); font-weight: 100 900; unicode-range: U+0000-00FF; }
+:root { --brand: #F25C1F; --brand2: #FF8A3D; --bg: #07080A; }
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html, body { width: 1080px; height: 1920px; overflow: hidden; background: var(--bg); }
+body { font-family: 'Readex', 'Noto Color Emoji', sans-serif; color: #fff; position: relative; }
+.layer { position: absolute; inset: 0; }
+#bg { background: var(--bg); }
+.glow { position: absolute; border-radius: 50%; }
+#grid { position: absolute; inset: 0; opacity: .07;
+  background-image: linear-gradient(rgba(255,255,255,.6) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,.6) 1px, transparent 1px);
+  background-size: 90px 90px; }
+#vignette { background: radial-gradient(ellipse at center, transparent 55%, rgba(0,0,0,.75) 100%); }
+#progress { position: absolute; top: 0; right: 0; height: 8px; background: linear-gradient(270deg, var(--brand), var(--brand2)); }
+#brandmark { position: absolute; top: 34px; left: 40px; display: flex; align-items: center; gap: 14px; direction: ltr; opacity: .9; }
+#brandmark .ic { width: 52px; height: 52px; border-radius: 15px; background: var(--brand); display: grid; place-items: center; font: 800 34px 'Alex'; }
+#brandmark .tx { font: 700 30px 'Alex'; letter-spacing: 1px; }
+
+/* header */
+#head { position: absolute; top: 110px; left: 60px; right: 60px; text-align: center; }
+#chip { display: inline-flex; align-items: center; gap: 14px; padding: 10px 26px 10px 14px; border-radius: 999px; background: rgba(242,92,31,.14); border: 2px solid rgba(242,92,31,.6); font: 700 30px 'Readex'; color: #ffb38a; }
+#chip b { display: inline-grid; place-items: center; min-width: 54px; height: 54px; border-radius: 999px; background: var(--brand); color: #fff; font: 800 28px 'Alex'; direction: ltr; }
+#title { margin-top: 22px; font: 800 84px/1.15 'Alex'; letter-spacing: -1px; text-shadow: 0 6px 40px rgba(0,0,0,.6); }
+#sub { margin-top: 12px; font: 500 36px 'Readex'; color: #b9bcc4; }
+
+/* phone */
+#phoneWrap { position: absolute; left: 50%; top: 400px; width: 556px; height: 1161px; margin-left: -278px; perspective: 2200px; }
+#phone { position: absolute; inset: 0; border-radius: 78px; background: linear-gradient(145deg, #3a3c42, #121316 40%, #26282d); padding: 18px;
+  box-shadow: 0 0 0 3px #4a4d55 inset, 0 60px 120px rgba(0,0,0,.7), 0 0 140px rgba(242,92,31,.25); transform-style: preserve-3d; }
+#phone.white { background: linear-gradient(145deg, #f4f4f6, #c9cbd1 45%, #eef0f3); box-shadow: 0 0 0 3px #fff inset, 0 60px 120px rgba(0,0,0,.7), 0 0 140px rgba(255,255,255,.18); }
+#screen { position: absolute; inset: 18px; border-radius: 62px; overflow: hidden; background: #000; }
+#screen img.shot { position: absolute; top: 0; left: 0; width: 520px; height: 1125px; }
+#island { position: absolute; top: 34px; left: 50%; width: 150px; height: 42px; margin-left: -75px; border-radius: 30px; background: #000; z-index: 5; }
+.tap { position: absolute; border-radius: 50%; pointer-events: none; z-index: 6; }
+#phoneTag { position: absolute; top: -66px; left: 50%; transform: translateX(-50%); padding: 8px 26px; border-radius: 999px; background: #fff; color: #111; font: 700 28px 'Readex'; white-space: nowrap; }
+
+/* pills */
+.pill { position: absolute; display: flex; align-items: center; gap: 14px; padding: 18px 28px; border-radius: 26px;
+  background: rgba(18,19,22,.92); border: 2px solid rgba(242,92,31,.75); box-shadow: 0 20px 50px rgba(0,0,0,.55), 0 0 30px rgba(242,92,31,.25);
+  font: 700 34px 'Readex'; white-space: nowrap; z-index: 20; }
+.pill .e { font-size: 40px; font-family: 'Noto Color Emoji'; }
+
+/* subtitles */
+#subs { position: absolute; left: 50px; right: 50px; bottom: 96px; display: flex; justify-content: center; z-index: 30; }
+#subBox { max-width: 980px; padding: 24px 40px 28px; border-radius: 30px; background: rgba(0,0,0,.72); border: 1px solid rgba(255,255,255,.12);
+  box-shadow: 0 20px 60px rgba(0,0,0,.5); text-align: center; font: 700 46px/1.55 'Readex'; }
+#subBox .w { display: inline-block; white-space: pre; }
+#subBox .hl { color: #ff9a5c; }
+
+/* text scenes */
+#textStage { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 30px; z-index: 10; }
+.bigt { font: 900 128px/1.2 'Alex'; text-align: center; letter-spacing: -2px; text-shadow: 0 10px 60px rgba(242,92,31,.35); }
+.grad { background: linear-gradient(90deg, #ffb07a, var(--brand) 50%, #ff3d00); -webkit-background-clip: text; background-clip: text; color: transparent; }
+.chaos { position: absolute; padding: 22px 36px; border-radius: 26px; background: #16171a; border: 2px solid #2c2e33; font: 800 58px 'Alex'; box-shadow: 0 20px 40px rgba(0,0,0,.5); }
+.chaos .e { font-family: 'Noto Color Emoji'; margin-inline-start: 14px; }
+.x { position: absolute; height: 12px; background: #ff3b30; border-radius: 6px; top: 50%; left: -6%; transform-origin: center; }
+
+#logoStage, #ctaStage, #statsStage, #pdfStage { position: absolute; inset: 0; z-index: 10; }
+.appicon { position: absolute; left: 50%; width: 300px; height: 300px; margin-left: -150px; border-radius: 76px; background: linear-gradient(145deg, #ff7a3a, #e2430c);
+  display: grid; place-items: center; font: 900 210px/1 'Alex'; box-shadow: 0 40px 120px rgba(242,92,31,.55), inset 0 -10px 30px rgba(0,0,0,.2); }
+.ring { position: absolute; left: 50%; border-radius: 50%; border: 6px solid var(--brand); }
+.logoName { position: absolute; left: 0; right: 0; text-align: center; font: 900 170px/1 'Alex'; }
+.logoLat { position: absolute; left: 0; right: 0; text-align: center; font: 700 52px 'Alex'; letter-spacing: 22px; color: var(--brand2); direction: ltr; }
+.logoTag { position: absolute; left: 80px; right: 80px; text-align: center; font: 600 44px/1.5 'Readex'; color: #d5d7dc; }
+
+.stat { position: absolute; width: 440px; height: 330px; border-radius: 40px; background: rgba(22,23,26,.9); border: 2px solid #2c2e33; display: flex; flex-direction: column; align-items: center; justify-content: center; }
+.stat .v { font: 900 130px/1 'Alex'; direction: ltr; }
+.stat .l { margin-top: 16px; font: 700 40px 'Readex'; color: #c3c6cd; text-align: center; padding: 0 20px; }
+
+.page { position: absolute; width: 560px; border-radius: 14px; box-shadow: 0 40px 90px rgba(0,0,0,.7); background: #fff; }
+
+.ctaLine { position: absolute; left: 0; right: 0; text-align: center; }
+.ctaChecks { position: absolute; left: 120px; right: 120px; display: flex; flex-direction: column; gap: 22px; }
+.ck { display: flex; align-items: center; gap: 20px; padding: 22px 30px; border-radius: 24px; background: rgba(22,23,26,.92); border: 2px solid #2c2e33; font: 700 42px 'Readex'; }
+.ck i { font-style: normal; display: grid; place-items: center; width: 56px; height: 56px; border-radius: 50%; background: var(--brand); font: 900 34px 'Alex'; }
+.btn { position: absolute; left: 110px; right: 110px; height: 150px; border-radius: 999px; background: linear-gradient(90deg, #ff8a3d, var(--brand)); display: grid; place-items: center;
+  font: 900 56px 'Alex'; box-shadow: 0 30px 80px rgba(242,92,31,.55); }
+</style>
+</head>
+<body>
+<div id="bg" class="layer">
+  <div id="g1" class="glow"></div><div id="g2" class="glow"></div><div id="g3" class="glow"></div>
+  <div id="grid"></div>
+</div>
+<div id="vignette" class="layer"></div>
+<div id="progress"></div>
+<div id="brandmark"><div class="ic">ك</div><div class="tx">PT COACH</div></div>
+
+<div id="head"><div id="chip"><b id="chipN">01</b><span id="chipT">كوتش</span></div><div id="title"></div><div id="sub"></div></div>
+
+<div id="phoneWrap"><div id="phone"><div id="phoneTag">موبايل العميل</div><div id="screen"><div id="island"></div>
+  <img id="shotA" class="shot"><img id="shotB" class="shot"></div></div></div>
+<div id="pills"></div>
+
+<div id="textStage"></div>
+<div id="logoStage"></div>
+<div id="statsStage"></div>
+<div id="pdfStage"></div>
+<div id="ctaStage"></div>
+
+<div id="subs"><div id="subBox"></div></div>
+
+<script src="TIMELINE"></script>
+<script>
+const TL = window.TL, F = TL.fps;
+const $ = (id) => document.getElementById(id);
+const clamp = (x, a = 0, b = 1) => Math.max(a, Math.min(b, x));
+const ease = (t) => 1 - Math.pow(1 - clamp(t), 3);
+const easeIO = (t) => { t = clamp(t); return t < .5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2; };
+const back = (t) => { t = clamp(t); const c1 = 1.70158, c3 = c1 + 1; return 1 + c3 * Math.pow(t - 1, 3) + c1 * Math.pow(t - 1, 2); };
+const rnd = (i) => { const x = Math.sin(i * 127.1 + 311.7) * 43758.5453; return x - Math.floor(x); };
+const SCALE = 520 / 390;
+const HL = /(\d[\d,]*|PDF|Groq|Navy|Mifflin|Katch-McArdle|English|كود|لوجو|دوسة|بدوسة|أوتوماتيك|من غير نت|مشفّر|بموافقتك|مجاني|1082|بالجرام|بدائل|بالعامية|تطبيق واحد)/;
+
+function sceneAt(f) { for (const s of TL.scenes) if (f >= s.start && f < s.start + s.frames) return s; return null; }
+function phoneSceneNeighbors(s) { const i = TL.scenes.indexOf(s); return [TL.scenes[i - 1], TL.scenes[i + 1]]; }
+const isPhone = (s) => s && (s.type === 'phone' || s.type === 'viewer');
+
+// ---------- background ----------
+function renderBg(f, s) {
+  const t = f / F;
+  const energy = s && (s.music === 'drop') ? 1 : s && s.music === 'groove' ? .7 : .45;
+  const beat = Math.exp(-((f % 15) / 15) * 4) * (s && (s.music === 'drop' || s.music === 'groove') ? 1 : .25);
+  const g = [[$('g1'), 900, 0.13, 200, 500], [$('g2'), 800, 0.09, 880, 1300], [$('g3'), 700, 0.11, 540, 1750]];
+  g.forEach(([el, size, sp, x0, y0], i) => {
+    const x = x0 + Math.sin(t * sp * 2 + i) * 160, y = y0 + Math.cos(t * sp * 1.6 + i * 2) * 140;
+    el.style.cssText = `width:${size}px;height:${size}px;left:${x - size / 2}px;top:${y - size / 2}px;background:radial-gradient(circle, rgba(242,92,31,${(.20 + .10 * beat) * energy}) 0%, rgba(242,92,31,0) 65%)`;
+  });
+  $('grid').style.transform = `translateY(${(t * 18) % 90}px)`;
+  $('progress').style.width = (f / TL.total * 100) + '%';
+}
+
+// ---------- header ----------
+function renderHead(f, s) {
+  const head = $('head');
+  if (!isPhone(s)) { head.style.opacity = 0; return; }
+  const l = f - s.start;
+  const inT = ease(l / 14), out = clamp((s.frames - l) / 8);
+  head.style.opacity = Math.min(inT, out);
+  head.style.transform = `translateY(${(1 - inT) * -40}px)`;
+  $('chipN').textContent = s.n; $('chipT').textContent = s.sub;
+  const ti = $('title'); if (ti.textContent !== s.title) { ti.textContent = s.title; ti.style.whiteSpace = 'nowrap'; ti.style.fontSize = '84px'; const w = ti.scrollWidth; if (w > 950) ti.style.fontSize = Math.floor(84 * 950 / w) + 'px'; } $('sub').textContent = '';
+  $('title').style.transform = `scale(${0.9 + 0.1 * back(l / 16)})`;
+}
+
+// ---------- phone ----------
+const shotCache = {};
+function clipFrame(s, l) {
+  const c = s.clipData; const i = Math.floor(Math.max(0, l - c.lead) * c.rate);
+  return c.dir + c.frames[Math.min(c.frames.length - 1, i)];
+}
+async function setImg(el, src) { if (el.dataset.src !== src) { el.dataset.src = src; el.src = src; try { await el.decode(); } catch (e) {} } }
+async function renderPhone(f, s) {
+  const wrap = $('phoneWrap'), phone = $('phone');
+  if (!isPhone(s)) { wrap.style.opacity = 0; $('pills').innerHTML = ''; return; }
+  const l = f - s.start;
+  const [prev, next] = phoneSceneNeighbors(s);
+  const enterFromNothing = !isPhone(prev), exitToNothing = !isPhone(next);
+  const switchType = (a, b) => a && b && a.type !== b.type;
+  let o = 1, ty = 0, sc = 1, ry = 0;
+  if (enterFromNothing || switchType(prev, s)) { const k = back(l / 18); o = clamp(l / 8); ty = (1 - k) * 260; sc = 0.86 + 0.14 * k; ry = (1 - ease(l / 22)) * -25; }
+  if (exitToNothing || switchType(s, next)) { const k = clamp((l - (s.frames - 12)) / 12); if (k > 0) { o = Math.min(o, 1 - k); sc *= 1 - .1 * k; ty -= 80 * k; } }
+  const t = f / F;
+  ry += Math.sin(t * 0.9) * 4; const rx = Math.sin(t * 0.7 + 1) * 2.5;
+  const beat = (s.music === 'drop') ? Math.exp(-((f % 15) / 15) * 5) : 0;
+  wrap.style.opacity = o;
+  wrap.style.transform = `translateY(${ty + Math.sin(t * 1.3) * 6}px) scale(${sc * (1 + beat * 0.008)})`;
+  phone.style.transform = `rotateY(${ry}deg) rotateX(${rx}deg)`;
+  phone.classList.toggle('white', s.type === 'viewer');
+  $('phoneTag').style.display = s.type === 'viewer' ? 'block' : 'none';
+  // screen content: slide transition between consecutive phone scenes
+  const A = $('shotA'), B = $('shotB');
+  const T = 12;
+  if (isPhone(prev) && !switchType(prev, s) && l < T) {
+    const k = easeIO(l / T);
+    await Promise.all([setImg(A, clipFrame(prev, prev.frames + l)), setImg(B, clipFrame(s, l))]);
+    A.style.transform = `translateX(${k * 520}px)`; A.style.opacity = 1 - k * .4;
+    B.style.transform = `translateX(${(k - 1) * 520}px)`; B.style.opacity = 1; B.style.display = 'block';
+  } else {
+    await setImg(A, clipFrame(s, l)); A.style.transform = 'none'; A.style.opacity = 1; B.style.display = 'none';
+  }
+  // taps
+  document.querySelectorAll('.tap').forEach((e) => e.remove());
+  for (const tp of s.clipData.taps) {
+    const d = l - tp.f;
+    if (d < -2 || d > 16) continue;
+    const scr = $('screen');
+    const x = tp.x * SCALE, y = tp.y * SCALE;
+    const dot = document.createElement('div'); dot.className = 'tap';
+    const press = d < 4 ? clamp((d + 2) / 4) : 1 - clamp((d - 4) / 8);
+    dot.style.cssText = `left:${x - 34}px;top:${y - 34}px;width:68px;height:68px;background:rgba(255,255,255,${0.55 * press});border:3px solid rgba(255,255,255,${0.9 * press});transform:scale(${0.7 + 0.3 * press})`;
+    scr.appendChild(dot);
+    if (d >= 2) {
+      const r = document.createElement('div'); r.className = 'tap'; const k = clamp((d - 2) / 14); const R = 40 + 90 * ease(k);
+      r.style.cssText = `left:${x - R}px;top:${y - R}px;width:${2 * R}px;height:${2 * R}px;border:5px solid rgba(242,92,31,${0.9 * (1 - k)})`;
+      scr.appendChild(r);
+    }
+  }
+  renderPills(s, l);
+}
+function renderPills(s, l) {
+  const box = $('pills'); box.innerHTML = '';
+  const ps = s.pills || [];
+  const slots = [{ side: 'right', y: 640 }, { side: 'left', y: 980 }, { side: 'right', y: 1320 }];
+  ps.forEach((p, i) => {
+    const at = 22 + i * Math.max(30, Math.floor((s.frames - 80) / Math.max(1, ps.length)));
+    const d = l - at; if (d < 0) return;
+    const out = clamp((s.frames - l) / 8);
+    const k = back(d / 14);
+    const slot = slots[i % 3];
+    const el = document.createElement('div'); el.className = 'pill';
+    el.innerHTML = `<span class="e">${p.icon}</span><span>${p.text}</span>`;
+    const t = (l + i * 20) / F;
+    const fx = Math.sin(t * 1.4) * 6;
+    el.style.top = (slot.y + Math.cos(t * 1.1) * 8) + 'px';
+    if (slot.side === 'right') el.style.right = (34 + fx) + 'px'; else el.style.left = (34 + fx) + 'px';
+    el.style.opacity = Math.min(clamp(d / 6), out);
+    el.style.transform = `scale(${0.5 + 0.5 * k}) translateX(${(1 - k) * (slot.side === 'right' ? 120 : -120)}px)`;
+    box.appendChild(el);
+  });
+}
+
+// ---------- subtitles ----------
+function captionOf(s, l) {
+  if (s.captions) {
+    const lead = 10, usable = s.frames - lead - 6, n = s.captions.length, per = usable / n;
+    const i = Math.min(n - 1, Math.max(0, Math.floor((l - lead) / per)));
+    return { text: s.captions[i], t0: s.start + lead + i * per, t1: s.start + lead + (i + 1) * per };
+  }
+  if (s.caption) { const lead = s.type === 'text' ? 6 : 14; return { text: s.caption, t0: s.start + lead, t1: s.start + s.frames - 4 }; }
+  return null;
+}
+let lastCap = '';
+function renderSubs(f, s) {
+  const box = $('subBox'), wrap = $('subs');
+  const c = s && captionOf(s, f - s.start);
+  if (!c || f < c.t0) { wrap.style.opacity = 0; return; }
+  const l = f - c.t0;
+  const words = c.text.split(' ');
+  if (lastCap !== c.text) { box.innerHTML = words.map((w) => `<span class="w${HL.test(w) ? ' hl' : ''}">${w}</span>`).join(' '); lastCap = c.text; }
+  const spans = box.querySelectorAll('.w');
+  const out = clamp((c.t1 - f) / 5);
+  wrap.style.opacity = Math.min(clamp(l / 4), out);
+  wrap.style.transform = `translateY(${(1 - ease(l / 8)) * 30}px)`;
+  spans.forEach((sp, i) => { const k = ease((l - i * 1.6) / 6); sp.style.opacity = 0.15 + 0.85 * k; sp.style.transform = `translateY(${(1 - k) * 14}px)`; });
+}
+
+// ---------- text scenes ----------
+function renderText(f, s) {
+  const st = $('textStage');
+  if (!s || s.type !== 'text') { st.innerHTML = ''; st.style.opacity = 0; return; }
+  st.style.opacity = 1;
+  const l = f - s.start, tsec = l / F;
+  let beat = null;
+  for (const b of s.beats) if (tsec >= b.at) beat = b;
+  if (!beat) { st.innerHTML = ''; return; }
+  const bl = l - Math.round(beat.at * F);
+  const out = clamp((s.frames - l) / 8);
+  st.innerHTML = '';
+  if (beat.style === 'big' || beat.style === 'stack') {
+    beat.lines.forEach((line, i) => {
+      const d = bl - i * 10; const k = back(d / 14);
+      const el = document.createElement('div'); el.className = 'bigt' + (i === 1 || beat.style === 'big' && /💪/.test(line) ? '' : '');
+      if (beat.style === 'stack' && i === 1) el.classList.add('grad');
+      el.textContent = line;
+      el.style.opacity = Math.min(clamp(d / 5), out);
+      el.style.transform = `scale(${1.6 - 0.6 * k})`;
+      if (beat.style === 'stack' && i === 1) el.style.fontSize = '124px';
+      st.appendChild(el);
+    });
+  } else if (beat.style === 'chaos') {
+    const icons = ['📝', '💬', '📊', '🗒️', '🧮'];
+    const pos = [[150, 520], [560, 700], [200, 950], [600, 1180], [300, 1400]];
+    beat.lines.forEach((w, i) => {
+      const d = bl - i * 4; if (d < 0) return;
+      const k = back(d / 12);
+      const el = document.createElement('div'); el.className = 'chaos';
+      el.innerHTML = `${w}<span class="e">${icons[i]}</span>`;
+      const shake = d > 14 ? Math.sin(l * 1.7 + i) * 6 : 0;
+      el.style.left = pos[i][0] + 'px'; el.style.top = pos[i][1] + 'px';
+      el.style.transform = `rotate(${(rnd(i) - .5) * 24 + shake}deg) scale(${k})`;
+      el.style.opacity = out;
+      // red strike after all appeared
+      const sd = bl - 34 - i * 3;
+      if (sd > 0) { const x = document.createElement('div'); x.className = 'x'; x.style.width = (112 * ease(sd / 8)) + '%'; x.style.transform = `rotate(${-8 + rnd(i + 9) * 16}deg)`; el.appendChild(x); }
+      st.appendChild(el);
+    });
+  }
+}
+
+// ---------- logo ----------
+function renderLogo(f, s) {
+  const st = $('logoStage');
+  if (!s || s.type !== 'logo') { st.innerHTML = ''; return; }
+  const l = f - s.start; const out = clamp((s.frames - l) / 10);
+  const k = back(l / 18);
+  st.innerHTML = '';
+  st.style.opacity = out;
+  for (let i = 0; i < 3; i++) {
+    const d = l - i * 6; if (d < 0) continue; const r = 150 + 520 * ease(d / 40);
+    const ring = document.createElement('div'); ring.className = 'ring';
+    ring.style.cssText = `width:${2 * r}px;height:${2 * r}px;margin-left:${-r}px;top:${640 - r}px;opacity:${(1 - clamp(d / 40)) * .8}`;
+    st.appendChild(ring);
+  }
+  const ic = document.createElement('div'); ic.className = 'appicon'; ic.textContent = 'ك';
+  ic.style.top = '490px'; ic.style.transform = `scale(${k}) rotate(${(1 - ease(l / 20)) * -30}deg)`;
+  st.appendChild(ic);
+  const n = document.createElement('div'); n.className = 'logoName'; n.textContent = 'كوتش';
+  const d2 = l - 12; n.style.top = '880px'; n.style.opacity = clamp(d2 / 8); n.style.transform = `translateY(${(1 - ease(d2 / 14)) * 60}px)`;
+  st.appendChild(n);
+  const la = document.createElement('div'); la.className = 'logoLat'; la.textContent = 'PT COACH';
+  const d3 = l - 20; la.style.top = '1080px'; la.style.opacity = clamp(d3 / 8); la.style.letterSpacing = (60 - 38 * ease(d3 / 20)) + 'px';
+  st.appendChild(la);
+  const tg = document.createElement('div'); tg.className = 'logoTag'; tg.textContent = 'مساعدك الشخصي كمدرب — العملاء، التمرين، الأكل، والفلوس';
+  const d4 = l - 32; tg.style.top = '1200px'; tg.style.opacity = clamp(d4 / 10);
+  st.appendChild(tg);
+}
+
+// ---------- pdf ----------
+async function renderPdf(f, s) {
+  const st = $('pdfStage');
+  if (!s || s.type !== 'pdf') { st.innerHTML = ''; return; }
+  const l = f - s.start, out = clamp((s.frames - l) / 10);
+  st.innerHTML = ''; st.style.opacity = out;
+  const pages = s.pages.slice(0, 5); const n = pages.length;
+  const imgs = [];
+  pages.forEach((src, i) => {
+    const d = l - i * 8; if (d < 0) return;
+    const k = back(d / 16);
+    const spread = (i - (n - 1) / 2);
+    const img = document.createElement('img'); img.className = 'page'; img.src = src;
+    const x = 540 - 280 + spread * 150 * ease((l - 30) / 30);
+    const rot = spread * 7 * ease((l - 30) / 30);
+    img.style.left = x + 'px'; img.style.top = (420 + Math.abs(spread) * 40 * ease((l - 30) / 30)) + 'px';
+    img.style.transform = `translateY(${(1 - k) * 700}px) rotate(${rot}deg) scale(${0.92 + 0.08 * k})`;
+    img.style.zIndex = 10 - Math.abs(Math.round(spread));
+    st.appendChild(img); imgs.push(img);
+  });
+  await Promise.all(imgs.map((im) => im.decode().catch(() => {})));
+  const h = document.createElement('div'); h.className = 'ctaLine'; h.style.cssText = `top:170px;font:800 80px 'Alex'`; h.textContent = 'ملف PDF احترافي';
+  h.style.opacity = clamp(l / 10); st.appendChild(h);
+  const h2 = document.createElement('div'); h2.className = 'ctaLine grad'; h2.style.cssText = `top:285px;font:800 60px 'Alex'`; h2.textContent = 'بلوجو بتاعك وألوانك';
+  h2.style.opacity = clamp((l - 8) / 10); st.appendChild(h2);
+}
+
+// ---------- stats ----------
+function renderStats(f, s) {
+  const st = $('statsStage');
+  if (!s || s.type !== 'stats') { st.innerHTML = ''; return; }
+  const l = f - s.start, out = clamp((s.frames - l) / 10);
+  st.innerHTML = ''; st.style.opacity = out;
+  const h = document.createElement('div'); h.className = 'ctaLine'; h.style.cssText = `top:250px;font:900 92px 'Alex'`; h.innerHTML = 'كل ده <span class="grad">في تطبيق واحد</span>';
+  h.style.opacity = clamp(l / 10); h.style.transform = `scale(${1.3 - .3 * back(l / 16)})`; st.appendChild(h);
+  s.items.forEach((it, i) => {
+    const d = l - 14 - i * 9; if (d < 0) return;
+    const k = back(d / 14);
+    const el = document.createElement('div'); el.className = 'stat';
+    const col = i % 2, row = Math.floor(i / 2);
+    el.style.left = (col === 0 ? 560 : 80) + 'px'; el.style.top = (520 + row * 380) + 'px';
+    el.style.transform = `scale(${k})`;
+    const v = Math.round(it.value * ease(d / 40));
+    el.innerHTML = `<div class="v grad">${it.value === 0 ? '0' : '+' + v.toLocaleString('en-US')}</div><div class="l">${it.label}</div>`;
+    st.appendChild(el);
+  });
+  const extra = ['100% أوفلاين', 'عربي و English', 'بياناتك على موبايلك'];
+  extra.forEach((t, i) => {
+    const d = l - 60 - i * 8; if (d < 0) return;
+    const el = document.createElement('div'); el.className = 'pill';
+    el.style.top = (1300 + i * 0) + 'px'; el.style.left = (80 + i * 310) + 'px'; el.style.fontSize = '30px';
+    el.textContent = t; el.style.transform = `scale(${back(d / 12)})`;
+    st.appendChild(el);
+  });
+}
+
+// ---------- CTA ----------
+function renderCta(f, s) {
+  const st = $('ctaStage');
+  if (!s || s.type !== 'cta') { st.innerHTML = ''; return; }
+  const l = f - s.start;
+  const endFade = clamp((TL.total - f) / 40);
+  st.innerHTML = ''; st.style.opacity = 1;
+  const ic = document.createElement('div'); ic.className = 'appicon'; ic.textContent = 'ك';
+  ic.style.top = '170px'; ic.style.width = ic.style.height = '220px'; ic.style.marginLeft = '-110px'; ic.style.fontSize = '150px'; ic.style.borderRadius = '56px';
+  ic.style.transform = `scale(${back(l / 16) * (1 + Math.exp(-((f % 15) / 15) * 5) * .03)})`;
+  st.appendChild(ic);
+  const t1 = document.createElement('div'); t1.className = 'ctaLine'; t1.style.cssText = `top:440px;font:900 100px/1.2 'Alex';white-space:nowrap`; t1.textContent = 'ادفع مرة واحدة';
+  t1.style.opacity = clamp((l - 8) / 8); t1.style.transform = `scale(${1.4 - .4 * back((l - 8) / 14)})`; st.appendChild(t1);
+  const t2 = document.createElement('div'); t2.className = 'ctaLine grad'; t2.style.cssText = `top:580px;font:900 88px/1.3 'Alex';white-space:nowrap`; t2.textContent = 'واستخدمه على طول';
+  t2.style.opacity = clamp((l - 20) / 8); t2.style.transform = `scale(${1.4 - .4 * back((l - 20) / 14)})`; st.appendChild(t2);
+  const box = document.createElement('div'); box.className = 'ctaChecks'; box.style.top = '820px';
+  ['من غير اشتراك شهري', 'شغال من غير نت', 'بياناتك على موبايلك انت', 'تحديثات مستمرة'].forEach((t, i) => {
+    const d = l - 40 - i * 10; const c = document.createElement('div'); c.className = 'ck';
+    c.innerHTML = `<i>✓</i><span>${t}</span>`; c.style.opacity = clamp(d / 6); c.style.transform = `translateX(${(1 - ease(d / 12)) * 200}px)`;
+    box.appendChild(c);
+  });
+  st.appendChild(box);
+  const b = document.createElement('div'); b.className = 'btn'; b.style.top = '1350px'; b.textContent = 'اطلب كود التفعيل دلوقتي';
+  const d = l - 90; b.style.opacity = clamp(d / 8);
+  b.style.transform = `scale(${(d > 0 ? back(d / 14) : 0) * (1 + Math.sin(l / 6) * .025)})`;
+  st.appendChild(b);
+  document.body.style.opacity = 1;
+  st.style.opacity = endFade;
+}
+
+async function render(f) {
+  const s = sceneAt(f) || TL.scenes[TL.scenes.length - 1];
+  renderBg(f, s);
+  renderHead(f, s);
+  await renderPhone(f, s);
+  renderText(f, s);
+  renderLogo(f, s);
+  await renderPdf(f, s);
+  renderStats(f, s);
+  renderCta(f, s);
+  renderSubs(f, s);
+  if (f >= TL.total - 40) { document.querySelectorAll('#subs, #brandmark, #progress').forEach((e) => e.style.opacity = clamp((TL.total - f) / 40)); }
+  return true;
+}
+window.render = render;
+window.ready = document.fonts.ready.then(() => true);
+</script>
+</body>
+</html>

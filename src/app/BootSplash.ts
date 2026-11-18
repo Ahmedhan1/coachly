@@ -96,7 +96,11 @@ const SPLASH_ID = 'boot-splash';
 let shownAt = 0;
 
 export function showBootSplash(cache: BrandCache | null, fallbackIcon = '/icons/icon-512.png'): void {
-  if (document.getElementById(SPLASH_ID)) return;
+  if (document.getElementById(SPLASH_ID)) {
+    // Already up from public/boot.js: keep its start time for the minimum on-screen time.
+    shownAt = (window as { __bootSplashAt?: number }).__bootSplashAt ?? performance.now();
+    return;
+  }
   shownAt = performance.now();
   const el = document.createElement('div');
   el.id = SPLASH_ID;

@@ -350,3 +350,32 @@
 .editSave {
   margin: var(--sp-5) var(--gutter) 0;
 }
+
+.iconLink {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-3);
+  margin-block-start: var(--sp-3);
+}
+
+.iconSteps {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-2);
+  margin: 0;
+  padding-inline-start: var(--sp-5);
+  font: var(--t-sub);
+}
+
+.iconLinkUrl {
+  padding: var(--sp-3);
+  border-radius: var(--r-md);
+  background: var(--surface-2);
+  font: 600 14px/1.4 var(--font-mono, ui-monospace, monospace);
+  overflow-wrap: anywhere;
+  text-align: start;
+}
+
+.iconButton {
+  margin-block-start: var(--sp-3);
+}

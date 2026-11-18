@@ -17,6 +17,8 @@ import { BrowserPushService } from '@/services/push/pushService';
 import { META_KEYS } from '@/services/license/licenseActivationService';
 import { buildEnv, createActivationService } from './activationFactory';
 import { afterFirstPaint } from './afterFirstPaint';
+import { importHostedBrand } from '@/features/identity/hostedBrand';
+import { HttpBrandHosting } from '@/services/brand/brandHosting';
 import { createAppRouter } from './router';
 import { CLOUD_PASSWORD_KEY, IDENTITY_SETUP_KEY, ServicesProvider, useServices, type AppServices } from './services';
 
@@ -58,6 +60,9 @@ export function createBrowserServices(): AppServices {
   };
 }
 
+/** Waits for a background step, but never longer than `ms` (a slow network must not hold the app). */
+const settle = (p: Promise<unknown>, ms = 5000) => Promise.race([p, new Promise((resolve) => setTimeout(resolve, ms))]);
+
 type BootPhase =
   | { phase: 'loading' }
   | { phase: 'error' }
@@ -73,10 +78,14 @@ function Boot() {
   useBrandTheme(boot.phase === 'ready' ? settings?.primaryColor : undefined);
   useOnlineSync(boot.phase === 'ready');
 
+  // Installed from a branded install page (/?brand=<id>): bring the logo and colour in before the setup wizard.
+  const [brandImport] = useState(() => importHostedBrand(services, new HttpBrandHosting(), window.location.search).catch(() => false));
+
   useEffect(() => {
     let cancelled = false;
     const afterActivation = async () => {
       await services.data.ensureFirstRun(new Date());
+      await settle(brandImport);
       const done = await services.meta.get(IDENTITY_SETUP_KEY);
       if (!cancelled) setBoot(done ? { phase: 'ready' } : { phase: 'setup' });
     };
@@ -99,7 +108,7 @@ function Boot() {
     return () => {
       cancelled = true;
     };
-  }, [services]);
+  }, [services, brandImport]);
 
   // The daily purge of old soft-deleted rows waits until the first screen has painted and the main thread is idle.
   useEffect(() => {
@@ -124,6 +133,7 @@ function Boot() {
           locked={boot.locked}
           onActivated={async () => {
             await services.data.ensureFirstRun(new Date());
+            await settle(brandImport);
             const done = await services.meta.get(IDENTITY_SETUP_KEY);
             setBoot(done ? { phase: 'ready' } : { phase: 'setup' });
           }}

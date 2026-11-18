@@ -12,6 +12,8 @@ export const progressEntrySchema = z.object({
   notes: longTextSchema,
   /** Entries can come from the trainer or from the client's weekly check-in link. */
   source: z.enum(['trainer', 'client']),
+  /** 'navy': bodyFatPercent was estimated from neck/waist(/hip) and height, not typed (absent = typed or none). */
+  bodyFatSource: z.literal('navy').optional(),
   ...entityMetaShape,
 });
 

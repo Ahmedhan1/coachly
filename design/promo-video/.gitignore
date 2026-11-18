@@ -1,0 +1,12 @@
+footage*/
+frames-*/
+out/
+comp/pdf/
+comp/fonts/
+comp/built-*.html
+comp/timeline*.js
+comp/timeline*.json
+music-*.wav
+scripts/viewer-gen.mjs
+scripts/node_modules
+assets/logo.png
