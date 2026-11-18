@@ -186,6 +186,7 @@ test('the activation screen offers the language switch before activating', async
   await expect(page.locator('html')).toHaveAttribute('dir', 'ltr');
   await expect(page.getByLabel('Activation code')).toBeVisible();
   await expect(page.getByTestId('activation-language')).toHaveText(/العربية/);
+  await settle(page);
   await page.screenshot({ path: `${SHOTS}/activation.png` });
 });
 

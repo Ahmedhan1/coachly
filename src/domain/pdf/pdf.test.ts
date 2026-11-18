@@ -215,6 +215,26 @@ describe('meals and progress tables', () => {
     // recipe r1: 150 g + 10 g in grams (eggs are pieces) → 160 جم
     expect(card.items[0]?.grams).toBe('160 جم');
   });
+  it('items from the gram planner list every food with its grams and kcal, and totals come from those lines', () => {
+    const base = pdfTestCase('mixed_text', syntheticExercises(4, false));
+    const plan = base.mealPlan!;
+    const first = plan.meals[0]!;
+    const lines = [
+      { name: 'صدر فراخ ني (من غير جلد)', nameEn: 'Chicken breast, raw', grams: 180, kcal: 216, proteinG: 41, carbG: 0, fatG: 5 },
+      { name: 'بيض', nameEn: 'Egg', grams: 100, units: 2, unitLabel: 'بيضة', unitLabelEn: 'egg', kcal: 143, proteinG: 13, carbG: 1, fatG: 10 },
+    ];
+    const mealPlan = { ...plan, meals: [{ ...first, items: [{ ...first.items[0]!, servings: 1.3, lines }] }] };
+    const card = (lang?: 'en') =>
+      contentBlocks(layoutPdfDocument({ ...base, mealPlan, sections: ['recipes'], ...(lang ? { language: lang } : {}) })).find((b) => b.type === 'mealCard') as Extract<PdfBlock, { type: 'mealCard' }>;
+    const ar = card();
+    expect(ar.items.map((i) => [i.text.startsWith('· ') ? i.text : 'dish', i.detail, i.grams, i.kcal])).toEqual([
+      ['dish', '', '280 جم', '359 سعرة'],
+      ['· صدر فراخ ني (من غير جلد)', '', '180 جم', '216 سعرة'],
+      ['· بيض', '2 بيضة', '100 جم', '143 سعرة'],
+    ]);
+    expect(ar.totals?.[0]?.value).toBe('359');
+    expect(card('en').items[2]?.text).toBe('· Egg');
+  });
   it('progress prints a measurement table: first, latest, change', () => {
     const doc = layoutPdfDocument({ ...pdfTestCase('max_branding', syntheticExercises(4, true)), sections: ['progress'] });
     const table = contentBlocks(doc).find((b) => b.type === 'measureTable') as Extract<PdfBlock, { type: 'measureTable' }>;
