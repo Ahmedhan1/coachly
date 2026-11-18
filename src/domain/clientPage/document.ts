@@ -13,7 +13,7 @@ export type ShareDocumentV1 = {
     exercises: Array<{ name: string; sets?: number; reps?: string; restSec?: number; tempo?: string; rpe?: number; image?: string; notes?: string }>;
   }>;
   /** `options`: other ways to eat the meal on the same numbers; the client picks one on his page (optional). */
-  meals: Array<{ title: string; time?: string; items: string[]; notes?: string; options?: Array<{ items: string[] }> }>;
+  meals: Array<{ title: string; time?: string; items: string[]; notes?: string; options?: Array<{ items: string[] }>; id?: string }>;
   supplements: Array<{ name: string; text: string }>;
   notes: string;
   checkinsEnabled: boolean;
@@ -58,6 +58,8 @@ export interface CheckinDocumentV1 {
   sleepHours?: number;
   /** 1 (very tired) … 5 (great). */
   energy?: number;
+  /** The client's picks among meal options (meal id → option index, 0 = as planned). */
+  mealPicks?: Array<{ id: string; o: number }>;
   /** How much of the plan the client followed this week, 0–100 %. */
   adherence?: number;
 }
@@ -233,6 +235,13 @@ export function parseCheckin(value: unknown): CheckinDocumentV1 | null {
     if (!inRange(v[k], min, max)) return null;
     if (k === 'energy' && !Number.isInteger(v[k])) return null;
     out[k] = v[k];
+  }
+  if (v.mealPicks !== undefined) {
+    const picks = v.mealPicks as unknown;
+    const okPick = (p: unknown) =>
+      typeof p === 'object' && p !== null && typeof (p as { id?: unknown }).id === 'string' && ((p as { id: string }).id.length > 0 && (p as { id: string }).id.length <= 64) && Number.isInteger((p as { o?: unknown }).o) && inRange((p as { o: number }).o, 0, 3);
+    if (!Array.isArray(picks) || picks.length > 84 || !picks.every(okPick)) return null;
+    out.mealPicks = (picks as { id: string; o: number }[]).map((p) => ({ id: p.id, o: p.o }));
   }
   return out;
 }
