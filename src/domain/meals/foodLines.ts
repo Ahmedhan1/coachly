@@ -6,11 +6,15 @@ import type { FoodCategory } from './recipes';
  * it may be scaled and rounded. Names are data (Arabic, optional English); the domain never picks a locale.
  */
 export interface FoodLineSource {
+  /** Id of the food-table row the line came from (for allergies, dislikes and favourites). */
+  foodId?: string;
   name: string;
   nameEn?: string;
   /** Grams in one serving of the recipe (the starting point the solver scales from). */
   grams: number;
   per100g: Per100g;
+  /** Fibre per 100 g when the food table has it. */
+  fiberPer100g?: number;
   category?: FoodCategory;
   /** Counted in whole units of this many grams (an egg = 50 g, a baladi loaf = 90 g). */
   unitG?: number;

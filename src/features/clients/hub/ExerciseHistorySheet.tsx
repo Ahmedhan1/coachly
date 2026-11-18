@@ -6,6 +6,8 @@ import { Button, LineChart, Num, Sheet, Tx, cx } from '@/ui';
 import { formatIsoDate, formatNumber } from '@/ui/format';
 import { useExerciseCatalog } from '@/features/programs/catalog';
 import { exerciseName } from '@/features/programs/names';
+import { clientNoteText } from '@/domain/programs/tailor';
+import type { Client } from '@/domain/models';
 import styles from './Hub.module.css';
 
 export interface ExerciseHistorySheetProps {
@@ -14,10 +16,14 @@ export interface ExerciseHistorySheetProps {
   unit: 'kg' | 'lb';
   onClose: () => void;
   onOpenDetail: () => void;
+  /** The client this history belongs to (shows their own note on the exercise). */
+  client?: Pick<Client, 'name' | 'exerciseNotes'>;
+  /** Opens the client-only note editor for this exercise. */
+  onNote?: () => void;
 }
 
 /** One client's history of one exercise: best 1RM and weight, the 1RM trend, and every session's sets. */
-export function ExerciseHistorySheet({ exerciseId, logs, unit, onClose, onOpenDetail }: ExerciseHistorySheetProps) {
+export function ExerciseHistorySheet({ exerciseId, logs, unit, onClose, onOpenDetail, client, onNote }: ExerciseHistorySheetProps) {
   const catalog = useExerciseCatalog();
   const name = exerciseName(catalog?.byId.get(exerciseId), exerciseId);
   const h = exerciseHistory(logs, exerciseId);
@@ -25,6 +31,9 @@ export function ExerciseHistorySheet({ exerciseId, logs, unit, onClose, onOpenDe
   const shown = (kg: number) => formatNumber(Math.round(kgToUnit(kg, unit) * 10) / 10);
   return (
     <Sheet open onClose={onClose} title={name} cancelLabel={t('common.close')}>
+      {client && clientNoteText(client.exerciseNotes?.[exerciseId], t('clientDetail.kg')) && (
+        <p className={styles.exNote}>{clientNoteText(client.exerciseNotes?.[exerciseId], t('clientDetail.kg'))}</p>
+      )}
       {h.entries.length === 0 ? (
         <p className={styles.emptyBody}>{t('hub.training.historyEmpty')}</p>
       ) : (
@@ -78,6 +87,11 @@ export function ExerciseHistorySheet({ exerciseId, logs, unit, onClose, onOpenDe
             ))}
           </ol>
         </>
+      )}
+      {client && onNote && (
+        <Button block variant="secondary" icon="edit" onClick={onNote}>
+          {t('hub.tailor.note.button', { name: client.name })}
+        </Button>
       )}
       <Button block variant="secondary" icon="dumbbell" onClick={onOpenDetail}>
         {t('hub.exercise.openDetail')}

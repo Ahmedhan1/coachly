@@ -340,3 +340,12 @@
 .bannerText strong {
   font: var(--t-headline);
 }
+
+.clientNote {
+  margin: 0;
+  padding: var(--sp-2) var(--sp-3);
+  border-radius: var(--r-sm);
+  background: var(--warn-tint);
+  color: var(--text);
+  font: 600 15px/1.4 var(--font-ui);
+}

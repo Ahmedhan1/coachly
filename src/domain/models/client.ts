@@ -32,6 +32,33 @@ export const clientPackageSchema = z.object({
   currency: currencySchema,
 });
 
+/** Optional training profile: where and how the client trains (drives the exercise fit rules). */
+export const trainingPlaceSchema = z.enum(['gym', 'home', 'both']);
+export const trainingLevelSchema = z.enum(['beginner', 'intermediate', 'advanced']);
+export const injuryJointSchema = z.enum(['knee', 'shoulder', 'lower_back', 'wrist', 'elbow', 'neck', 'hip', 'ankle']);
+export const trainingEmphasisSchema = z.enum(['fat_loss', 'muscle', 'strength', 'fitness', 'rehab']);
+const exerciseRefSchema = z.string().min(1).max(160);
+
+export const trainingProfileSchema = z.object({
+  place: trainingPlaceSchema.optional(),
+  /** Equipment ids (see src/domain/exercises EQUIPMENT_IDS) the client has at home. */
+  homeEquipment: z.array(z.string().min(1).max(40)).max(20).optional(),
+  level: trainingLevelSchema.optional(),
+  injuredJoints: z.array(injuryJointSchema).max(8).optional(),
+  injuryNote: shortTextSchema.optional(),
+  emphasis: trainingEmphasisSchema.optional(),
+  sessionsPerWeek: z.number().int().min(1).max(7).optional(),
+  sessionMinutes: z.number().int().min(15).max(240).optional(),
+  avoidIds: z.array(exerciseRefSchema).max(300).optional(),
+  favouriteIds: z.array(exerciseRefSchema).max(300).optional(),
+});
+
+/** The trainer's note on one exercise for this client only (cue, limit). */
+export const clientExerciseNoteSchema = z.object({
+  note: shortTextSchema,
+  maxKg: z.number().positive().max(500).nullable().optional(),
+});
+
 export const clientSchema = z
   .object({
     id: clientIdSchema,
@@ -49,6 +76,9 @@ export const clientSchema = z
     remainingSessions: z.number().int().min(0).max(1000),
     notes: longTextSchema,
     photoId: imageIdSchema.nullable(),
+    trainingProfile: trainingProfileSchema.optional(),
+    /** Per-client exercise notes, keyed by exercise id. */
+    exerciseNotes: z.record(exerciseRefSchema, clientExerciseNoteSchema).optional(),
     ...entityMetaShape,
   })
   .refine((c) => !c.startDate || !c.endDate || c.startDate <= c.endDate, {
@@ -59,3 +89,5 @@ export const clientSchema = z
 export type Client = z.infer<typeof clientSchema>;
 export type ClientGoal = z.infer<typeof clientGoalSchema>;
 export type Measurements = z.infer<typeof measurementsSchema>;
+export type TrainingProfile = z.infer<typeof trainingProfileSchema>;
+export type ClientExerciseNote = z.infer<typeof clientExerciseNoteSchema>;

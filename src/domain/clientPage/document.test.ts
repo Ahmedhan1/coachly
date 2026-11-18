@@ -191,3 +191,28 @@ describe('client page language', () => {
     expect(buildShareDocument({ ...base, extras: { lang: 'fr' as unknown as 'en' } }).lang).toBeUndefined();
   });
 });
+
+describe('client page exercise notes', () => {
+  it("adds the client's own note to the exercise's notes", () => {
+    const program = {
+      name: 'برنامج',
+      notes: '',
+      days: [{ id: 'd', name: '', items: [{ id: 'i', exerciseId: 'Squat', sets: 3, reps: '10', restSec: 60, tempo: '', rpe: null, supersetGroup: null, notes: 'نزول بطيء' }] }],
+    } as unknown as Parameters<typeof buildShareDocument>[0]['program'];
+    const doc = buildShareDocument({
+      now: 1_700_000_000_000,
+      trainerName: 'كابتن',
+      color: '#F25C1F',
+      client: { name: 'سارة' },
+      program,
+      exercise: () => ({ name: 'سكوات', imageFile: null, note: 'من غير ألم في الركبة' }),
+      dayTitle: () => 'اليوم 1',
+      mealPlan: null,
+      mealItem: () => '',
+      supplements: [],
+      notes: '',
+      checkinsEnabled: false,
+    });
+    expect(doc.days[0]?.exercises[0]?.notes).toBe('نزول بطيء\nمن غير ألم في الركبة');
+  });
+});

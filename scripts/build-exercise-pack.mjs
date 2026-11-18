@@ -21,6 +21,10 @@ import { dirname, join, resolve } from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 import { promisify } from 'node:util';
 import { buildExercisePack, packImageFileName } from '../src/domain/exercises/pack.ts';
+import { deriveHomeFriendly, deriveJointStress } from '../src/domain/exercises/jointStress.ts';
+
+/** Joint load + home-friendly rules (src/domain/exercises/jointStress.ts); hand-set values win. */
+const JOINT_RULES = { stress: deriveJointStress, home: deriveHomeFriendly };
 
 const run = promisify(execFile);
 const repoRoot = resolve(dirname(fileURLToPath(import.meta.url)), '..');
@@ -33,6 +37,7 @@ export const DEFAULTS = Object.freeze({
   names: 'data-src/exercise-names.ar.json',
   overrides: 'data-src/exercise-names.overrides.ar.json',
   extras: 'data-src/exercise-extras.json',
+  fixes: 'data-src/exercise-fixes.json',
   cues: 'data-src/exercise-cues.ar.json',
   namesEn: 'data-src/exercise-names.en.json',
   cuesEn: 'data-src/exercise-cues.en.json',
@@ -73,6 +78,7 @@ export function parseArgs(argv, root = repoRoot) {
       case '--names': opts.names = value(); break;
       case '--overrides': opts.overrides = value(); break;
       case '--extras': opts.extras = value(); break;
+      case '--fixes': opts.fixes = value(); break;
       case '--cues': opts.cues = value(); break;
       case '--cache': opts.cache = value(); break;
       case '--out': opts.out = value(); break;
@@ -91,7 +97,7 @@ export function parseArgs(argv, root = repoRoot) {
       default: throw new Error(`unknown option ${flag}`);
     }
   }
-  for (const key of ['source', 'names', 'overrides', 'extras', 'cues', 'namesEn', 'cuesEn', 'cache', 'out']) opts[key] = resolve(root, opts[key]);
+  for (const key of ['source', 'names', 'overrides', 'extras', 'fixes', 'cues', 'namesEn', 'cuesEn', 'cache', 'out']) opts[key] = resolve(root, opts[key]);
   return opts;
 }
 
@@ -235,13 +241,18 @@ export async function buildPack(opts, log = console.log) {
   const cues = new Map(Object.entries(readOptional(opts.cues, {}).cues ?? {}));
   const englishNames = new Map(Object.entries(readOptional(opts.namesEn, {}).names ?? {}));
   const cuesEn = new Map(Object.entries(readOptional(opts.cuesEn, {}).cues ?? {}));
+  const fixes = new Map(Object.entries(readOptional(opts.fixes ?? '', {}).fixes ?? {}));
+  const shared = { popular, extras, cues, englishNames, cuesEn, fixes, jointRules: JOINT_RULES };
   const sourceIds = new Set(sources.map((s) => s.id));
   for (const x of extras) {
     if (x.imagesFrom !== undefined && !sourceIds.has(x.imagesFrom)) throw new Error(`extra ${x.id}: imagesFrom ${x.imagesFrom} is not a dataset exercise`);
   }
   const imgDir = join(opts.out, 'img');
   const manifestFile = join(opts.out, 'exercises.json');
-  if (opts.manifestOnly) return rebuildManifestOnly({ sources, arabicNames, popular, extras, cues, englishNames, cuesEn, manifestFile }, log);
+  for (const id of fixes.keys()) {
+    if (!sourceIds.has(id) && !extras.some((x) => x.id === id)) throw new Error(`fix ${id}: no such exercise`);
+  }
+  if (opts.manifestOnly) return rebuildManifestOnly({ sources, arabicNames, shared, manifestFile, imgDir, format: opts.format }, log);
   mkdirSync(imgDir, { recursive: true });
 
   const plan = planImages(sources, opts.format).slice(0, opts.limit);
@@ -298,7 +309,7 @@ export async function buildPack(opts, log = console.log) {
     imagesById.set(p.id, [...(imagesById.get(p.id) ?? []), p.outName]);
   }
   const imgBytes = dirSize(imgDir);
-  const pack = buildExercisePack({ sources, arabicNames, imagesById, image: settings, source: SOURCE_LABEL, imageBytes: imgBytes, popular, extras, cues, englishNames, cuesEn });
+  const pack = buildExercisePack({ sources, arabicNames, imagesById, image: settings, source: SOURCE_LABEL, imageBytes: imgBytes, ...shared });
   writeFileSync(manifestFile, serializePack(pack));
 
   // 4. report
@@ -322,12 +333,18 @@ export async function buildPack(opts, log = console.log) {
  * `--manifest-only`: rewrites exercises.json from the data-src files (names, cues, English) and keeps the
  * image list, settings and byte count of the existing manifest. Never touches, downloads or deletes images.
  */
-function rebuildManifestOnly({ sources, arabicNames, popular, extras, cues, englishNames, cuesEn, manifestFile }, log) {
+function rebuildManifestOnly({ sources, arabicNames, shared, manifestFile, imgDir }, log) {
   if (!existsSync(manifestFile)) throw new Error(`--manifest-only needs an existing ${manifestFile}`);
   const previous = JSON.parse(readFileSync(manifestFile, 'utf8'));
-  const imagesById = new Map(previous.exercises.filter((e) => e.extra !== true).map((e) => [e.id, e.images]));
   const image = { format: previous.image.format, maxSize: previous.image.maxSize, quality: previous.image.quality };
-  const pack = buildExercisePack({ sources, arabicNames, imagesById, image, source: SOURCE_LABEL, imageBytes: previous.imageBytes, popular, extras, cues, englishNames, cuesEn });
+  // Every encoded photo that exists on disk (fixes in data-src/exercise-fixes.json then pick which to keep),
+  // so a fix can be undone without re-encoding.
+  const imagesById = new Map();
+  for (const p of planImages(sources, image.format)) {
+    if (!existsSync(join(imgDir, p.outName))) continue;
+    imagesById.set(p.id, [...(imagesById.get(p.id) ?? []), p.outName]);
+  }
+  const pack = buildExercisePack({ sources, arabicNames, imagesById, image, source: SOURCE_LABEL, imageBytes: previous.imageBytes, ...shared });
   writeFileSync(manifestFile, serializePack(pack));
   log(`manifest only: ${pack.count} exercises, ${pack.exercises.filter((e) => (e.cuesEn?.length ?? 0) > 0).length} with English cues; images untouched`);
   return { pack, imageCount: 0, totalImages: 0, missing: 0, fetched: 0, encoded: 0, failures: [], totalBytes: 0, overBudget: false };

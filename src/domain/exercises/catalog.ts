@@ -1,5 +1,6 @@
 import type { ExercisePack, MuscleGroupId } from './pack';
 import type { CatalogExercise, CustomExerciseInput, ExerciseImage, ExerciseOverride } from './types';
+import { deriveHomeFriendly, deriveJointStress } from './jointStress';
 
 const unique = (ids: readonly MuscleGroupId[]): MuscleGroupId[] => [...new Set(ids)];
 
@@ -26,6 +27,8 @@ export function catalogFromPack(pack: ExercisePack, packUrl: string): CatalogExe
     ...(e.cues !== undefined && e.cues.length > 0 ? { cues: e.cues } : {}),
     ...(e.cuesEn !== undefined && e.cuesEn.length > 0 ? { cuesEn: e.cuesEn } : {}),
     ...(e.popular !== undefined ? { popularRank: e.popular } : {}),
+    jointStress: e.jointStress ?? deriveJointStress(e),
+    homeFriendly: e.homeFriendly ?? deriveHomeFriendly(e),
   }));
   return popularFirst(list);
 }
@@ -57,19 +60,26 @@ function applyOverride(exercise: CatalogExercise, override: ExerciseOverride | u
 
 export function customToCatalog(custom: CustomExerciseInput): CatalogExercise {
   const primary = unique(custom.primaryMuscles);
+  const secondary = unique(custom.secondaryMuscles ?? []).filter((id) => !primary.includes(id));
+  const equipment = custom.equipment ?? 'other';
+  const category = custom.category ?? 'strength';
+  const en = custom.nameEn?.trim() ?? '';
   return {
     id: custom.id,
     nameEn: custom.nameEn?.trim() ?? '',
     nameAr: custom.nameAr.trim(),
     primaryMuscles: primary,
-    secondaryMuscles: unique(custom.secondaryMuscles ?? []).filter((id) => !primary.includes(id)),
-    equipment: custom.equipment ?? 'other',
+    secondaryMuscles: secondary,
+    equipment,
     level: custom.level ?? 'beginner',
-    category: custom.category ?? 'strength',
+    category,
     force: null,
     mechanic: null,
     images: stored(custom.imageIds ?? []),
     isCustom: true,
+    // Rules read the English name; an Arabic-only custom exercise is judged by muscles and equipment.
+    jointStress: deriveJointStress({ en, primary, secondary, equipment, category }),
+    homeFriendly: deriveHomeFriendly({ en, equipment, category }),
   };
 }
 

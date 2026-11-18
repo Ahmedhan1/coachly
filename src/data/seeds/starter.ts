@@ -1,5 +1,6 @@
 import { z } from 'zod';
 import { buildRecipeRows, ingredientEntrySchema, type IngredientEntry, type RecipeIngredientRow } from '@/domain/meals';
+import { bundledPhotoSchema, recipeCuisineSchema, type RecipeCuisine } from '@/domain/models';
 import ingredientsJson from './ingredients.ar.json';
 import recipesJson from './recipes.ar.json';
 import supplementsJson from './supplements.ar.json';
@@ -13,6 +14,9 @@ const starterRecipeSchema = z.object({
   items: z.array(z.object({ ingredient: z.string(), grams: z.number().positive() })).min(1),
   instructions: z.string(),
   instructionsEn: z.string().optional(),
+  prepMin: z.number().int().min(0).optional(),
+  cuisine: recipeCuisineSchema.optional(),
+  photo: bundledPhotoSchema.optional(),
   /** Data version that introduced the recipe (absent = the first release). Lets updates add only new recipes. */
   since: z.number().int().min(1).optional(),
 });
@@ -29,6 +33,9 @@ export interface StarterRecipe {
   instructions: string;
   ingredients: RecipeIngredientRow[];
   since: number;
+  prepMin?: number;
+  cuisine?: RecipeCuisine;
+  photo?: string;
 }
 
 /** Version of the shipped food table and recipe book. Bumping it makes existing installs merge in what is new. */
@@ -68,6 +75,9 @@ export function starterRecipes(table: readonly IngredientEntry[] = starterIngred
       ...(r.instructionsEn ? { instructionsEn: r.instructionsEn } : {}),
       ingredients: rows.value,
       since: r.since ?? 1,
+      ...(r.prepMin !== undefined ? { prepMin: r.prepMin } : {}),
+      ...(r.cuisine ? { cuisine: r.cuisine } : {}),
+      ...(r.photo ? { photo: r.photo } : {}),
     };
   });
 }

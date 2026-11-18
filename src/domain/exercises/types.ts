@@ -4,6 +4,7 @@ import type {
   ExerciseForce,
   ExerciseLevel,
   ExerciseMechanic,
+  JointStress,
   MuscleGroupId,
 } from './pack';
 
@@ -37,6 +38,13 @@ export interface CatalogExercise {
   renamedEn?: boolean;
   /** 1-based rank in the «الأشهر» (most common) set; undefined for the rest. Lower = more common. */
   popularRank?: number;
+  /**
+   * Joint load (knee / shoulder / lower back): set on every built-in exercise (from the pack, or derived by
+   * rule when an older pack lacks it). Custom exercises get the rule-derived value too.
+   */
+  jointStress?: JointStress;
+  /** Doable at home (body weight, bands, dumbbells, kettlebell, ball, mat). */
+  homeFriendly?: boolean;
 }
 
 /** A trainer-created exercise (stored in the data layer). */

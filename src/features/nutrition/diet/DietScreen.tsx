@@ -1,16 +1,28 @@
 import { useDeferredValue, useMemo, useState, type ReactNode } from 'react';
+import { useUiStore } from '@/app/uiStore';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useLive } from '@/app/useLive';
 import {
   DIET_SCHEDULES,
+  applySplit,
+  blockedRecipes,
+  cycleDayTypes,
+  cycleTargets,
   dietNoteKeys,
   dietPlanTargets,
   goalDefaults,
   gramRecipe,
+  macroControlWarnings,
+  macroSpecFrom,
   macroSplit,
+  macroTargetsFromSpec,
   planGramWeek,
+  presetShares,
+  recipeBoosts,
+  slotsFor,
   withKcal,
   type DietGoal,
+  type DietProfile,
   type DietSettings,
   type DietSchedule,
   type DietStyle,
@@ -22,15 +34,23 @@ import {
 } from '@/domain/meals';
 import type { Client } from '@/domain/models';
 import { t } from '@/i18n';
-import { Button, EmptyState, PageHeader, SegmentedControl, Select } from '@/ui';
+import { waterIntake } from '@/domain/nutrition';
+import { Button, EmptyState, Icon, PageHeader, SegmentedControl, Select } from '@/ui';
 import { ClientNav } from '../shared/ClientNav';
 import { Slider } from '../shared/Slider';
 import { parseDecimal } from '../shared/numbers';
 import { useBackTo, useClient } from '../shared/useClient';
 import { useNutritionStore, useStarterData } from '../shared/useNutritionStore';
 import { useRecipesWithNutrition } from '../meals/useRecipeLookup';
+import { CyclePanel } from './CyclePanel';
 import { DietSettingsSheet } from './DietSettingsSheet';
 import { DietWeek } from './DietWeek';
+import { MacroPanel } from './MacroPanel';
+import { PrefsSheet } from './PrefsSheet';
+import { SplitPanel } from './SplitPanel';
+import { TrendCard } from './TrendCard';
+import { useDietProfile } from './useDietProfile';
+import cal from './Cal.module.css';
 import common from '../shared/common.module.css';
 import styles from './Diet.module.css';
 
@@ -52,6 +72,7 @@ export function DietScreen() {
   const recipes = useRecipesWithNutrition();
   const [version, setVersion] = useState(0);
   const dietSettings = useLive(() => store.getDietSettings(), [store, version]);
+  const { profile, save: saveProfile } = useDietProfile(clientId);
 
   const header = <PageHeader title={t('nutrition.diet.title')} subtitle={client?.name} back={{ to: back, label: t('nutrition.diet.back') }} />;
   // Wait for the starter cookbook: planning while it is still being written would re-plan for every new recipe.
@@ -70,7 +91,8 @@ export function DietScreen() {
         </div>
       </div>
     );
-  if (!ready || client === undefined || saved === undefined || settings === undefined || dietSettings === undefined || recipes === undefined || foods === undefined) return header;
+  if (!ready || client === undefined || saved === undefined || settings === undefined || dietSettings === undefined || recipes === undefined || foods === undefined || profile === undefined)
+    return header;
   if (client === null) {
     return (
       <>
@@ -96,7 +118,19 @@ export function DietScreen() {
     );
   }
   return (
-    <DietView client={client} saved={saved} settings={settings} dietSettings={dietSettings} recipes={recipes} foods={foods} header={header} onSettingsChanged={() => setVersion((v) => v + 1)} />
+    <DietView
+      key={client.id}
+      client={client}
+      saved={saved}
+      settings={settings}
+      dietSettings={dietSettings}
+      recipes={recipes}
+      foods={foods}
+      header={header}
+      initialProfile={profile}
+      onProfile={(p) => void saveProfile(p)}
+      onSettingsChanged={() => setVersion((v) => v + 1)}
+    />
   );
 }
 
@@ -108,11 +142,22 @@ interface ViewProps {
   recipes: NonNullable<ReturnType<typeof useRecipesWithNutrition>>;
   foods: IngredientEntry[];
   header: ReactNode;
+  initialProfile: DietProfile;
+  onProfile: (p: DietProfile) => void;
   onSettingsChanged: () => void;
 }
 
-function DietView({ client, saved, settings, dietSettings, recipes, foods, header, onSettingsChanged }: ViewProps) {
+function DietView({ client, saved, settings, dietSettings, recipes, foods, header, initialProfile, onProfile, onSettingsChanged }: ViewProps) {
   const navigate = useNavigate();
+  const showToast = useUiStore((s) => s.showToast);
+  const [profile, setProfileState] = useState<DietProfile>(initialProfile);
+  const setProfile = (p: DietProfile) => {
+    setProfileState(p);
+    onProfile(p);
+  };
+  const [showPrefs, setShowPrefs] = useState(false);
+  const kpg = settings.kcalPerGram;
+  const weightKg = saved.input.weightKg;
   const startGoal: DietGoal = saved.input.goal;
   const initial = goalDefaults(startGoal, settings, dietSettings);
   const [goal, setGoal] = useState<DietGoal>(startGoal);
@@ -141,19 +186,71 @@ function DietView({ client, saved, settings, dietSettings, recipes, foods, heade
     () => dietPlanTargets({ saved, goal, style, percent, proteinPerKg, fatPerKg }, settings, dietSettings),
     [saved, goal, style, percent, proteinPerKg, fatPerKg, settings, dietSettings],
   );
-  const targets = useMemo(() => (kcalOverride === null ? plan.targets : withKcal(plan.targets, kcalOverride, settings.kcalPerGram)), [plan, kcalOverride, settings]);
+  const kcalTargets = useMemo(() => (kcalOverride === null ? plan.targets : withKcal(plan.targets, kcalOverride, settings.kcalPerGram)), [plan, kcalOverride, settings]);
+  // The trainer's own macro split (grams / g per kg / %) divides the same calories.
+  const specTargets = useMemo(() => (profile.macro ? macroTargetsFromSpec(kcalTargets.kcal, weightKg, profile.macro, kpg) : null), [profile.macro, kcalTargets, weightKg, kpg]);
+  const targets = useMemo(
+    () => (specTargets ? { kcal: specTargets.kcal, proteinG: specTargets.proteinG, carbG: specTargets.carbG, fatG: specTargets.fatG } : kcalTargets),
+    [specTargets, kcalTargets],
+  );
+  const macroWarnings = specTargets ? macroControlWarnings(targets, { goal, weightKg, sex: saved.input.sex, overflowKcal: specTargets.overflowKcal }, dietSettings, kpg) : [];
   const book: GramRecipe[] = useMemo(() => recipes.map((r) => gramRecipe(r.recipe, foods)), [recipes, foods]);
+  const exclude = useMemo(() => blockedRecipes(book, profile.prefs), [book, profile.prefs]);
+  const boost = useMemo(() => recipeBoosts(book, profile.prefs), [book, profile.prefs]);
+  // Meal split: preset or the trainer's own shares, plus carbs moved around the workout time.
+  const slots = useMemo(() => {
+    const base = slotsFor(schedule, meals, dietSettings);
+    const shares = profile.split === 'custom' ? profile.shares : presetShares(base, profile.split, profile.workoutTime);
+    return applySplit(base, shares, profile.workoutTime);
+  }, [schedule, meals, dietSettings, profile.split, profile.shares, profile.workoutTime]);
+  // Carb cycling: training / rest / refeed days, weekly average kept on the day target.
+  const extraKcal = profile.cycle.extraKcal ?? dietSettings.trainingDayExtraKcal;
+  const dayTypes = useMemo(() => cycleDayTypes(7, profile.cycle.trainingDays, profile.cycle.refeedDay), [profile.cycle.trainingDays, profile.cycle.refeedDay]);
+  const cycle = useMemo(() => cycleTargets(targets, dayTypes, { trainingExtraKcal: extraKcal, refeedKcal: saved.tdee }, kpg), [targets, dayTypes, extraKcal, saved.tdee, kpg]);
+  const dayTargets = profile.cycle.enabled ? cycle.days : null;
+  const water = waterIntake(weightKg, settings.waterMlPerKg);
   const perServing = useMemo(() => new Map(recipes.map((r) => [r.recipe.id as string, r.perServing.kcal])), [recipes]);
 
   // Planning follows the controls without blocking them (a slider drag stays smooth on a phone).
-  const controls = useMemo(() => ({ targets, goal, style, schedule, meals, vegetarian, seed }), [targets, goal, style, schedule, meals, vegetarian, seed]);
+  const controls = useMemo(
+    () => ({ targets, goal, style, schedule, meals, vegetarian, seed, slots, dayTargets, exclude, boost }),
+    [targets, goal, style, schedule, meals, vegetarian, seed, slots, dayTargets, exclude, boost],
+  );
   const live = useDeferredValue(controls);
   const week = useMemo(
-    () => planGramWeek(book, live.targets, { goal: live.goal, schedule: live.schedule, mealsPerDay: live.meals, days: 7, style: live.style, vegetarian: live.vegetarian, seed: live.seed }, dietSettings),
+    () =>
+      planGramWeek(
+        book,
+        live.targets,
+        {
+          goal: live.goal,
+          schedule: live.schedule,
+          mealsPerDay: live.meals,
+          days: 7,
+          style: live.style,
+          vegetarian: live.vegetarian,
+          seed: live.seed,
+          slots: live.slots,
+          ...(live.dayTargets ? { dayTargets: live.dayTargets } : {}),
+          exclude: live.exclude,
+          boost: live.boost,
+        },
+        dietSettings,
+      ),
     [book, live, dietSettings],
   );
-  /** Hand edits survive target changes but not a new layout (meals, schedule, filters, variation). */
-  const layoutKey = `${live.schedule}|${live.meals}|${live.style}|${live.vegetarian}|${live.seed}|${live.goal}|${book.length}`;
+  /** Hand edits survive target and split changes but not a new layout (meals, schedule, filters, food prefs, variation). */
+  const layoutKey = `${live.schedule}|${live.meals}|${live.style}|${live.vegetarian}|${live.seed}|${live.goal}|${book.length}|${JSON.stringify(profile.prefs)}|${profile.cycle.enabled}`;
+  const liveDayTargets = useMemo(() => Array.from({ length: 7 }, (_, i) => live.dayTargets?.[i] ?? live.targets), [live]);
+  const prefsCount = profile.prefs.allergies.length + profile.prefs.dislikes.length + profile.prefs.loves.length + (profile.prefs.budget ? 1 : 0);
+  const applyTrend = (delta: number) => {
+    const next = Math.max(800, Math.min(8000, Math.round(kcalTargets.kcal + delta)));
+    setKcalText(null);
+    setKcalOverride(next);
+    showToast({ message: t('nutrition.cal.applied', { kcal: next }), duration: 3000 });
+  };
+  const toggleMacro = (on: boolean) =>
+    setProfile({ ...profile, macro: on ? macroSpecFrom(kcalTargets, weightKg, { protein: 'perKg', fat: 'perKg', carb: 'grams' }, 'carb', kpg) : null });
 
   const range = goal === 'cut' ? settings.goalRanges.cut : settings.goalRanges.bulk;
   const noteKeys = dietNoteKeys(goal, style, schedule);
@@ -209,9 +306,17 @@ function DietView({ client, saved, settings, dietSettings, recipes, foods, heade
               display={`${percent}%`}
             />
           )}
-          <Slider label={t('nutrition.diet.proteinPerKg')} value={proteinPerKg} min={settings.proteinPerKgRange.min} max={settings.proteinPerKgRange.max} step={0.1} onChange={setProteinPerKg} display={String(Math.round(proteinPerKg * 10) / 10)} />
-          <Slider label={t('nutrition.diet.fatPerKg')} value={fatPerKg} min={settings.fatPerKgRange.min} max={settings.fatPerKgRange.max} step={0.1} onChange={setFatPerKg} display={String(Math.round(fatPerKg * 10) / 10)} />
+          {!profile.macro && (
+            <>
+              <Slider label={t('nutrition.diet.proteinPerKg')} value={proteinPerKg} min={settings.proteinPerKgRange.min} max={settings.proteinPerKgRange.max} step={0.1} onChange={setProteinPerKg} display={String(Math.round(proteinPerKg * 10) / 10)} />
+              <Slider label={t('nutrition.diet.fatPerKg')} value={fatPerKg} min={settings.fatPerKgRange.min} max={settings.fatPerKgRange.max} step={0.1} onChange={setFatPerKg} display={String(Math.round(fatPerKg * 10) / 10)} />
+            </>
+          )}
         </div>
+      </section>
+
+      <section className={common.section}>
+        <TrendCard clientId={client.id} goal={goal} ds={dietSettings} onApply={applyTrend} />
       </section>
 
       <section className={common.section} aria-label={t('nutrition.diet.targetsTitle')}>
@@ -268,6 +373,30 @@ function DietView({ client, saved, settings, dietSettings, recipes, foods, heade
           </div>
         </dl>
         <p className={common.caption}>{t('nutrition.diet.split', { p: split.p, c: split.c, f: split.f })}</p>
+        <div className={common.tile}>
+          <label className={styles.check}>
+            <input type="checkbox" checked={profile.macro !== null} onChange={(e) => toggleMacro(e.target.checked)} />
+            {t('nutrition.cal.macroCustom')}
+          </label>
+          {profile.macro && <MacroPanel spec={profile.macro} targets={targets} weightKg={weightKg} kpg={kpg} onChange={(m) => setProfile({ ...profile, macro: m })} />}
+          {macroWarnings.map((w) => (
+            <p key={w} className={common.note} role="status">
+              {t(`nutrition.cal.warn.${w}`, {
+                n:
+                  w === 'protein_low_cut'
+                    ? dietSettings.cutMinProteinPerKg
+                    : w === 'protein_low'
+                      ? dietSettings.minProteinPerKg
+                      : w === 'protein_very_high'
+                        ? dietSettings.maxProteinPerKg
+                        : w === 'fat_low'
+                          ? dietSettings.minFatPerKg
+                          : dietSettings.maxFatPercent,
+                kcal: Math.round(specTargets?.overflowKcal ?? 0),
+              })}
+            </p>
+          ))}
+        </div>
         {plan.floored && kcalOverride === null && <p className={common.note}>{t('nutrition.diet.flooredNote', { kcal: r1(targets.kcal) })}</p>}
         {plan.warnings.map((w) => (
           <p key={w} className={common.note} role="status">
@@ -285,6 +414,54 @@ function DietView({ client, saved, settings, dietSettings, recipes, foods, heade
         </div>
       </section>
 
+      <section className={common.section}>
+        <details className={common.disclosure}>
+          <summary>
+            {t('nutrition.cal.splitTitle')}
+            <Icon name="chevronDown" />
+          </summary>
+          <div className={common.disclosureBody}>
+            <SplitPanel
+              slots={slots}
+              kcal={targets.kcal}
+              preset={profile.split}
+              workoutTime={profile.workoutTime}
+              onPreset={(p) => setProfile({ ...profile, split: p, shares: null, workoutTime: p === 'workout' && profile.workoutTime === null ? '17:00' : profile.workoutTime })}
+              onShares={(sh) => setProfile({ ...profile, split: 'custom', shares: sh })}
+              onWorkout={(time) => setProfile({ ...profile, workoutTime: time, ...(profile.split === 'custom' ? {} : {}) })}
+            />
+          </div>
+        </details>
+        <details className={common.disclosure}>
+          <summary>
+            {t('nutrition.cal.cycleTitle')}
+            <Icon name="chevronDown" />
+          </summary>
+          <div className={common.disclosureBody}>
+            <CyclePanel
+              cycle={profile.cycle}
+              extraKcal={extraKcal}
+              types={dayTypes}
+              days={cycle.days}
+              averageKcal={cycle.averageKcal}
+              targetKcal={targets.kcal}
+              onChange={(c) => setProfile({ ...profile, cycle: c })}
+            />
+          </div>
+        </details>
+        <div className={`${common.tile} ${cal.panel}`}>
+          <h2 className={common.sectionTitle}>{t('nutrition.cal.prefsTitle')}</h2>
+          <p className={common.caption}>
+            {prefsCount === 0 ? t('nutrition.cal.prefsNone') : t('nutrition.cal.prefsSummary', { blocked: exclude.size, loves: profile.prefs.loves.length })}
+          </p>
+          <div className={common.actions}>
+            <Button variant="secondary" icon="settings" onClick={() => setShowPrefs(true)}>
+              {t('nutrition.cal.prefsOpen')}
+            </Button>
+          </div>
+        </div>
+      </section>
+
       {book.length === 0 ? (
         <p className={common.note}>{t('nutrition.diet.noRecipes')}</p>
       ) : (
@@ -296,13 +473,18 @@ function DietView({ client, saved, settings, dietSettings, recipes, foods, heade
           recipes={recipes}
           foods={foods}
           perServing={perServing}
-          targets={live.targets}
-          options={{ goal: live.goal, style: live.style, vegetarian: live.vegetarian }}
+          targets={liveDayTargets}
+          slots={live.slots}
+          dayTypes={live.dayTargets ? dayTypes : null}
+          water={water.ok ? water.value : null}
+          options={{ goal: live.goal, style: live.style, vegetarian: live.vegetarian, exclude: live.exclude, boost: live.boost }}
           ds={dietSettings}
           noteKeys={noteKeys}
           onSaved={() => navigate(`/clients/${client.id}/meals`, { replace: true })}
         />
       )}
+
+      {showPrefs && <PrefsSheet prefs={profile.prefs} foods={foods} onChange={(p) => setProfile({ ...profile, prefs: p })} onClose={() => setShowPrefs(false)} />}
 
       {showSettings && (
         <DietSettingsSheet

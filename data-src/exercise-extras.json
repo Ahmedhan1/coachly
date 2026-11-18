@@ -1,5 +1,5 @@
 {
- "_note": "Built-in exercises the free-exercise-db lacks but Egyptian gyms use. Cues are our own Arabic words. imagesFrom reuses a pack exercise photo only when it truly shows the same movement; otherwise the app shows the muscle-map illustration (rendered from our own 3D model).",
+ "_note": "Built-in exercises the free-exercise-db lacks but Egyptian gyms use. Cues are our own Arabic words. imagesFrom reuses a pack exercise photo only when it truly shows the same movement; otherwise the app shows the muscle-map illustration (rendered from our own 3D model). Wave 5: imagesFrom set for 17 extras after a visual check that the dataset photos show the same movement (see docs/EXERCISE_PACK.md).",
  "exercises": [
   {
    "id": "pt_Hip_Thrust_Machine",
@@ -155,7 +155,8 @@
     "ادفع بكعب الرجل اللي قدام",
     "ميّل شوية لقدام لو عايز جلوتس أكتر"
    ],
-   "popular": true
+   "popular": true,
+   "imagesFrom": "Split_Squat_with_Dumbbells"
   },
   {
    "id": "pt_Dumbbell_Hip_Thrust",
@@ -303,7 +304,8 @@
     "ارفع بالكوع لحد مستوى الكتف",
     "متتأرجحش بجسمك"
    ],
-   "popular": true
+   "popular": true,
+   "imagesFrom": "Standing_Low-Pulley_Deltoid_Raise"
   },
   {
    "id": "pt_Cable_Triceps_Kickback",
@@ -343,7 +345,8 @@
     "الكوع ثابت جنبك",
     "اعصر البايسبس فوق",
     "نزّل ببطء"
-   ]
+   ],
+   "imagesFrom": "Standing_Biceps_Cable_Curl"
   },
   {
    "id": "pt_Smith_Machine_Shrug",
@@ -409,7 +412,8 @@
     "متمسكش المقابض",
     "جسمك مستقيم وخطواتك كاملة"
    ],
-   "popular": true
+   "popular": true,
+   "imagesFrom": "Walking_Treadmill"
   },
   {
    "id": "pt_Burpee",
@@ -582,7 +586,8 @@
     "امسك الماكينة وميّل شوية لقدام",
     "ادفع الرجل لورا بالجلوتس",
     "اعصر فوق ثانية"
-   ]
+   ],
+   "imagesFrom": "One-Legged_Cable_Kickback"
   },
   {
    "id": "pt_Leg_Press_Single_Leg",
@@ -757,7 +762,8 @@
     "صدرك على المسند",
     "اسحب بالكوع واضغط لوحين الكتف",
     "متميلش بجسمك"
-   ]
+   ],
+   "imagesFrom": "Leverage_Iso_Row"
   },
   {
    "id": "pt_Pendlay_Row",
@@ -824,7 +830,8 @@
     "ميّل لقدام شوية والإيدين مفرودة تقريباً",
     "اسحب بالكوع لحد فخادك",
     "اعصر اللاتس"
-   ]
+   ],
+   "imagesFrom": "Straight-Arm_Pulldown"
   },
   {
    "id": "pt_Glute_Focused_Back_Extension",
@@ -973,7 +980,8 @@
     "امسك الباند بقبضة واسعة",
     "لف الباند لورا بإيدين مفرودة",
     "وسّع القبضة لو حسيت بشد"
-   ]
+   ],
+   "imagesFrom": "Round_The_World_Shoulder_Stretch"
   },
   {
    "id": "pt_Bayesian_Curl",
@@ -1485,7 +1493,8 @@
     "نطّة جانبية على رجل واحدة",
     "انزل على الركبة اللي بتهبط عليها",
     "ثبّت ثانية وارجع"
-   ]
+   ],
+   "imagesFrom": "Lateral_Bound"
   },
   {
    "id": "pt_Plank_Shoulder_Taps",
@@ -1594,7 +1603,8 @@
     "ارفع الجذع والرجل مع بعض",
     "المس مشط رجلك بإيدك",
     "نزّل ببطء"
-   ]
+   ],
+   "imagesFrom": "Jackknife_Sit-Up"
   },
   {
    "id": "pt_Bicycle_Crunch",
@@ -1615,7 +1625,8 @@
     "وصّل الكوع بالركبة المعاكسة",
     "لف بالكتف مش بالرقبة",
     "حركة بطيئة ومتحكم فيها"
-   ]
+   ],
+   "imagesFrom": "Air_Bike"
   },
   {
    "id": "pt_Hanging_Knee_Raise",
@@ -1658,7 +1669,8 @@
     "اتعلق وكتافك لتحت",
     "ارفع رجلك لحد البار",
     "اتحكم في النزول"
-   ]
+   ],
+   "imagesFrom": "Hanging_Pike"
   },
   {
    "id": "pt_Copenhagen_Plank",
@@ -1748,7 +1760,8 @@
     "اظبط الكرسي في مستوى الحوض",
     "ضهرك مفرود",
     "غيّر المقاومة حسب الفترة"
-   ]
+   ],
+   "imagesFrom": "Bicycling_Stationary"
   },
   {
    "id": "pt_Treadmill_Sprint",
@@ -1771,7 +1784,8 @@
     "سخّن كويس قبل السرعة العالية",
     "ممسكش المقابض",
     "فترات قصيرة وراحة"
-   ]
+   ],
+   "imagesFrom": "Running_Treadmill"
   },
   {
    "id": "pt_Shadow_Boxing",
@@ -1858,7 +1872,8 @@
     "ارفع الكورة فوق راسك وانت واقف على صوابعك",
     "اضربها للأرض بالأبس واللاتس",
     "التقطها وكرر"
-   ]
+   ],
+   "imagesFrom": "Overhead_Slam"
   },
   {
    "id": "pt_Bear_Crawl",
@@ -2073,7 +2088,8 @@
     "الفوم رولر تحت ضهرك العلوي ودراعك على صدرك",
     "لف ببطء على الأماكن المشدودة",
     "متدورش على أسفل الضهر"
-   ]
+   ],
+   "imagesFrom": "Rhomboids-SMR"
   },
   {
    "id": "pt_Foam_Roll_Glutes",
@@ -2094,7 +2110,8 @@
     "اقعد على الفوم رولر ورجل على التانية",
     "لف ببطء على الأماكن المشدودة",
     "تنفس واسترخي"
-   ]
+   ],
+   "imagesFrom": "Piriformis-SMR"
   },
   {
    "id": "pt_Cobra_Stretch",
@@ -2117,6 +2134,2785 @@
     "ارفع صدرك وحوضك على الأرض",
     "متشدش رقبتك لورا"
    ]
+  },
+  {
+   "id": "pt_Smith_Machine_Sumo_Squat",
+   "en": "Smith Machine Sumo Squat",
+   "ar": "سومو سكوات على السميث",
+   "primary": [
+    "quads",
+    "adductors"
+   ],
+   "secondary": [
+    "glutes"
+   ],
+   "equipment": "machine",
+   "level": "beginner",
+   "category": "strength",
+   "force": "push",
+   "mechanic": "compound",
+   "cues": [
+    "رجليك أوسع من كتفك وصوابعك لبره",
+    "انزل وركبك ماشية مع صوابعك",
+    "اطلع بالكعب واعصر الجلوتس"
+   ]
+  },
+  {
+   "id": "pt_Smith_Machine_Inverted_Row",
+   "en": "Smith Machine Inverted Row",
+   "ar": "إنفيرتد رو على السميث",
+   "primary": [
+    "middle_back"
+   ],
+   "secondary": [
+    "lats",
+    "biceps"
+   ],
+   "equipment": "machine",
+   "level": "beginner",
+   "category": "strength",
+   "force": "pull",
+   "mechanic": "compound",
+   "cues": [
+    "البار على ارتفاع وسطك وجسمك مفرود",
+    "اسحب صدرك للبار واضغط لوحين الكتف",
+    "انزل ببطء"
+   ],
+   "jointStress": {
+    "lowerBack": "low",
+    "shoulder": "low"
+   }
+  },
+  {
+   "id": "pt_Smith_Machine_Reverse_Lunge",
+   "en": "Smith Machine Reverse Lunge",
+   "ar": "ريفرس لانجز على السميث",
+   "primary": [
+    "quads",
+    "glutes"
+   ],
+   "secondary": [
+    "hamstrings"
+   ],
+   "equipment": "machine",
+   "level": "intermediate",
+   "category": "strength",
+   "force": "push",
+   "mechanic": "compound",
+   "cues": [
+    "ارجع خطوة لورا والبار ثابت",
+    "انزل لحد ما الركبة اللي ورا تقرب من الأرض",
+    "ادفع بكعب الرجل اللي قدام"
+   ],
+   "jointStress": {
+    "knee": "medium"
+   }
+  },
+  {
+   "id": "pt_Smith_Machine_Seated_Shoulder_Press",
+   "en": "Smith Machine Seated Shoulder Press",
+   "ar": "شولدر برس قاعد على السميث",
+   "primary": [
+    "shoulders"
+   ],
+   "secondary": [
+    "triceps"
+   ],
+   "equipment": "machine",
+   "level": "beginner",
+   "category": "strength",
+   "force": "push",
+   "mechanic": "compound",
+   "cues": [
+    "الدكة تحت البار وضهرك على المسند",
+    "انزل البار لحد دقنك",
+    "ادفع لفوق من غير ما تقفل الكوع"
+   ],
+   "jointStress": {
+    "lowerBack": "low"
+   }
+  },
+  {
+   "id": "pt_Smith_Machine_Glute_Bridge",
+   "en": "Smith Machine Glute Bridge",
+   "ar": "جلوت بريدج على السميث",
+   "primary": [
+    "glutes"
+   ],
+   "secondary": [
+    "hamstrings"
+   ],
+   "equipment": "machine",
+   "level": "beginner",
+   "category": "strength",
+   "force": "push",
+   "mechanic": "isolation",
+   "cues": [
+    "نام على الأرض والبار على الحوض بمخدة",
+    "ادفع بالكعب واقفل بالجلوتس",
+    "اعصر ثانية فوق"
+   ],
+   "jointStress": {
+    "knee": "low",
+    "shoulder": "low",
+    "lowerBack": "low"
+   }
+  },
+  {
+   "id": "pt_Machine_Low_Row",
+   "en": "Machine Low Row",
+   "ar": "لو رو على الماشين",
+   "primary": [
+    "middle_back",
+    "lats"
+   ],
+   "secondary": [
+    "biceps",
+    "traps"
+   ],
+   "equipment": "machine",
+   "level": "beginner",
+   "category": "strength",
+   "force": "pull",
+   "mechanic": "compound",
+   "cues": [
+    "صدرك على المسند ورجلك ثابتة",
+    "اسحب الإيد لحد وسطك بالكوع",
+    "اعصر لوحين الكتف وارجع ببطء"
+   ],
+   "jointStress": {
+    "knee": "low",
+    "shoulder": "low",
+    "lowerBack": "low"
+   }
+  },
+  {
+   "id": "pt_Machine_Back_Extension",
+   "en": "Seated Back Extension Machine",
+   "ar": "باك إكستنشن قاعد على الماشين",
+   "primary": [
+    "lower_back"
+   ],
+   "secondary": [
+    "glutes",
+    "hamstrings"
+   ],
+   "equipment": "machine",
+   "level": "beginner",
+   "category": "strength",
+   "force": "pull",
+   "mechanic": "isolation",
+   "cues": [
+    "اقعد وضهرك على المسند والحزام مربوط",
+    "ارجع لورا ببطء لحد ما جسمك يتفرد",
+    "متشدش بسرعة"
+   ],
+   "jointStress": {
+    "lowerBack": "medium",
+    "knee": "low",
+    "shoulder": "low"
+   }
+  },
+  {
+   "id": "pt_Machine_Torso_Rotation",
+   "en": "Machine Torso Rotation",
+   "ar": "تورسو روتيشن على الماشين",
+   "primary": [
+    "obliques"
+   ],
+   "secondary": [
+    "abs"
+   ],
+   "equipment": "machine",
+   "level": "beginner",
+   "category": "strength",
+   "force": "pull",
+   "mechanic": "isolation",
+   "cues": [
+    "اقعد وحوضك ثابت",
+    "لف بوسطك مش بإيدك",
+    "ارجع ببطء من غير ما الأوزان تخبط"
+   ],
+   "jointStress": {
+    "lowerBack": "medium"
+   }
+  },
+  {
+   "id": "pt_Hack_Squat_Calf_Raise",
+   "en": "Hack Squat Calf Raise",
+   "ar": "كالف رايز على الهاك سكوات",
+   "primary": [
+    "calves"
+   ],
+   "secondary": [],
+   "equipment": "machine",
+   "level": "beginner",
+   "category": "strength",
+   "force": "push",
+   "mechanic": "isolation",
+   "cues": [
+    "طراطيف رجلك على طرف البلاتفورم",
+    "انزل بالكعب لتحت لآخر مدى",
+    "اطلع على صوابعك واثبت ثانية"
+   ],
+   "jointStress": {
+    "knee": "low",
+    "lowerBack": "medium"
+   }
+  },
+  {
+   "id": "pt_Wide_Stance_Leg_Press",
+   "en": "Wide-Stance Leg Press",
+   "ar": "ليج برس رجل واسعة",
+   "primary": [
+    "glutes",
+    "adductors"
+   ],
+   "secondary": [
+    "quads",
+    "hamstrings"
+   ],
+   "equipment": "machine",
+   "level": "beginner",
+   "category": "strength",
+   "force": "push",
+   "mechanic": "compound",
+   "cues": [
+    "رجليك واسعة وعالية على البلاتفورم",
+    "ركبك ماشية مع صوابعك",
+    "متخليش حوضك يتكور تحت"
+   ],
+   "jointStress": {
+    "knee": "medium",
+    "lowerBack": "medium"
+   }
+  },
+  {
+   "id": "pt_High_Foot_Leg_Press",
+   "en": "High-Foot Leg Press",
+   "ar": "ليج برس رجل عالية",
+   "primary": [
+    "glutes",
+    "hamstrings"
+   ],
+   "secondary": [
+    "quads"
+   ],
+   "equipment": "machine",
+   "level": "beginner",
+   "category": "strength",
+   "force": "push",
+   "mechanic": "compound",
+   "cues": [
+    "رجليك فوق على البلاتفورم",
+    "انزل لحد 90 درجة",
+    "ادفع بالكعب للجلوتس"
+   ],
+   "jointStress": {
+    "knee": "low",
+    "lowerBack": "medium"
+   }
+  },
+  {
+   "id": "pt_Single_Leg_Lying_Leg_Curl",
+   "en": "Single-Leg Lying Leg Curl",
+   "ar": "ليج كيرل نايم برجل واحدة",
+   "primary": [
+    "hamstrings"
+   ],
+   "secondary": [
+    "calves"
+   ],
+   "equipment": "machine",
+   "level": "beginner",
+   "category": "strength",
+   "force": "pull",
+   "mechanic": "isolation",
+   "cues": [
+    "حوضك لازق في المسند",
+    "اسحب برجل واحدة لآخر مدى",
+    "انزل ببطء"
+   ],
+   "jointStress": {
+    "knee": "low",
+    "shoulder": "low",
+    "lowerBack": "low"
+   }
+  },
+  {
+   "id": "pt_Leaning_Hip_Abduction_Machine",
+   "en": "Hip Abduction Machine (Leaning Forward)",
+   "ar": "أبداكتور على الماشين مايل لقدام",
+   "primary": [
+    "glutes",
+    "abductors"
+   ],
+   "secondary": [],
+   "equipment": "machine",
+   "level": "beginner",
+   "category": "strength",
+   "force": "push",
+   "mechanic": "isolation",
+   "cues": [
+    "ميّل بجسمك لقدام وضهرك مفرود",
+    "افتح برجليك بالجلوتس",
+    "ارجع ببطء"
+   ],
+   "jointStress": {
+    "knee": "low",
+    "shoulder": "low",
+    "lowerBack": "low"
+   }
+  },
+  {
+   "id": "pt_Cable_Y_Raise",
+   "en": "Cable Y-Raise",
+   "ar": "واي رايز على الكابل",
+   "primary": [
+    "shoulders"
+   ],
+   "secondary": [
+    "traps"
+   ],
+   "equipment": "cable",
+   "level": "intermediate",
+   "category": "strength",
+   "force": "pull",
+   "mechanic": "isolation",
+   "cues": [
+    "الكابلين من تحت ومتقاطعين",
+    "ارفع إيدك على شكل حرف Y",
+    "متهزش جسمك"
+   ],
+   "jointStress": {
+    "shoulder": "medium"
+   }
+  },
+  {
+   "id": "pt_Standing_Single_Arm_Cable_Row",
+   "en": "Standing Single-Arm Cable Row",
+   "ar": "ون آرم رو واقف على الكابل",
+   "primary": [
+    "middle_back",
+    "lats"
+   ],
+   "secondary": [
+    "biceps"
+   ],
+   "equipment": "cable",
+   "level": "beginner",
+   "category": "strength",
+   "force": "pull",
+   "mechanic": "compound",
+   "cues": [
+    "اقف ورجل قدام التانية",
+    "اسحب بالكوع لجنبك",
+    "متلفش جسمك"
+   ],
+   "jointStress": {
+    "knee": "low",
+    "shoulder": "low",
+    "lowerBack": "low"
+   }
+  },
+  {
+   "id": "pt_Cable_Goblet_Squat",
+   "en": "Cable Goblet Squat",
+   "ar": "جوبلت سكوات على الكابل",
+   "primary": [
+    "quads"
+   ],
+   "secondary": [
+    "glutes",
+    "abs"
+   ],
+   "equipment": "cable",
+   "level": "beginner",
+   "category": "strength",
+   "force": "push",
+   "mechanic": "compound",
+   "cues": [
+    "امسك الإيد عند صدرك والكابل من تحت",
+    "انزل وضهرك مفرود",
+    "اطلع بالكعب"
+   ],
+   "jointStress": {
+    "knee": "medium",
+    "lowerBack": "low"
+   }
+  },
+  {
+   "id": "pt_Half_Kneeling_Cable_Chop",
+   "en": "Half-Kneeling Cable Chop",
+   "ar": "هاف نيلينج تشوب على الكابل",
+   "primary": [
+    "obliques"
+   ],
+   "secondary": [
+    "abs",
+    "shoulders"
+   ],
+   "equipment": "cable",
+   "level": "intermediate",
+   "category": "strength",
+   "force": "pull",
+   "mechanic": "compound",
+   "cues": [
+    "ركبة على الأرض والكابل من فوق",
+    "اسحب بالاتنين لتحت بالعرض",
+    "وسطك ثابت ومتلفش بحوضك"
+   ],
+   "jointStress": {
+    "knee": "low",
+    "shoulder": "low",
+    "lowerBack": "low"
+   }
+  },
+  {
+   "id": "pt_Cable_Glute_Abduction_Lying",
+   "en": "Cable Crossover Glute Kickback (45°)",
+   "ar": "جلوت كيك باك 45 على الكابل",
+   "primary": [
+    "glutes"
+   ],
+   "secondary": [
+    "abductors"
+   ],
+   "equipment": "cable",
+   "level": "beginner",
+   "category": "strength",
+   "force": "push",
+   "mechanic": "isolation",
+   "cues": [
+    "الكابل في رجلك وانت ماسك الجهاز",
+    "ادفع رجلك لورا ولبره بزاوية 45",
+    "متقوّسش ضهرك"
+   ],
+   "jointStress": {
+    "knee": "low",
+    "shoulder": "low",
+    "lowerBack": "low"
+   }
+  },
+  {
+   "id": "pt_B_Stance_Hip_Thrust",
+   "en": "B-Stance Hip Thrust",
+   "ar": "بي ستانس هيب ثرست",
+   "primary": [
+    "glutes"
+   ],
+   "secondary": [
+    "hamstrings"
+   ],
+   "equipment": "barbell",
+   "level": "intermediate",
+   "category": "strength",
+   "force": "push",
+   "mechanic": "isolation",
+   "cues": [
+    "رجل شغالة والتانية قدام على الكعب للتوازن",
+    "ادفع بكعب الرجل الشغالة",
+    "اقفل بالجلوتس فوق"
+   ],
+   "jointStress": {
+    "knee": "low",
+    "lowerBack": "medium"
+   }
+  },
+  {
+   "id": "pt_Bodyweight_Bulgarian_Split_Squat",
+   "en": "Bodyweight Bulgarian Split Squat",
+   "ar": "بلغاري سبليت سكوات بوزن الجسم",
+   "primary": [
+    "quads",
+    "glutes"
+   ],
+   "secondary": [
+    "hamstrings"
+   ],
+   "equipment": "body_only",
+   "level": "beginner",
+   "category": "strength",
+   "force": "push",
+   "mechanic": "compound",
+   "cues": [
+    "رجلك اللي ورا على الدكة أو الكنبة",
+    "انزل عمودي لحد ما فخدك يبقى موازي",
+    "ادفع بالكعب اللي قدام"
+   ],
+   "jointStress": {
+    "knee": "medium"
+   }
+  },
+  {
+   "id": "pt_Barbell_Bulgarian_Split_Squat",
+   "en": "Barbell Bulgarian Split Squat",
+   "ar": "بلغاري سبليت سكوات بالبار",
+   "primary": [
+    "quads",
+    "glutes"
+   ],
+   "secondary": [
+    "hamstrings",
+    "adductors"
+   ],
+   "equipment": "barbell",
+   "level": "expert",
+   "category": "strength",
+   "force": "push",
+   "mechanic": "compound",
+   "cues": [
+    "البار على ضهرك والرجل اللي ورا على الدكة",
+    "انزل ببطء ووسطك مشدود",
+    "ادفع بالكعب اللي قدام"
+   ]
+  },
+  {
+   "id": "pt_Deficit_Reverse_Lunge",
+   "en": "Deficit Reverse Lunge",
+   "ar": "ديفيسيت ريفرس لانجز",
+   "primary": [
+    "glutes",
+    "quads"
+   ],
+   "secondary": [
+    "hamstrings"
+   ],
+   "equipment": "dumbbell",
+   "level": "intermediate",
+   "category": "strength",
+   "force": "push",
+   "mechanic": "compound",
+   "cues": [
+    "اقف على ستيب واطي والدامبل في إيدك",
+    "ارجع لورا خطوة وانزل لتحت",
+    "ادفع بكعب الرجل اللي فوق"
+   ],
+   "jointStress": {
+    "knee": "medium"
+   }
+  },
+  {
+   "id": "pt_Lateral_Step_Up",
+   "en": "Lateral Step-Up",
+   "ar": "لاتيرال ستيب أب",
+   "primary": [
+    "quads",
+    "glutes"
+   ],
+   "secondary": [
+    "abductors"
+   ],
+   "equipment": "dumbbell",
+   "level": "beginner",
+   "category": "strength",
+   "force": "push",
+   "mechanic": "compound",
+   "cues": [
+    "اقف جنب البوكس ورجل عليه",
+    "اطلع بالرجل اللي فوق من غير ما تزق بالتانية",
+    "انزل ببطء"
+   ],
+   "jointStress": {
+    "knee": "medium"
+   }
+  },
+  {
+   "id": "pt_Barbell_Reverse_Lunge",
+   "en": "Barbell Reverse Lunge",
+   "ar": "ريفرس لانجز بالبار",
+   "primary": [
+    "quads",
+    "glutes"
+   ],
+   "secondary": [
+    "hamstrings"
+   ],
+   "equipment": "barbell",
+   "level": "intermediate",
+   "category": "strength",
+   "force": "push",
+   "mechanic": "compound",
+   "cues": [
+    "البار على ضهرك ووسطك مشدود",
+    "ارجع خطوة لورا وانزل",
+    "ارجع بالرجل اللي قدام"
+   ]
+  },
+  {
+   "id": "pt_Heel_Elevated_Goblet_Squat",
+   "en": "Heel-Elevated Goblet Squat",
+   "ar": "جوبلت سكوات والكعب عالي",
+   "primary": [
+    "quads"
+   ],
+   "secondary": [
+    "glutes"
+   ],
+   "equipment": "dumbbell",
+   "level": "beginner",
+   "category": "strength",
+   "force": "push",
+   "mechanic": "compound",
+   "cues": [
+    "كعبك على طوبة أو طبق",
+    "انزل عميق وضهرك مفرود",
+    "اطلع والوزن على نص رجلك"
+   ],
+   "jointStress": {
+    "knee": "medium",
+    "lowerBack": "low"
+   }
+  },
+  {
+   "id": "pt_Dumbbell_Goblet_Squat",
+   "en": "Dumbbell Goblet Squat",
+   "ar": "جوبلت سكوات بالدامبل",
+   "primary": [
+    "quads"
+   ],
+   "secondary": [
+    "glutes",
+    "abs"
+   ],
+   "equipment": "dumbbell",
+   "level": "beginner",
+   "category": "strength",
+   "force": "push",
+   "mechanic": "compound",
+   "cues": [
+    "امسك الدامبل بالطول عند صدرك",
+    "الكوع جوه الركبة تحت",
+    "ضهرك مفرود وصدرك لفوق"
+   ],
+   "jointStress": {
+    "knee": "medium",
+    "lowerBack": "low"
+   }
+  },
+  {
+   "id": "pt_Dumbbell_Sumo_Deadlift",
+   "en": "Dumbbell Sumo Deadlift",
+   "ar": "سومو ديدليفت بالدامبل",
+   "primary": [
+    "glutes",
+    "adductors"
+   ],
+   "secondary": [
+    "hamstrings",
+    "quads"
+   ],
+   "equipment": "dumbbell",
+   "level": "beginner",
+   "category": "strength",
+   "force": "pull",
+   "mechanic": "compound",
+   "cues": [
+    "رجليك واسعة والدامبل بين رجليك",
+    "ضهرك مفرود وزق ركبك لبره",
+    "اطلع بالجلوتس"
+   ],
+   "jointStress": {
+    "lowerBack": "medium",
+    "knee": "low"
+   }
+  },
+  {
+   "id": "pt_Dumbbell_Thruster",
+   "en": "Dumbbell Thruster",
+   "ar": "ثرستر بالدامبل",
+   "primary": [
+    "quads",
+    "shoulders"
+   ],
+   "secondary": [
+    "glutes",
+    "triceps"
+   ],
+   "equipment": "dumbbell",
+   "level": "intermediate",
+   "category": "strength",
+   "force": "push",
+   "mechanic": "compound",
+   "cues": [
+    "الدامبل عند كتفك وانزل سكوات",
+    "اطلع بسرعة وادفع الدامبل لفوق",
+    "حركة واحدة متصلة"
+   ],
+   "jointStress": {
+    "knee": "medium",
+    "shoulder": "medium",
+    "lowerBack": "medium"
+   }
+  },
+  {
+   "id": "pt_EZ_Bar_Overhead_Triceps_Extension",
+   "en": "EZ-Bar Seated Overhead Triceps Extension",
+   "ar": "أوفرهيد ترايسبس إكستنشن بالإيزي بار",
+   "primary": [
+    "triceps"
+   ],
+   "secondary": [],
+   "equipment": "ez_bar",
+   "level": "beginner",
+   "category": "strength",
+   "force": "push",
+   "mechanic": "isolation",
+   "cues": [
+    "اقعد وضهرك على المسند",
+    "نزل البار ورا راسك والكوع ثابت",
+    "افرد بالترايسبس بس"
+   ],
+   "jointStress": {
+    "shoulder": "medium",
+    "lowerBack": "low"
+   }
+  },
+  {
+   "id": "pt_Kettlebell_Deadlift",
+   "en": "Kettlebell Deadlift",
+   "ar": "ديدليفت بالكيتل بيل",
+   "primary": [
+    "glutes",
+    "hamstrings"
+   ],
+   "secondary": [
+    "lower_back",
+    "quads"
+   ],
+   "equipment": "kettlebell",
+   "level": "beginner",
+   "category": "strength",
+   "force": "pull",
+   "mechanic": "compound",
+   "cues": [
+    "الكيتل بيل بين رجليك",
+    "ارجع بحوضك وضهرك مفرود",
+    "اطلع بالجلوتس"
+   ],
+   "jointStress": {
+    "lowerBack": "medium",
+    "knee": "low"
+   },
+   "homeFriendly": true
+  },
+  {
+   "id": "pt_Kettlebell_Sumo_Deadlift",
+   "en": "Kettlebell Sumo Deadlift",
+   "ar": "سومو ديدليفت بالكيتل بيل",
+   "primary": [
+    "glutes",
+    "adductors"
+   ],
+   "secondary": [
+    "hamstrings"
+   ],
+   "equipment": "kettlebell",
+   "level": "beginner",
+   "category": "strength",
+   "force": "pull",
+   "mechanic": "compound",
+   "cues": [
+    "رجليك واسعة وصوابعك لبره",
+    "ضهرك مفرود وزق ركبك لبره",
+    "اطلع بالجلوتس"
+   ],
+   "jointStress": {
+    "lowerBack": "medium",
+    "knee": "low"
+   }
+  },
+  {
+   "id": "pt_Kettlebell_Front_Rack_Carry",
+   "en": "Kettlebell Front Rack Carry",
+   "ar": "فرونت راك كاري بالكيتل بيل",
+   "primary": [
+    "abs"
+   ],
+   "secondary": [
+    "shoulders",
+    "forearms",
+    "traps"
+   ],
+   "equipment": "kettlebell",
+   "level": "intermediate",
+   "category": "strength",
+   "force": "static",
+   "mechanic": "compound",
+   "cues": [
+    "الكيتل بيل عند صدرك والكوع لتحت",
+    "امشي خطوات ثابتة وجسمك مفرود",
+    "وسطك مشدود"
+   ],
+   "jointStress": {
+    "knee": "low",
+    "lowerBack": "medium",
+    "shoulder": "low"
+   }
+  },
+  {
+   "id": "pt_Kettlebell_Gorilla_Row",
+   "en": "Kettlebell Gorilla Row",
+   "ar": "جوريلا رو بالكيتل بيل",
+   "primary": [
+    "middle_back",
+    "lats"
+   ],
+   "secondary": [
+    "biceps",
+    "lower_back"
+   ],
+   "equipment": "kettlebell",
+   "level": "intermediate",
+   "category": "strength",
+   "force": "pull",
+   "mechanic": "compound",
+   "cues": [
+    "رجليك واسعة والكيتل بيلز بينهم",
+    "ميّل لقدام وضهرك مفرود",
+    "اسحب واحدة واحدة بالكوع"
+   ],
+   "jointStress": {
+    "lowerBack": "medium"
+   }
+  },
+  {
+   "id": "pt_Kettlebell_Goblet_Reverse_Lunge",
+   "en": "Kettlebell Goblet Reverse Lunge",
+   "ar": "جوبلت ريفرس لانجز بالكيتل بيل",
+   "primary": [
+    "quads",
+    "glutes"
+   ],
+   "secondary": [
+    "hamstrings",
+    "abs"
+   ],
+   "equipment": "kettlebell",
+   "level": "beginner",
+   "category": "strength",
+   "force": "push",
+   "mechanic": "compound",
+   "cues": [
+    "الكيتل بيل عند صدرك",
+    "ارجع خطوة لورا وانزل",
+    "ادفع بكعب الرجل اللي قدام"
+   ],
+   "jointStress": {
+    "knee": "medium",
+    "lowerBack": "low"
+   }
+  },
+  {
+   "id": "pt_Kettlebell_Russian_Twist",
+   "en": "Kettlebell Russian Twist",
+   "ar": "رشن تويست بالكيتل بيل",
+   "primary": [
+    "obliques"
+   ],
+   "secondary": [
+    "abs"
+   ],
+   "equipment": "kettlebell",
+   "level": "intermediate",
+   "category": "strength",
+   "force": "pull",
+   "mechanic": "isolation",
+   "cues": [
+    "اقعد ومّيل لورا شوية",
+    "لف الكيتل بيل من جنب لجنب",
+    "الحركة من وسطك مش إيدك"
+   ],
+   "jointStress": {
+    "lowerBack": "medium"
+   }
+  },
+  {
+   "id": "pt_TRX_Biceps_Curl",
+   "en": "TRX Biceps Curl",
+   "ar": "بايسبس كيرل على التي آر إكس",
+   "primary": [
+    "biceps"
+   ],
+   "secondary": [
+    "forearms"
+   ],
+   "equipment": "other",
+   "level": "beginner",
+   "category": "strength",
+   "force": "pull",
+   "mechanic": "isolation",
+   "cues": [
+    "ميّل لورا وإيدك قدامك",
+    "اسحب إيدك لراسك والكوع ثابت",
+    "انزل ببطء"
+   ],
+   "jointStress": {
+    "knee": "low",
+    "shoulder": "low",
+    "lowerBack": "low"
+   },
+   "homeFriendly": true
+  },
+  {
+   "id": "pt_TRX_Triceps_Extension",
+   "en": "TRX Triceps Extension",
+   "ar": "ترايسبس إكستنشن على التي آر إكس",
+   "primary": [
+    "triceps"
+   ],
+   "secondary": [
+    "abs"
+   ],
+   "equipment": "other",
+   "level": "intermediate",
+   "category": "strength",
+   "force": "push",
+   "mechanic": "isolation",
+   "cues": [
+    "ميّل لقدام وإيدك فوق راسك",
+    "انزل بالكوع بس",
+    "افرد بالترايسبس"
+   ],
+   "jointStress": {
+    "knee": "low",
+    "shoulder": "medium",
+    "lowerBack": "low"
+   },
+   "homeFriendly": true
+  },
+  {
+   "id": "pt_TRX_Squat",
+   "en": "TRX Squat",
+   "ar": "سكوات على التي آر إكس",
+   "primary": [
+    "quads",
+    "glutes"
+   ],
+   "secondary": [
+    "hamstrings"
+   ],
+   "equipment": "other",
+   "level": "beginner",
+   "category": "strength",
+   "force": "push",
+   "mechanic": "compound",
+   "cues": [
+    "امسك الحبال وارجع بحوضك",
+    "انزل وضهرك مفرود",
+    "استخدم الحبال للتوازن بس"
+   ],
+   "jointStress": {
+    "knee": "low",
+    "shoulder": "low",
+    "lowerBack": "low"
+   },
+   "homeFriendly": true
+  },
+  {
+   "id": "pt_TRX_Hamstring_Curl",
+   "en": "TRX Hamstring Curl",
+   "ar": "هامسترينج كيرل على التي آر إكس",
+   "primary": [
+    "hamstrings"
+   ],
+   "secondary": [
+    "glutes"
+   ],
+   "equipment": "other",
+   "level": "intermediate",
+   "category": "strength",
+   "force": "pull",
+   "mechanic": "isolation",
+   "cues": [
+    "كعبك في الحبال وحوضك مرفوع",
+    "اسحب كعبك ناحية مقعدتك",
+    "حوضك يفضل فوق"
+   ],
+   "jointStress": {
+    "knee": "low",
+    "shoulder": "low",
+    "lowerBack": "low"
+   },
+   "homeFriendly": true
+  },
+  {
+   "id": "pt_TRX_Y_Fly",
+   "en": "TRX Y-Fly",
+   "ar": "واي فلاي على التي آر إكس",
+   "primary": [
+    "shoulders"
+   ],
+   "secondary": [
+    "traps",
+    "middle_back"
+   ],
+   "equipment": "other",
+   "level": "intermediate",
+   "category": "strength",
+   "force": "pull",
+   "mechanic": "isolation",
+   "cues": [
+    "ميّل لورا وإيدك مفرودة",
+    "افتح إيدك لفوق على شكل Y",
+    "جسمك مفرود زي اللوح"
+   ],
+   "jointStress": {
+    "shoulder": "medium"
+   },
+   "homeFriendly": true
+  },
+  {
+   "id": "pt_TRX_Pike",
+   "en": "TRX Pike",
+   "ar": "بايك على التي آر إكس",
+   "primary": [
+    "abs"
+   ],
+   "secondary": [
+    "shoulders",
+    "hip_flexors"
+   ],
+   "equipment": "other",
+   "level": "expert",
+   "category": "strength",
+   "force": "pull",
+   "mechanic": "compound",
+   "cues": [
+    "رجلك في الحبال وانت في وضع بلانك عالي",
+    "ارفع حوضك لفوق ورجلك مفرودة",
+    "انزل ببطء لبلانك"
+   ],
+   "jointStress": {
+    "shoulder": "medium"
+   },
+   "homeFriendly": true
+  },
+  {
+   "id": "pt_TRX_Single_Leg_Squat",
+   "en": "TRX Single-Leg Squat",
+   "ar": "سينجل ليج سكوات على التي آر إكس",
+   "primary": [
+    "quads",
+    "glutes"
+   ],
+   "secondary": [],
+   "equipment": "other",
+   "level": "intermediate",
+   "category": "strength",
+   "force": "push",
+   "mechanic": "compound",
+   "cues": [
+    "امسك الحبال واقف على رجل واحدة",
+    "انزل ببطء والرجل التانية قدام",
+    "اطلع بالكعب"
+   ],
+   "jointStress": {
+    "knee": "medium"
+   },
+   "homeFriendly": true
+  },
+  {
+   "id": "pt_TRX_Mountain_Climber",
+   "en": "TRX Mountain Climber",
+   "ar": "ماونتن كلايمبر على التي آر إكس",
+   "primary": [
+    "abs"
+   ],
+   "secondary": [
+    "hip_flexors",
+    "shoulders"
+   ],
+   "equipment": "other",
+   "level": "intermediate",
+   "category": "cardio",
+   "force": "push",
+   "mechanic": "compound",
+   "cues": [
+    "رجلك في الحبال وإيدك تحت كتفك",
+    "دخّل ركبك بالتبادل",
+    "حوضك مايطلعش لفوق"
+   ],
+   "jointStress": {
+    "shoulder": "medium",
+    "knee": "low"
+   },
+   "homeFriendly": true
+  },
+  {
+   "id": "pt_TRX_Chest_Fly",
+   "en": "TRX Chest Fly",
+   "ar": "تشيست فلاي على التي آر إكس",
+   "primary": [
+    "chest"
+   ],
+   "secondary": [
+    "shoulders"
+   ],
+   "equipment": "other",
+   "level": "intermediate",
+   "category": "strength",
+   "force": "push",
+   "mechanic": "isolation",
+   "cues": [
+    "ميّل لقدام وإيدك قدامك",
+    "افتح إيدك والكوع مثني شوية",
+    "ارجع بالتشيست"
+   ],
+   "jointStress": {
+    "shoulder": "medium"
+   },
+   "homeFriendly": true
+  },
+  {
+   "id": "pt_Band_Biceps_Curl",
+   "en": "Band Biceps Curl",
+   "ar": "بايسبس كيرل بالباند",
+   "primary": [
+    "biceps"
+   ],
+   "secondary": [
+    "forearms"
+   ],
+   "equipment": "bands",
+   "level": "beginner",
+   "category": "strength",
+   "force": "pull",
+   "mechanic": "isolation",
+   "cues": [
+    "اقف على الباند والكوع جنبك",
+    "اسحب لفوق واعصر",
+    "انزل ببطء"
+   ],
+   "jointStress": {
+    "knee": "low",
+    "shoulder": "low",
+    "lowerBack": "low"
+   }
+  },
+  {
+   "id": "pt_Band_Triceps_Pushdown",
+   "en": "Band Triceps Pushdown",
+   "ar": "ترايسبس بوش داون بالباند",
+   "primary": [
+    "triceps"
+   ],
+   "secondary": [],
+   "equipment": "bands",
+   "level": "beginner",
+   "category": "strength",
+   "force": "push",
+   "mechanic": "isolation",
+   "cues": [
+    "الباند متعلق فوق الباب",
+    "الكوع ثابت جنبك",
+    "افرد لتحت واعصر"
+   ],
+   "jointStress": {
+    "knee": "low",
+    "shoulder": "low",
+    "lowerBack": "low"
+   }
+  },
+  {
+   "id": "pt_Band_Seated_Row",
+   "en": "Band Seated Row",
+   "ar": "سيتد رو بالباند",
+   "primary": [
+    "middle_back"
+   ],
+   "secondary": [
+    "lats",
+    "biceps"
+   ],
+   "equipment": "bands",
+   "level": "beginner",
+   "category": "strength",
+   "force": "pull",
+   "mechanic": "compound",
+   "cues": [
+    "اقعد ورجلك مفرودة والباند حوالين رجلك",
+    "اسحب بالكوع لورا",
+    "اضغط لوحين الكتف"
+   ],
+   "jointStress": {
+    "knee": "low",
+    "shoulder": "low",
+    "lowerBack": "low"
+   }
+  },
+  {
+   "id": "pt_Band_Chest_Press",
+   "en": "Band Chest Press",
+   "ar": "تشيست برس بالباند",
+   "primary": [
+    "chest"
+   ],
+   "secondary": [
+    "triceps",
+    "shoulders"
+   ],
+   "equipment": "bands",
+   "level": "beginner",
+   "category": "strength",
+   "force": "push",
+   "mechanic": "compound",
+   "cues": [
+    "الباند ورا ضهرك أو متعلق ورا",
+    "ادفع لقدام لحد ما إيدك تتفرد",
+    "ارجع ببطء"
+   ],
+   "jointStress": {
+    "shoulder": "low"
+   }
+  },
+  {
+   "id": "pt_Band_Romanian_Deadlift",
+   "en": "Band Romanian Deadlift",
+   "ar": "رومانيان ديدليفت بالباند",
+   "primary": [
+    "hamstrings",
+    "glutes"
+   ],
+   "secondary": [
+    "lower_back"
+   ],
+   "equipment": "bands",
+   "level": "beginner",
+   "category": "strength",
+   "force": "pull",
+   "mechanic": "compound",
+   "cues": [
+    "اقف على الباند وامسكه بإيدك",
+    "ارجع بحوضك وضهرك مفرود",
+    "اطلع واعصر الجلوتس"
+   ],
+   "jointStress": {
+    "lowerBack": "low",
+    "knee": "low"
+   }
+  },
+  {
+   "id": "pt_Band_Straight_Arm_Pulldown",
+   "en": "Band Straight-Arm Pulldown",
+   "ar": "ستريت آرم بول داون بالباند",
+   "primary": [
+    "lats"
+   ],
+   "secondary": [
+    "triceps"
+   ],
+   "equipment": "bands",
+   "level": "beginner",
+   "category": "strength",
+   "force": "pull",
+   "mechanic": "isolation",
+   "cues": [
+    "الباند متعلق فوق وإيدك مفرودة",
+    "اسحب لتحت لحد فخدك",
+    "اعصر اللاتس"
+   ],
+   "jointStress": {
+    "knee": "low",
+    "shoulder": "low",
+    "lowerBack": "low"
+   }
+  },
+  {
+   "id": "pt_Band_Woodchop",
+   "en": "Band Woodchop",
+   "ar": "وود تشوب بالباند",
+   "primary": [
+    "obliques"
+   ],
+   "secondary": [
+    "abs",
+    "shoulders"
+   ],
+   "equipment": "bands",
+   "level": "beginner",
+   "category": "strength",
+   "force": "pull",
+   "mechanic": "compound",
+   "cues": [
+    "الباند متعلق فوق على جنب",
+    "اسحب بالعرض لتحت ولف من وسطك",
+    "ارجع ببطء"
+   ],
+   "jointStress": {
+    "knee": "low",
+    "shoulder": "low",
+    "lowerBack": "low"
+   }
+  },
+  {
+   "id": "pt_Band_Front_Squat",
+   "en": "Band Front Squat",
+   "ar": "فرونت سكوات بالباند",
+   "primary": [
+    "quads"
+   ],
+   "secondary": [
+    "glutes"
+   ],
+   "equipment": "bands",
+   "level": "beginner",
+   "category": "strength",
+   "force": "push",
+   "mechanic": "compound",
+   "cues": [
+    "اقف على الباند وامسكه عند كتفك",
+    "انزل سكوات وضهرك مفرود",
+    "اطلع بالكعب"
+   ],
+   "jointStress": {
+    "knee": "medium",
+    "lowerBack": "low"
+   }
+  },
+  {
+   "id": "pt_Mini_Band_Squat",
+   "en": "Mini-Band Squat",
+   "ar": "ميني باند سكوات",
+   "primary": [
+    "quads",
+    "glutes"
+   ],
+   "secondary": [
+    "abductors"
+   ],
+   "equipment": "bands",
+   "level": "beginner",
+   "category": "strength",
+   "force": "push",
+   "mechanic": "compound",
+   "cues": [
+    "الميني باند فوق الركبة",
+    "انزل وزق ركبك لبره ضد الباند",
+    "اطلع بالكعب"
+   ],
+   "jointStress": {
+    "knee": "medium"
+   }
+  },
+  {
+   "id": "pt_Thread_The_Needle",
+   "en": "Thread the Needle",
+   "ar": "ثريد ذا نيدل",
+   "primary": [
+    "middle_back"
+   ],
+   "secondary": [
+    "shoulders"
+   ],
+   "equipment": "body_only",
+   "level": "beginner",
+   "category": "stretching",
+   "force": null,
+   "mechanic": null,
+   "cues": [
+    "على إيدك وركبك",
+    "دخّل إيد تحت جسمك ولف",
+    "افتحها لفوق ببطء"
+   ],
+   "jointStress": {
+    "knee": "low",
+    "shoulder": "low",
+    "lowerBack": "low"
+   }
+  },
+  {
+   "id": "pt_Knee_To_Wall_Ankle_Mobilization",
+   "en": "Knee-to-Wall Ankle Mobilization",
+   "ar": "موبيليتي للكاحل - الركبة للحيطة",
+   "primary": [
+    "calves"
+   ],
+   "secondary": [
+    "tibialis"
+   ],
+   "equipment": "body_only",
+   "level": "beginner",
+   "category": "stretching",
+   "force": null,
+   "mechanic": null,
+   "cues": [
+    "رجلك قدام الحيطة بمسافة صغيرة",
+    "زق ركبتك للحيطة والكعب على الأرض",
+    "زوّد المسافة شوية شوية"
+   ],
+   "jointStress": {
+    "knee": "low",
+    "shoulder": "low",
+    "lowerBack": "low"
+   }
+  },
+  {
+   "id": "pt_Foam_Roller_Thoracic_Extension",
+   "en": "Foam Roller Thoracic Extension",
+   "ar": "ثوراسيك إكستنشن على الفوم رولر",
+   "primary": [
+    "middle_back"
+   ],
+   "secondary": [
+    "lats"
+   ],
+   "equipment": "foam_roll",
+   "level": "beginner",
+   "category": "stretching",
+   "force": null,
+   "mechanic": null,
+   "cues": [
+    "الفوم رولر تحت نص ضهرك وإيدك ورا راسك",
+    "ارجع لورا فوق الرولر",
+    "متنزلش لتحت لأسفل الضهر"
+   ],
+   "jointStress": {
+    "knee": "low",
+    "shoulder": "low",
+    "lowerBack": "low"
+   }
+  },
+  {
+   "id": "pt_Front_To_Back_Leg_Swings",
+   "en": "Front-to-Back Leg Swings",
+   "ar": "ليج سوينج قدام وورا",
+   "primary": [
+    "hip_flexors",
+    "hamstrings"
+   ],
+   "secondary": [
+    "glutes"
+   ],
+   "equipment": "body_only",
+   "level": "beginner",
+   "category": "stretching",
+   "force": null,
+   "mechanic": null,
+   "cues": [
+    "امسك في حيطة واقف على رجل",
+    "مرجح الرجل التانية قدام وورا",
+    "زوّد المدى بالتدريج"
+   ],
+   "jointStress": {
+    "knee": "low",
+    "shoulder": "low",
+    "lowerBack": "low"
+   }
+  },
+  {
+   "id": "pt_Lateral_Leg_Swings",
+   "en": "Lateral Leg Swings",
+   "ar": "ليج سوينج جنب",
+   "primary": [
+    "adductors",
+    "abductors"
+   ],
+   "secondary": [],
+   "equipment": "body_only",
+   "level": "beginner",
+   "category": "stretching",
+   "force": null,
+   "mechanic": null,
+   "cues": [
+    "امسك في حيطة وانت مواجهها",
+    "مرجح رجلك يمين وشمال قدام جسمك",
+    "جسمك ثابت"
+   ],
+   "jointStress": {
+    "knee": "low",
+    "shoulder": "low",
+    "lowerBack": "low"
+   }
+  },
+  {
+   "id": "pt_Goblet_Squat_Hold",
+   "en": "Goblet Squat Hold (Mobility)",
+   "ar": "جوبلت سكوات هولد للموبيليتي",
+   "primary": [
+    "quads",
+    "adductors"
+   ],
+   "secondary": [
+    "glutes"
+   ],
+   "equipment": "kettlebell",
+   "level": "beginner",
+   "category": "stretching",
+   "force": "static",
+   "mechanic": null,
+   "cues": [
+    "انزل لتحت خالص والوزن عند صدرك",
+    "زق ركبك لبره بالكوع",
+    "اثبت واتنفس"
+   ],
+   "jointStress": {
+    "knee": "medium"
+   }
+  },
+  {
+   "id": "pt_Figure_Four_Stretch",
+   "en": "Seated Figure-4 Glute Stretch",
+   "ar": "فيجر فور ستريتش للجلوتس",
+   "primary": [
+    "glutes"
+   ],
+   "secondary": [
+    "abductors"
+   ],
+   "equipment": "body_only",
+   "level": "beginner",
+   "category": "stretching",
+   "force": null,
+   "mechanic": null,
+   "cues": [
+    "اقعد وحط كاحلك على ركبة الرجل التانية",
+    "ميّل لقدام وضهرك مفرود",
+    "اثبت واتنفس"
+   ],
+   "jointStress": {
+    "knee": "low",
+    "shoulder": "low",
+    "lowerBack": "low"
+   }
+  },
+  {
+   "id": "pt_Butterfly_Stretch",
+   "en": "Butterfly Stretch",
+   "ar": "باترفلاي ستريتش",
+   "primary": [
+    "adductors"
+   ],
+   "secondary": [],
+   "equipment": "body_only",
+   "level": "beginner",
+   "category": "stretching",
+   "force": null,
+   "mechanic": null,
+   "cues": [
+    "اقعد وبطون رجلك في بعض",
+    "انزل بركبك لتحت بالراحة",
+    "ضهرك مفرود"
+   ],
+   "jointStress": {
+    "knee": "low",
+    "shoulder": "low",
+    "lowerBack": "low"
+   }
+  },
+  {
+   "id": "pt_Sleeper_Stretch",
+   "en": "Sleeper Stretch",
+   "ar": "سليبر ستريتش للكتف",
+   "primary": [
+    "shoulders"
+   ],
+   "secondary": [],
+   "equipment": "body_only",
+   "level": "beginner",
+   "category": "stretching",
+   "force": null,
+   "mechanic": null,
+   "cues": [
+    "نام على جنبك والدراع تحتك قدامك",
+    "نزل كف الإيد لتحت بالإيد التانية",
+    "بالراحة من غير وجع"
+   ],
+   "jointStress": {
+    "knee": "low",
+    "shoulder": "low",
+    "lowerBack": "low"
+   }
+  },
+  {
+   "id": "pt_Walking_Knee_Hug",
+   "en": "Walking Knee Hug",
+   "ar": "ووكينج ني هج",
+   "primary": [
+    "glutes"
+   ],
+   "secondary": [
+    "hip_flexors",
+    "hamstrings"
+   ],
+   "equipment": "body_only",
+   "level": "beginner",
+   "category": "stretching",
+   "force": null,
+   "mechanic": null,
+   "cues": [
+    "امشي واسحب ركبة لصدرك",
+    "اطلع على صوابع الرجل التانية",
+    "بدّل كل خطوة"
+   ],
+   "jointStress": {
+    "knee": "low",
+    "shoulder": "low",
+    "lowerBack": "low"
+   }
+  },
+  {
+   "id": "pt_Lateral_Shuffle",
+   "en": "Lateral Shuffle",
+   "ar": "لاتيرال شافل",
+   "primary": [
+    "quads",
+    "abductors"
+   ],
+   "secondary": [
+    "calves",
+    "glutes"
+   ],
+   "equipment": "body_only",
+   "level": "beginner",
+   "category": "cardio",
+   "force": null,
+   "mechanic": "compound",
+   "cues": [
+    "انزل نص سكوات",
+    "اتحرك جنب بخطوات سريعة",
+    "رجليك متلمسش بعض"
+   ],
+   "jointStress": {
+    "knee": "medium"
+   }
+  },
+  {
+   "id": "pt_Arm_Swings",
+   "en": "Arm Swings (Warm-Up)",
+   "ar": "آرم سوينج للتسخين",
+   "primary": [
+    "shoulders"
+   ],
+   "secondary": [
+    "chest",
+    "middle_back"
+   ],
+   "equipment": "body_only",
+   "level": "beginner",
+   "category": "stretching",
+   "force": null,
+   "mechanic": null,
+   "cues": [
+    "افتح إيدك وقفلها قدام صدرك",
+    "زوّد المدى بالتدريج",
+    "اتنفس عادي"
+   ],
+   "jointStress": {
+    "knee": "low",
+    "shoulder": "low",
+    "lowerBack": "low"
+   }
+  },
+  {
+   "id": "pt_Hip_Hinge_Dowel_Drill",
+   "en": "Hip Hinge Dowel Drill",
+   "ar": "هيب هينج بالعصاية",
+   "primary": [
+    "hamstrings",
+    "glutes"
+   ],
+   "secondary": [
+    "lower_back"
+   ],
+   "equipment": "other",
+   "level": "beginner",
+   "category": "stretching",
+   "force": null,
+   "mechanic": null,
+   "cues": [
+    "العصاية على ضهرك تلمس راسك ونص ضهرك وحوضك",
+    "ارجع بحوضك والعصاية متتحركش",
+    "اطلع بالجلوتس"
+   ],
+   "jointStress": {
+    "knee": "low",
+    "shoulder": "low",
+    "lowerBack": "low"
+   },
+   "homeFriendly": true
+  },
+  {
+   "id": "pt_Cat_Cow",
+   "en": "Cat-Cow",
+   "ar": "كات كاو",
+   "primary": [
+    "lower_back"
+   ],
+   "secondary": [
+    "abs",
+    "middle_back"
+   ],
+   "equipment": "body_only",
+   "level": "beginner",
+   "category": "stretching",
+   "force": null,
+   "mechanic": null,
+   "cues": [
+    "على إيدك وركبك",
+    "كوّر ضهرك لفوق وبعدين انزل بيه",
+    "مع النفس وببطء"
+   ],
+   "jointStress": {
+    "knee": "low",
+    "shoulder": "low",
+    "lowerBack": "low"
+   }
+  },
+  {
+   "id": "pt_Ski_Erg",
+   "en": "Ski Erg",
+   "ar": "سكي إرج",
+   "primary": [
+    "lats"
+   ],
+   "secondary": [
+    "triceps",
+    "abs",
+    "shoulders"
+   ],
+   "equipment": "machine",
+   "level": "intermediate",
+   "category": "cardio",
+   "force": "pull",
+   "mechanic": "compound",
+   "cues": [
+    "امسك الإيدين فوق",
+    "اسحب لتحت بجسمك كله",
+    "ارجع لفوق بهدوء"
+   ],
+   "jointStress": {
+    "knee": "low",
+    "shoulder": "medium",
+    "lowerBack": "medium"
+   }
+  },
+  {
+   "id": "pt_Arm_Ergometer",
+   "en": "Arm Ergometer (Upper-Body Bike)",
+   "ar": "آرم إرجوميتر",
+   "primary": [
+    "shoulders"
+   ],
+   "secondary": [
+    "biceps",
+    "triceps"
+   ],
+   "equipment": "machine",
+   "level": "beginner",
+   "category": "cardio",
+   "force": null,
+   "mechanic": "compound",
+   "cues": [
+    "اقعد قدام الجهاز وضهرك مفرود",
+    "لف بإيدك بإيقاع ثابت",
+    "مناسب لو رجلك متصابة"
+   ],
+   "jointStress": {
+    "knee": "low",
+    "shoulder": "low",
+    "lowerBack": "low"
+   }
+  },
+  {
+   "id": "pt_Treadmill_Backward_Walk",
+   "en": "Treadmill Backward Walk",
+   "ar": "مشي لورا على التريدميل",
+   "primary": [
+    "quads"
+   ],
+   "secondary": [
+    "calves",
+    "glutes"
+   ],
+   "equipment": "machine",
+   "level": "beginner",
+   "category": "cardio",
+   "force": null,
+   "mechanic": "compound",
+   "cues": [
+    "سرعة بطيئة وامسك الهاندل",
+    "امشي لورا بخطوات صغيرة",
+    "مفيد للركبة"
+   ],
+   "jointStress": {
+    "knee": "low",
+    "shoulder": "low",
+    "lowerBack": "low"
+   }
+  },
+  {
+   "id": "pt_Rowing_Machine_Intervals",
+   "en": "Rowing Machine Intervals",
+   "ar": "إنترفال على الروينج",
+   "primary": [
+    "middle_back",
+    "quads"
+   ],
+   "secondary": [
+    "lats",
+    "hamstrings",
+    "glutes"
+   ],
+   "equipment": "machine",
+   "level": "intermediate",
+   "category": "cardio",
+   "force": "pull",
+   "mechanic": "compound",
+   "cues": [
+    "رجلك الأول بعدين ضهرك بعدين إيدك",
+    "سريع في الشغل وهادي في الراحة",
+    "ضهرك مفرود"
+   ],
+   "jointStress": {
+    "knee": "low",
+    "lowerBack": "medium"
+   }
+  },
+  {
+   "id": "pt_Elliptical_Intervals",
+   "en": "Elliptical Intervals",
+   "ar": "إنترفال على الإليبتيكال",
+   "primary": [
+    "quads"
+   ],
+   "secondary": [
+    "glutes",
+    "hamstrings",
+    "calves"
+   ],
+   "equipment": "machine",
+   "level": "beginner",
+   "category": "cardio",
+   "force": null,
+   "mechanic": "compound",
+   "cues": [
+    "سرعة عالية في الشغل وهادية في الراحة",
+    "متسندش على الهاندل",
+    "إيدك ورجلك مع بعض"
+   ],
+   "jointStress": {
+    "knee": "low",
+    "shoulder": "low",
+    "lowerBack": "low"
+   }
+  },
+  {
+   "id": "pt_Side_Plank_Hip_Dip",
+   "en": "Side Plank Hip Dip",
+   "ar": "سايد بلانك هيب ديب",
+   "primary": [
+    "obliques"
+   ],
+   "secondary": [
+    "abs",
+    "abductors"
+   ],
+   "equipment": "body_only",
+   "level": "intermediate",
+   "category": "strength",
+   "force": "static",
+   "mechanic": "isolation",
+   "cues": [
+    "كوعك تحت كتفك وجسمك مفرود",
+    "نزل حوضك شوية وارفعه",
+    "متلفش لقدام"
+   ],
+   "jointStress": {
+    "knee": "low",
+    "shoulder": "low",
+    "lowerBack": "low"
+   }
+  },
+  {
+   "id": "pt_Stir_The_Pot",
+   "en": "Stir the Pot",
+   "ar": "ستير ذا بوت",
+   "primary": [
+    "abs"
+   ],
+   "secondary": [
+    "obliques",
+    "shoulders"
+   ],
+   "equipment": "exercise_ball",
+   "level": "expert",
+   "category": "strength",
+   "force": "static",
+   "mechanic": "compound",
+   "cues": [
+    "كوعك على الكورة ووضع بلانك",
+    "لف كوعك في دواير صغيرة",
+    "حوضك ثابت"
+   ],
+   "jointStress": {
+    "shoulder": "medium",
+    "lowerBack": "low",
+    "knee": "low"
+   }
+  },
+  {
+   "id": "pt_Hanging_Oblique_Knee_Raise",
+   "en": "Hanging Oblique Knee Raise",
+   "ar": "هانجينج أوبليك ني رايز",
+   "primary": [
+    "obliques"
+   ],
+   "secondary": [
+    "abs",
+    "hip_flexors"
+   ],
+   "equipment": "body_only",
+   "level": "intermediate",
+   "category": "strength",
+   "force": "pull",
+   "mechanic": "isolation",
+   "cues": [
+    "اتعلق وكتفك لتحت",
+    "ارفع ركبك لجنب ناحية الكوع",
+    "انزل ببطء من غير مرجحة"
+   ],
+   "jointStress": {
+    "shoulder": "medium",
+    "lowerBack": "medium"
+   }
+  },
+  {
+   "id": "pt_Plank_Up_Down",
+   "en": "Plank Up-Down",
+   "ar": "بلانك أب داون",
+   "primary": [
+    "abs"
+   ],
+   "secondary": [
+    "triceps",
+    "shoulders"
+   ],
+   "equipment": "body_only",
+   "level": "intermediate",
+   "category": "strength",
+   "force": "push",
+   "mechanic": "compound",
+   "cues": [
+    "من بلانك على الكوع لبلانك على الإيد",
+    "إيد إيد وحوضك ثابت",
+    "ارجع بنفس الترتيب"
+   ],
+   "jointStress": {
+    "shoulder": "medium"
+   }
+  },
+  {
+   "id": "pt_Bear_Hold",
+   "en": "Bear Plank Hold",
+   "ar": "بير بلانك هولد",
+   "primary": [
+    "abs"
+   ],
+   "secondary": [
+    "shoulders",
+    "quads"
+   ],
+   "equipment": "body_only",
+   "level": "beginner",
+   "category": "strength",
+   "force": "static",
+   "mechanic": "compound",
+   "cues": [
+    "على إيدك وصوابع رجلك والركبة فوق الأرض بشوية",
+    "ضهرك مفرود زي الترابيزة",
+    "اثبت واتنفس"
+   ],
+   "jointStress": {
+    "knee": "low",
+    "shoulder": "low",
+    "lowerBack": "low"
+   }
+  },
+  {
+   "id": "pt_Lying_Leg_Raise",
+   "en": "Lying Leg Raise",
+   "ar": "لاينج ليج رايز",
+   "primary": [
+    "abs"
+   ],
+   "secondary": [
+    "hip_flexors"
+   ],
+   "equipment": "body_only",
+   "level": "beginner",
+   "category": "strength",
+   "force": "pull",
+   "mechanic": "isolation",
+   "cues": [
+    "نام على ضهرك وإيدك تحت حوضك",
+    "ارفع رجلك مفرودة لفوق",
+    "انزل ببطء وضهرك لازق في الأرض"
+   ],
+   "jointStress": {
+    "lowerBack": "medium"
+   }
+  },
+  {
+   "id": "pt_McGill_Curl_Up",
+   "en": "McGill Curl-Up",
+   "ar": "ماكجيل كيرل أب",
+   "primary": [
+    "abs"
+   ],
+   "secondary": [],
+   "equipment": "body_only",
+   "level": "beginner",
+   "category": "strength",
+   "force": "static",
+   "mechanic": "isolation",
+   "cues": [
+    "نام ورجل مثنية والتانية مفرودة وإيدك تحت ضهرك",
+    "ارفع راسك وكتفك شوية بس",
+    "اثبت 8-10 ثواني"
+   ],
+   "jointStress": {
+    "knee": "low",
+    "shoulder": "low",
+    "lowerBack": "low"
+   }
+  },
+  {
+   "id": "pt_Dead_Bug_Band",
+   "en": "Band Dead Bug",
+   "ar": "ديد باج بالباند",
+   "primary": [
+    "abs"
+   ],
+   "secondary": [
+    "obliques"
+   ],
+   "equipment": "bands",
+   "level": "intermediate",
+   "category": "strength",
+   "force": "static",
+   "mechanic": "isolation",
+   "cues": [
+    "الباند متعلق ورا راسك وانت ماسكه",
+    "مد رجل وإيد عكس ببطء",
+    "ضهرك لازق في الأرض"
+   ],
+   "jointStress": {
+    "knee": "low",
+    "shoulder": "low",
+    "lowerBack": "low"
+   }
+  },
+  {
+   "id": "pt_Spanish_Squat",
+   "en": "Spanish Squat",
+   "ar": "سبانيش سكوات",
+   "primary": [
+    "quads"
+   ],
+   "secondary": [
+    "glutes"
+   ],
+   "equipment": "bands",
+   "level": "beginner",
+   "category": "strength",
+   "force": "push",
+   "mechanic": "compound",
+   "cues": [
+    "باند تقيلة ورا ركبك ومربوطة في عمود",
+    "ارجع لورا وانزل وقصبتك عمودية",
+    "مناسب لألم الركبة"
+   ],
+   "jointStress": {
+    "knee": "low",
+    "shoulder": "low",
+    "lowerBack": "low"
+   }
+  },
+  {
+   "id": "pt_Terminal_Knee_Extension",
+   "en": "Terminal Knee Extension (Band)",
+   "ar": "ترمينال ني إكستنشن بالباند",
+   "primary": [
+    "quads"
+   ],
+   "secondary": [],
+   "equipment": "bands",
+   "level": "beginner",
+   "category": "strength",
+   "force": "push",
+   "mechanic": "isolation",
+   "cues": [
+    "الباند ورا ركبتك ومربوط قدامك",
+    "افرد ركبتك لآخرها واعصر الكوادز",
+    "ارجع ببطء"
+   ],
+   "jointStress": {
+    "knee": "low",
+    "shoulder": "low",
+    "lowerBack": "low"
+   }
+  },
+  {
+   "id": "pt_Straight_Leg_Raise",
+   "en": "Supine Straight Leg Raise",
+   "ar": "ستريت ليج رايز نايم",
+   "primary": [
+    "quads",
+    "hip_flexors"
+   ],
+   "secondary": [],
+   "equipment": "body_only",
+   "level": "beginner",
+   "category": "strength",
+   "force": "pull",
+   "mechanic": "isolation",
+   "cues": [
+    "نام ورجل مثنية والتانية مفرودة",
+    "اعصر الكوادز وارفع الرجل المفرودة",
+    "انزل ببطء"
+   ],
+   "jointStress": {
+    "knee": "low",
+    "shoulder": "low",
+    "lowerBack": "low"
+   }
+  },
+  {
+   "id": "pt_Quad_Set",
+   "en": "Quad Set (Isometric)",
+   "ar": "كواد سيت",
+   "primary": [
+    "quads"
+   ],
+   "secondary": [],
+   "equipment": "body_only",
+   "level": "beginner",
+   "category": "strength",
+   "force": "static",
+   "mechanic": "isolation",
+   "cues": [
+    "اقعد ورجلك مفرودة وفوطة تحت ركبتك",
+    "اضغط ركبتك على الفوطة واعصر الكوادز",
+    "اثبت 5 ثواني"
+   ],
+   "jointStress": {
+    "knee": "low",
+    "shoulder": "low",
+    "lowerBack": "low"
+   }
+  },
+  {
+   "id": "pt_Eccentric_Step_Down",
+   "en": "Eccentric Step-Down",
+   "ar": "ستيب داون ببطء",
+   "primary": [
+    "quads"
+   ],
+   "secondary": [
+    "glutes"
+   ],
+   "equipment": "body_only",
+   "level": "beginner",
+   "category": "strength",
+   "force": "push",
+   "mechanic": "compound",
+   "cues": [
+    "اقف على ستيب واطي على رجل واحدة",
+    "نزل الرجل التانية ببطء للأرض",
+    "ركبتك ماشية مع صوابعك"
+   ],
+   "jointStress": {
+    "knee": "low"
+   }
+  },
+  {
+   "id": "pt_Seated_Leg_Extension_Isometric",
+   "en": "Isometric Leg Extension Hold",
+   "ar": "ليج إكستنشن ثابت",
+   "primary": [
+    "quads"
+   ],
+   "secondary": [],
+   "equipment": "machine",
+   "level": "beginner",
+   "category": "strength",
+   "force": "static",
+   "mechanic": "isolation",
+   "cues": [
+    "وزن خفيف وارفع لحد زاوية مريحة",
+    "اثبت 20-30 ثانية",
+    "مفيد لتسكين ألم الركبة"
+   ],
+   "jointStress": {
+    "knee": "low",
+    "shoulder": "low",
+    "lowerBack": "low"
+   }
+  },
+  {
+   "id": "pt_Side_Lying_External_Rotation",
+   "en": "Side-Lying External Rotation",
+   "ar": "إكسترنال روتيشن نايم على جنبك",
+   "primary": [
+    "shoulders"
+   ],
+   "secondary": [
+    "middle_back"
+   ],
+   "equipment": "dumbbell",
+   "level": "beginner",
+   "category": "strength",
+   "force": "pull",
+   "mechanic": "isolation",
+   "cues": [
+    "نام على جنبك وفوطة تحت الكوع",
+    "لف الدامبل لفوق والكوع لازق",
+    "وزن خفيف جداً"
+   ],
+   "jointStress": {
+    "knee": "low",
+    "shoulder": "low",
+    "lowerBack": "low"
+   }
+  },
+  {
+   "id": "pt_Prone_Y_T_W_Raise",
+   "en": "Prone Y-T-W Raise",
+   "ar": "واي تي دبليو رايز",
+   "primary": [
+    "shoulders",
+    "middle_back"
+   ],
+   "secondary": [
+    "traps"
+   ],
+   "equipment": "dumbbell",
+   "level": "beginner",
+   "category": "strength",
+   "force": "pull",
+   "mechanic": "isolation",
+   "cues": [
+    "نام على بطنك على دكة مايلة",
+    "ارفع إيدك على شكل Y بعدين T بعدين W",
+    "وزن خفيف أو من غير وزن"
+   ],
+   "jointStress": {
+    "knee": "low",
+    "shoulder": "low",
+    "lowerBack": "low"
+   }
+  },
+  {
+   "id": "pt_Wall_Push_Up",
+   "en": "Wall Push-Up",
+   "ar": "وول بوش أب",
+   "primary": [
+    "chest"
+   ],
+   "secondary": [
+    "triceps",
+    "shoulders"
+   ],
+   "equipment": "body_only",
+   "level": "beginner",
+   "category": "strength",
+   "force": "push",
+   "mechanic": "compound",
+   "cues": [
+    "إيدك على الحيطة بعرض كتفك",
+    "قرّب صدرك للحيطة وجسمك مفرود",
+    "ادفع وارجع"
+   ],
+   "jointStress": {
+    "knee": "low",
+    "shoulder": "low",
+    "lowerBack": "low"
+   }
+  },
+  {
+   "id": "pt_Pendulum_Swing",
+   "en": "Pendulum Shoulder Swing (Codman)",
+   "ar": "بندولم للكتف",
+   "primary": [
+    "shoulders"
+   ],
+   "secondary": [],
+   "equipment": "body_only",
+   "level": "beginner",
+   "category": "stretching",
+   "force": null,
+   "mechanic": null,
+   "cues": [
+    "ميّل لقدام وسند بإيد على ترابيزة",
+    "سيب الدراع التاني مدلدل",
+    "حركه دواير صغيرة بجسمك"
+   ],
+   "jointStress": {
+    "knee": "low",
+    "shoulder": "low",
+    "lowerBack": "low"
+   }
+  },
+  {
+   "id": "pt_Half_Kneeling_Landmine_Press",
+   "en": "Half-Kneeling Landmine Press",
+   "ar": "هاف نيلينج لاندماين برس",
+   "primary": [
+    "shoulders"
+   ],
+   "secondary": [
+    "chest",
+    "triceps",
+    "abs"
+   ],
+   "equipment": "barbell",
+   "level": "intermediate",
+   "category": "strength",
+   "force": "push",
+   "mechanic": "compound",
+   "cues": [
+    "ركبة على الأرض والبار عند كتفك",
+    "ادفع لفوق ولقدام على الزاوية",
+    "وسطك مشدود"
+   ],
+   "jointStress": {
+    "shoulder": "low",
+    "lowerBack": "low",
+    "knee": "low"
+   }
+  },
+  {
+   "id": "pt_Band_Scapular_Retraction",
+   "en": "Band Scapular Retraction",
+   "ar": "سكابيولار ريتراكشن بالباند",
+   "primary": [
+    "middle_back"
+   ],
+   "secondary": [
+    "traps"
+   ],
+   "equipment": "bands",
+   "level": "beginner",
+   "category": "strength",
+   "force": "pull",
+   "mechanic": "isolation",
+   "cues": [
+    "امسك الباند قدامك وإيدك مفرودة",
+    "اضغط لوحين الكتف لورا بس",
+    "متثنيش الكوع"
+   ],
+   "jointStress": {
+    "knee": "low",
+    "shoulder": "low",
+    "lowerBack": "low"
+   }
+  },
+  {
+   "id": "pt_Serratus_Wall_Slide",
+   "en": "Foam Roller Serratus Wall Slide",
+   "ar": "سيراتس وول سلايد",
+   "primary": [
+    "shoulders"
+   ],
+   "secondary": [
+    "chest"
+   ],
+   "equipment": "foam_roll",
+   "level": "beginner",
+   "category": "strength",
+   "force": "push",
+   "mechanic": "isolation",
+   "cues": [
+    "الفوم رولر على الحيطة تحت دراعك",
+    "زحلق لفوق وادفع لقدام شوية",
+    "ارجع ببطء"
+   ],
+   "jointStress": {
+    "knee": "low",
+    "shoulder": "low",
+    "lowerBack": "low"
+   }
+  },
+  {
+   "id": "pt_Glute_Bridge_Hold",
+   "en": "Glute Bridge Hold",
+   "ar": "جلوت بريدج هولد",
+   "primary": [
+    "glutes"
+   ],
+   "secondary": [
+    "hamstrings"
+   ],
+   "equipment": "body_only",
+   "level": "beginner",
+   "category": "strength",
+   "force": "static",
+   "mechanic": "isolation",
+   "cues": [
+    "نام وركبك مثنية",
+    "ارفع حوضك واعصر الجلوتس",
+    "اثبت 20-30 ثانية"
+   ],
+   "jointStress": {
+    "knee": "low",
+    "shoulder": "low",
+    "lowerBack": "low"
+   }
+  },
+  {
+   "id": "pt_Supine_Pelvic_Tilt",
+   "en": "Supine Pelvic Tilt",
+   "ar": "بيلفيك تيلت نايم",
+   "primary": [
+    "abs"
+   ],
+   "secondary": [
+    "lower_back"
+   ],
+   "equipment": "body_only",
+   "level": "beginner",
+   "category": "strength",
+   "force": "static",
+   "mechanic": "isolation",
+   "cues": [
+    "نام وركبك مثنية",
+    "الزق ضهرك في الأرض بشد البطن",
+    "سيب ببطء"
+   ],
+   "jointStress": {
+    "knee": "low",
+    "shoulder": "low",
+    "lowerBack": "low"
+   }
+  },
+  {
+   "id": "pt_Quadruped_Rock_Back",
+   "en": "Quadruped Rock Back",
+   "ar": "كوادروبد روك باك",
+   "primary": [
+    "glutes"
+   ],
+   "secondary": [
+    "lower_back"
+   ],
+   "equipment": "body_only",
+   "level": "beginner",
+   "category": "stretching",
+   "force": null,
+   "mechanic": null,
+   "cues": [
+    "على إيدك وركبك وضهرك مفرود",
+    "ارجع بحوضك لكعبك",
+    "ضهرك مايتكورش"
+   ],
+   "jointStress": {
+    "knee": "low",
+    "shoulder": "low",
+    "lowerBack": "low"
+   }
+  },
+  {
+   "id": "pt_Side_Lying_Hip_Abduction",
+   "en": "Side-Lying Hip Abduction",
+   "ar": "سايد لاينج هيب أبداكشن",
+   "primary": [
+    "abductors",
+    "glutes"
+   ],
+   "secondary": [],
+   "equipment": "body_only",
+   "level": "beginner",
+   "category": "strength",
+   "force": "push",
+   "mechanic": "isolation",
+   "cues": [
+    "نام على جنبك والرجل اللي تحت مثنية",
+    "ارفع الرجل اللي فوق مفرودة ولورا شوية",
+    "انزل ببطء"
+   ],
+   "jointStress": {
+    "knee": "low",
+    "shoulder": "low",
+    "lowerBack": "low"
+   }
+  },
+  {
+   "id": "pt_Single_Leg_Glute_Bridge_Bench",
+   "en": "Shoulder-Elevated Single-Leg Glute Bridge",
+   "ar": "سينجل ليج جلوت بريدج على الدكة",
+   "primary": [
+    "glutes"
+   ],
+   "secondary": [
+    "hamstrings"
+   ],
+   "equipment": "body_only",
+   "level": "intermediate",
+   "category": "strength",
+   "force": "push",
+   "mechanic": "isolation",
+   "cues": [
+    "ضهرك العلوي على الدكة ورجل واحدة على الأرض",
+    "ادفع بالكعب واقفل بالجلوتس",
+    "حوضك مستوي"
+   ],
+   "jointStress": {
+    "knee": "low",
+    "shoulder": "low",
+    "lowerBack": "low"
+   }
+  },
+  {
+   "id": "pt_Dumbbell_Seal_Row",
+   "en": "Dumbbell Chest-Supported Row (Flat Bench)",
+   "ar": "تشيست سابورتد رو بالدامبل على دكة عالية",
+   "primary": [
+    "middle_back",
+    "lats"
+   ],
+   "secondary": [
+    "biceps",
+    "shoulders"
+   ],
+   "equipment": "dumbbell",
+   "level": "beginner",
+   "category": "strength",
+   "force": "pull",
+   "mechanic": "compound",
+   "cues": [
+    "نام على بطنك على دكة عالية",
+    "اسحب الدامبل بالكوع",
+    "اضغط لوحين الكتف"
+   ],
+   "jointStress": {
+    "knee": "low",
+    "shoulder": "low",
+    "lowerBack": "low"
+   }
+  },
+  {
+   "id": "pt_Dumbbell_Pullover_Bench",
+   "en": "Dumbbell Pullover (Across Bench)",
+   "ar": "بول أوفر بالدامبل على الدكة",
+   "primary": [
+    "chest",
+    "lats"
+   ],
+   "secondary": [
+    "triceps"
+   ],
+   "equipment": "dumbbell",
+   "level": "intermediate",
+   "category": "strength",
+   "force": "pull",
+   "mechanic": "compound",
+   "cues": [
+    "ضهرك العلوي على الدكة بالعرض",
+    "نزل الدامبل ورا راسك والكوع مثني شوية",
+    "ارجع فوق صدرك"
+   ],
+   "jointStress": {
+    "shoulder": "medium",
+    "lowerBack": "low"
+   }
+  },
+  {
+   "id": "pt_Incline_Dumbbell_Y_Raise",
+   "en": "Incline Dumbbell Y-Raise",
+   "ar": "واي رايز بالدامبل على دكة مايلة",
+   "primary": [
+    "shoulders"
+   ],
+   "secondary": [
+    "traps"
+   ],
+   "equipment": "dumbbell",
+   "level": "beginner",
+   "category": "strength",
+   "force": "pull",
+   "mechanic": "isolation",
+   "cues": [
+    "نام على بطنك على دكة مايلة",
+    "ارفع الدامبل على شكل Y",
+    "وزن خفيف وحركة بطيئة"
+   ],
+   "jointStress": {
+    "knee": "low",
+    "shoulder": "low",
+    "lowerBack": "low"
+   }
+  },
+  {
+   "id": "pt_Machine_Preacher_Hammer_Curl",
+   "en": "Cable Rope Preacher Hammer Curl",
+   "ar": "بريتشر هامر كيرل بالحبل على الكابل",
+   "primary": [
+    "biceps"
+   ],
+   "secondary": [
+    "forearms"
+   ],
+   "equipment": "cable",
+   "level": "beginner",
+   "category": "strength",
+   "force": "pull",
+   "mechanic": "isolation",
+   "cues": [
+    "دراعك على مسند البريتشر والحبل في إيدك",
+    "اسحب لفوق والكف في وش بعض",
+    "انزل ببطء"
+   ],
+   "jointStress": {
+    "knee": "low",
+    "shoulder": "low",
+    "lowerBack": "low"
+   }
+  },
+  {
+   "id": "pt_Cable_Single_Arm_Lateral_Raise_Behind",
+   "en": "Behind-the-Back Cable Lateral Raise",
+   "ar": "لاتيرال رايز ورا الضهر على الكابل",
+   "primary": [
+    "shoulders"
+   ],
+   "secondary": [],
+   "equipment": "cable",
+   "level": "intermediate",
+   "category": "strength",
+   "force": "pull",
+   "mechanic": "isolation",
+   "cues": [
+    "الكابل من تحت وورا ضهرك",
+    "ارفع الدراع لجنب لحد كتفك",
+    "متهزش جسمك"
+   ],
+   "jointStress": {
+    "shoulder": "medium"
+   }
+  },
+  {
+   "id": "pt_Smith_Machine_Close_Grip_Incline",
+   "en": "Smith Machine Reverse-Grip Incline Press",
+   "ar": "ريفرس جريب إنكلاين برس على السميث",
+   "primary": [
+    "chest"
+   ],
+   "secondary": [
+    "triceps",
+    "shoulders"
+   ],
+   "equipment": "machine",
+   "level": "intermediate",
+   "category": "strength",
+   "force": "push",
+   "mechanic": "compound",
+   "cues": [
+    "الدكة مايلة والقبضة معكوسة",
+    "نزل البار لأعلى صدرك",
+    "ادفع بالتشيست"
+   ],
+   "jointStress": {
+    "shoulder": "low"
+   }
+  },
+  {
+   "id": "pt_Machine_Chest_Fly_Single_Arm",
+   "en": "Single-Arm Pec Deck",
+   "ar": "بيك دك بإيد واحدة",
+   "primary": [
+    "chest"
+   ],
+   "secondary": [
+    "shoulders"
+   ],
+   "equipment": "machine",
+   "level": "beginner",
+   "category": "strength",
+   "force": "push",
+   "mechanic": "isolation",
+   "cues": [
+    "ضهرك على المسند",
+    "اقفل بإيد واحدة لنص الجسم",
+    "اعصر ثانية وارجع ببطء"
+   ],
+   "jointStress": {
+    "shoulder": "medium"
+   }
+  },
+  {
+   "id": "pt_Seated_Dumbbell_Calf_Raise",
+   "en": "Seated Dumbbell Calf Raise",
+   "ar": "كالف رايز قاعد بالدامبل",
+   "primary": [
+    "calves"
+   ],
+   "secondary": [],
+   "equipment": "dumbbell",
+   "level": "beginner",
+   "category": "strength",
+   "force": "push",
+   "mechanic": "isolation",
+   "cues": [
+    "اقعد والدامبل على ركبك وطراطيفك على طوبة",
+    "انزل بالكعب لآخر مدى",
+    "اطلع واثبت ثانية"
+   ],
+   "jointStress": {
+    "knee": "low",
+    "shoulder": "low",
+    "lowerBack": "low"
+   }
+  },
+  {
+   "id": "pt_Reverse_Nordic",
+   "en": "Reverse Nordic Curl",
+   "ar": "ريفرس نوردك",
+   "primary": [
+    "quads"
+   ],
+   "secondary": [
+    "hip_flexors"
+   ],
+   "equipment": "body_only",
+   "level": "expert",
+   "category": "strength",
+   "force": "pull",
+   "mechanic": "isolation",
+   "cues": [
+    "على ركبك وجسمك مفرود من الركبة للراس",
+    "ارجع لورا ببطء",
+    "اطلع بالكوادز"
+   ],
+   "jointStress": {
+    "knee": "high"
+   }
+  },
+  {
+   "id": "pt_Frog_Stance_Pump",
+   "en": "Dumbbell Frog Pump",
+   "ar": "فروج بامب بالدامبل",
+   "primary": [
+    "glutes"
+   ],
+   "secondary": [
+    "adductors"
+   ],
+   "equipment": "dumbbell",
+   "level": "beginner",
+   "category": "strength",
+   "force": "push",
+   "mechanic": "isolation",
+   "cues": [
+    "بطون رجلك في بعض والدامبل على الحوض",
+    "ارفع حوضك واعصر",
+    "عدات كتير سريعة"
+   ],
+   "jointStress": {
+    "knee": "low",
+    "shoulder": "low",
+    "lowerBack": "low"
+   }
   }
  ]
 }

@@ -20,6 +20,7 @@ describe('gramRecipe', () => {
       table,
     );
     expect(r.lines[0]).toEqual({
+      foodId: 'egg',
       name: 'بيض',
       nameEn: 'Egg',
       grams: 100,

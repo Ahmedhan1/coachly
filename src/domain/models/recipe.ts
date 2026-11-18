@@ -15,6 +15,14 @@ export const ingredientSchema = z.object({
   fatG: nonNegative.nullable(),
 });
 
+/** Cuisine families used to browse the cookbook (labels live in i18n under nutrition.book.cuisines). */
+export const RECIPE_CUISINES = ['egyptian', 'levantine', 'gulf', 'mediterranean', 'asian', 'international'] as const;
+export const recipeCuisineSchema = z.enum(RECIPE_CUISINES);
+export type RecipeCuisine = z.infer<typeof recipeCuisineSchema>;
+
+/** File stem of a bundled food photo in public/food-img/photos/ (e.g. "koshari" → koshari.webp). */
+export const bundledPhotoSchema = z.string().regex(/^[a-z0-9-]{1,60}$/);
+
 export const recipeSchema = z.object({
   id: recipeIdSchema,
   name: requiredNameSchema,
@@ -25,6 +33,11 @@ export const recipeSchema = z.object({
   instructions: longTextSchema,
   instructionsEn: longTextSchema.optional(),
   imageId: imageIdSchema.nullable(),
+  /** Bundled photo of a starter recipe (the trainer's own photo, imageId, wins). */
+  photo: bundledPhotoSchema.optional(),
+  /** Minutes from start to plate (starter recipes). */
+  prepMin: z.number().int().min(0).max(1440).optional(),
+  cuisine: recipeCuisineSchema.optional(),
   tags: z.array(shortTextSchema).max(20),
   ...entityMetaShape,
 });

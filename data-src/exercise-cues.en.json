@@ -1042,6 +1042,546 @@
    "Back and arms against the wall",
    "Slide your arms up without arching your back",
    "Slow movement"
+  ],
+  "pt_Smith_Machine_Sumo_Squat": [
+   "Feet wider than shoulders, toes out",
+   "Knees track over your toes as you lower",
+   "Drive through your heels and squeeze your glutes"
+  ],
+  "pt_Smith_Machine_Inverted_Row": [
+   "Bar at waist height, body in a straight line",
+   "Pull your chest to the bar, squeeze your shoulder blades",
+   "Lower slowly"
+  ],
+  "pt_Smith_Machine_Reverse_Lunge": [
+   "Step back while the bar stays on its track",
+   "Lower until the back knee nearly touches the floor",
+   "Drive up through the front heel"
+  ],
+  "pt_Smith_Machine_Seated_Shoulder_Press": [
+   "Bench under the bar, back on the pad",
+   "Lower the bar to chin height",
+   "Press up without locking your elbows"
+  ],
+  "pt_Smith_Machine_Glute_Bridge": [
+   "Lie on the floor, padded bar over your hips",
+   "Drive through your heels and lock out with your glutes",
+   "Squeeze for a second at the top"
+  ],
+  "pt_Machine_Low_Row": [
+   "Chest on the pad, feet fixed",
+   "Pull the handles to your waist, elbows leading",
+   "Squeeze your shoulder blades and return slowly"
+  ],
+  "pt_Machine_Back_Extension": [
+   "Sit with the pad on your upper back and the belt fastened",
+   "Extend back slowly until you are upright",
+   "No jerking"
+  ],
+  "pt_Machine_Torso_Rotation": [
+   "Sit with your hips fixed",
+   "Rotate with your waist, not your arms",
+   "Return slowly without the weights clanking"
+  ],
+  "pt_Hack_Squat_Calf_Raise": [
+   "Balls of your feet on the edge of the platform",
+   "Lower your heels for a full stretch",
+   "Rise onto your toes and hold a second"
+  ],
+  "pt_Wide_Stance_Leg_Press": [
+   "Feet wide and high on the platform",
+   "Knees follow your toes",
+   "Don't let your hips curl up at the bottom"
+  ],
+  "pt_High_Foot_Leg_Press": [
+   "Feet high on the platform",
+   "Lower to 90 degrees",
+   "Push through your heels for the glutes"
+  ],
+  "pt_Single_Leg_Lying_Leg_Curl": [
+   "Hips pressed into the pad",
+   "Curl one leg all the way",
+   "Lower slowly"
+  ],
+  "pt_Leaning_Hip_Abduction_Machine": [
+   "Lean forward with a flat back",
+   "Push your legs out with your glutes",
+   "Return slowly"
+  ],
+  "pt_Cable_Y_Raise": [
+   "Two low cables, crossed",
+   "Raise your arms into a Y shape",
+   "Don't swing your body"
+  ],
+  "pt_Standing_Single_Arm_Cable_Row": [
+   "Stand in a split stance",
+   "Pull your elbow back to your side",
+   "Don't rotate your torso"
+  ],
+  "pt_Cable_Goblet_Squat": [
+   "Hold the handle at your chest, cable low",
+   "Squat down with a flat back",
+   "Drive up through your heels"
+  ],
+  "pt_Half_Kneeling_Cable_Chop": [
+   "One knee down, cable set high",
+   "Pull both hands down and across",
+   "Keep your hips square"
+  ],
+  "pt_Cable_Glute_Abduction_Lying": [
+   "Ankle strap on, hold the frame",
+   "Kick back and out at 45 degrees",
+   "Don't arch your back"
+  ],
+  "pt_B_Stance_Hip_Thrust": [
+   "One working leg, the other forward on its heel",
+   "Drive through the working heel",
+   "Lock out with your glutes"
+  ],
+  "pt_Bodyweight_Bulgarian_Split_Squat": [
+   "Back foot on a bench or sofa",
+   "Drop straight down until the front thigh is parallel",
+   "Drive through the front heel"
+  ],
+  "pt_Barbell_Bulgarian_Split_Squat": [
+   "Bar on your back, rear foot on the bench",
+   "Lower slowly with your core braced",
+   "Drive through the front heel"
+  ],
+  "pt_Deficit_Reverse_Lunge": [
+   "Stand on a low step with dumbbells",
+   "Step back and lower deep",
+   "Drive up through the front heel"
+  ],
+  "pt_Lateral_Step_Up": [
+   "Stand beside the box, one foot on it",
+   "Step up with the top leg only",
+   "Lower slowly"
+  ],
+  "pt_Barbell_Reverse_Lunge": [
+   "Bar on your back, core braced",
+   "Step back and lower",
+   "Return by driving through the front leg"
+  ],
+  "pt_Heel_Elevated_Goblet_Squat": [
+   "Heels on a plate or wedge",
+   "Squat deep with a flat back",
+   "Stand up with weight over mid-foot"
+  ],
+  "pt_Dumbbell_Goblet_Squat": [
+   "Hold the dumbbell vertically at your chest",
+   "Elbows inside your knees at the bottom",
+   "Flat back, chest up"
+  ],
+  "pt_Dumbbell_Sumo_Deadlift": [
+   "Wide stance, dumbbell between your feet",
+   "Flat back, knees pushed out",
+   "Stand up with your glutes"
+  ],
+  "pt_Dumbbell_Thruster": [
+   "Dumbbells at your shoulders, squat down",
+   "Drive up and press overhead",
+   "One smooth movement"
+  ],
+  "pt_EZ_Bar_Overhead_Triceps_Extension": [
+   "Sit with back support",
+   "Lower the bar behind your head, elbows fixed",
+   "Extend with the triceps only"
+  ],
+  "pt_Kettlebell_Deadlift": [
+   "Kettlebell between your feet",
+   "Push your hips back, flat back",
+   "Stand up with your glutes"
+  ],
+  "pt_Kettlebell_Sumo_Deadlift": [
+   "Wide stance, toes out",
+   "Flat back, knees out",
+   "Stand up with your glutes"
+  ],
+  "pt_Kettlebell_Front_Rack_Carry": [
+   "Kettlebells racked at your chest, elbows down",
+   "Walk with steady steps, body tall",
+   "Brace your core"
+  ],
+  "pt_Kettlebell_Gorilla_Row": [
+   "Wide stance, kettlebells between your feet",
+   "Hinge forward with a flat back",
+   "Row one arm at a time"
+  ],
+  "pt_Kettlebell_Goblet_Reverse_Lunge": [
+   "Kettlebell at your chest",
+   "Step back and lower",
+   "Drive through the front heel"
+  ],
+  "pt_Kettlebell_Russian_Twist": [
+   "Sit and lean back slightly",
+   "Move the kettlebell side to side",
+   "Rotate from your waist, not your arms"
+  ],
+  "pt_TRX_Biceps_Curl": [
+   "Lean back, arms in front",
+   "Curl your hands to your head, elbows fixed",
+   "Lower slowly"
+  ],
+  "pt_TRX_Triceps_Extension": [
+   "Lean forward, hands above your head",
+   "Bend only at the elbows",
+   "Extend with the triceps"
+  ],
+  "pt_TRX_Squat": [
+   "Hold the straps and sit back",
+   "Squat with a flat back",
+   "Use the straps for balance only"
+  ],
+  "pt_TRX_Hamstring_Curl": [
+   "Heels in the cradles, hips up",
+   "Pull your heels toward you",
+   "Keep your hips high"
+  ],
+  "pt_TRX_Y_Fly": [
+   "Lean back, arms straight",
+   "Raise your arms into a Y",
+   "Body straight as a plank"
+  ],
+  "pt_TRX_Pike": [
+   "Feet in the straps, high plank",
+   "Lift your hips into a pike, legs straight",
+   "Lower slowly back to plank"
+  ],
+  "pt_TRX_Single_Leg_Squat": [
+   "Hold the straps, stand on one leg",
+   "Lower slowly, other leg forward",
+   "Drive up through the heel"
+  ],
+  "pt_TRX_Mountain_Climber": [
+   "Feet in the straps, hands under shoulders",
+   "Alternate driving your knees in",
+   "Keep your hips level"
+  ],
+  "pt_TRX_Chest_Fly": [
+   "Lean forward, arms in front",
+   "Open your arms with soft elbows",
+   "Bring them back with your chest"
+  ],
+  "pt_Band_Biceps_Curl": [
+   "Stand on the band, elbows at your sides",
+   "Curl up and squeeze",
+   "Lower slowly"
+  ],
+  "pt_Band_Triceps_Pushdown": [
+   "Band anchored high",
+   "Elbows fixed at your sides",
+   "Push down and squeeze"
+  ],
+  "pt_Band_Seated_Row": [
+   "Sit, legs straight, band around your feet",
+   "Pull your elbows back",
+   "Squeeze your shoulder blades"
+  ],
+  "pt_Band_Chest_Press": [
+   "Band behind your back or anchored behind",
+   "Press forward until your arms are straight",
+   "Return slowly"
+  ],
+  "pt_Band_Romanian_Deadlift": [
+   "Stand on the band, hold the ends",
+   "Push your hips back, flat back",
+   "Stand up and squeeze your glutes"
+  ],
+  "pt_Band_Straight_Arm_Pulldown": [
+   "Band anchored high, arms straight",
+   "Pull down to your thighs",
+   "Squeeze your lats"
+  ],
+  "pt_Band_Woodchop": [
+   "Band anchored high to one side",
+   "Pull down and across, rotating from your waist",
+   "Return slowly"
+  ],
+  "pt_Band_Front_Squat": [
+   "Stand on the band, hold it at your shoulders",
+   "Squat with a flat back",
+   "Drive up through your heels"
+  ],
+  "pt_Mini_Band_Squat": [
+   "Mini band above your knees",
+   "Squat and push your knees out against the band",
+   "Drive up through your heels"
+  ],
+  "pt_Thread_The_Needle": [
+   "On hands and knees",
+   "Thread one arm under your body and rotate",
+   "Open it up to the ceiling slowly"
+  ],
+  "pt_Knee_To_Wall_Ankle_Mobilization": [
+   "Foot a short distance from the wall",
+   "Drive your knee to the wall, heel down",
+   "Move back a little at a time"
+  ],
+  "pt_Foam_Roller_Thoracic_Extension": [
+   "Roller under your mid-back, hands behind your head",
+   "Extend back over the roller",
+   "Stay off your lower back"
+  ],
+  "pt_Front_To_Back_Leg_Swings": [
+   "Hold a wall, stand on one leg",
+   "Swing the other leg forward and back",
+   "Build the range gradually"
+  ],
+  "pt_Lateral_Leg_Swings": [
+   "Face a wall and hold it",
+   "Swing one leg side to side in front of you",
+   "Keep your torso still"
+  ],
+  "pt_Goblet_Squat_Hold": [
+   "Sink into a deep squat, weight at your chest",
+   "Push your knees out with your elbows",
+   "Hold and breathe"
+  ],
+  "pt_Figure_Four_Stretch": [
+   "Sit and cross one ankle over the other knee",
+   "Lean forward with a flat back",
+   "Hold and breathe"
+  ],
+  "pt_Butterfly_Stretch": [
+   "Sit with the soles of your feet together",
+   "Let your knees drop gently",
+   "Back straight"
+  ],
+  "pt_Sleeper_Stretch": [
+   "Lie on your side, bottom arm in front",
+   "Gently push the forearm down with the other hand",
+   "Easy, never into pain"
+  ],
+  "pt_Walking_Knee_Hug": [
+   "Walk and pull one knee to your chest",
+   "Rise onto the toes of the standing leg",
+   "Switch every step"
+  ],
+  "pt_Lateral_Shuffle": [
+   "Sink into a half squat",
+   "Move sideways with quick steps",
+   "Don't let your feet touch"
+  ],
+  "pt_Arm_Swings": [
+   "Open and cross your arms in front of your chest",
+   "Build the range gradually",
+   "Breathe normally"
+  ],
+  "pt_Hip_Hinge_Dowel_Drill": [
+   "Dowel along your back touching head, mid-back and hips",
+   "Push your hips back without the dowel moving",
+   "Stand up with your glutes"
+  ],
+  "pt_Cat_Cow": [
+   "On hands and knees",
+   "Round your back up, then let it sag",
+   "Slowly, with your breath"
+  ],
+  "pt_Ski_Erg": [
+   "Hold the handles high",
+   "Pull down using your whole body",
+   "Return up smoothly"
+  ],
+  "pt_Arm_Ergometer": [
+   "Sit tall in front of the machine",
+   "Crank with your arms at a steady pace",
+   "Good when the legs are injured"
+  ],
+  "pt_Treadmill_Backward_Walk": [
+   "Slow speed, hold the rails",
+   "Walk backwards with small steps",
+   "Kind to the knees"
+  ],
+  "pt_Rowing_Machine_Intervals": [
+   "Legs, then back, then arms",
+   "Hard on the work intervals, easy on the rest",
+   "Flat back"
+  ],
+  "pt_Elliptical_Intervals": [
+   "Fast on work intervals, easy on rest",
+   "Don't lean on the handles",
+   "Arms and legs together"
+  ],
+  "pt_Side_Plank_Hip_Dip": [
+   "Elbow under shoulder, body straight",
+   "Dip your hips a little and lift",
+   "Don't rotate forward"
+  ],
+  "pt_Stir_The_Pot": [
+   "Elbows on the ball in a plank",
+   "Make small circles with your elbows",
+   "Keep your hips still"
+  ],
+  "pt_Hanging_Oblique_Knee_Raise": [
+   "Hang with your shoulders pulled down",
+   "Raise your knees to one side",
+   "Lower slowly, no swinging"
+  ],
+  "pt_Plank_Up_Down": [
+   "From forearm plank to high plank",
+   "One hand at a time, hips still",
+   "Return the same way"
+  ],
+  "pt_Bear_Hold": [
+   "On hands and toes, knees just off the floor",
+   "Back flat as a table",
+   "Hold and breathe"
+  ],
+  "pt_Lying_Leg_Raise": [
+   "Lie on your back, hands under your hips",
+   "Raise your straight legs",
+   "Lower slowly, lower back flat"
+  ],
+  "pt_McGill_Curl_Up": [
+   "Lie down, one knee bent, hands under your lower back",
+   "Lift your head and shoulders slightly",
+   "Hold 8-10 seconds"
+  ],
+  "pt_Dead_Bug_Band": [
+   "Band anchored behind your head, arms holding it",
+   "Extend the opposite arm and leg slowly",
+   "Lower back pressed down"
+  ],
+  "pt_Spanish_Squat": [
+   "Heavy band behind your knees, anchored to a post",
+   "Sit back with shins vertical",
+   "Good for sore knees"
+  ],
+  "pt_Terminal_Knee_Extension": [
+   "Band behind the knee, anchored in front",
+   "Straighten the knee fully and squeeze your quads",
+   "Return slowly"
+  ],
+  "pt_Straight_Leg_Raise": [
+   "Lie down, one knee bent, the other straight",
+   "Tighten your quads and lift the straight leg",
+   "Lower slowly"
+  ],
+  "pt_Quad_Set": [
+   "Sit, leg straight, towel under the knee",
+   "Press the knee down and tighten your quads",
+   "Hold 5 seconds"
+  ],
+  "pt_Eccentric_Step_Down": [
+   "Stand on a low step on one leg",
+   "Slowly lower the other foot to the floor",
+   "Knee tracks over your toes"
+  ],
+  "pt_Seated_Leg_Extension_Isometric": [
+   "Light weight, lift to a comfortable angle",
+   "Hold 20-30 seconds",
+   "Helps calm knee pain"
+  ],
+  "pt_Side_Lying_External_Rotation": [
+   "Lie on your side, towel under the elbow",
+   "Rotate the dumbbell up, elbow stays put",
+   "Very light weight"
+  ],
+  "pt_Prone_Y_T_W_Raise": [
+   "Lie face down on an incline bench",
+   "Raise your arms in a Y, then a T, then a W",
+   "Light weight or none"
+  ],
+  "pt_Wall_Push_Up": [
+   "Hands on the wall, shoulder width",
+   "Bring your chest to the wall, body straight",
+   "Push back"
+  ],
+  "pt_Pendulum_Swing": [
+   "Lean forward, one hand on a table",
+   "Let the other arm hang loose",
+   "Make small circles using your body"
+  ],
+  "pt_Half_Kneeling_Landmine_Press": [
+   "One knee down, bar at your shoulder",
+   "Press up and forward on the angle",
+   "Core braced"
+  ],
+  "pt_Band_Scapular_Retraction": [
+   "Hold the band in front, arms straight",
+   "Squeeze only your shoulder blades back",
+   "Keep your elbows straight"
+  ],
+  "pt_Serratus_Wall_Slide": [
+   "Roller on the wall under your forearms",
+   "Slide up while pushing gently forward",
+   "Return slowly"
+  ],
+  "pt_Glute_Bridge_Hold": [
+   "Lie down, knees bent",
+   "Lift your hips and squeeze your glutes",
+   "Hold 20-30 seconds"
+  ],
+  "pt_Supine_Pelvic_Tilt": [
+   "Lie down, knees bent",
+   "Flatten your lower back by bracing your abs",
+   "Release slowly"
+  ],
+  "pt_Quadruped_Rock_Back": [
+   "On hands and knees, back flat",
+   "Rock your hips back toward your heels",
+   "Don't let your back round"
+  ],
+  "pt_Side_Lying_Hip_Abduction": [
+   "Lie on your side, bottom knee bent",
+   "Lift the top leg straight and slightly back",
+   "Lower slowly"
+  ],
+  "pt_Single_Leg_Glute_Bridge_Bench": [
+   "Upper back on the bench, one foot down",
+   "Drive through the heel and lock out with your glutes",
+   "Keep your hips level"
+  ],
+  "pt_Dumbbell_Seal_Row": [
+   "Lie face down on a high bench",
+   "Row the dumbbells with your elbows",
+   "Squeeze your shoulder blades"
+  ],
+  "pt_Dumbbell_Pullover_Bench": [
+   "Upper back across the bench",
+   "Lower the dumbbell behind your head, soft elbows",
+   "Bring it back over your chest"
+  ],
+  "pt_Incline_Dumbbell_Y_Raise": [
+   "Lie face down on an incline bench",
+   "Raise the dumbbells into a Y",
+   "Light weight, slow tempo"
+  ],
+  "pt_Machine_Preacher_Hammer_Curl": [
+   "Arms on the preacher pad, rope in hand",
+   "Curl up with palms facing each other",
+   "Lower slowly"
+  ],
+  "pt_Cable_Single_Arm_Lateral_Raise_Behind": [
+   "Low cable behind your back",
+   "Raise your arm out to shoulder height",
+   "Don't swing"
+  ],
+  "pt_Smith_Machine_Close_Grip_Incline": [
+   "Incline bench, reverse grip",
+   "Lower the bar to your upper chest",
+   "Press with your chest"
+  ],
+  "pt_Machine_Chest_Fly_Single_Arm": [
+   "Back against the pad",
+   "Bring one handle to the middle",
+   "Squeeze a second, return slowly"
+  ],
+  "pt_Seated_Dumbbell_Calf_Raise": [
+   "Sit with dumbbells on your knees, balls of the feet on a plate",
+   "Lower your heels fully",
+   "Rise and hold a second"
+  ],
+  "pt_Reverse_Nordic": [
+   "Kneel with a straight line from knees to head",
+   "Lean back slowly",
+   "Come up with your quads"
+  ],
+  "pt_Frog_Stance_Pump": [
+   "Soles together, dumbbell on your hips",
+   "Lift your hips and squeeze",
+   "High reps, quick tempo"
   ]
  }
 }

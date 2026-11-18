@@ -6,9 +6,9 @@ test.describe('exercise library', () => {
     await openApp(page, '/exercises');
     const list = page.getByRole('list', { name: 'التمارين' });
     await expect(list.getByRole('listitem').first()).toBeVisible();
-    // 876 exercises, but only the rows near the viewport are in the DOM.
+    // 1000+ exercises, but only the rows near the viewport are in the DOM.
     expect(await list.getByRole('listitem').count()).toBeLessThan(40);
-    await expect(list.getByRole('listitem').first()).toHaveAttribute('aria-setsize', /^(8\d\d|9\d\d)$/);
+    await expect(list.getByRole('listitem').first()).toHaveAttribute('aria-setsize', /^1\d{3}$/);
 
     // Muscle filter through the sheet.
     await page.getByRole('button', { name: 'الفلاتر' }).click();

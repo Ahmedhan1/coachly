@@ -1,6 +1,7 @@
 import { DIET_TAGS, isSide, recipeKinds } from './dietBook';
 import { checkMacros, goalBonus, type MacroCheck } from './dietPlanner';
 import type { DietSettings } from './dietSettings';
+import { mealTargets } from './mealSplit';
 import { slotsFor, type DietSchedule, type DietSlot, type MealKind, type MealsPerDay } from './dietSlots';
 import type { DietGoal, DietStyle, MacroTargets } from './dietTargets';
 import {
@@ -62,6 +63,8 @@ export interface GramPlanOptions {
   style?: DietStyle;
   vegetarian?: boolean;
   exclude?: ReadonlySet<string>;
+  /** Score bonus per recipe id (the client loves it: positive; costly in budget mode: negative). */
+  boost?: ReadonlyMap<string, number>;
 }
 
 // ---------- the solver ----------
@@ -424,7 +427,7 @@ function pickMain(
     const miss = mealMiss(buildMeal([r, ...sides], target));
     const jitter = ((hash(r.id) + salt) % 100) / 100;
     const repeats = keyFoods(r).some((f) => eatenToday.has(f)) ? REPEAT_PENALTY : 0;
-    const score = miss + jitter * 0.18 - goalBonus(asDietRecipe(r), opts.goal, opts.style) + sides.length * 0.04 + repeats;
+    const score = miss + jitter * 0.18 - goalBonus(asDietRecipe(r), opts.goal, opts.style) + sides.length * 0.04 + repeats - (opts.boost?.get(r.id) ?? 0);
     if (score < bestScore) {
       best = { main: r, sides };
       bestScore = score;
@@ -451,8 +454,9 @@ export function planGramDay(book: readonly GramRecipe[], target: MacroTargets, c
   const pool = usablePool(book, ctx);
   const used = new Set<string>();
   const eaten = new Set<string>();
+  const targets = mealTargets(target, ctx.slots);
   const meals: WMeal[] = ctx.slots.map((slot, i) => {
-    const t = mealTarget(target, slot.sharePercent);
+    const t = targets[i] ?? mealTarget(target, slot.sharePercent);
     const avoid = new Set([...ctx.recent, ...used]);
     const pick = pickMain(pool, slot.kind, t, ctx, avoid, ctx.dayIndex * 31 + i * 17, eaten);
     if (!pick) return { target: t, free: true, dishes: [] };
@@ -469,15 +473,19 @@ export interface GramWeekOptions extends GramPlanOptions {
   mealsPerDay: MealsPerDay;
   days: number;
   seed?: number;
+  /** The trainer's own meal layout (shares, carb weights); else the schedule's default. */
+  slots?: readonly DietSlot[];
+  /** Targets per day (carb cycling); a missing day uses `target`. */
+  dayTargets?: readonly MacroTargets[];
 }
 
 /** Consecutive days; each day avoids the previous day's main dishes. */
 export function planGramWeek(book: readonly GramRecipe[], target: MacroTargets, opts: GramWeekOptions, ds: DietSettings): GramDay[] {
-  const slots = slotsFor(opts.schedule, opts.mealsPerDay, ds);
+  const slots = opts.slots ?? slotsFor(opts.schedule, opts.mealsPerDay, ds);
   const out: GramDay[] = [];
   let recent: ReadonlySet<string> = new Set();
   for (let d = 0; d < opts.days; d++) {
-    const day = planGramDay(book, target, { ...opts, slots, dayIndex: d + (opts.seed ?? 0) * 7, recent }, ds);
+    const day = planGramDay(book, opts.dayTargets?.[d] ?? target, { ...opts, slots, dayIndex: d + (opts.seed ?? 0) * 7, recent }, ds);
     out.push(day);
     recent = new Set(day.meals.flatMap((m) => (m.dishes[0] ? [m.dishes[0].recipeId] : [])));
   }
@@ -486,12 +494,15 @@ export function planGramWeek(book: readonly GramRecipe[], target: MacroTargets, 
 
 // ---------- edits ----------
 
-function rebuild(day: GramDay, mealIndex: number | null, change: (meals: WMeal[]) => void, ds: DietSettings, target = day.target): GramDay {
-  const meals = day.meals.map((m, i) => fromGramMeal(target === day.target ? m : { ...m, target: mealTarget(target, m.slot.sharePercent) }, mealIndex === null || i === mealIndex));
+function rebuild(day: GramDay, mealIndex: number | null, change: (meals: WMeal[]) => void, ds: DietSettings, target = day.target, slots?: readonly DietSlot[]): GramDay {
+  const layout = slots && slots.length === day.meals.length ? slots : day.meals.map((m) => m.slot);
+  const fresh = target !== day.target || slots !== undefined;
+  const aims = fresh ? mealTargets(target, layout) : [];
+  const meals = day.meals.map((m, i) => fromGramMeal(fresh ? { ...m, slot: layout[i] ?? m.slot, target: aims[i] ?? m.target } : m, mealIndex === null || i === mealIndex));
   change(meals);
   solveAndRound(meals, target, mealIndex === null ? PLAN_WEIGHTS : MEAL_WEIGHTS);
   return toGramDay(
-    day.meals.map((m) => m.slot),
+    layout,
     meals,
     target,
     ds,
@@ -546,9 +557,12 @@ export function nudgeStep(line: Pick<GramLine, 'src' | 'role'>): number {
   return 10;
 }
 
-/** Keeps dishes and hand-set foods but aims the whole day at new targets (the trainer moved a parameter). */
-export function retargetDay(day: GramDay, target: MacroTargets, ds: DietSettings): GramDay {
-  return rebuild(day, null, () => undefined, ds, target);
+/**
+ * Keeps dishes and hand-set foods but aims the whole day at new targets (the trainer moved a parameter), and
+ * optionally a new meal split (same number of meals).
+ */
+export function retargetDay(day: GramDay, target: MacroTargets, ds: DietSettings, slots?: readonly DietSlot[]): GramDay {
+  return rebuild(day, null, () => undefined, ds, target, slots);
 }
 
 /** Dishes that may replace one dish of a meal: same slot, mains for a main and same-role sides for a side. */
@@ -569,7 +583,7 @@ export function dishAlternatives(book: readonly GramRecipe[], day: GramDay, meal
       w.dishes[dishIndex] = { recipeId: r.id, lines: r.lines.map((l) => workLine(l)) };
       const miss = mealMiss(w);
       const kcal = w.dishes.reduce((a, d) => a + d.lines.reduce((b, l) => b + valueOf(l, 'kcal'), 0), 0);
-      return { recipeId: r.id, kcal: Math.round(kcal), score: miss - goalBonus(asDietRecipe(r), opts.goal, opts.style) };
+      return { recipeId: r.id, kcal: Math.round(kcal), score: miss - goalBonus(asDietRecipe(r), opts.goal, opts.style) - (opts.boost?.get(r.id) ?? 0) };
     });
   scored.sort((a, b) => a.score - b.score || a.recipeId.localeCompare(b.recipeId));
   return scored.slice(0, Math.max(0, limit)).map(({ recipeId, kcal }) => ({ recipeId, kcal }));

@@ -141,6 +141,13 @@
   min-inline-size: 0;
 }
 
+.exNote {
+  display: block;
+  margin-block-start: 2px;
+  font: var(--t-caption);
+  color: var(--warn);
+}
+
 .exSpec {
   font: var(--t-sub);
   color: var(--text-2);

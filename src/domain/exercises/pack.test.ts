@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest';
 import {
   DATASET_MUSCLE_TO_GROUP,
   MUSCLE_GROUP_IDS,
+  applyExerciseFix,
   buildExercisePack,
   buildPackExercise,
   cleanEnglishName,
@@ -212,5 +213,59 @@ describe('English names and cues in the pack', () => {
     expect(pack.exercises.map((e) => e.en)).toEqual(['Barbell Bench Press', 'Barbell Back Squat']);
     expect(pack.exercises[1]?.cuesEn).toEqual(['Brace before you descend']);
     expect(pack.exercises[0]?.cuesEn).toBeUndefined();
+  });
+});
+
+describe('hand-reviewed fixes and joint data', () => {
+  const base = {
+    sources: [squat],
+    arabicNames: new Map([['Barbell_Full_Squat', 'بار فول سكوات']]),
+    imagesById: new Map([['Barbell_Full_Squat', ['Barbell_Full_Squat-0.webp', 'Barbell_Full_Squat-1.webp']]]),
+    image: { format: 'webp' as const, maxSize: 480, quality: 60 },
+    source: 'yuhonas/free-exercise-db',
+  };
+
+  it('keeps only the listed photos and replaces muscles and equipment', () => {
+    const pack = buildExercisePack({
+      ...base,
+      fixes: new Map([['Barbell_Full_Squat', { keepImages: [1], primary: ['glutes' as const], secondary: ['glutes' as const, 'quads' as const], equipment: 'machine' as const }]]),
+    });
+    const e = pack.exercises[0];
+    expect(e?.images).toEqual(['Barbell_Full_Squat-1.webp']);
+    expect(e?.primary).toEqual(['glutes']);
+    expect(e?.secondary).toEqual(['quads']);
+    expect(e?.equipment).toBe('machine');
+  });
+
+  it('applyExerciseFix is idempotent and a missing fix changes nothing', () => {
+    const e = buildPackExercise(squat, 'x', ['Barbell_Full_Squat-0.webp', 'Barbell_Full_Squat-1.webp']);
+    const once = applyExerciseFix(e, { keepImages: [0] });
+    expect(applyExerciseFix(once, { keepImages: [0] })).toEqual(once);
+    expect(applyExerciseFix(e, undefined)).toBe(e);
+  });
+
+  it('adds joint data from the rules; extras and fixes win per joint', () => {
+    const rules = { stress: () => ({ knee: 'high', shoulder: 'medium', lowerBack: 'high' }) as const, home: () => false };
+    const pack = buildExercisePack({
+      ...base,
+      jointRules: rules,
+      extras: [
+        {
+          id: 'pt_Wall', en: 'Wall Push-Up', ar: 'وول بوش أب', primary: ['chest'], secondary: [], equipment: 'body_only',
+          level: 'beginner', category: 'strength', force: 'push', mechanic: 'compound', jointStress: { knee: 'low' }, homeFriendly: true,
+        },
+      ],
+      fixes: new Map([['Barbell_Full_Squat', { jointStress: { shoulder: 'low' as const } }]]),
+    });
+    const [squatOut, wall] = [pack.exercises.find((e) => e.id === 'Barbell_Full_Squat'), pack.exercises.find((e) => e.id === 'pt_Wall')];
+    expect(squatOut?.jointStress).toEqual({ knee: 'high', shoulder: 'low', lowerBack: 'high' });
+    expect(squatOut?.homeFriendly).toBe(false);
+    expect(wall?.jointStress).toEqual({ knee: 'low', shoulder: 'medium', lowerBack: 'high' });
+    expect(wall?.homeFriendly).toBe(true);
+  });
+
+  it('leaves joint data out when no rules are given (older callers)', () => {
+    const pack = buildExercisePack(base);
+    expect(pack.exercises[0]).not.toHaveProperty('jointStress');
   });
 });

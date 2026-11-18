@@ -101,6 +101,21 @@ export const CATEGORY_IDS = [
 export type ExerciseCategory = (typeof CATEGORY_IDS)[number];
 
 export type ExerciseForce = 'push' | 'pull' | 'static';
+
+/** How much an exercise loads a sensitive joint. Used to tailor programs to a client's injuries. */
+export const STRESS_LEVELS = ['low', 'medium', 'high'] as const;
+export type StressLevel = (typeof STRESS_LEVELS)[number];
+
+/**
+ * Joint load of one exercise (knee, shoulder, lower back). Filled for the whole built-in library by
+ * `deriveJointStress()` (src/domain/exercises/jointStress.ts) plus hand-reviewed overrides; rules in
+ * docs/EXERCISE_PACK.md.
+ */
+export interface JointStress {
+  knee: StressLevel;
+  shoulder: StressLevel;
+  lowerBack: StressLevel;
+}
 export type ExerciseMechanic = 'compound' | 'isolation';
 
 /** One record of free-exercise-db dist/exercises.json. */
@@ -140,15 +155,43 @@ export interface PackExercise {
   popular?: number;
   /** True for the app's own built-in additions (data-src/exercise-extras.json), not from the dataset. */
   extra?: boolean;
+  /** Joint load (knee / shoulder / lower back). Present on every built-in exercise. */
+  jointStress?: JointStress;
+  /** True when it can be done at home with body weight, bands, dumbbells, a kettlebell, a ball or a mat. */
+  homeFriendly?: boolean;
 }
 
 /**
  * A built-in exercise the dataset lacks (data-src/exercise-extras.json). `imagesFrom` names a dataset
  * exercise whose photos truly show the same movement; without it the app draws the muscle map.
  */
-export interface ExtraExercise extends Omit<PackExercise, 'images' | 'popular' | 'extra' | 'cuesEn'> {
+export interface ExtraExercise extends Omit<PackExercise, 'images' | 'popular' | 'extra' | 'cuesEn' | 'jointStress'> {
   imagesFrom?: string;
+  /** Hand-set joint load; unset parts come from the rules. */
+  jointStress?: Partial<JointStress>;
   popular?: boolean;
+}
+
+/**
+ * A hand-reviewed correction of one exercise (data-src/exercise-fixes.json), applied after the dataset
+ * mapping and the extras. Found by the visual audit of the photos; `reason` says why.
+ */
+export interface ExerciseFix {
+  /** Keep only these photos, by their 0-based index in the file name (`<id>-<n>.webp`). */
+  keepImages?: number[];
+  primary?: MuscleGroupId[];
+  secondary?: MuscleGroupId[];
+  equipment?: EquipmentId;
+  /** Hand-set joint load; unset parts come from the rules. */
+  jointStress?: Partial<JointStress>;
+  homeFriendly?: boolean;
+  reason?: string;
+}
+
+/** The joint rules (src/domain/exercises/jointStress.ts), passed in so this file stays import-free. */
+export interface JointRules {
+  stress: (e: PackExercise) => JointStress;
+  home: (e: PackExercise) => boolean;
 }
 
 export interface PackImageSettings {
@@ -321,11 +364,33 @@ export interface BuildExercisePackInput {
   englishNames?: ReadonlyMap<string, string>;
   /** Exercise id → short English cues (data-src/exercise-cues.en.json), dataset and extras alike. */
   cuesEn?: ReadonlyMap<string, readonly string[]>;
+  /** Exercise id → hand-reviewed correction (data-src/exercise-fixes.json). */
+  fixes?: ReadonlyMap<string, ExerciseFix>;
+  /** When given, every exercise gets `jointStress` and `homeFriendly` (hand-set values win). */
+  jointRules?: JointRules;
+}
+
+const imageIndex = (file: string): number => Number(/-(\d+)\.[a-z]+$/.exec(file)?.[1] ?? -1);
+
+/** Applies a hand-reviewed fix: photos kept, muscles and equipment replaced. */
+export function applyExerciseFix(e: PackExercise, fix: ExerciseFix | undefined): PackExercise {
+  if (fix === undefined) return e;
+  const primary = fix.primary !== undefined ? [...new Set(fix.primary)] : e.primary;
+  const secondary = (fix.secondary ?? e.secondary).filter((id) => !primary.includes(id));
+  const keep = fix.keepImages;
+  return {
+    ...e,
+    primary,
+    secondary: [...new Set(secondary)],
+    ...(fix.equipment !== undefined ? { equipment: fix.equipment } : {}),
+    images: keep === undefined ? e.images : e.images.filter((file) => keep.includes(imageIndex(file))),
+  };
 }
 
 function extraToPack(extra: ExtraExercise, imagesById: ReadonlyMap<string, readonly string[]>): PackExercise {
-  const { imagesFrom, popular, ...rest } = extra;
+  const { imagesFrom, popular, jointStress, ...rest } = extra;
   void popular; // the rank is computed in buildExercisePack
+  void jointStress; // merged with the rules in buildExercisePack
   const primary = [...new Set(rest.primary)];
   return {
     ...rest,
@@ -350,6 +415,8 @@ export function buildExercisePack(input: BuildExercisePackInput): ExercisePack {
   ];
   const rank = new Map<string, number>();
   for (const id of popularIds) if (!rank.has(id)) rank.set(id, rank.size + 1);
+  const extraJoint = new Map((input.extras ?? []).map((x) => [x.id, x.jointStress ?? {}]));
+  const extraHome = new Map((input.extras ?? []).filter((x) => x.homeFriendly !== undefined).map((x) => [x.id, x.homeFriendly]));
   const exercises = [...fromDataset, ...extras]
     .map((e) => {
       const r = rank.get(e.id);
@@ -359,7 +426,10 @@ export function buildExercisePack(input: BuildExercisePackInput): ExercisePack {
       const withCues: PackExercise = cues !== undefined && cues.length > 0 ? { ...named, cues: [...cues] } : named;
       const en = input.cuesEn?.get(e.id);
       const withEn: PackExercise = en !== undefined && en.length > 0 ? { ...withCues, cuesEn: [...en] } : withCues;
-      return r === undefined ? withEn : { ...withEn, popular: r };
+      const fix = input.fixes?.get(e.id);
+      const fixed = applyExerciseFix(withEn, fix);
+      const ranked = r === undefined ? fixed : { ...fixed, popular: r };
+      return withJointData(ranked, input.jointRules, { ...extraJoint.get(e.id), ...fix?.jointStress }, fix?.homeFriendly ?? extraHome.get(e.id));
     })
     .sort((a, b) => (a.id < b.id ? -1 : a.id > b.id ? 1 : 0));
   return {
@@ -370,4 +440,17 @@ export function buildExercisePack(input: BuildExercisePackInput): ExercisePack {
     imageBytes: input.imageBytes ?? 0,
     exercises,
   };
+}
+
+function withJointData(
+  e: PackExercise,
+  rules: JointRules | undefined,
+  hand: Partial<JointStress>,
+  home: boolean | undefined,
+): PackExercise {
+  if (rules === undefined) return e;
+  const { homeFriendly: _h, jointStress: _j, ...plain } = e;
+  void _h;
+  void _j;
+  return { ...plain, jointStress: { ...rules.stress(plain), ...hand }, homeFriendly: home ?? rules.home(plain) };
 }
