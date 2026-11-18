@@ -224,7 +224,7 @@ export function DietWeek({ client, week, book, recipes, foods, perServing, targe
                 return (
                   <div key={`${dish.recipeId}-${di}`} className={styles.dish}>
                     <div className={styles.dishHead}>
-                      <FoodImage imageId={r?.imageId} icon={r ? recipeIconHex(r.ingredients, icons ?? foods) : undefined} className={styles.dishImg} />
+                      <FoodImage imageId={r?.imageId} photo={r?.photo} icon={r ? recipeIconHex(r.ingredients, icons ?? foods) : undefined} className={styles.dishImg} />
                       <p className={styles.dishName}>{name}</p>
                       <span className={`${styles.dishKcal} num`}>{dish.totals.kcal}</span>
                       <button type="button" className={plan.swap} onClick={() => setSwapping({ meal: mi, dish: di })} aria-label={t('nutrition.diet.swapDish', { name })}>
