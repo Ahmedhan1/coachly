@@ -290,3 +290,24 @@ describe('share document guard', () => {
     expect(parseCheckinDocument({ v: 1, kind: 'checkin', createdAt: 1, armCm: 500 })).toBeNull();
   });
 });
+
+describe('client page language', () => {
+  it('accepts lang en/ar and rejects other values', () => {
+    expect(parseShareDocument({ ...SAMPLE_DOCUMENT, lang: 'en' })).not.toBeNull();
+    expect(parseShareDocument({ ...SAMPLE_DOCUMENT, lang: 'ar' })).not.toBeNull();
+    expect(parseShareDocument({ ...SAMPLE_DOCUMENT, lang: 'fr' })).toBeNull();
+  });
+  it('has an English label for every Arabic viewer label', () => {
+    const block = (name: string) => {
+      const start = VIEWER_SCRIPT.indexOf(`var ${name} = {`);
+      const end = VIEWER_SCRIPT.indexOf('\n};', start);
+      return VIEWER_SCRIPT.slice(start, end);
+    };
+    const keys = (b: string) => [...b.matchAll(/^ {2}(\w+):/gm)].map((m) => m[1]).sort();
+    const ar = keys(block('AR'));
+    expect(ar.length).toBeGreaterThan(50);
+    expect(keys(block('EN'))).toEqual(ar);
+    expect(block('EN')).not.toMatch(/[؀-ۿ]/);
+    expect(VIEWER_SCRIPT).toContain("document.documentElement.dir = en ? 'ltr' : 'rtl'");
+  });
+});

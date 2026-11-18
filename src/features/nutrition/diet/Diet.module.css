@@ -319,3 +319,60 @@
   justify-content: space-between;
   gap: var(--sp-2);
 }
+
+/* First open while the starter cookbook is written. */
+.preparing {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-3);
+  margin: var(--sp-4) var(--gutter) 0;
+  color: var(--text-2);
+  font: var(--t-callout);
+}
+
+.preparing p {
+  margin: 0;
+}
+
+.spinner {
+  flex: none;
+  inline-size: 20px;
+  block-size: 20px;
+  border: 2px solid var(--line);
+  border-block-start-color: var(--brand);
+  border-radius: var(--r-full);
+  animation: spin 0.9s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.skeleton {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-3);
+  margin: var(--sp-4) var(--gutter) 0;
+}
+
+.skeleton span {
+  block-size: 96px;
+  border-radius: var(--r-lg);
+  background: var(--surface);
+  animation: pulse 1.4s ease-in-out infinite;
+}
+
+@keyframes pulse {
+  50% {
+    opacity: 0.55;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .spinner,
+  .skeleton span {
+    animation: none;
+  }
+}

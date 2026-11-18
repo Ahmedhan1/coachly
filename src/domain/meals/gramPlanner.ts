@@ -389,7 +389,30 @@ function mealMiss(m: WMeal): number {
   return (Math.abs(s.k - t.kcal) + 0.5 * (4 * Math.abs(s.p - t.proteinG) + 4 * Math.abs(s.c - t.carbG) + 9 * Math.abs(s.f - t.fatG))) / scale;
 }
 
-function pickMain(pool: Pool, kind: MealKind, target: MacroTargets, opts: GramPlanOptions, avoid: ReadonlySet<string>, salt: number): { main: GramRecipe; sides: GramRecipe[] } | null {
+/**
+ * The foods a dish is "about": its protein foods, or its biggest calorie source when it has none. Used to avoid
+ * cottage cheese at the snack and again at dinner on the same day.
+ */
+export function keyFoods(r: Pick<GramRecipe, 'lines'>): string[] {
+  const roles = r.lines.map((l) => ({ l, role: lineRole(l), kcal: (l.per100g.kcal * l.grams) / 100 }));
+  const protein = roles.filter((x) => x.role === 'protein').map((x) => x.l.name);
+  if (protein.length > 0) return protein;
+  const top = roles.filter((x) => x.role !== 'fixed').sort((a, b) => b.kcal - a.kcal)[0];
+  return top ? [top.l.name] : [];
+}
+
+/** Score added when a dish repeats a key food already eaten today (soft: a much better fit still wins). */
+const REPEAT_PENALTY = 0.35;
+
+function pickMain(
+  pool: Pool,
+  kind: MealKind,
+  target: MacroTargets,
+  opts: GramPlanOptions,
+  avoid: ReadonlySet<string>,
+  salt: number,
+  eatenToday: ReadonlySet<string> = new Set(),
+): { main: GramRecipe; sides: GramRecipe[] } | null {
   const all = mainsForKind(pool.mains, kind);
   const fallback = all.length > 0 ? all : pool.mains;
   const fresh = fallback.filter((r) => !avoid.has(r.id));
@@ -400,7 +423,8 @@ function pickMain(pool: Pool, kind: MealKind, target: MacroTargets, opts: GramPl
     const sides = sidesFor(r, kind, pool.sides, opts.style, salt);
     const miss = mealMiss(buildMeal([r, ...sides], target));
     const jitter = ((hash(r.id) + salt) % 100) / 100;
-    const score = miss + jitter * 0.18 - goalBonus(asDietRecipe(r), opts.goal, opts.style) + sides.length * 0.04;
+    const repeats = keyFoods(r).some((f) => eatenToday.has(f)) ? REPEAT_PENALTY : 0;
+    const score = miss + jitter * 0.18 - goalBonus(asDietRecipe(r), opts.goal, opts.style) + sides.length * 0.04 + repeats;
     if (score < bestScore) {
       best = { main: r, sides };
       bestScore = score;
@@ -426,12 +450,14 @@ export interface GramDayContext extends GramPlanOptions {
 export function planGramDay(book: readonly GramRecipe[], target: MacroTargets, ctx: GramDayContext, ds: DietSettings): GramDay {
   const pool = usablePool(book, ctx);
   const used = new Set<string>();
+  const eaten = new Set<string>();
   const meals: WMeal[] = ctx.slots.map((slot, i) => {
     const t = mealTarget(target, slot.sharePercent);
     const avoid = new Set([...ctx.recent, ...used]);
-    const pick = pickMain(pool, slot.kind, t, ctx, avoid, ctx.dayIndex * 31 + i * 17);
+    const pick = pickMain(pool, slot.kind, t, ctx, avoid, ctx.dayIndex * 31 + i * 17, eaten);
     if (!pick) return { target: t, free: true, dishes: [] };
     used.add(pick.main.id);
+    for (const f of keyFoods(pick.main)) eaten.add(f);
     return buildMeal([pick.main, ...pick.sides], t);
   });
   solveAndRound(meals, target, PLAN_WEIGHTS);

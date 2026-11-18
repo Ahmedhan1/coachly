@@ -35,7 +35,7 @@ const ORIGIN = 'https://viewer.test';
 const APP = 'https://app.test';
 const shareId = b64url(crypto.getRandomValues(new Uint8Array(16)));
 const key = lib.generateRawKey();
-const envelope = await lib.sealWithKey(key, new TextEncoder().encode(JSON.stringify(lib.SAMPLE_DOCUMENT)));
+let envelope = await lib.sealWithKey(key, new TextEncoder().encode(JSON.stringify(lib.SAMPLE_DOCUMENT)));
 
 async function expectedWriteToken(raw) {
   const ikm = await crypto.subtle.importKey('raw', raw, 'HKDF', false, ['deriveBits']);
@@ -205,6 +205,28 @@ try {
     const bg = await page.evaluate(() => getComputedStyle(document.body).backgroundColor);
     assert.equal(bg, 'rgb(11, 12, 12)');
     await page.screenshot({ path: join(shotDir, 'viewer-program-dark.png'), fullPage: true });
+  });
+  await step('an English document (lang: en) renders LTR with English labels, light and dark', async () => {
+    envelope = await lib.sealWithKey(key, new TextEncoder().encode(JSON.stringify({ ...lib.SAMPLE_DOCUMENT, lang: 'en' })));
+    for (const scheme of ['light', 'dark']) {
+      await page.emulateMedia({ colorScheme: scheme });
+      await page.goto('about:blank');
+      await page.goto(`${ORIGIN}/c/${shareId}#k=${b64url(key)}`);
+      await page.waitForSelector('body[data-ready="1"]');
+      assert.equal(await page.getAttribute('html', 'dir'), 'ltr');
+      assert.equal(await page.getAttribute('html', 'lang'), 'en');
+      const tabs = await page.locator('.tab').allTextContents();
+      assert.deepEqual(tabs, ['Training', 'Meals', 'Progress', 'Check-in']);
+      await page.click('.pills .pill >> nth=0');
+      const text = await page.textContent('#app');
+      for (const s of ['Next session', 'Your package', '5 of 12 sessions left', 'Sets 4', 'Reps 8-10', 'Rest 90s', 'Superset A', 'This page is private to you']) {
+        assert.ok(text.includes(s), `missing "${s}"`);
+      }
+      assert.ok((await page.textContent('#brand')).includes('Hi '));
+      await page.screenshot({ path: join(shotDir, `viewer-program-en-${scheme}.png`), fullPage: true });
+    }
+    envelope = await lib.sealWithKey(key, new TextEncoder().encode(JSON.stringify(lib.SAMPLE_DOCUMENT)));
+    await page.emulateMedia({ colorScheme: 'light' });
   });
 } finally {
   await browser.close();

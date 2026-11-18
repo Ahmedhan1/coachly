@@ -42,7 +42,7 @@ export const pdf: EnArea<'pdf'> = {
   readySize: 'Size {size}',
   previewPage: 'Page {n}',
   open: 'Open file',
-  downloadAndSend: 'Download and send on WhatsApp',
+  downloadAndSend: 'Send on WhatsApp',
   fallbackTitle: 'The file was downloaded to the phone',
   fallbackBody: 'This browser cannot send a PDF directly, so we saved it in Downloads as “{name}”.',
   fallbackSteps: 'In WhatsApp: open the client’s chat → tap the paperclip → “Document” → pick the file from Downloads.',

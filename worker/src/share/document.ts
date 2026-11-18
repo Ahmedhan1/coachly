@@ -135,6 +135,8 @@ export interface ShareDocumentV1 {
   checkins?: Array<{ d: string; weightKg?: number; waistCm?: number }>;
   /** Date of the first measurement (YYYY-MM-DD), for "since you started". */
   startDate?: string;
+  /** The trainer's app language: 'en' shows the page LTR with English labels. Absent = Arabic. */
+  lang?: 'ar' | 'en';
 }
 
 export type ShareDocument = ShareDocumentV1;
@@ -270,7 +272,8 @@ function isOptionalExtras(value: Obj): boolean {
     optNum(value.nextDay, 0, LIMITS.days - 1) &&
     optNum(value.streakWeeks, 0, 520) &&
     optArray(value.checkins, LIMITS.checkins, (c) => isObj(c) && isDate(c.d) && optNum(c.weightKg, 20, 400) && optNum(c.waistCm, 30, 300)) &&
-    (value.startDate === undefined || isDate(value.startDate))
+    (value.startDate === undefined || isDate(value.startDate)) &&
+    (value.lang === undefined || value.lang === 'ar' || value.lang === 'en')
   );
 }
 
