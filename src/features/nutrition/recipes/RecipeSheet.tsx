@@ -7,7 +7,7 @@ import type { IngredientEntry } from '@/domain/meals';
 import { searchItems } from '@/data';
 import { useLive } from '@/app/useLive';
 import { t } from '@/i18n';
-import { pick } from '@/i18n/locale';
+import { isEnglish, pick } from '@/i18n/locale';
 import { Icon, IconButton, Num, SearchField, Sheet, TextArea, TextField } from '@/ui';
 import { FoodImage } from '../shared/FoodImage';
 import { fieldText, gramsText, kcalText, parseDecimal } from '../shared/numbers';
@@ -70,6 +70,9 @@ export function RecipeSheet({ recipe, onClose }: { recipe: Recipe | null; onClos
   const [servings, setServings] = useState(String(recipe?.servings ?? 1));
   const [rows, setRows] = useState<Row[]>(recipe && recipe.ingredients.length > 0 ? recipe.ingredients.map(toRow) : [emptyRow()]);
   const [instructions, setInstructions] = useState(recipe?.instructions ?? '');
+  const [nameEn, setNameEn] = useState(recipe?.nameEn ?? '');
+  const [instructionsEn, setInstructionsEn] = useState(recipe?.instructionsEn ?? '');
+  const english = isEnglish();
   const [imageId, setImageId] = useState<string | null>(recipe?.imageId ?? null);
   const [error, setError] = useState<string | null>(null);
 
@@ -98,7 +101,16 @@ export function RecipeSheet({ recipe, onClose }: { recipe: Recipe | null; onClos
     e.preventDefault();
     if (!name.trim()) return setError(t('nutrition.book.nameRequired'));
     if (!ingredients) return setError(t('nutrition.book.invalid'));
-    const body = { name: name.trim(), servings: servingsN, ingredients, instructions: instructions.trim(), imageId: imageId as ImageId | null, tags: recipe?.tags ?? [] };
+    const body = {
+      name: name.trim(),
+      ...(nameEn.trim() ? { nameEn: nameEn.trim() } : {}),
+      servings: servingsN,
+      ingredients,
+      instructions: instructions.trim(),
+      ...(instructionsEn.trim() ? { instructionsEn: instructionsEn.trim() } : {}),
+      imageId: imageId as ImageId | null,
+      tags: recipe?.tags ?? [],
+    };
     if (recipe) {
       await repos.recipes.update(recipe.id, body);
       await store.adoptStarter(recipe.id);
@@ -132,6 +144,7 @@ export function RecipeSheet({ recipe, onClose }: { recipe: Recipe | null; onClos
           }}
           autoComplete="off"
         />
+        {english && <TextField label={t('nutrition.book.nameEn')} value={nameEn} onChange={(e) => setNameEn(e.target.value)} autoComplete="off" />}
         <div className={styles.hero}>
           <FoodImage imageId={imageId} icon={recipeIconHex(ingredients ?? [], foods ?? [])} className={styles.heroImg} />
         </div>
@@ -186,6 +199,9 @@ export function RecipeSheet({ recipe, onClose }: { recipe: Recipe | null; onClos
         )}
 
         <TextArea label={`${t('nutrition.book.instructions')} (${t('common.optional')})`} value={instructions} onChange={(e) => setInstructions(e.target.value)} />
+        {english && (
+          <TextArea label={`${t('nutrition.book.instructionsEn')} (${t('common.optional')})`} value={instructionsEn} onChange={(e) => setInstructionsEn(e.target.value)} />
+        )}
         <PhotoField label={t('nutrition.book.photo')} addLabel={t('nutrition.book.addPhoto')} removeLabel={t('nutrition.book.removePhoto')} imageId={imageId} onChange={setImageId} />
         {error && (
           <p className={common.error} role="alert">

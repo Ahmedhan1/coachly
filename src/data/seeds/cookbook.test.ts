@@ -4,6 +4,7 @@ import {
   defaultDietSettings,
   gramRecipe,
   isSide,
+  keyFoods,
   planGramWeek,
   recipeKinds,
   type DietGoal,
@@ -110,6 +111,20 @@ describe('gram planner on the real cookbook', () => {
       });
     }
   }
+
+  it('rarely repeats the same key food (e.g. cottage cheese) in two meals of one day', () => {
+    let days = 0;
+    let repeated = 0;
+    for (const goal of ['cut', 'maintain', 'bulk', 'recomp'] as const)
+      for (const mealsPerDay of [3, 4, 5] as MealsPerDay[]) {
+        for (const d of planGramWeek(book, targets[goal], { goal, schedule: 'normal', mealsPerDay, days: 7 }, ds)) {
+          days += 1;
+          const foods = d.meals.flatMap((m) => keyFoods(byId.get(m.dishes[0]?.recipeId ?? '') ?? { lines: [] }));
+          if (new Set(foods).size < foods.length) repeated += 1;
+        }
+      }
+    expect(repeated / days, `${repeated} of ${days} days repeat a key food`).toBeLessThan(0.2);
+  });
 
   it('Ramadan and fasting layouts also plan', () => {
     for (const schedule of ['ramadan', 'if_16_8'] as const) {

@@ -225,3 +225,32 @@ test('PDF in English: generates, previews LTR pages, and a session screen in Eng
   const n = await pages.count();
   for (let i = 0; i < Math.min(n, 3); i++) await pages.nth(i).screenshot({ path: `${SHOTS}/pdf-page-${i + 1}.png` });
 });
+
+test('English in dark mode: home, client hub, diet, settings, PDF preview', async ({ page }) => {
+  test.setTimeout(150_000);
+  await page.emulateMedia({ colorScheme: 'dark' });
+  await openApp(page);
+  await page.evaluate(() => localStorage.setItem('pt.locale', 'en'));
+  await page.reload();
+  await settle(page);
+  const userData = await demoUserData(page);
+  await expectNoArabicUi(page, userData, 'dark-home');
+  await page.goto('/clients');
+  await settle(page);
+  await page.getByRole('main').getByRole('link').filter({ hasText: /\S/ }).first().click();
+  await expect(page.getByRole('tablist', { name: 'Client file sections' })).toBeVisible();
+  const clientId = page.url().split('/clients/')[1]!.split(/[/?]/)[0]!;
+  await expectNoArabicUi(page, userData, 'dark-client-hub');
+  await page.goto(`/clients/${clientId}/diet`);
+  await settle(page);
+  await expect(page.getByText(/Preparing the cookbook/)).toHaveCount(0, { timeout: 20_000 });
+  await expectNoArabicUi(page, userData, 'dark-diet');
+  await page.goto('/more/settings');
+  await settle(page);
+  await expectNoArabicUi(page, userData, 'dark-settings');
+  await page.goto(`/more/pdf?client=${clientId}`);
+  await settle(page);
+  await page.getByRole('button', { name: 'Create the file' }).click();
+  await expect(page.getByText(/File ready: \d+ pages/)).toBeVisible({ timeout: 90_000 });
+  await expectNoArabicUi(page, userData, 'dark-pdf');
+});

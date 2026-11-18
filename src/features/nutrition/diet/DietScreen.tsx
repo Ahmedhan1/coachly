@@ -55,6 +55,21 @@ export function DietScreen() {
 
   const header = <PageHeader title={t('nutrition.diet.title')} subtitle={client?.name} back={{ to: back, label: t('nutrition.diet.back') }} />;
   // Wait for the starter cookbook: planning while it is still being written would re-plan for every new recipe.
+  if (!ready && client)
+    return (
+      <div className={common.page}>
+        {header}
+        <div className={styles.preparing} role="status">
+          <span className={styles.spinner} aria-hidden="true" />
+          <p>{t('nutrition.diet.preparing')}</p>
+        </div>
+        <div className={styles.skeleton} aria-hidden="true">
+          <span />
+          <span />
+          <span />
+        </div>
+      </div>
+    );
   if (!ready || client === undefined || saved === undefined || settings === undefined || dietSettings === undefined || recipes === undefined || foods === undefined) return header;
   if (client === null) {
     return (

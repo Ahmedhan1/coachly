@@ -5,7 +5,11 @@
 // Keep this free of backticks and "${" (it lives inside String.raw).
 export const VIEWER_SCRIPT = String.raw`(function () {
 'use strict';
-var T = {
+var AR = {
+  pageTitle: 'صفحتك',
+  exFew: 'تمارين',
+  exMany: 'تمرين',
+  kg: ' كجم',
   loading: 'جاري التحميل…',
   noKey: 'اللينك ناقص. اطلب من المدرب يبعتهولك تاني.',
   badKey: 'مش قادرين نفتح الصفحة باللينك ده. اطلب من المدرب لينك جديد.',
@@ -23,6 +27,7 @@ var T = {
   minutes: ' دقيقة',
   packageLabel: 'باقتك',
   packageLeft: 'فاضل ',
+  packageSuffix: '',
   of: ' من ',
   sessions: ' حصة',
   until: 'لحد ',
@@ -106,6 +111,123 @@ var T = {
   adherence: 'التزامك بالخطة (%)',
   howWeek: 'أسبوعك كان عامل إزاي؟'
 };
+
+var EN = {
+  pageTitle: 'Your page',
+  exFew: 'exercises',
+  exMany: 'exercises',
+  kg: ' kg',
+  loading: 'Loading…',
+  noKey: 'The link is incomplete. Ask your coach to send it again.',
+  badKey: 'We could not open the page with this link. Ask your coach for a new one.',
+  revoked: 'This link was cancelled or does not exist. Contact your coach.',
+  offline: 'No internet, or the server is not responding. Try again.',
+  retry: 'Try again',
+  hello: 'Hi ',
+  updated: 'Last update from your coach: ',
+  tabProgram: 'Training',
+  tabMeals: 'Meals',
+  tabProgress: 'Progress',
+  tabCheckin: 'Check-in',
+  nextSession: 'Next session',
+  noNextSession: 'No session booked',
+  minutes: ' min',
+  packageLabel: 'Your package',
+  packageLeft: '',
+  of: ' of ',
+  sessions: ' sessions',
+  packageSuffix: ' left',
+  until: 'until ',
+  nextWorkout: 'Next workout',
+  goal: 'Your goal',
+  noProgram: 'Your coach has not added a program yet. It shows here once it is ready.',
+  noMeals: 'No meal plan yet. It shows here once your coach prepares it.',
+  supplements: 'Supplements',
+  notes: 'Coach notes',
+  setsTotal: ' sets',
+  next: 'Next',
+  sets: 'Sets ',
+  reps: 'Reps ',
+  rest: 'Rest ',
+  sec: 's',
+  tempo: 'Tempo ',
+  rpe: 'RPE ',
+  superset: 'Superset ',
+  targets: 'Your daily target',
+  kcalUnit: 'kcal per day',
+  protein: 'Protein',
+  carbs: 'Carbs',
+  fat: 'Fat',
+  gram: ' g',
+  water: 'Water: ',
+  liter: ' L',
+  dayKcal: ' kcal',
+  progressEmpty: 'No measurements yet. Send your first check-in from the Check-in tab and your coach will follow up.',
+  series: { weight: 'Weight', waist: 'Waist', bodyFat: 'Body fat', hip: 'Hips', chest: 'Chest', arm: 'Arm', thigh: 'Thigh' },
+  units: { weight: 'kg', waist: 'cm', bodyFat: '%', hip: 'cm', chest: 'cm', arm: 'cm', thigh: 'cm' },
+  fromStart: ' since the first measurement',
+  same: 'Same as the first measurement',
+  records: 'Your best lifts',
+  attended: 'Attended ',
+  attendedSuffix: ' sessions so far',
+  checkinTitle: 'Weekly check-in',
+  checkinHint: 'Log your weight and measurements once a week, and your coach will see them.',
+  weight: 'Weight (kg)',
+  waist: 'Waist (cm)',
+  more: 'Other measurements (optional)',
+  hip: 'Hips (cm)',
+  chest: 'Chest (cm)',
+  arm: 'Arm (cm)',
+  thigh: 'Thigh (cm)',
+  checkinNotes: 'Notes for your coach',
+  photo: 'Photos (optional, up to 3)',
+  send: 'Send to coach',
+  sending: 'Sending…',
+  sent: 'Sent to your coach. Thanks!',
+  empty: 'Enter at least your weight, a measurement or a note.',
+  badNumber: 'A number is not valid.',
+  tooMany: 'Too many check-ins today. Try tomorrow.',
+  tooBig: 'The photos are too large. Try fewer photos.',
+  failed: 'Not sent. Check your internet and try again.',
+  photoFailed: 'We could not read this photo.',
+  privateNote: 'This page is private to you. Do not share the link.',
+  days: ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'],
+  am: 'am',
+  pm: 'pm',
+  today: 'Today',
+  tomorrow: 'Tomorrow',
+  todayWorkout: 'Your next workout',
+  streak: 'Your consistency',
+  weeksInRow: ' weeks in a row',
+  weekInRow: ' week',
+  milestones: 'Your milestones',
+  nextMilestone: 'Next goal: ',
+  lostKg: 'Lost ',
+  gainedKg: 'Gained ',
+  kgSuffix: ' kg',
+  waistDown: 'Waist down ',
+  cmSuffix: ' cm',
+  sessionsDone: ' sessions done',
+  weeksStreak: ' weeks in a row',
+  checkinsDone: ' check-ins sent',
+  since: 'Started ',
+  history: 'Your past check-ins',
+  sleep: 'Sleep (hours per night)',
+  energy: 'Your energy this week',
+  energyLabels: ['Very tired', 'Tired', 'OK', 'Good', 'Great'],
+  adherence: 'Plan adherence (%)',
+  howWeek: 'How was your week?'
+};
+var T = AR;
+
+/** The trainer's app language (doc.lang): English pages are LTR with English labels; Arabic is the default. */
+function applyLanguage(doc) {
+  var en = doc && doc.lang === 'en';
+  T = en ? EN : AR;
+  document.documentElement.lang = en ? 'en' : 'ar';
+  document.documentElement.dir = en ? 'ltr' : 'rtl';
+  document.title = T.pageTitle;
+}
 
 var cfg = document.getElementById('cfg');
 var shareId = cfg.getAttribute('data-share');
@@ -202,7 +324,7 @@ function formatDate(sec) {
 }
 function shortDate(iso) { return isStr(iso, 10) ? Number(iso.slice(8, 10)) + '/' + Number(iso.slice(5, 7)) : ''; }
 function isoDay(iso) { return isStr(iso, 10) ? Number(iso.slice(8, 10)) + '/' + Number(iso.slice(5, 7)) + '/' + iso.slice(0, 4) : ''; }
-function count(n, few, many) { return n + ' ' + (n >= 3 && n <= 10 ? few : many); }
+function count(n, few, many) { return n + ' ' + (T === EN ? (n === 1 ? few.replace(/s$/, '') : many) : (n >= 3 && n <= 10 ? few : many)); }
 function fmt(n) { return String(Math.round(n * 10) / 10); }
 function clock(d) {
   var h = d.getHours(), m = d.getMinutes();
@@ -274,11 +396,11 @@ function summary(doc) {
   }
   if (doc.days.length > 0) {
     var day = doc.days[nextDayIndex(doc)];
-    if (day && isStr(day.title, 80)) box.appendChild(stat(T.nextWorkout, day.title, count(arr(day.exercises).length, 'تمارين', 'تمرين')));
+    if (day && isStr(day.title, 80)) box.appendChild(stat(T.nextWorkout, day.title, count(arr(day.exercises).length, T.exFew, T.exMany)));
   }
   var p = doc.package;
   if (p && isNum(p.left) && isNum(p.total) && p.total > 0) {
-    box.appendChild(stat(T.packageLabel, T.packageLeft + p.left + T.of + p.total + T.sessions, isStr(p.endDate, 10) ? T.until + isoDay(p.endDate) : ''));
+    box.appendChild(stat(T.packageLabel, T.packageLeft + p.left + T.of + p.total + T.sessions + T.packageSuffix, isStr(p.endDate, 10) ? T.until + isoDay(p.endDate) : ''));
   }
   if (doc.goal && isStr(doc.goal.title, 80) && doc.goal.title) box.appendChild(stat(T.goal, doc.goal.title, ''));
   if (isNum(doc.streakWeeks) && doc.streakWeeks > 0) {
@@ -356,7 +478,7 @@ function dayView(day, isNext) {
   var head = el('div', 'day-head');
   head.appendChild(el('h2', '', isStr(day.title, 80) ? day.title : ''));
   var sets = exs.reduce(function (n, x) { return n + (isNum(x.sets) ? x.sets : 0); }, 0);
-  head.appendChild(el('span', 'sub', count(exs.length, 'تمارين', 'تمرين') + (sets ? ' · ' + sets + T.setsTotal : '')));
+  head.appendChild(el('span', 'sub', count(exs.length, T.exFew, T.exMany) + (sets ? ' · ' + sets + T.setsTotal : '')));
   box.appendChild(head);
   var ul = el('ul', 'list');
   exs.forEach(function (x, i) { ul.appendChild(exerciseCard(x, i + 1)); });
@@ -529,7 +651,7 @@ function seriesOf(doc, key) {
 function milestones(doc) {
   var done = [], next = [];
   var w = seriesOf(doc, 'weight');
-  var lossGoal = !(doc.goal && /تضخيم|زيادة/.test(String(doc.goal.title)));
+  var lossGoal = !(doc.goal && /تضخيم|زيادة|muscle|gain|bulk/i.test(String(doc.goal.title)));
   if (w.length > 1) {
     var diff = Math.round((w[w.length - 1].v - w[0].v) * 10) / 10;
     var lost = lossGoal ? -diff : diff;
@@ -602,7 +724,7 @@ function progressSection(doc) {
     recs.forEach(function (r) {
       var row = el('div', 'rec');
       row.appendChild(el('span', '', r.name));
-      row.appendChild(el('strong', '', fmt(r.weightKg) + ' كجم × ' + r.reps));
+      row.appendChild(el('strong', '', fmt(r.weightKg) + T.kg + ' × ' + r.reps));
       rc.appendChild(row);
     });
     s.appendChild(rc);
@@ -825,6 +947,7 @@ function start() {
         var doc = null;
         try { doc = plain ? JSON.parse(new TextDecoder().decode(plain)) : null; } catch (e) { doc = null; }
         if (!valid(doc)) { message(T.badKey, false); return; }
+        applyLanguage(doc);
         render(doc, raw);
       });
     }, function () { message(T.offline, true); });

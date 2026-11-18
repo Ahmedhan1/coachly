@@ -68,7 +68,16 @@ test('PDF: every section on its own renders', async ({ page }) => {
   // Every section needs content of its own: a program, a saved calculation and a measurement.
   await assignTemplateProgram(page, id);
   await seedClientData(page, id);
+  // A meal-plan day and one supplement from the catalog.
+  await page.goto(`/clients/${id}/meals?standalone=1`);
+  await page.getByRole('button', { name: 'ابدأ أول يوم' }).click();
+  await expect(page.getByRole('tablist', { name: 'الأيام' })).toBeVisible();
+  await page.goto(`/clients/${id}/supplements?standalone=1`);
+  await page.getByRole('button', { name: 'ضيف من الكتالوج' }).first().click();
+  await page.getByRole('dialog', { name: 'اختار منتج' }).getByRole('button').filter({ hasNotText: /إلغاء|إغلاق/ }).first().click();
+  await expect(page.getByRole('status').filter({ hasText: /^اتضاف / })).toBeVisible();
   await page.goto(`/more/pdf?client=${id}&standalone=1`);
+  await page.getByLabel(/تعليمات وملاحظات للعميل/).fill('اشرب مية كتير ونام 8 ساعات.');
   const names = ['الغلاف', 'بيانات العميل', 'جدول التمارين', 'السعرات والماكروز', 'خطة الوجبات', 'المكملات', 'التقدم', 'تعليمات وملاحظات'];
   for (const only of names) {
     for (const name of names) {
