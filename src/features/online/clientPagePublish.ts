@@ -6,18 +6,24 @@ import { getLocale, t } from '@/i18n';
 import { newClientShare } from '@/services/clientPage/clientPageService';
 import { ExerciseLibraryStore } from '@/data/exerciseLibraryStore';
 import { mergeCatalog, type CatalogExercise } from '@/domain/exercises';
+import { mealItemRows } from '@/domain/meals';
 import { loadBuiltinCatalog } from '@/features/programs/catalog';
 import { exerciseName } from '@/features/programs/names';
 import { clientPageLogo } from '@/features/identity/brandAssets';
 import { readShare, saveShare, type ShareRecord } from './prefs';
+
+/** Meal items as client-page lines: exact grams per food when the item came from the gram planner. */
+const itemRows = (i: MealPlan['meals'][number]['items'][number], recipeName: ReadonlyMap<string, string>): string[] =>
+  mealItemRows(i, { name: i.recipeId ? (recipeName.get(i.recipeId) ?? '') : '', units: { g: t('nutrition.units.g'), kcal: t('nutrition.units.kcal') }, english: getLocale() === 'en' });
 
 const mealsOf = (plan: MealPlan, recipeName: ReadonlyMap<string, string>): ShareDocumentV1['meals'] =>
   plan.meals.slice(0, 12).map((m) => {
     const meal: ShareDocumentV1['meals'][number] = {
       title: m.name.slice(0, 80) || '—',
       items: m.items
+        .flatMap((i) => itemRows(i, recipeName))
         .slice(0, 30)
-        .map((i) => `${i.recipeId ? (recipeName.get(i.recipeId) ?? i.text) : i.text}${i.servings !== 1 ? ` × ${i.servings}` : ''}`.trim().slice(0, 200))
+        .map((s) => s.trim().slice(0, 200))
         .filter(Boolean),
     };
     if (m.time) meal.time = m.time;
@@ -58,7 +64,7 @@ export async function buildClientShareDoc(services: AppServices, client: Client,
   const program = [...programs].sort((a, b) => b.updatedAt - a.updatedAt)[0] ?? null;
   const byEx = new Map((catalog ?? []).map((e) => [e.id, e]));
   const exName = (id: string) => exerciseName(byEx.get(id), id);
-  const recipeName = new Map(recipes.map((r) => [r.id as string, r.name]));
+  const recipeName = new Map(recipes.map((r) => [r.id as string, getLocale() === 'en' && r.nameEn ? r.nameEn : r.name]));
   const supp = new Map(supplements.map((s) => [s.id as string, s]));
   const sortedPlans = [...plans].sort((a, b) => a.createdAt - b.createdAt);
   const goalTitle = t(`pdf.doc.client.goals.${client.goal}`);
@@ -75,7 +81,7 @@ export async function buildClientShareDoc(services: AppServices, client: Client,
     },
     dayTitle: (i, name) => `${t('training.programs.builder.dayDefault', { n: i + 1 })}${name ? ` — ${name}` : ''}`,
     mealPlan: sortedPlans[0] ?? null,
-    mealItem: (item) => `${item.recipeId ? (recipeName.get(item.recipeId) ?? '') : item.text}${item.servings !== 1 ? ` × ${item.servings}` : ''}`,
+    mealItem: (item) => itemRows(item, recipeName).join(' · '),
     supplements: rows.flatMap((r) => {
       const s = supp.get(r.supplementId);
       return s ? [{ name: s.name, dose: r.dose, timing: r.timing, notes: r.notes }] : [];

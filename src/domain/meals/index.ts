@@ -18,3 +18,4 @@ export * from './foodIcon';
 export * from './foodLines';
 export * from './gramPlanner';
 export * from './gramBook';
+export * from './mealItemText';

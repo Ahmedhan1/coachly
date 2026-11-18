@@ -65,7 +65,9 @@ async function assignTemplateProgram(page: Page, clientId: string) {
 test('PDF: every section on its own renders', async ({ page }) => {
   test.setTimeout(300_000);
   const id = await openSara(page);
+  // Every section needs content of its own: a program, a saved calculation and a measurement.
   await assignTemplateProgram(page, id);
+  await seedClientData(page, id);
   await page.goto(`/more/pdf?client=${id}&standalone=1`);
   const names = ['الغلاف', 'بيانات العميل', 'جدول التمارين', 'السعرات والماكروز', 'خطة الوجبات', 'المكملات', 'التقدم', 'تعليمات وملاحظات'];
   for (const only of names) {

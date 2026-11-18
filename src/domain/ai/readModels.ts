@@ -1,4 +1,5 @@
 import { daysBetween, subscriptionAttention, type Client, type MealPlan, type Payment, type Program, type ProgressEntry, type Recipe } from '../models';
+import { mealItemText } from '../meals/mealItemText';
 import type { Task } from './tasks';
 
 /**
@@ -115,7 +116,12 @@ export function mealPlansView(plans: readonly MealPlan[], recipeName: (id: strin
     name: m.name,
     clientId: m.clientId,
     targetKcal: m.targetKcal,
-    meals: m.meals.map((meal) => ({ name: meal.name, time: meal.time, items: meal.items.map((i) => (i.recipeId ? recipeName(i.recipeId) : i.text)) })),
+    // Items from the gram planner carry exact grams per food; the assistant sees them ("رز أبيض مطبوخ 150 g").
+    meals: m.meals.map((meal) => ({
+      name: meal.name,
+      time: meal.time,
+      items: meal.items.map((i) => (i.lines?.length ? mealItemText(i, { name: i.recipeId ? recipeName(i.recipeId) : '', units: { g: 'g', kcal: 'kcal' } }) : i.recipeId ? recipeName(i.recipeId) : i.text)),
+    })),
   }));
 }
 
