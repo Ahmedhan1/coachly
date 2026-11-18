@@ -16,3 +16,15 @@
   inline-size: 28px;
   block-size: 28px;
 }
+
+.photo {
+  overflow: hidden;
+  background: var(--surface-2);
+}
+
+.photo img {
+  display: block;
+  inline-size: 100%;
+  block-size: 100%;
+  object-fit: cover;
+}

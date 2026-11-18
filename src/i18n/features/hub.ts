@@ -228,7 +228,7 @@ export const hub = {
       safer: 'بدائل أأمن',
       saferTitle: 'بدائل أأمن من {name}',
       noSafer: 'مفيش بديل أأمن بالأدوات المتاحة',
-      hidden: '{n} تمرين مستخبي (أدوات مش متاحة أو ممنوع لـ {name})',
+      hidden: '{n} تمرين مستخبي (أدوات مش متاحة أو إصابة أو ممنوع لـ {name})',
       noEquipment: 'محتاج أدوات مش عنده',
       favourite: 'مفضّل',
       tailored: 'متفصّل على {name}',
