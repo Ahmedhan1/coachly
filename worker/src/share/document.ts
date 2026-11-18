@@ -52,6 +52,8 @@ export interface ShareMeal {
   notes?: string;
   /** Up to 3 other ways to eat this meal on the same numbers; the client picks one (older viewers ignore it). */
   options?: Array<{ items: string[] }>;
+  /** The app's meal id (random, no personal data), so the client's pick can be sent back with a check-in. */
+  id?: string;
 }
 
 export interface ShareSupplement {
@@ -167,6 +169,8 @@ export interface CheckinDocumentV1 {
   energy?: number;
   /** How much of the plan was followed this week, 0–100 %. */
   adherence?: number;
+  /** The client's picks among meal options: meal id → option index (0 = as planned, 1–3 = an option). */
+  mealPicks?: Array<{ id: string; o: number }>;
 }
 
 export const LIMITS = {
@@ -185,6 +189,9 @@ export const LIMITS = {
   meals: 12,
   itemsPerMeal: 30,
   mealOptions: 3,
+  mealId: 64,
+  /** 7 days × 12 meals. */
+  mealPicks: 84,
   supplements: 30,
   mealDays: 7,
   seriesPoints: 60,
@@ -307,7 +314,8 @@ function isMeal(value: unknown): boolean {
     optStr(value.time, LIMITS.shortText) &&
     arrayOf(value.items, LIMITS.itemsPerMeal, (item) => str(item, LIMITS.item)) &&
     optStr(value.notes, LIMITS.note) &&
-    optArray(value.options, LIMITS.mealOptions, (o) => isObj(o) && arrayOf(o.items, LIMITS.itemsPerMeal, (item) => str(item, LIMITS.item)))
+    optArray(value.options, LIMITS.mealOptions, (o) => isObj(o) && arrayOf(o.items, LIMITS.itemsPerMeal, (item) => str(item, LIMITS.item))) &&
+    optStr(value.id, LIMITS.mealId)
   );
 }
 
@@ -362,6 +370,7 @@ export function parseCheckinDocument(value: unknown): CheckinDocumentV1 | null {
     optNum(value.thighCm, 20, 200) &&
     optNum(value.sleepHours, 0, 24) &&
     (value.energy === undefined || (Number.isInteger(value.energy) && optNum(value.energy, 1, 5))) &&
-    optNum(value.adherence, 0, 100);
+    optNum(value.adherence, 0, 100) &&
+    optArray(value.mealPicks, LIMITS.mealPicks, (p) => isObj(p) && str(p.id, LIMITS.mealId, false) && Number.isInteger(p.o) && optNum(p.o, 0, LIMITS.mealOptions));
   return ok ? (value as unknown as CheckinDocumentV1) : null;
 }
