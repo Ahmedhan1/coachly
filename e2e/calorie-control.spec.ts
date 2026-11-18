@@ -229,3 +229,59 @@ for (const [w, h, scheme, lang] of [
     await page.screenshot({ path: `${SHOTS}/goal-${lang}-${w}-${scheme}-2.png` });
   });
 }
+
+test('neck measurement → Navy body fat in the goal planner; client meal picks reach the meal plan', async ({ page }) => {
+  test.setTimeout(120_000);
+  await openDiet(page);
+  const dietUrl = page.url();
+  const clientPath = new URL(dietUrl).pathname.replace(/\/diet$/, '');
+  // A progress entry with waist, neck and hips (Sara is a woman: hips are needed).
+  await page.goto(`${clientPath}/progress?standalone=1`);
+  await page.getByRole('button', { name: 'قياس جديد' }).first().click();
+  const sheet = page.getByRole('dialog');
+  await sheet.getByLabel('الوسط (سم)').fill('80');
+  await sheet.getByLabel(/^الرقبة \(سم/).fill('33');
+  await sheet.getByLabel('الهيب (سم)').fill('100');
+  await sheet.getByRole('button', { name: /حفظ/ }).first().click();
+  await expect(page.getByText('اتحفظ القياس')).toBeVisible();
+  await page.goto(dietUrl);
+  await expect(page.getByRole('region', { name: 'فطار' }).first()).toBeVisible({ timeout: 30_000 });
+  await page.getByLabel('احسب السعرات من الوزن المطلوب والمدة').check();
+  await expect(page.getByText(/نسبة الدهون متقدّرة من المقاسات/)).toBeVisible();
+  await expect(page.getByText(/كاتش-ماكاردل/).first()).toBeVisible();
+  await page.waitForTimeout(1200); // let the launch splash fade
+  await page.screenshot({ path: `${SHOTS}/navy-hint.png` });
+
+  // Save the week (meals carry options), then simulate an imported check-in with the client's picks.
+  await page.getByRole('button', { name: 'احفظ كخطة للعميل' }).click();
+  await expect(page.getByText(/اتحفظ 7 أيام/)).toBeVisible();
+  const clientId = clientPath.split('/').pop() ?? '';
+  const picked = await page.evaluate(async (cid) => {
+    const db: IDBDatabase = await new Promise((res, rej) => {
+      const r = indexedDB.open('pt-coach');
+      r.onsuccess = () => res(r.result);
+      r.onerror = () => rej(r.error);
+    });
+    const all: { clientId: string; deletedAt: number | null; meals: { id: string; options?: unknown[] }[] }[] = await new Promise((res) => {
+      const r = db.transaction('mealPlans').objectStore('mealPlans').getAll();
+      r.onsuccess = () => res(r.result as never);
+    });
+    const meal = all.filter((p) => p.clientId === cid && p.deletedAt === null).flatMap((p) => p.meals).find((m) => (m.options?.length ?? 0) > 0);
+    if (!meal) return null;
+    await new Promise((res) => {
+      const tx = db.transaction('meta', 'readwrite');
+      tx.objectStore('meta').put({ key: `nutrition.mealPicks.${cid}`, value: { at: 1, picks: [{ id: meal.id, o: 1 }] } });
+      tx.oncomplete = () => res(null);
+    });
+    return meal.id;
+  }, clientId);
+  expect(picked).not.toBeNull();
+  await page.goto(`${clientPath}/meals?standalone=1`);
+  const card = page.getByRole('region', { name: 'العميل اختار من صفحته' });
+  await expect(card).toBeVisible();
+  await page.waitForTimeout(1200); // let the launch splash fade
+  await page.screenshot({ path: `${SHOTS}/client-picks.png` });
+  await card.getByRole('button', { name: 'طبّق اختياراته على الخطة' }).click();
+  await expect(page.getByText(/اتطبّقت اختيارات/)).toBeVisible();
+  await expect(card).toHaveCount(0);
+});
