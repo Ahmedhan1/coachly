@@ -58,6 +58,7 @@ export const pdf: EnArea<'pdf'> = {
   failed: 'The file was not created. Try fewer sections or fewer images.',
   noSections: 'Choose at least one section.',
   shareFailed: 'Sharing did not work. Download the file and send it from Files.',
+  emptySections: 'The sections you chose have no data for this client yet. Pick other sections or add the data first.',
   noProgram: 'This client has no program; the exercises section will be removed.',
   defaultTitle: 'Program for {name}',
   defaultTitleNoClient: 'Training program',

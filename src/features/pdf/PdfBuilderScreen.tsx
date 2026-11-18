@@ -157,7 +157,14 @@ export function PdfBuilderScreen() {
     const renderer = new HtmlPdfRenderer({ images: createImageSource({ getStoredBlob: (id) => repos.images.getBlob(id), packBaseUrl: '' }) });
     const result = await renderer.render(input, { signal: ctrl.signal, onProgress: (p) => setStatus({ kind: 'working', progress: p }) });
     if (ctrl.signal.aborted) return setStatus({ kind: 'idle' });
-    if (!result.ok) return setStatus({ kind: 'failed' });
+    if (!result.ok) {
+      // Nothing to print (e.g. only sections this client has no data for yet): say so instead of a vague failure.
+      if (result.error === 'no_pages') {
+        setStatus({ kind: 'idle' });
+        return showToast({ message: t('pdf.emptySections') });
+      }
+      return setStatus({ kind: 'failed' });
+    }
     setSent(null);
     setStatus({
       kind: 'ready',
