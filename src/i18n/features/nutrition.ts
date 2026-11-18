@@ -301,6 +301,7 @@ export const nutrition = {
       chestCm: 'الصدر',
       armCm: 'الدراع',
       thighCm: 'الفخذ',
+      neckCm: 'الرقبة',
     },
     metricUnits: {
       weightKg: 'كجم',
@@ -333,6 +334,7 @@ export const nutrition = {
     weight: 'الوزن (كجم)',
     bodyFat: 'نسبة الدهون %',
     waist: 'الوسط (سم)',
+    neck: 'الرقبة (سم، لحساب نسبة الدهون)',
     hip: 'الهيب (سم)',
     chest: 'الصدر (سم)',
     arm: 'الدراع (سم)',

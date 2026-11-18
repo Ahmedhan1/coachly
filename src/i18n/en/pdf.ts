@@ -116,6 +116,7 @@ export const pdf: EnArea<'pdf'> = {
         chestCm: 'Chest',
         armCm: 'Arm',
         thighCm: 'Thigh',
+        neckCm: 'Neck',
       },
     },
     nutrition: {

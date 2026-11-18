@@ -53,6 +53,7 @@ export const PDF_TEST_LABELS: PdfLabels = {
       chestCm: 'الصدر',
       armCm: 'الدراع',
       thighCm: 'الفخذ',
+      neckCm: 'الرقبة',
     },
   },
   nutrition: {

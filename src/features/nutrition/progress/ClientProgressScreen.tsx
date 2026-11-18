@@ -35,7 +35,7 @@ function exerciseHistory(logs: readonly WorkoutLog[], exerciseId: string): { dat
   return [...best].map(([date, value]) => ({ date, value })).sort((a, b) => a.date.localeCompare(b.date));
 }
 
-const METRICS = ['weightKg', 'bodyFatPercent', 'waistCm', 'hipCm', 'chestCm', 'armCm', 'thighCm'] as const;
+const METRICS = ['weightKg', 'bodyFatPercent', 'waistCm', 'neckCm', 'hipCm', 'chestCm', 'armCm', 'thighCm'] as const;
 type Metric = (typeof METRICS)[number];
 
 const metricUnit = (m: Metric) =>

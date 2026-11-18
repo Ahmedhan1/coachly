@@ -15,6 +15,7 @@ const FIELDS = [
   ['weightKg', 'nutrition.progress.weight'],
   ['bodyFatPercent', 'nutrition.progress.bodyFat'],
   ['waistCm', 'nutrition.progress.waist'],
+  ['neckCm', 'nutrition.progress.neck'],
   ['hipCm', 'nutrition.progress.hip'],
   ['chestCm', 'nutrition.progress.chest'],
   ['armCm', 'nutrition.progress.arm'],

@@ -114,6 +114,7 @@ export const pdf = {
         chestCm: 'الصدر',
         armCm: 'الدراع',
         thighCm: 'الفخذ',
+        neckCm: 'الرقبة',
       },
     },
     nutrition: {

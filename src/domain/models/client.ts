@@ -19,6 +19,8 @@ export const measurementsSchema = z.object({
   heightCm: z.number().positive().max(260).optional(),
   bodyFatPercent: z.number().min(0).max(75).optional(),
   waistCm: z.number().positive().max(300).optional(),
+  /** For the US Navy body-fat estimate (with waist, height, and hip for women). */
+  neckCm: z.number().positive().max(100).optional(),
   hipCm: z.number().positive().max(300).optional(),
   chestCm: z.number().positive().max(300).optional(),
   armCm: z.number().positive().max(150).optional(),
