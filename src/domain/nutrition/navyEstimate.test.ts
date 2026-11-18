@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { bodyFatForPlan, navyBodyFat, navyFromMeasures } from '.';
+import { bodyFatForPlan, entryNavyEstimate, navyBodyFat, navyFromMeasures } from '.';
 
 describe('Navy body fat from measurements', () => {
   it('uses the latest neck and waist (and hip for women)', () => {
@@ -20,5 +20,35 @@ describe('Navy body fat from measurements', () => {
     expect(bodyFatForPlan(18, entries, 'male', 178)).toEqual({ bodyFatPercent: 18, source: 'given' });
     expect(bodyFatForPlan(null, entries, 'male', 178).source).toBe('navy');
     expect(bodyFatForPlan(null, [], 'male', 178)).toEqual({ bodyFatPercent: null, source: null });
+  });
+});
+
+describe('Navy estimate for one progress entry', () => {
+  const male = { sex: 'male' as const, heightCm: 178 };
+  it('estimates when neck and waist exist, body fat is empty and the profile has sex and height', () => {
+    const r = entryNavyEstimate({ neckCm: 38, waistCm: 90 }, male);
+    const ref = navyBodyFat({ sex: 'male', heightCm: 178, neckCm: 38, waistCm: 90 });
+    expect(r.status).toBe('estimated');
+    expect(r.status === 'estimated' && ref.ok && r.bodyFatPercent).toBe(ref.ok ? Math.round(ref.value * 10) / 10 : -1);
+  });
+
+  it('does nothing when body fat is typed or the tape measures are missing', () => {
+    expect(entryNavyEstimate({ neckCm: 38, waistCm: 90, bodyFatPercent: 20 }, male)).toEqual({ status: 'none' });
+    expect(entryNavyEstimate({ waistCm: 90 }, male)).toEqual({ status: 'none' });
+    expect(entryNavyEstimate({ neckCm: 38 }, male)).toEqual({ status: 'none' });
+  });
+
+  it('women also need the hip', () => {
+    expect(entryNavyEstimate({ neckCm: 32, waistCm: 80 }, { sex: 'female', heightCm: 165 })).toEqual({ status: 'needs', missing: ['hip'] });
+    expect(entryNavyEstimate({ neckCm: 32, waistCm: 80, hipCm: 100 }, { sex: 'female', heightCm: 165 }).status).toBe('estimated');
+  });
+
+  it('says what the client profile lacks', () => {
+    expect(entryNavyEstimate({ neckCm: 38, waistCm: 90 }, { sex: null, heightCm: undefined })).toEqual({ status: 'needs', missing: ['gender', 'height'] });
+    expect(entryNavyEstimate({ neckCm: 38, waistCm: 90 }, { sex: 'male', heightCm: undefined })).toEqual({ status: 'needs', missing: ['height'] });
+  });
+
+  it('reports a formula rejection', () => {
+    expect(entryNavyEstimate({ neckCm: 40, waistCm: 38 }, male)).toEqual({ status: 'invalid', error: 'waist_not_greater_than_neck' });
   });
 });
