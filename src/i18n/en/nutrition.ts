@@ -351,6 +351,11 @@ export const nutrition: EnArea<'nutrition'> = {
     delete: 'Delete measurement',
     invalid: 'Check the numbers you entered.',
     emptyEntry: 'Enter at least one number or add a photo.',
+    navyEstimate: 'Estimated body fat (Navy formula): {n}%',
+    navyAuto: 'Saved automatically because the body fat box is empty. If you have a reading from a device, type it above.',
+    navyNeeds: 'To estimate body fat from neck and waist we also need: {list}.',
+    navyMissing: { gender: 'gender in the client profile', height: 'height in the client profile', hip: 'hips' },
+    navyBadge: 'Navy estimate',
   },
   foods: {
     title: 'Food table',
