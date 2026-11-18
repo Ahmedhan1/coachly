@@ -202,7 +202,7 @@ export const settings = {
     build: 'رقم النسخة {b}',
     model: 'مجسم العضلات: Z-Anatomy - The libre 3D atlas of anatomy (CC BY-SA 4.0)، مبني على BodyParts3D - The Database Center for Life Science (CC BY-SA 2.1 Japan). اتعدّل (تجميع العضلات وتخفيف المثلثات وتصدير GLB) والملف المعدّل متاح بنفس الرخصة على /models/muscles.glb.',
     exercises: 'بيانات التمارين من free-exercise-db (Unlicense).',
-    foodImages: 'رسومات الأطعمة: Twemoji (CC BY 4.0).',
+    foodImages: 'رسومات الأطعمة: Twemoji (CC BY 4.0). صور الأكل: Wikimedia Commons (CC0 / CC BY / CC BY-SA)، أسماء المصورين في docs/FOOD_PHOTOS.md.',
     fonts: 'الخطوط: Readex Pro و Alexandria (SIL Open Font License).',
     licenses: 'كل المكتبات مفتوحة المصدر ورخصها في ملف LICENSES.md مع التطبيق.',
     disclaimer: 'المحتوى إرشادي من المدرب ولا يغني عن استشارة طبيب.',

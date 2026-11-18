@@ -73,7 +73,7 @@ function MealPlanView({ client, plans, saved, tolerance, recipes, foods, back }:
   const [tool, setTool] = useState<null | 'shopping' | 'copyTo'>(null);
   const day = plans.find((p) => p.id === selectedId) ?? plans[0];
   const lookup = useMemo(() => new Map<string, MacroTotals>(recipes.map((r) => [r.recipe.id, r.perServing])), [recipes]);
-  const images = useMemo(() => new Map(recipes.map((r) => [r.recipe.id, { imageId: r.recipe.imageId, icon: recipeIconHex(r.recipe.ingredients, foods) }])), [recipes, foods]);
+  const images = useMemo(() => new Map(recipes.map((r) => [r.recipe.id, { imageId: r.recipe.imageId, photo: r.recipe.photo, icon: recipeIconHex(r.recipe.ingredients, foods) }])), [recipes, foods]);
   const names = useMemo(() => new Map(recipes.map((r) => [r.recipe.id, pick(r.recipe.name, r.recipe.nameEn)])), [recipes]);
   const target = saved?.targetKcal ?? day?.targetKcal ?? null;
 
