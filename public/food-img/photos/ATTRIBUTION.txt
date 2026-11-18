@@ -3,36 +3,63 @@ Food photos from Wikimedia Commons (adapted: cropped and resized). See docs/FOOD
 alex-liver.webp — "Kebda Iskandarani( Alexandria Liver) sandowichs.jpg" by Dalia fathallah — CC BY-SA 4.0 — https://commons.wikimedia.org/wiki/File:Kebda_Iskandarani(_Alexandria_Liver)_sandowichs.jpg
 avocado-toast.webp — "Smashed Avocado On Toast (with one poached egg) - Jonny's 2026-01-06.jpg" by Andy Li — CC0 — https://commons.wikimedia.org/wiki/File:Smashed_Avocado_On_Toast_(with_one_poached_egg)_-_Jonny%27s_2026-01-06.jpg
 baba-ghanoush.webp — "Baba Ghanoush.jpg" by Basel15 at English Wikipedia — Public domain — https://commons.wikimedia.org/wiki/File:Baba_Ghanoush.jpg
+baked-apple.webp — "Food in Catalonia 05.jpg" by Kritzolina — CC BY-SA 4.0 — https://commons.wikimedia.org/wiki/File:Food_in_Catalonia_05.jpg
 baked-eggs.webp — "Oeufs cocotte provencale.jpg" by Charlie1 — CC BY-SA 3.0 — https://commons.wikimedia.org/wiki/File:Oeufs_cocotte_provencale.jpg
 baked-fish.webp — "-2015-10-04 Oven Baked Sea Bass, Trimingham.JPG" by Kolforn (Kolforn)
 I'd appreciate if you could mail me (Kolforn@gmail.com) if you — CC BY-SA 4.0 — https://commons.wikimedia.org/wiki/File:-2015-10-04_Oven_Baked_Sea_Bass,_Trimingham.JPG
 baked-salmon.webp — "Liat Portal for Foodie Disorder - Oven-baked teriyaki salmon with vegetables.jpg" by HaJunkiyada — CC BY-SA 4.0 — https://commons.wikimedia.org/wiki/File:Liat_Portal_for_Foodie_Disorder_-_Oven-baked_teriyaki_salmon_with_vegetables.jpg
+balaleet.webp — "Balaleet 2019.jpg" by Droodkin — CC BY-SA 4.0 — https://commons.wikimedia.org/wiki/File:Balaleet_2019.jpg
 bamia.webp — "Du bamia avec du riz en février 2022.jpg" by Benoît Prieur — CC0 — https://commons.wikimedia.org/wiki/File:Du_bamia_avec_du_riz_en_f%C3%A9vrier_2022.jpg
-basmati.webp — "Raw Basmati Rice.jpg" by Gaurav Dhwaj Khadka — CC BY-SA 4.0 — https://commons.wikimedia.org/wiki/File:Raw_Basmati_Rice.jpg
 bean-salad.webp — "Corn and black bean salad.jpg" by Daniel Sone (Photographer) — Public domain — https://commons.wikimedia.org/wiki/File:Corn_and_black_bean_salad.jpg
+bean-soup.webp — "Collard Greens and White Bean Soup.jpg" by Thriving Vegetarian — CC BY 2.0 — https://commons.wikimedia.org/wiki/File:Collard_Greens_and_White_Bean_Soup.jpg
+beef-broccoli.webp — "Broccoli beef (5457397534).jpg" by jeffreyw — CC BY 2.0 — https://commons.wikimedia.org/wiki/File:Broccoli_beef_(5457397534).jpg
 beef-stirfry.webp — "Cooking stir fry beef, Terrytown, Louisiana, February 2016 Skillet.jpg" by Infrogmation of New Orleans — CC BY-SA 4.0 — https://commons.wikimedia.org/wiki/File:Cooking_stir_fry_beef,_Terrytown,_Louisiana,_February_2016_Skillet.jpg
+beet-salad.webp — "Beetroot Salad (3862315693).jpg" by Suzette - www.suzette.nu from Arnhem, Netherlands — CC BY 2.0 — https://commons.wikimedia.org/wiki/File:Beetroot_Salad_(3862315693).jpg
 belila.webp — "Belila.jpg" by Youmna9115 — CC0 — https://commons.wikimedia.org/wiki/File:Belila.jpg
 boiled-potatoes.webp — "Boiled, floury potatoes (5299865427).jpg" by benjgibbs — CC BY 2.0 — https://commons.wikimedia.org/wiki/File:Boiled,_floury_potatoes_(5299865427).jpg
+breakfast-burrito.webp — "Bacon Kale Breakfast Burrito (8429773809).jpg" by Cajsa Lilliehook from Portland — CC BY-SA 2.0 — https://commons.wikimedia.org/wiki/File:Bacon_Kale_Breakfast_Burrito_(8429773809).jpg
+broccoli-soup.webp — "Cream of broccoli soup.jpg" by Alpha from Melbourne, Australia — CC BY-SA 2.0 — https://commons.wikimedia.org/wiki/File:Cream_of_broccoli_soup.jpg
+burrito-bowl.webp — "Los Gallitos - October 31 2022 - Sarah Stierch 04.jpg" by Missvain — CC BY 4.0 — https://commons.wikimedia.org/wiki/File:Los_Gallitos_-_October_31_2022_-_Sarah_Stierch_04.jpg
+cabbage-rolls.webp — "02022 Hungarian stuffed cabbage rolls in pickled cabbage leaves with veal and deer meat.jpg" by Silar — CC BY-SA 4.0 — https://commons.wikimedia.org/wiki/File:02022_Hungarian_stuffed_cabbage_rolls_in_pickled_cabbage_leaves_with_veal_and_deer_meat.jpg
 caesar.webp — "Chicken Caesar Salad - Amo 2026-04-11.jpg" by Andy Li — CC0 — https://commons.wikimedia.org/wiki/File:Chicken_Caesar_Salad_-_Amo_2026-04-11.jpg
 cheese-sandwich.webp — "Cheese ploughman's sandwich.jpg" by Thumperward — CC BY-SA 4.0 — https://commons.wikimedia.org/wiki/File:Cheese_ploughman%27s_sandwich.jpg
+chicken-avocado-salad.webp — "Salad of Poached Chicken with Avocado, Rocket Peach and Radish (67408669).jpg" by Alpha from Melbourne, Australia — CC BY-SA 2.0 — https://commons.wikimedia.org/wiki/File:Salad_of_Poached_Chicken_with_Avocado,_Rocket_Peach_and_Radish_(67408669).jpg
 chicken-broccoli.webp — "Ginger chicken (3168342551).jpg" by Ginny — CC BY-SA 2.0 — https://commons.wikimedia.org/wiki/File:Ginger_chicken_(3168342551).jpg
 chicken-kebab.webp — "Lamb and Chicken Kebab with rice - Etci Kitchen 2025-09-22.jpg" by Andy Li — CC0 — https://commons.wikimedia.org/wiki/File:Lamb_and_Chicken_Kebab_with_rice_-_Etci_Kitchen_2025-09-22.jpg
 chicken-potato-tray.webp — "Halal Roast Chicken Leg + Roasted Sweet Potato - Foodilic 2024-03-25.jpg" by Andy Li — CC0 — https://commons.wikimedia.org/wiki/File:Halal_Roast_Chicken_Leg_%2B_Roasted_Sweet_Potato_-_Foodilic_2024-03-25.jpg
+chicken-raw.webp — "Raw chicken slices.jpg" by kakyusei — CC0 — https://commons.wikimedia.org/wiki/File:Raw_chicken_slices.jpg
 chicken-rice.webp — "Friday dinner - Curry chicken with bell peppers and rice - 02.jpg" by Infrogmation of New Orleans — CC BY-SA 4.0 — https://commons.wikimedia.org/wiki/File:Friday_dinner_-_Curry_chicken_with_bell_peppers_and_rice_-_02.jpg
 chicken-salad.webp — "Liat Portal for Foodie Disorder - Grilled chicken thighs with ptitim and Israeli salad.jpg" by HaJunkiyada — CC BY-SA 4.0 — https://commons.wikimedia.org/wiki/File:Liat_Portal_for_Foodie_Disorder_-_Grilled_chicken_thighs_with_ptitim_and_Israeli_salad.jpg
 chicken-shawarma.webp — "Plate Shawarma - variant.jpg" by Vis M — CC BY-SA 4.0 — https://commons.wikimedia.org/wiki/File:Plate_Shawarma_-_variant.jpg
 chicken-soup.webp — "Chicken Vegetable Soup (8731954951).jpg" by Cajsa Lilliehook from Portland — CC BY-SA 2.0 — https://commons.wikimedia.org/wiki/File:Chicken_Vegetable_Soup_(8731954951).jpg
+chicken-wrap.webp — "Handmade Chicken Shawarma Wrap - Lavash.jpg" by Andy Li — CC0 — https://commons.wikimedia.org/wiki/File:Handmade_Chicken_Shawarma_Wrap_-_Lavash.jpg
+chickpea-curry.webp — "Chana Masala - Mohammed - Spice Of Life 2024-05-27.jpg" by Andy Li — CC0 — https://commons.wikimedia.org/wiki/File:Chana_Masala_-_Mohammed_-_Spice_Of_Life_2024-05-27.jpg
 chickpea-salad.webp — "Colorful healthy Chickpea Salad - 49859083608.jpg" by FitTasteTic — CC BY-SA 2.0 — https://commons.wikimedia.org/wiki/File:Colorful_healthy_Chickpea_Salad_-_49859083608.jpg
+chickpeas.webp — "Ordinary chickpeas in a ceramic bowl.jpg" by AlixSaz — CC BY-SA 4.0 — https://commons.wikimedia.org/wiki/File:Ordinary_chickpeas_in_a_ceramic_bowl.jpg
+chili.webp — "Two-Bean Vegetarian Chili.jpg" by Thriving Vegetarian — CC BY 2.0 — https://commons.wikimedia.org/wiki/File:Two-Bean_Vegetarian_Chili.jpg
+chocolate-milk.webp — "Chocolate milk.JPG" by stevepb — CC0 — https://commons.wikimedia.org/wiki/File:Chocolate_milk.JPG
+cilbir.webp — "Çılbır with duck-fat sautéed Ramps (14826584557).jpg" by Premshree Pillai from Brooklyn, NY, US — CC BY-SA 2.0 — https://commons.wikimedia.org/wiki/File:%C3%87%C4%B1lb%C4%B1r_with_duck-fat_saut%C3%A9ed_Ramps_(14826584557).jpg
+club-sandwich.webp — "Club-sandwich.jpg" by Memm — CC BY 3.0 — https://commons.wikimedia.org/wiki/File:Club-sandwich.jpg
 couscous-chicken.webp — "Liat Portal for Foodie Disorder - Algerian couscous with vegetable soup and chicken.jpg" by HaJunkiyada — CC BY-SA 4.0 — https://commons.wikimedia.org/wiki/File:Liat_Portal_for_Foodie_Disorder_-_Algerian_couscous_with_vegetable_soup_and_chicken.jpg
 curry.webp — "Chicken Curry with Rice.jpg" by Gaurav Dhwaj Khadka — CC BY-SA 4.0 — https://commons.wikimedia.org/wiki/File:Chicken_Curry_with_Rice.jpg
+daoud-basha.webp — "Meatballs with tomato sauce (Spain).jpg" by Juan Emilio Prades Bel — CC BY 4.0 — https://commons.wikimedia.org/wiki/File:Meatballs_with_tomato_sauce_(Spain).jpg
 date-bars.webp — "Gluten-Free Blackberry Oat Bars.jpg" by Simmer + Sauce — CC BY 3.0 — https://commons.wikimedia.org/wiki/File:Gluten-Free_Blackberry_Oat_Bars.jpg
 egg-salad.webp — "Egg salad 01.jpg" by Mushki Brichta — CC BY-SA 4.0 — https://commons.wikimedia.org/wiki/File:Egg_salad_01.jpg
 egg-white-omelette.webp — "FoodOmelete.jpg" by Renee Comet (photographer) — Public domain — https://commons.wikimedia.org/wiki/File:FoodOmelete.jpg
 eggs-basterma.webp — "Eggs with Pastirma.png" by FarsMZ — CC BY-SA 4.0 — https://commons.wikimedia.org/wiki/File:Eggs_with_Pastirma.png
 eggs-spinach.webp — "Eggs Florentine - Ala's Cafe 2024-01-21.jpg" by Andy Li — CC0 — https://commons.wikimedia.org/wiki/File:Eggs_Florentine_-_Ala%27s_Cafe_2024-01-21.jpg
+falafel-bowl.webp — "Tasty Buddha Bowl with Falafel - Dyke Road Park Cafe 2025-05-09.jpg" by Andy Li — CC0 — https://commons.wikimedia.org/wiki/File:Tasty_Buddha_Bowl_with_Falafel_-_Dyke_Road_Park_Cafe_2025-05-09.jpg
+falafel-wrap.webp — "Falafel &Tzatziki Wrap - Lavash.jpg" by Andy Li — CC0 — https://commons.wikimedia.org/wiki/File:Falafel_%26Tzatziki_Wrap_-_Lavash.jpg
 fasolia.webp — "0050Cuisine food of Bulacan in Baliuag 02.jpg" by Judgefloro — CC0 — https://commons.wikimedia.org/wiki/File:0050Cuisine_food_of_Bulacan_in_Baliuag_02.jpg
+fattoush.webp — "Fattoush mixed-salad.jpg" by Arousing Appetites — CC BY-SA 3.0 — https://commons.wikimedia.org/wiki/File:Fattoush_mixed-salad.jpg
+fish-soup.webp — "Fish soup, Ibiza.jpg" by Gerda Arendt — CC0 — https://commons.wikimedia.org/wiki/File:Fish_soup,_Ibiza.jpg
 fish-vegetables.webp — "Cajun Grilled Fish, Savoury Rice and Mixed Baked Vegetables (17459785061).jpg" by CharmaineZoe's Marvelous Melange from England — CC BY 2.0 — https://commons.wikimedia.org/wiki/File:Cajun_Grilled_Fish,_Savoury_Rice_and_Mixed_Baked_Vegetables_(17459785061).jpg
+french-toast.webp — "French toast 001.jpg" by Ocdp — CC0 — https://commons.wikimedia.org/wiki/File:French_toast_001.jpg
+fried-rice.webp — "Fried rice in home.jpg" by Peachyeung316 — CC BY-SA 4.0 — https://commons.wikimedia.org/wiki/File:Fried_rice_in_home.jpg
 fruit-salad.webp — "Fruit salad in tezpur university.jpg" by Akashdoley13 — CC BY-SA 4.0 — https://commons.wikimedia.org/wiki/File:Fruit_salad_in_tezpur_university.jpg
+ful.webp — "Ful Medames.JPG" by Miansari66 — CC0 — https://commons.wikimedia.org/wiki/File:Ful_Medames.JPG
+garlic.webp — "Garlic bulbs and cloves.jpg" by Ivar Leidus — CC BY-SA 4.0 — https://commons.wikimedia.org/wiki/File:Garlic_bulbs_and_cloves.jpg
+greek-salad.webp — "Greek Salad Choriatiki.jpg" by https://www.flickr.com/photos/zone41/ — CC BY 2.0 — https://commons.wikimedia.org/wiki/File:Greek_Salad_Choriatiki.jpg
 green-bean-stew.webp — "Боранија - како вариво без месо.jpg" by Orhidejasonce — CC BY-SA 4.0 — https://commons.wikimedia.org/wiki/File:%D0%91%D0%BE%D1%80%D0%B0%D0%BD%D0%B8%D1%98%D0%B0_-_%D0%BA%D0%B0%D0%BA%D0%BE_%D0%B2%D0%B0%D1%80%D0%B8%D0%B2%D0%BE_%D0%B1%D0%B5%D0%B7_%D0%BC%D0%B5%D1%81%D0%BE.jpg
 green-salad.webp — "Fresh salad with arugula, cabbage and tomato in a glass bowl.jpg" by Horacio Cambeiro — CC BY-SA 3.0 — https://commons.wikimedia.org/wiki/File:Fresh_salad_with_arugula,_cabbage_and_tomato_in_a_glass_bowl.jpg
 grilled-chicken.webp — "Grilled chicken breast, Santo Domingo, La Palma.jpg" by Gerda Arendt — CC0 — https://commons.wikimedia.org/wiki/File:Grilled_chicken_breast,_Santo_Domingo,_La_Palma.jpg
@@ -42,40 +69,80 @@ grilled-halloumi.webp — "Grilled halloumi, Πλάκα, 31st Ave.jpg" by Elyaqi
 grilled-mackerel.webp — "Grilled mackerel on a BBQ.jpg" by Kernow Skies — CC BY-SA 3.0 — https://commons.wikimedia.org/wiki/File:Grilled_mackerel_on_a_BBQ.jpg
 grilled-shrimp.webp — "Grilled Shrimp Skewers.jpg" by Eximiousincorp — CC BY-SA 4.0 — https://commons.wikimedia.org/wiki/File:Grilled_Shrimp_Skewers.jpg
 halloumi-salad.webp — "Halloumi & Crispy Chickpeas Salad - No.16 2025-08-24.jpg" by Andy Li — CC0 — https://commons.wikimedia.org/wiki/File:Halloumi_%26_Crispy_Chickpeas_Salad_-_No.16_2025-08-24.jpg
+harees.webp — "Armenian Harisa.JPG" by Ketone16 — CC BY-SA 4.0 — https://commons.wikimedia.org/wiki/File:Armenian_Harisa.JPG
+harira.webp — "Harira oranaise.png" by وهراني — CC BY-SA 3.0 — https://commons.wikimedia.org/wiki/File:Harira_oranaise.png
+herbs.webp — "Liat Portal for Foodie Disorder - Parsley.jpg" by HaJunkiyada — CC BY-SA 4.0 — https://commons.wikimedia.org/wiki/File:Liat_Portal_for_Foodie_Disorder_-_Parsley.jpg
+kabsa.webp — "Kabsa.jpg" by Basel15 at en.wikipedia — Public domain — https://commons.wikimedia.org/wiki/File:Kabsa.jpg
+kibbeh.webp — "Kibbeh3.jpg" by Bazel — CC BY-SA 3.0 — https://commons.wikimedia.org/wiki/File:Kibbeh3.jpg
+kofta-pita.webp — "Lamb Kofta Pitta - T @ The Dials 2024-02-07.jpg" by Andy Li — CC0 — https://commons.wikimedia.org/wiki/File:Lamb_Kofta_Pitta_-_T_@_The_Dials_2024-02-07.jpg
+kung-pao.webp — "Kung-pao-shanghai.jpg" by Steven G. Johnson — CC BY-SA 3.0 — https://commons.wikimedia.org/wiki/File:Kung-pao-shanghai.jpg
+lentil-salad.webp — "Lentil salad (29308018298).jpg" by Joey Doll — CC BY 2.0 — https://commons.wikimedia.org/wiki/File:Lentil_salad_(29308018298).jpg
 lentil-soup.webp — "Homemade Lentil Soup - Lavash 2025-02-10.jpg" by Andy Li — CC0 — https://commons.wikimedia.org/wiki/File:Homemade_Lentil_Soup_-_Lavash_2025-02-10.jpg
 lentils-spinach.webp — "Dal Palak Spinach and lentil curry (15914333462).jpg" by Yummy O Yummy — CC BY 2.0 — https://commons.wikimedia.org/wiki/File:Dal_Palak_Spinach_and_lentil_curry_(15914333462).jpg
 lettuce-wraps.webp — "Lettuce Wraps (4104199873).jpg" by Vegan Feast Catering — CC BY 2.0 — https://commons.wikimedia.org/wiki/File:Lettuce_Wraps_(4104199873).jpg
+liver.webp — "Raw veal liver, 2010.jpg" by Javier Lastras — CC BY 2.0 — https://commons.wikimedia.org/wiki/File:Raw_veal_liver,_2010.jpg
+manakish.webp — "Omnia, Park Royal, London (3434493860).jpg" by Ewan Munro from London, UK — CC BY-SA 2.0 — https://commons.wikimedia.org/wiki/File:Omnia,_Park_Royal,_London_(3434493860).jpg
+meal-prep.webp — "Meal prep glass container (45165270525).jpg" by Ella Olsson from Stockholm, Sweden — CC BY 2.0 — https://commons.wikimedia.org/wiki/File:Meal_prep_glass_container_(45165270525).jpg
+menemen.webp — "Turkish egg dish Menemen.jpg" by E4024 — CC BY-SA 4.0 — https://commons.wikimedia.org/wiki/File:Turkish_egg_dish_Menemen.jpg
 milkshake.webp — "Strawberry and banana milkshake, May 2005.jpg" by Dicemanic — CC BY 2.0 — https://commons.wikimedia.org/wiki/File:Strawberry_and_banana_milkshake,_May_2005.jpg
+mince.webp — "Hakket-oksekoed.jpg" by Gajda-13 at Danish Wikipedia — CC BY-SA 3.0 — https://commons.wikimedia.org/wiki/File:Hakket-oksekoed.jpg
+minestrone.webp — "Minestrone soup.jpg" by Katrin Morenz from Aachen, Deutschland — CC BY-SA 2.0 — https://commons.wikimedia.org/wiki/File:Minestrone_soup.jpg
 mixed-nuts.webp — "Liat Portal for Foodie Disorder - Mixed nuts and dried fruit.jpg" by HaJunkiyada — CC BY-SA 4.0 — https://commons.wikimedia.org/wiki/File:Liat_Portal_for_Foodie_Disorder_-_Mixed_nuts_and_dried_fruit.jpg
 mujaddara.webp — "Mujaddara.jpg" by Bazel — CC BY-SA 3.0 — https://commons.wikimedia.org/wiki/File:Mujaddara.jpg
+musakhan.webp — "Mushakhan Dish.jpg" by Kokaly — CC BY-SA 3.0 — https://commons.wikimedia.org/wiki/File:Mushakhan_Dish.jpg
+mushroom-soup.webp — "Cream of mushroom soup.jpg" by MichalPL — CC BY-SA 4.0 — https://commons.wikimedia.org/wiki/File:Cream_of_mushroom_soup.jpg
+nicoise.webp — "Salade niçoise (7545098258).jpg" by cyclonebill from Copenhagen, Denmark — CC BY-SA 2.0 — https://commons.wikimedia.org/wiki/File:Salade_ni%C3%A7oise_(7545098258).jpg
 noodle-soup.webp — "Chicken Noodle Soup US.jpg" by Nichijyou123 — CC BY-SA 4.0 — https://commons.wikimedia.org/wiki/File:Chicken_Noodle_Soup_US.jpg
+noodles-stirfry.webp — "Noodle stir fry with chicken, shrimp, and broccoli (18471621051).jpg" by jeffreyw — CC BY 2.0 — https://commons.wikimedia.org/wiki/File:Noodle_stir_fry_with_chicken,_shrimp,_and_broccoli_(18471621051).jpg
 oatmeal-banana.webp — "Banana oatmeal.jpg" by Shisma — CC BY 4.0 — https://commons.wikimedia.org/wiki/File:Banana_oatmeal.jpg
 oatmeal-fruit.webp — "Oatmeal pancake with fruit.jpg" by Drhnn — CC BY 4.0 — https://commons.wikimedia.org/wiki/File:Oatmeal_pancake_with_fruit.jpg
 omelette-veg.webp — "Cha-om omelette.jpg" by Wagaung at English Wikipedia — CC BY-SA 3.0 — https://commons.wikimedia.org/wiki/File:Cha-om_omelette.jpg
+onion.webp — "Red Onion on White.JPG" by Colin — CC BY-SA 3.0 — https://commons.wikimedia.org/wiki/File:Red_Onion_on_White.JPG
+orzo-soup.webp — "Lemon chicken orzo soup.jpg" by Karen and Brad Emerson — CC BY 2.0 — https://commons.wikimedia.org/wiki/File:Lemon_chicken_orzo_soup.jpg
 overnight-oats.webp — "Protein overnight oats.jpg" by Nervy8924 — CC BY-SA 4.0 — https://commons.wikimedia.org/wiki/File:Protein_overnight_oats.jpg
 pancakes.webp — "Foodiesfeed.com pouring-honey-on-pancakes-with-walnuts.jpg" by Mae Mu — CC0 — https://commons.wikimedia.org/wiki/File:Foodiesfeed.com_pouring-honey-on-pancakes-with-walnuts.jpg
+pasta.webp — "Barilla penne 2.jpg" by Mx. Granger — CC0 — https://commons.wikimedia.org/wiki/File:Barilla_penne_2.jpg
 pasta-chicken.webp — "Baked chicken steak pasta with tomato sauce.jpg" by Apeach316 — CC BY-SA 2.0 — https://commons.wikimedia.org/wiki/File:Baked_chicken_steak_pasta_with_tomato_sauce.jpg
 pb-banana-toast.webp — "Avocado Toast and Peanut Butter Toast with Strawberries and Bananas.jpg" by Tony Webster — CC BY 2.0 — https://commons.wikimedia.org/wiki/File:Avocado_Toast_and_Peanut_Butter_Toast_with_Strawberries_and_Bananas.jpg
 peas-stew.webp — "02023 0181 meatballs and potatoes with peas and carrots stew.jpg" by Silar — CC BY-SA 4.0 — https://commons.wikimedia.org/wiki/File:02023_0181_meatballs_and_potatoes_with_peas_and_carrots_stew.jpg
+poke.webp — "Rice bowl topped with salmon and salmon egg (14904439935).jpg" by pelican from Tokyo, Japan — CC BY-SA 2.0 — https://commons.wikimedia.org/wiki/File:Rice_bowl_topped_with_salmon_and_salmon_egg_(14904439935).jpg
 potato-salad.webp — "Potato salad 3.jpg" by jules — CC BY 2.0 — https://commons.wikimedia.org/wiki/File:Potato_salad_3.jpg
 protein-shake.webp — "Protein shake.jpg" by Sandstein — CC BY 3.0 — https://commons.wikimedia.org/wiki/File:Protein_shake.jpg
 pumpkin-soup.webp — "Pumpkin soup with seeds and croutons in Bosnia and Herzegovina-bs.jpg" by Minja Klarić — CC BY-SA 4.0 — https://commons.wikimedia.org/wiki/File:Pumpkin_soup_with_seeds_and_croutons_in_Bosnia_and_Herzegovina-bs.jpg
 quinoa-salad.webp — "Quinoa Salad (5045982815).jpg" by Geoff Peters from Vancouver, BC, Canada — CC BY 2.0 — https://commons.wikimedia.org/wiki/File:Quinoa_Salad_(5045982815).jpg
+ratatouille.webp — "Ratatouille.jpg" by Marcus Guimarães — CC BY 2.0 — https://commons.wikimedia.org/wiki/File:Ratatouille.jpg
+red-lentils.webp — "Split Red Lentil.jpg" by Sanjay Acharya — CC BY-SA 4.0 — https://commons.wikimedia.org/wiki/File:Split_Red_Lentil.jpg
+rice.webp — "A bowl of rice.jpg" by Douglas Perkins — CC0 — https://commons.wikimedia.org/wiki/File:A_bowl_of_rice.jpg
 rice-bowl.webp — "Oyakodon 003.jpg" by Ocdp — CC0 — https://commons.wikimedia.org/wiki/File:Oyakodon_003.jpg
 rice-veg.webp — "Jambalaya - naviniea.jpg" by naviniea — CC BY-SA 2.0 — https://commons.wikimedia.org/wiki/File:Jambalaya_-_naviniea.jpg
 roast-sweet-potato.webp — "Gungoguma (roasted sweet potatoes) 2.jpg" by 국립국어원 — CC BY-SA 2.0 kr — https://commons.wikimedia.org/wiki/File:Gungoguma_(roasted_sweet_potatoes)_2.jpg
+roasted-chickpeas.webp — "Leblebi.jpg" by Physicistjedi — Public domain — https://commons.wikimedia.org/wiki/File:Leblebi.jpg
 salad-baladi.webp — "Cucumber tomato feta salad.jpg" by jeffreyw — CC BY 2.0 — https://commons.wikimedia.org/wiki/File:Cucumber_tomato_feta_salad.jpg
+saloona.webp — "Chicken stew with mixed vegetables.jpg" by FBenjr123 — CC BY-SA 4.0 — https://commons.wikimedia.org/wiki/File:Chicken_stew_with_mixed_vegetables.jpg
 sardine-toast.webp — "Sardines et pain grillé 01.jpg" by Arnaud 25 — CC BY-SA 4.0 — https://commons.wikimedia.org/wiki/File:Sardines_et_pain_grill%C3%A9_01.jpg
+satay.webp — "Sate Ayam Panggang.jpg" by Meandkancil2020 — CC BY-SA 4.0 — https://commons.wikimedia.org/wiki/File:Sate_Ayam_Panggang.jpg
+sauteed-veg.webp — "Poriyal.jpg" by VinPrasad — CC BY-SA 4.0 — https://commons.wikimedia.org/wiki/File:Poriyal.jpg
 sayadieh.webp — "Fish Sayadieh.jpg" by young shanahan — CC BY 2.0 — https://commons.wikimedia.org/wiki/File:Fish_Sayadieh.jpg
 scrambled-eggs.webp — "Scrambed eggs.jpg" by Takeaway — CC BY-SA 3.0 — https://commons.wikimedia.org/wiki/File:Scrambed_eggs.jpg
 shish-tawook.webp — "Tavuk Şiş.jpg" by Garrett Ziegler — CC BY-SA 4.0 — https://commons.wikimedia.org/wiki/File:Tavuk_%C5%9Ei%C5%9F.jpg
+shrimp.webp — "Frozen raw shrimps.jpg" by Fumikas Sagisavas — CC0 — https://commons.wikimedia.org/wiki/File:Frozen_raw_shrimps.jpg
+shrimp-fried-rice.webp — "Shrimp Fried Rice (Taiwan).jpg" by Ralff Nestor Nacor — CC BY-SA 4.0 — https://commons.wikimedia.org/wiki/File:Shrimp_Fried_Rice_(Taiwan).jpg
 shrimp-pasta.webp — "Shrimp and basil pesto pasta 2.jpg" by 에그란 — CC BY 4.0 — https://commons.wikimedia.org/wiki/File:Shrimp_and_basil_pesto_pasta_2.jpg
 shrimp-salad.webp — "Shrimp salad from Turkey.jpg" by E4024 — CC BY-SA 4.0 — https://commons.wikimedia.org/wiki/File:Shrimp_salad_from_Turkey.jpg
 shrimp-stirfry.webp — "Noodle stir fry with chicken, shrimp, and broccoli (18471621051).jpg" by jeffreyw — CC BY 2.0 — https://commons.wikimedia.org/wiki/File:Noodle_stir_fry_with_chicken,_shrimp,_and_broccoli_(18471621051).jpg
 smoked-salmon-salad.webp — "Smoked Salmon Salad à la AC.jpg" by Andrew Currie — CC BY 2.0 — https://commons.wikimedia.org/wiki/File:Smoked_Salmon_Salad_%C3%A0_la_AC.jpg
+souvlaki.webp — "Souvlaki in Athens.JPG" by Miyagawa — CC BY-SA 4.0 — https://commons.wikimedia.org/wiki/File:Souvlaki_in_Athens.JPG
 strawberry-smoothie.webp — "Glass of strawberry smoothie (6828826294).jpg" by woodleywonderworks — CC BY 2.0 — https://commons.wikimedia.org/wiki/File:Glass_of_strawberry_smoothie_(6828826294).jpg
 stuffed-peppers.webp — "Quinoa stuffed peppers.jpg" by Mark Bonica — CC BY 2.0 — https://commons.wikimedia.org/wiki/File:Quinoa_stuffed_peppers.jpg
+tabbouleh.webp — "Flickr - cyclonebill - Tabbouleh.jpg" by cyclonebill — CC BY-SA 2.0 — https://commons.wikimedia.org/wiki/File:Flickr_-_cyclonebill_-_Tabbouleh.jpg
+teriyaki.webp — "Bowl of Teriyaki chicken and beef YakinikuCNE.jpg" by CNEcija12345 — CC BY-SA 4.0 — https://commons.wikimedia.org/wiki/File:Bowl_of_Teriyaki_chicken_and_beef_YakinikuCNE.jpg
+tilapia.webp — "Fresh tilapia from Ghana.jpg" by Edithobayaa1 — CC BY-SA 4.0 — https://commons.wikimedia.org/wiki/File:Fresh_tilapia_from_Ghana.jpg
+tofu-scramble.webp — "Tofu Scramble in New Orleans.jpg" by Bart Everson — CC BY 2.0 — https://commons.wikimedia.org/wiki/File:Tofu_Scramble_in_New_Orleans.jpg
+tomato.webp — "Fresh red tomatoes.jpg" by Selimee — CC BY-SA 4.0 — https://commons.wikimedia.org/wiki/File:Fresh_red_tomatoes.jpg
+tomato-soup.webp — "Tomato soup, Turkish style.jpg" by E4024 — CC BY-SA 4.0 — https://commons.wikimedia.org/wiki/File:Tomato_soup,_Turkish_style.jpg
 tortilla-espanola.webp — "Tortilla española con patatas y cebolla.jpg" by Juan Emilio Prades Bel — CC BY 4.0 — https://commons.wikimedia.org/wiki/File:Tortilla_espa%C3%B1ola_con_patatas_y_cebolla.jpg
+trail-mix.webp — "Gorp.jpg" by ImGz — CC BY-SA 3.0 — https://commons.wikimedia.org/wiki/File:Gorp.jpg
+tuna-can.webp — "Lata de atún-Albo.jpg" by Tamorlan — CC BY 3.0 — https://commons.wikimedia.org/wiki/File:Lata_de_at%C3%BAn-Albo.jpg
 tuna-melt.webp — "Tuna melt sandwich with fries.jpg" by kweez mcG from London, UK — CC BY 2.0 — https://commons.wikimedia.org/wiki/File:Tuna_melt_sandwich_with_fries.jpg
 tuna-pasta.webp — "Pasta with tuna & vegetables (5746832862).jpg" by Luca Nebuloni from Milan, Italy — CC BY 2.0 — https://commons.wikimedia.org/wiki/File:Pasta_with_tuna_%26_vegetables_(5746832862).jpg
 tuna-salad.webp — "Tuna fish sandwiches for the National School Lunch Program (1).jpg" by U.S. Department of Agriculture — Public domain — https://commons.wikimedia.org/wiki/File:Tuna_fish_sandwiches_for_the_National_School_Lunch_Program_(1).jpg
@@ -83,6 +150,7 @@ tuna-sandwich.webp — "Tuna olive and avocado sandwich.jpg" by Richard Masoner 
 turkey-sandwich.webp — "Korbel Champagne Cellars - Stierch - April 2019 05.jpg" by Missvain — CC BY 4.0 — https://commons.wikimedia.org/wiki/File:Korbel_Champagne_Cellars_-_Stierch_-_April_2019_05.jpg
 tzatziki.webp — "Tzatziki meze or appetizer, also used as a sauce.jpg" by Nikodem Nijaki — CC BY-SA 3.0 — https://commons.wikimedia.org/wiki/File:Tzatziki_meze_or_appetizer,_also_used_as_a_sauce.jpg
 vermicelli-rice.webp — "Arabic rice.jpg" by El Mono Español — CC BY-SA 4.0 — https://commons.wikimedia.org/wiki/File:Arabic_rice.jpg
+watermelon-feta.webp — "Watermelon Vegan Feta Salad (10695235746).jpg" by Stephanie from Austin TX — CC BY 2.0 — https://commons.wikimedia.org/wiki/File:Watermelon_Vegan_Feta_Salad_(10695235746).jpg
 wrap.webp — "Smoked chicken and avocado wrap.jpg" by Takeaway — CC BY-SA 3.0 — https://commons.wikimedia.org/wiki/File:Smoked_chicken_and_avocado_wrap.jpg
 yellow-lentil-soup.webp — "Lentil Soup - Schnitzel & Co. 2026-05-16.jpg" by Andy Li — CC0 — https://commons.wikimedia.org/wiki/File:Lentil_Soup_-_Schnitzel_%26_Co._2026-05-16.jpg
 yogurt-berries.webp — "Vegan yogurt, March 2012.jpg" by Veganbaking.net from USA — CC BY-SA 2.0 — https://commons.wikimedia.org/wiki/File:Vegan_yogurt,_March_2012.jpg

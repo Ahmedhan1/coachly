@@ -40,13 +40,13 @@ for (const [w, h] of [
 
       // Cuisine chip + English search.
       await filters.getByRole('button', { name: 'خليجي', exact: true }).click();
-      await expect(page.getByText('كبسة فراخ خفيفة')).toBeVisible();
+      await expect(page.getByText('مجبوس سمك')).toBeVisible();
       await filters.getByRole('button', { name: 'خليجي', exact: true }).click();
-      await page.getByRole('searchbox', { name: 'دوّر على وصفة' }).fill('shakshuka');
-      await expect(page.getByText('شكشوكة بالجبنة اللايت')).toBeVisible();
+      await page.getByRole('searchbox', { name: 'دوّر على وصفة' }).fill('kabsa');
+      await expect(page.getByText('كبسة فراخ خفيفة')).toBeVisible();
 
       // Recipe detail shows the large photo.
-      await page.getByText('شكشوكة بالجبنة اللايت').click();
+      await page.getByText('كبسة فراخ خفيفة').click();
       await expect(page.getByRole('dialog').locator('[data-kind="photo"] img').first()).toBeVisible();
       await page.screenshot({ path: `${SHOTS}/recipe-detail.png` });
     });

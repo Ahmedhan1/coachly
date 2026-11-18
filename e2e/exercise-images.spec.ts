@@ -104,14 +104,33 @@ test('no-photo and drawing exercises in the program picker, builder, session and
   await page.getByRole('button', { name: 'خيارات البرنامج' }).click();
   await page.getByRole('button', { name: 'ابدأ حصة باليوم ده' }).click();
   await expect(page.getByRole('button', { name: 'خلّصت السيت' })).toBeVisible();
+  // Skip the template exercises so the no-photo one becomes the current exercise card.
+  for (let i = 0; i < 6; i++) {
+    const before = await page.getByText(/^تمرين \d+ من \d+$/).first().textContent();
+    await page.getByRole('button', { name: /تخطّي|تخطي/ }).first().click();
+    await expect.poll(() => page.getByText(/^تمرين \d+ من \d+$/).first().textContent()).not.toBe(before);
+  }
+  await expect(page.getByRole('heading', { name: 'سبانيش سكوات' }).first()).toBeVisible();
+  await page.getByRole('heading', { name: 'سبانيش سكوات' }).first().scrollIntoViewIfNeeded();
+  await page.evaluate(() => window.scrollTo(0, 0));
   await page.waitForTimeout(1200);
-  if (shot) await page.screenshot({ path: `${shot}/session-start.png`, fullPage: true });
+  await expectNoBrokenImages(page);
+  if (shot) await page.screenshot({ path: `${shot}/session-nophoto.png` });
 
   await page.goto(`/more/pdf?client=${clientId}&standalone=1`);
   await page.getByLabel('نوع الملف').selectOption({ label: 'برنامج كامل' });
+  for (const name of ['الغلاف', 'جدول التمارين']) {
+    const box = page.getByRole('checkbox', { name, exact: true });
+    if ((await box.isChecked()) !== (name === 'جدول التمارين')) await box.click();
+  }
   await page.getByRole('button', { name: 'اعمل الملف' }).click();
   await expect(page.getByText(/الملف جاهز: \d+ صفحة/)).toBeVisible({ timeout: 120_000 });
+  if (shot) await page.screenshot({ path: `${shot}/pdf-screen.png`, fullPage: true });
   const pages = page.getByRole('img', { name: /^صفحة \d+$/ });
   const count = await pages.count();
-  for (let i = 0; i < count && shot; i++) await pages.nth(i).screenshot({ path: `${shot}/pdf-page-${i + 1}.png` });
+  for (let i = 0; i < count && shot; i++) {
+    await pages.nth(i).scrollIntoViewIfNeeded();
+    await page.waitForTimeout(400);
+    await pages.nth(i).screenshot({ path: `${shot}/pdf-page-${i + 1}.png` });
+  }
 });
