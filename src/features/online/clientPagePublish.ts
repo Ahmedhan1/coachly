@@ -28,6 +28,8 @@ const mealsOf = (plan: MealPlan, recipeName: ReadonlyMap<string, string>): Share
         .filter(Boolean),
     };
     if (m.time) meal.time = m.time;
+    // The meal's random id (never a name) lets the client's pick come back in his check-in.
+    meal.id = m.id;
     // Other ways to eat this meal (same numbers): the client picks one on his page.
     const options = (m.options ?? [])
       .slice(0, 3)

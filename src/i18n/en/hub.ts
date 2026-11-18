@@ -95,6 +95,10 @@ export const hub: EnArea<'hub'> = {
     supplements: 'Supplements',
     supplementsCount: '{n} products',
     noSupplements: 'No supplements',
+    clientPicks: 'Client\'s meal choices',
+    clientPicksFrom: 'From the check-in on {date}',
+    clientPickOption: 'Chose “Option {n}”',
+    clientPicksKept: 'Eating the meals as planned.',
     recipes: 'Recipes',
   },
   progress: {

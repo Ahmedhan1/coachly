@@ -177,8 +177,17 @@ interface CheckinDocumentV1 {
   waistCm?: number;                  // 30–300
   notes?: string;                    // ≤ 1000
   photo?: string;                    // data:image/jpeg;base64,… downscaled in the browser to ≤ 1200 px, EXIF dropped
+  photos?: string[];                 // ≤ 2 more, same format
+  hipCm?, chestCm?, armCm?, thighCm?, neckCm?: number;   // neck 20–100 (for the Navy body-fat estimate)
+  sleepHours?: number; energy?: number /* 1–5 */; adherence?: number /* 0–100 */;
+  mealPicks?: Array<{ id: string; o: number }>;          // ≤ 84; meal id from the share document, o 0–3 (0 = as planned)
 }
 ```
+
+Meals in the share document carry `id` (the app's random meal id, `[A-Za-z0-9_-]{1,64}`, never a name) so the
+client's pick on the page can travel back inside this encrypted document. The app keeps the newest picks per
+client and shows them on the client's nutrition tab; with neck + waist (+ hip for women) and the client's height
+on file, it also stores a Navy body-fat estimate on the imported entry (marked as an estimate).
 
 App flow: `GET /api/checkins` → for each: `GET …/checkins/:id` → `openWithKey(k, bytes)` → `parseCheckinDocument`
 → store → `DELETE …/checkins/:id`.

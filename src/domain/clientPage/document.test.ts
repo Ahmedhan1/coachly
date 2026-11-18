@@ -49,7 +49,7 @@ describe('buildShareDocument', () => {
       notes: 'x',
       checkinsEnabled: false,
     });
-    expect(doc.meals).toEqual([{ title: 'فطار', time: '09:00', items: ['فول'] }]);
+    expect(doc.meals).toEqual([{ id: 'm', title: 'فطار', time: '09:00', items: ['فول'] }]);
     expect(doc.brand.color).toBe('#333333');
     expect(doc.programTitle).toBeUndefined();
   });
@@ -76,6 +76,7 @@ describe('meal options for the client to pick', () => {
       checkinsEnabled: false,
     });
     expect(doc.meals[0]?.options).toEqual([{ items: ['سمك ورز'] }, { items: ['كفتة وبطاطس'] }, { items: ['تونة'] }]);
+    expect(doc.meals[0]?.id).toBe('m');
     expect(parseWorkerDoc(doc)).not.toBeNull();
     const old = { ...doc, meals: [{ title: 'غدا', items: ['فراخ ورز'] }] };
     expect(parseWorkerDoc(old)).not.toBeNull();
@@ -90,6 +91,18 @@ describe('parseCheckin', () => {
     expect(parseCheckin({ v: 1, kind: 'checkin', createdAt: 1, weightKg: 5 })).toBeNull();
     expect(parseCheckin({ v: 1, kind: 'checkin', createdAt: 1, photo: 'data:text/html;base64,AA' })).toBeNull();
     expect(parseCheckin(null)).toBeNull();
+  });
+
+  it('carries the neck and the client\'s meal picks, rejecting odd ones', () => {
+    const picks = [
+      { id: 'm1', o: 2 },
+      { id: 'm2', o: 0 },
+    ];
+    expect(parseCheckin({ v: 1, kind: 'checkin', createdAt: 5, neckCm: 38, mealPicks: picks })).toEqual({ v: 1, kind: 'checkin', createdAt: 5, neckCm: 38, mealPicks: picks });
+    expect(parseCheckin({ v: 1, kind: 'checkin', createdAt: 5, neckCm: 5 })).toBeNull();
+    expect(parseCheckin({ v: 1, kind: 'checkin', createdAt: 5, mealPicks: [{ id: 'm1', o: 4 }] })).toBeNull();
+    expect(parseCheckin({ v: 1, kind: 'checkin', createdAt: 5, mealPicks: [{ id: 'غدا', o: 1 }] })).toBeNull();
+    expect(parseCheckin({ v: 1, kind: 'checkin', createdAt: 5, mealPicks: [{ id: 'm1', o: 1, name: 'x' }] })).toEqual({ v: 1, kind: 'checkin', createdAt: 5, mealPicks: [{ id: 'm1', o: 1 }] });
   });
 });
 
