@@ -1,6 +1,6 @@
 .thumb {
-  inline-size: 44px;
-  block-size: 44px;
+  inline-size: 56px;
+  block-size: 56px;
   border-radius: var(--r-sm);
   object-fit: cover;
 }
@@ -118,7 +118,13 @@
   border-radius: var(--r-lg);
 }
 
-.heroImg img {
+.heroImg[data-kind='photo'] {
+  inline-size: min(100%, 320px);
+  block-size: auto;
+  aspect-ratio: 4 / 3;
+}
+
+.heroImg[data-kind='icon'] img {
   inline-size: 64px;
   block-size: 64px;
 }
@@ -152,4 +158,45 @@
 
 .foodName {
   flex: 1;
+}
+
+.filters {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-2);
+  margin-block-start: var(--sp-3);
+}
+
+.chips {
+  display: flex;
+  gap: var(--sp-2);
+  padding-inline: var(--gutter);
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+
+.chip {
+  flex: none;
+  min-block-size: 40px;
+  padding-inline: var(--sp-3);
+  border: 1px solid var(--line);
+  border-radius: var(--r-full);
+  background: var(--surface);
+  color: var(--text);
+  font: var(--t-label);
+}
+
+.chip[aria-pressed='true'] {
+  border-color: var(--text);
+  background: var(--text);
+  color: var(--bg);
+}
+
+.filterBar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-inline: var(--gutter);
+  color: var(--text-2);
+  font: var(--t-sub);
 }

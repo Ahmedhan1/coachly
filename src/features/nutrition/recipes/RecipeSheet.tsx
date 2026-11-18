@@ -1,7 +1,7 @@
 import { useState, type FormEvent } from 'react';
 import { useRepos } from '@/app/services';
 import { useUiStore } from '@/app/uiStore';
-import { foodIconHex, recipeIconHex, storedRecipeNutrition, type Portion } from '@/domain/meals';
+import { recipeIconHex, storedRecipeNutrition, type Portion } from '@/domain/meals';
 import type { ImageId, Ingredient, Recipe } from '@/domain/models';
 import type { IngredientEntry } from '@/domain/meals';
 import { searchItems } from '@/data';
@@ -146,7 +146,7 @@ export function RecipeSheet({ recipe, onClose }: { recipe: Recipe | null; onClos
         />
         {english && <TextField label={t('nutrition.book.nameEn')} value={nameEn} onChange={(e) => setNameEn(e.target.value)} autoComplete="off" />}
         <div className={styles.hero}>
-          <FoodImage imageId={imageId} icon={recipeIconHex(ingredients ?? [], foods ?? [])} className={styles.heroImg} />
+          <FoodImage imageId={imageId} photo={recipe?.photo} icon={recipeIconHex(ingredients ?? [], foods ?? [])} className={styles.heroImg} />
         </div>
         <TextField label={t('nutrition.book.servings')} inputMode="numeric" value={servings} onChange={(e) => setServings(e.target.value)} ltr />
 
@@ -156,7 +156,7 @@ export function RecipeSheet({ recipe, onClose }: { recipe: Recipe | null; onClos
           {rows.map((r, i) => (
             <div key={i} className={styles.ingRow}>
               <div className={styles.ingTop}>
-                <FoodImage icon={foodIconHex(foods?.find((f) => f.name === r.name) ?? {})} className={styles.ingIcon} />
+                <FoodImage food={foods?.find((f) => f.name === r.name) ?? {}} className={styles.ingIcon} />
                 <TextField label={t('nutrition.book.ingredient')} value={r.name} onChange={(e) => setRow(i, { name: e.target.value })} autoComplete="off" />
                 <IconButton icon="close" tone="muted" label={t('nutrition.book.removeIngredient', { name: r.name || String(i + 1) })} onClick={() => setRows((rs) => (rs.length > 1 ? rs.filter((_, j) => j !== i) : [emptyRow()]))} />
               </div>

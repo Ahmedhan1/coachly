@@ -151,7 +151,7 @@ export function DietWeek({ client, week, book, recipes, foods, perServing, targe
           {days.map((d, i) => (
             <button key={i} type="button" role="tab" aria-selected={i === selected} className={plan.dayPill} onClick={() => setSelected(i)}>
               {t('nutrition.diet.dayShort', { n: i + 1 })}
-              {dayTypes?.[i] && dayTypes[i] !== 'rest' && <span className={cal.tag}>{t(`nutrition.cal.dayType.${dayTypes[i] ?? 'rest'}`)}</span>}
+              {dayTypes?.[i] && dayTypes[i] !== 'rest' && <span className={cal.pillTag}>{t(`nutrition.cal.dayType.${dayTypes[i] ?? 'rest'}`)}</span>}
               {!d.check.ok && <span className={styles.dot} aria-label={t('nutrition.diet.offTarget')} />}
             </button>
           ))}

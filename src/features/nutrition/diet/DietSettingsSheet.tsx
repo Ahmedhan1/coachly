@@ -21,7 +21,22 @@ const FIELDS = [
   'minProteinPerKg',
   'minFatPerKg',
 ] as const;
-type NumericKey = (typeof FIELDS)[number];
+/** Calorie-control coefficients (labels under nutrition.cal.s). */
+const CAL_FIELDS = [
+  'cutMinProteinPerKg',
+  'maxProteinPerKg',
+  'maxFatPercent',
+  'cutRateMinPercent',
+  'cutRateMaxPercent',
+  'bulkRateMinPercent',
+  'bulkRateMaxPercent',
+  'maintainBandPercent',
+  'kcalPerKgChange',
+  'trainingDayExtraKcal',
+] as const;
+const ALL_FIELDS = [...FIELDS, ...CAL_FIELDS] as const;
+type NumericKey = (typeof ALL_FIELDS)[number];
+const labelOf = (k: NumericKey) => ((CAL_FIELDS as readonly string[]).includes(k) ? t(`nutrition.cal.s.${k as (typeof CAL_FIELDS)[number]}`) : t(`nutrition.diet.s.${k as (typeof FIELDS)[number]}`));
 
 /** The planner's coefficients (high-protein level, low-carb share, tolerances, serving limits, safety floors). */
 export function DietSettingsSheet({ onClose, onSaved }: { onClose: () => void; onSaved: () => void }) {
@@ -41,13 +56,13 @@ interface FormProps {
 }
 
 function Form({ current, onClose, onSaved, store, showToast }: FormProps) {
-  const [values, setValues] = useState<Record<NumericKey, string>>(() => Object.fromEntries(FIELDS.map((k) => [k, fieldText(current[k])])) as Record<NumericKey, string>);
+  const [values, setValues] = useState<Record<NumericKey, string>>(() => Object.fromEntries(ALL_FIELDS.map((k) => [k, fieldText(current[k])])) as Record<NumericKey, string>);
   const [error, setError] = useState(false);
   const submit = async (e: FormEvent) => {
     e.preventDefault();
-    const next = { ...current, ...Object.fromEntries(FIELDS.map((k) => [k, parseDecimal(values[k])])) };
+    const next = { ...current, ...Object.fromEntries(ALL_FIELDS.map((k) => [k, parseDecimal(values[k])])) };
     const parsed = dietSettingsSchema.safeParse(next);
-    if (!parsed.success || parsed.data.minServings > parsed.data.maxServings) return setError(true);
+    if (!parsed.success || parsed.data.minServings > parsed.data.maxServings || parsed.data.cutRateMinPercent > parsed.data.cutRateMaxPercent || parsed.data.bulkRateMinPercent > parsed.data.bulkRateMaxPercent) return setError(true);
     await store.saveDietSettings(parsed.data);
     showToast({ message: t('nutrition.diet.settingsSaved'), duration: 2000 });
     onSaved();
@@ -73,8 +88,8 @@ function Form({ current, onClose, onSaved, store, showToast }: FormProps) {
       <form id="diet-settings-form" className={common.form} onSubmit={(e) => void submit(e)} noValidate>
         <p className={common.muted}>{t('nutrition.diet.settingsHint')}</p>
         <div className={common.grid2}>
-          {FIELDS.map((k) => (
-            <TextField key={k} label={t(`nutrition.diet.s.${k}`)} inputMode="decimal" value={values[k]} onChange={(e) => (setValues({ ...values, [k]: e.target.value }), setError(false))} ltr />
+          {ALL_FIELDS.map((k) => (
+            <TextField key={k} label={labelOf(k)} inputMode="decimal" value={values[k]} onChange={(e) => (setValues({ ...values, [k]: e.target.value }), setError(false))} ltr />
           ))}
         </div>
         {error && (

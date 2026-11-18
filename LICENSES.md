@@ -211,3 +211,16 @@ Other agents are adding dependencies in `worker/` and the root **right now**. At
   approximations entered by us from general knowledge of USDA FoodData Central (public domain) and the
   Egyptian/Middle-East food composition tables (nothing copied wholesale). No new dependencies, no new images
   (new foods reuse the bundled Twemoji illustrations, CC BY 4.0).
+
+### Exercise pack — wave 5 additions (2026-11-18)
+
+- **108 new built-in exercises** (`data-src/exercise-extras.json`, ids `pt_*`): names, muscles, Arabic and English
+  cues are our own work. They ship with **no new photos** — no new image source was added. Without a photo the app
+  shows our own muscle picture (rendered from our 3D model), labelled «العضلات المستهدفة».
+- **17 existing extras now reuse free-exercise-db photos** (`imagesFrom`) of the same movement, after a visual check;
+  same source and same YELLOW status as the rest of the pack photos above — no new files, no new risk.
+- **free-exercise-db upstream checked again (2026-11-18):** `dist/exercises.json` still has 876 exercises, the same
+  ids as our copy; its 3 entries without photos (Kettlebell Halo ×2, Kettlebell Overhead Triceps Extension) still
+  have none upstream.
+- Not used: wger images (CC-BY-SA, and the project rule says never copy from wger), Everkinetic illustrations
+  (CC-BY-SA 3.0, would need share-alike attribution per image) — left for an owner decision.

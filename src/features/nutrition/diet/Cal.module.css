@@ -314,3 +314,12 @@
     display: none !important;
   }
 }
+
+.pillTag {
+  margin-inline-start: 6px;
+  padding: 1px 6px;
+  border-radius: var(--r-full);
+  background: var(--surface-2);
+  color: var(--text-2);
+  font: 500 11px/1.4 var(--font-ui);
+}

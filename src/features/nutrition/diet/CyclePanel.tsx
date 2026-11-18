@@ -28,7 +28,7 @@ export function CyclePanel({ cycle, extraKcal, types, days, averageKcal, targetK
         <input type="checkbox" checked={cycle.enabled} onChange={(e) => onChange({ ...cycle, enabled: e.target.checked })} />
         {t('nutrition.cal.cycleOn')}
       </label>
-      <p className={diet.intro}>{t('nutrition.cal.cycleHint')}</p>
+      <p className={styles.rowSub}>{t('nutrition.cal.cycleHint')}</p>
       {cycle.enabled && (
         <>
           <p className={styles.rowSub}>{t('nutrition.cal.trainingDays')}</p>
