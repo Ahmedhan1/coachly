@@ -243,10 +243,26 @@ function mealBlocks(input: PdfDocumentInput): PdfBlock[] {
     if (meal.items.length === 0) continue;
     let sum = zero;
     let known = false;
-    const items = meal.items.map((item) => {
+    const items = meal.items.flatMap((item) => {
       const recipe = item.recipeId ? recipes.get(item.recipeId) : undefined;
       if (recipe && !used.includes(recipe)) used.push(recipe);
-      const name = recipe?.name ?? item.text;
+      const en = input.language === 'en';
+      const name = (en && recipe?.nameEn) || recipe?.name || item.text;
+      if (item.lines && item.lines.length > 0) {
+        // Exact grams from the diet planner: the dish, then each food with its grams and kcal; totals from the lines.
+        const lineSum = item.lines.reduce<MacroSum>((a, l) => addMacros(a, { kcal: l.kcal, p: l.proteinG, c: l.carbG, f: l.fatG }), zero);
+        sum = addMacros(sum, lineSum);
+        known = true;
+        return [
+          { text: name, detail: '', grams: `${formatNumber(item.lines.reduce((n, l) => n + l.grams, 0))} ${u.g}`, kcal: `${formatNumber(lineSum.kcal)} ${u.kcal}` },
+          ...item.lines.map((l) => ({
+            text: `· ${(en && l.nameEn) || l.name}`,
+            detail: l.units !== undefined && l.unitLabel ? `${formatNumber(l.units, 1)} ${(en && l.unitLabelEn) || l.unitLabel}` : '',
+            grams: `${formatNumber(l.grams)} ${u.g}`,
+            kcal: `${formatNumber(l.kcal)} ${u.kcal}`,
+          })),
+        ];
+      }
       const extra = recipe && item.text ? ` — ${item.text}` : '';
       const t = recipe ? recipeTotals(recipe) : null;
       if (t) {
@@ -254,12 +270,14 @@ function mealBlocks(input: PdfDocumentInput): PdfBlock[] {
         known = true;
       } else partial = true;
       const grams = recipe ? recipeGramsPerServing(recipe) : null;
-      return {
-        text: `${name}${extra}`,
-        detail: `${formatNumber(item.servings, 2)} ${L.servings}`,
-        grams: grams !== null ? `${formatNumber(grams * item.servings)} ${u.g}` : '',
-        kcal: t ? `${formatNumber(t.kcal * item.servings)} ${u.kcal}` : '',
-      };
+      return [
+        {
+          text: `${name}${extra}`,
+          detail: `${formatNumber(item.servings, 2)} ${L.servings}`,
+          grams: grams !== null ? `${formatNumber(grams * item.servings)} ${u.g}` : '',
+          kcal: t ? `${formatNumber(t.kcal * item.servings)} ${u.kcal}` : '',
+        },
+      ];
     });
     if (known) {
       day = addMacros(day, sum);
