@@ -21,9 +21,10 @@ export function FoodPhotosOffline({ stems }: { stems: readonly string[] }) {
     void cachedFoodPhotoCount(key.split(',')).then((n) => live && setStored(n));
     return () => {
       live = false;
-      abort.current?.abort();
     };
   }, [key]);
+  // Leaving the screen stops a running download (the photos stored so far stay).
+  useEffect(() => () => abort.current?.abort(), []);
 
   const start = async () => {
     abort.current = new AbortController();
@@ -31,7 +32,8 @@ export function FoodPhotosOffline({ stems }: { stems: readonly string[] }) {
     const r = await downloadFoodPhotos(stems, setProgress, abort.current.signal);
     abort.current = null;
     setProgress(null);
-    setResult(r);
+    // A stopped run shows "N of M stored" instead of a result line.
+    setResult(r.done < r.total ? null : r);
     setStored(await cachedFoodPhotoCount(stems));
   };
 

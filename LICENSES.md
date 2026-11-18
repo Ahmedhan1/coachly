@@ -191,6 +191,7 @@ Obligations (verdict **YELLOW = OK with obligations**):
 | hasaneyldrm/exercises-dataset | images marked © Gym visual | **RED** — do not use |
 | Recipes / food table | our own content (values: USDA FoodData Central / FAO-INFOODS family, approximated) | OK |
 | Twemoji SVG illustrations in `public/food/` (npm `@twemoji/svg` 15.0.0, copied, not a dependency) | Graphics CC-BY 4.0 (code MIT); attribution in app About screen and `public/food/ATTRIBUTION.txt` | GREEN with attribution |
+| Food photos in `public/food-img/photos/` (Wikimedia Commons, 320×240 WebP, cropped/resized) | CC0 / public domain / CC BY / CC BY-SA, per file; author, title, license and link for every file in **docs/FOOD_PHOTOS.md** (+ `public/food-img/photos/ATTRIBUTION.txt`); app credit line "صور الأكل: Wikimedia Commons" on the recipe book screen | GREEN with attribution (BY-SA covers the adapted photos only) |
 
 ## 6. To re-verify at phase end
 
@@ -224,3 +225,6 @@ Other agents are adding dependencies in `worker/` and the root **right now**. At
   have none upstream.
 - Not used: wger images (CC-BY-SA, and the project rule says never copy from wger), Everkinetic illustrations
   (CC-BY-SA 3.0, would need share-alike attribution per image) — left for an owner decision.
+- Wave 5 food data: `ingredients.ar.json` v5 (13 new foods, 315 in total) and `recipes.ar.json` v4 (128 new original
+  recipes, 342 in total, each with prep time and cuisine). Food photos: Wikimedia Commons only, each checked by eye,
+  listed with author / license / source in `docs/FOOD_PHOTOS.md`; files cached at run time (not precached).

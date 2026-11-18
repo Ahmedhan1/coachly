@@ -22,42 +22,47 @@ export function PhotoCarousel({ exercise }: { exercise: CatalogExercise }) {
     setIndex(Math.min(total - 1, Math.round(Math.abs(el.scrollLeft) / el.clientWidth)));
   };
   return (
-    <div className={styles.carousel}>
-      <div ref={track} className={styles.track} onScroll={onScroll} aria-label={t('training.library.detail.photos')} role="group">
-        {images.map((image, i) => (
-          <div
-            key={image ? (image.kind === 'pack' ? image.path : image.imageId) : 'none'}
-            className={styles.slide}
-            role="group"
-            aria-label={t('training.library.detail.photo', { n: i + 1, total })}
-          >
-            {image === undefined ? (
-              // No photo at all: the muscle picture, labelled so it never reads as an empty or broken box.
+    <>
+      <div className={styles.carousel}>
+        <div ref={track} className={styles.track} onScroll={onScroll} aria-label={t('training.library.detail.photos')} role="group">
+          {images.map((image, i) => (
+            <div
+              key={image ? (image.kind === 'pack' ? image.path : image.imageId) : 'none'}
+              className={styles.slide}
+              role="group"
+              aria-label={t('training.library.detail.photo', { n: i + 1, total })}
+            >
+              {image === undefined ? (
+                // No photo at all: the muscle picture, labelled so it never reads as an empty or broken box.
+                <span className={cx(styles.photo, styles.pictureSlide)}>
+                  <IllustrationImage exercise={exercise} fallbackSize={200} />
+                  <span className={styles.pictureBadge}>{t('exercises.detail.illustration')}</span>
+                </span>
+              ) : (
+                <ExercisePhoto exercise={exercise} image={image} fallbackSize={200} className={styles.photo} eager={i === 0} />
+              )}
+            </div>
+          ))}
+          {withPicture && (
+            <div className={styles.slide} role="group" aria-label={t('exercises.detail.illustrationSlide')}>
               <span className={cx(styles.photo, styles.pictureSlide)}>
                 <IllustrationImage exercise={exercise} fallbackSize={200} />
                 <span className={styles.pictureBadge}>{t('exercises.detail.illustration')}</span>
               </span>
-            ) : (
-              <ExercisePhoto exercise={exercise} image={image} fallbackSize={200} className={styles.photo} eager={i === 0} />
-            )}
-          </div>
-        ))}
-        {withPicture && (
-          <div className={styles.slide} role="group" aria-label={t('exercises.detail.illustrationSlide')}>
-            <span className={cx(styles.photo, styles.pictureSlide)}>
-              <IllustrationImage exercise={exercise} fallbackSize={200} />
-              <span className={styles.pictureBadge}>{t('exercises.detail.illustration')}</span>
-            </span>
+            </div>
+          )}
+        </div>
+        {total > 1 && (
+          <div className={styles.dots} aria-hidden="true">
+            {Array.from({ length: total }, (_, i) => (
+              <span key={i} className={cx(styles.dot, i === index && styles.dotOn)} />
+            ))}
           </div>
         )}
       </div>
-      {total > 1 && (
-        <div className={styles.dots} aria-hidden="true">
-          {Array.from({ length: total }, (_, i) => (
-            <span key={i} className={cx(styles.dot, i === index && styles.dotOn)} />
-          ))}
-        </div>
+      {exercise.imageCredit !== undefined && (
+        <p className={styles.credit}>{t('exercises.detail.photoCredit', { credit: exercise.imageCredit })}</p>
       )}
-    </div>
+    </>
   );
 }

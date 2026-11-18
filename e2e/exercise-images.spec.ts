@@ -66,3 +66,52 @@ test('an extra now reuses the matching dataset photos (imagesFrom)', async ({ pa
   await expect(photo).toBeVisible({ timeout: 20_000 });
   await expect(photo).toHaveAttribute('src', /Air_Bike-0\.webp/);
 });
+
+test('no-photo and drawing exercises in the program picker, builder, session and PDF', async ({ page }) => {
+  test.setTimeout(240_000);
+  await page.setViewportSize({ width: 412, height: 915 });
+  await openApp(page);
+  await page.getByRole('link', { name: 'العملاء', exact: true }).click();
+  await page.getByRole('link', { name: /سارة محمود/ }).click();
+  const clientId = page.url().split('/clients/')[1]?.split(/[/?]/)[0] ?? '';
+  await page.getByRole('link', { name: /البرنامج/ }).first().click();
+  await page.getByRole('button', { name: /فول بادي/ }).click();
+  await expect(page.getByTestId('exercise-card').first()).toBeVisible();
+
+  for (const [query, name] of [
+    ['سبانيش', 'سبانيش سكوات'],
+    ['جلوت بريدج هولد', 'جلوت بريدج هولد'],
+  ] as const) {
+    await page.getByRole('button', { name: 'ضيف تمرين' }).first().click();
+    const picker = page.getByRole('dialog', { name: 'ضيف تمرين' });
+    await picker.getByRole('searchbox').or(picker.getByRole('textbox')).first().fill(query);
+    const row = picker.getByText(name, { exact: true }).first();
+    await expect(row).toBeVisible();
+    await page.waitForTimeout(1200);
+    await expectNoBrokenImages(page);
+    if (shot) await page.screenshot({ path: `${shot}/picker-${query === 'سبانيش' ? 'nophoto' : 'drawing'}.png` });
+    await row.click();
+    const done = picker.getByRole('button', { name: /ضيف|تم|خلاص/ }).last();
+    if (await picker.isVisible()) await done.click();
+    await expect(page.getByTestId('exercise-card').filter({ hasText: name })).toBeVisible();
+  }
+  const added = page.getByTestId('exercise-card').filter({ hasText: 'سبانيش سكوات' });
+  await added.scrollIntoViewIfNeeded();
+  await page.waitForTimeout(1200);
+  await expectNoBrokenImages(page);
+  if (shot) await page.screenshot({ path: `${shot}/builder-nophoto.png` });
+
+  await page.getByRole('button', { name: 'خيارات البرنامج' }).click();
+  await page.getByRole('button', { name: 'ابدأ حصة باليوم ده' }).click();
+  await expect(page.getByRole('button', { name: 'خلّصت السيت' })).toBeVisible();
+  await page.waitForTimeout(1200);
+  if (shot) await page.screenshot({ path: `${shot}/session-start.png`, fullPage: true });
+
+  await page.goto(`/more/pdf?client=${clientId}&standalone=1`);
+  await page.getByLabel('نوع الملف').selectOption({ label: 'برنامج كامل' });
+  await page.getByRole('button', { name: 'اعمل الملف' }).click();
+  await expect(page.getByText(/الملف جاهز: \d+ صفحة/)).toBeVisible({ timeout: 120_000 });
+  const pages = page.getByRole('img', { name: /^صفحة \d+$/ });
+  const count = await pages.count();
+  for (let i = 0; i < count && shot; i++) await pages.nth(i).screenshot({ path: `${shot}/pdf-page-${i + 1}.png` });
+});

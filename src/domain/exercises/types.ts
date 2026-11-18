@@ -45,6 +45,8 @@ export interface CatalogExercise {
   jointStress?: JointStress;
   /** Doable at home (body weight, bands, dumbbells, kettlebell, ball, mat). */
   homeFriendly?: boolean;
+  /** Attribution for the pack photos (CC BY-SA sources); dropped when the trainer replaces the photos. */
+  imageCredit?: string;
 }
 
 /** A trainer-created exercise (stored in the data layer). */

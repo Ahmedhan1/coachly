@@ -13,8 +13,9 @@ async function openDiet(page: Page): Promise<void> {
   await page.getByRole('button', { name: 'حفظ للعميل' }).click();
   await page.getByRole('link', { name: 'الوجبات' }).click();
   await page.getByRole('button', { name: 'اعمل دايت أسبوع' }).first().click();
-  await expect(page.getByRole('heading', { level: 1, name: 'دايت أوتوماتيك' })).toBeVisible();
-  await expect(page.getByRole('region', { name: 'فطار' }).first()).toBeVisible();
+  await expect(page.getByRole('heading', { level: 1, name: 'دايت أوتوماتيك' })).toBeVisible({ timeout: 20_000 });
+  // The starter cookbook may still be seeding on a fresh install.
+  await expect(page.getByRole('region', { name: 'فطار' }).first()).toBeVisible({ timeout: 30_000 });
 }
 
 const mealTarget = async (page: Page, name: string) => {

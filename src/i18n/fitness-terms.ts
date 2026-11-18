@@ -162,6 +162,8 @@ export const EQUIPMENT_TERMS: Readonly<Record<string, string>> = {
   bosu: 'بوسو',
   'foam roll': 'فوم رولر',
   'foam roller': 'فوم رولر',
+  suspension: 'TRX',
+  trx: 'TRX',
   roller: 'رولر',
   plate: 'بليت',
   plates: 'بليتس',
@@ -801,7 +803,7 @@ export const ENGLISH_TERMS = {
   equipment: {
     barbell: 'Barbell', dumbbell: 'Dumbbell', cable: 'Cable', machine: 'Machine', kettlebell: 'Kettlebell',
     bands: 'Bands', 'body only': 'Bodyweight', 'medicine ball': 'Medicine Ball', 'exercise ball': 'Exercise Ball',
-    'e-z curl bar': 'EZ Bar', 'foam roll': 'Foam Roller', other: 'Other',
+    'e-z curl bar': 'EZ Bar', 'foam roll': 'Foam Roller', suspension: 'Suspension (TRX)', other: 'Other',
   },
   level: { beginner: 'Beginner', intermediate: 'Intermediate', expert: 'Advanced' },
   category: {

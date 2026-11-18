@@ -2737,7 +2737,12 @@
     "البار على ضهرك ووسطك مشدود",
     "ارجع خطوة لورا وانزل",
     "ارجع بالرجل اللي قدام"
-   ]
+   ],
+   "ownImages": [
+    "pt_Barbell_Reverse_Lunge-0.webp",
+    "pt_Barbell_Reverse_Lunge-1.webp"
+   ],
+   "imageCredit": "Everkinetic, CC BY-SA 4.0"
   },
   {
    "id": "pt_Heel_Elevated_Goblet_Squat",
@@ -3037,7 +3042,7 @@
    "secondary": [
     "forearms"
    ],
-   "equipment": "other",
+   "equipment": "suspension",
    "level": "beginner",
    "category": "strength",
    "force": "pull",
@@ -3064,7 +3069,7 @@
    "secondary": [
     "abs"
    ],
-   "equipment": "other",
+   "equipment": "suspension",
    "level": "intermediate",
    "category": "strength",
    "force": "push",
@@ -3092,7 +3097,7 @@
    "secondary": [
     "hamstrings"
    ],
-   "equipment": "other",
+   "equipment": "suspension",
    "level": "beginner",
    "category": "strength",
    "force": "push",
@@ -3119,7 +3124,7 @@
    "secondary": [
     "glutes"
    ],
-   "equipment": "other",
+   "equipment": "suspension",
    "level": "intermediate",
    "category": "strength",
    "force": "pull",
@@ -3147,7 +3152,7 @@
     "traps",
     "middle_back"
    ],
-   "equipment": "other",
+   "equipment": "suspension",
    "level": "intermediate",
    "category": "strength",
    "force": "pull",
@@ -3173,7 +3178,7 @@
     "shoulders",
     "hip_flexors"
    ],
-   "equipment": "other",
+   "equipment": "suspension",
    "level": "expert",
    "category": "strength",
    "force": "pull",
@@ -3197,7 +3202,7 @@
     "glutes"
    ],
    "secondary": [],
-   "equipment": "other",
+   "equipment": "suspension",
    "level": "intermediate",
    "category": "strength",
    "force": "push",
@@ -3223,7 +3228,7 @@
     "hip_flexors",
     "shoulders"
    ],
-   "equipment": "other",
+   "equipment": "suspension",
    "level": "intermediate",
    "category": "cardio",
    "force": "push",
@@ -3249,7 +3254,7 @@
    "secondary": [
     "shoulders"
    ],
-   "equipment": "other",
+   "equipment": "suspension",
    "level": "intermediate",
    "category": "strength",
    "force": "push",
@@ -3288,7 +3293,12 @@
     "knee": "low",
     "shoulder": "low",
     "lowerBack": "low"
-   }
+   },
+   "ownImages": [
+    "pt_Band_Biceps_Curl-0.webp",
+    "pt_Band_Biceps_Curl-1.webp"
+   ],
+   "imageCredit": "Everkinetic, CC BY-SA 4.0"
   },
   {
    "id": "pt_Band_Triceps_Pushdown",
@@ -4151,7 +4161,12 @@
    ],
    "jointStress": {
     "lowerBack": "medium"
-   }
+   },
+   "ownImages": [
+    "pt_Lying_Leg_Raise-0.webp",
+    "pt_Lying_Leg_Raise-1.webp"
+   ],
+   "imageCredit": "Everkinetic, CC BY-SA 4.0"
   },
   {
    "id": "pt_McGill_Curl_Up",
@@ -4558,7 +4573,12 @@
     "knee": "low",
     "shoulder": "low",
     "lowerBack": "low"
-   }
+   },
+   "ownImages": [
+    "pt_Glute_Bridge_Hold-0.webp",
+    "pt_Glute_Bridge_Hold-1.webp"
+   ],
+   "imageCredit": "Everkinetic, CC BY-SA 4.0"
   },
   {
    "id": "pt_Supine_Pelvic_Tilt",

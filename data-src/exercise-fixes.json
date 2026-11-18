@@ -216,6 +216,36 @@
     "hamstrings"
    ],
    "reason": "a split squat is quad-dominant"
+  },
+  "Suspended_Fallout": {
+   "equipment": "suspension",
+   "homeFriendly": true,
+   "reason": "done on a suspension trainer (TRX straps)"
+  },
+  "Suspended_Push-Up": {
+   "equipment": "suspension",
+   "homeFriendly": true,
+   "reason": "done on a suspension trainer (TRX straps)"
+  },
+  "Suspended_Reverse_Crunch": {
+   "equipment": "suspension",
+   "homeFriendly": true,
+   "reason": "done on a suspension trainer (TRX straps)"
+  },
+  "Suspended_Row": {
+   "equipment": "suspension",
+   "homeFriendly": true,
+   "reason": "done on a suspension trainer (TRX straps)"
+  },
+  "Suspended_Split_Squat": {
+   "equipment": "suspension",
+   "homeFriendly": true,
+   "reason": "done on a suspension trainer (TRX straps)"
+  },
+  "Inverted_Row_with_Straps": {
+   "equipment": "suspension",
+   "homeFriendly": true,
+   "reason": "done on a suspension trainer (TRX straps)"
   }
  }
 }

@@ -101,7 +101,7 @@ export function deriveJointStress(e: JointRuleInput): JointStress {
 }
 
 const HOME_EQUIPMENT: ReadonlySet<EquipmentId> = new Set([
-  'body_only', 'bands', 'dumbbell', 'kettlebell', 'exercise_ball', 'medicine_ball', 'foam_roll', 'other',
+  'body_only', 'bands', 'dumbbell', 'kettlebell', 'exercise_ball', 'medicine_ball', 'foam_roll', 'suspension', 'other',
 ]);
 const GYM_ONLY = /\b(machine|smith|cable|pulley|leverage|sled|prowler|treadmill|stationary|spin bike|assault|recumbent|rowing machine|elliptical|stairmaster|step mill|ski erg|ergometer|hanging|pull-up|pullup|pull ups|chin-up|chin|muscle up|dip|dips|ring|rope climb|glute ham|lat pulldown|pulldown|captain|landmine|yoke|tire|keg|atlas|log|rickshaw|car|conan|sledgehammer|chains|board|pin|blocks|incline|decline|preacher|bench press|hyperextension|back extension|reverse hyper|box jump|platform|bar|barbell|battling|heavy bag|circus|axle|t-bar|leg press|hack|pec deck|belt squat|pendulum|trap bar|wall ball|trail|bicycling|skating|jammer|bosu|harness)\b/i;
 

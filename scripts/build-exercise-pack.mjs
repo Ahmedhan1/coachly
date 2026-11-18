@@ -302,6 +302,8 @@ export async function buildPack(opts, log = console.log) {
 
   // 3. remove stale outputs, write the manifest with the images that really exist
   const expected = new Set(available.map((p) => p.outName));
+  // Our own files for extras (converted Everkinetic drawings, see docs/EXERCISE_PACK.md) are kept as they are.
+  for (const x of extras) for (const file of x.ownImages ?? []) expected.add(file);
   for (const file of readdirSync(imgDir)) if (!expected.has(file)) rmSync(join(imgDir, file));
   const imagesById = new Map();
   for (const p of plan) {
@@ -344,7 +346,7 @@ function rebuildManifestOnly({ sources, arabicNames, shared, manifestFile, imgDi
     if (!existsSync(join(imgDir, p.outName))) continue;
     imagesById.set(p.id, [...(imagesById.get(p.id) ?? []), p.outName]);
   }
-  const pack = buildExercisePack({ sources, arabicNames, imagesById, image, source: SOURCE_LABEL, imageBytes: previous.imageBytes, ...shared });
+  const pack = buildExercisePack({ sources, arabicNames, imagesById, image, source: SOURCE_LABEL, imageBytes: dirSize(imgDir), ...shared });
   writeFileSync(manifestFile, serializePack(pack));
   log(`manifest only: ${pack.count} exercises, ${pack.exercises.filter((e) => (e.cuesEn?.length ?? 0) > 0).length} with English cues; images untouched`);
   return { pack, imageCount: 0, totalImages: 0, missing: 0, fetched: 0, encoded: 0, failures: [], totalBytes: 0, overBudget: false };
