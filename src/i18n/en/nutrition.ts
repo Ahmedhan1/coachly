@@ -521,7 +521,7 @@ export const nutrition: EnArea<'nutrition'> = {
     },
     save: 'Save as the client’s plan',
     replaceExisting: 'Replace the current days (you can undo)',
-    saved: 'Saved {n} days to {name}’s plan',
+    saved: 'Saved {n} days to the plan for {name}',
     saveUndo: 'Undo',
     shopping: 'Shopping list for the week',
     editAfter: 'After saving you can edit any day or meal from the meals screen.',

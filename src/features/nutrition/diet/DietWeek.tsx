@@ -332,7 +332,7 @@ function LineRow({ line, food, onSet, onLock }: { line: GramLine; food: Ingredie
             aria-label={line.locked ? t('nutrition.diet.unlock', { name }) : t('nutrition.diet.lock', { name })}
             onClick={onLock}
           >
-            <Icon name="key" />
+            <Icon name={line.locked ? 'lock' : 'unlock'} />
           </button>
         </div>
       )}
