@@ -20,7 +20,7 @@ Fetched 235 photos on 2026-11-18 with a build script (`pt-coach-asset-builder/1.
 | `baba-ghanoush.webp` | [Baba Ghanoush.jpg](https://commons.wikimedia.org/wiki/File:Baba_Ghanoush.jpg) | Basel15 at English Wikipedia | Public domain |
 | `baked-apple.webp` | [Food in Catalonia 05.jpg](https://commons.wikimedia.org/wiki/File:Food_in_Catalonia_05.jpg) | Kritzolina | CC BY-SA 4.0 |
 | `baked-eggs.webp` | [Oeufs cocotte provencale.jpg](https://commons.wikimedia.org/wiki/File:Oeufs_cocotte_provencale.jpg) | Charlie1 | CC BY-SA 3.0 |
-| `baked-fish.webp` | [-2015-10-04 Oven Baked Sea Bass, Trimingham.JPG](https://commons.wikimedia.org/wiki/File:-2015-10-04_Oven_Baked_Sea_Bass,_Trimingham.JPG) | Kolforn (Kolforn) I'd appreciate if you could mail me (Kolforn@gmail.com) if you | CC BY-SA 4.0 |
+| `baked-fish.webp` | [-2015-10-04 Oven Baked Sea Bass, Trimingham.JPG](https://commons.wikimedia.org/wiki/File:-2015-10-04_Oven_Baked_Sea_Bass,_Trimingham.JPG) | Kolforn | CC BY-SA 4.0 |
 | `baked-salmon.webp` | [Liat Portal for Foodie Disorder - Oven-baked teriyaki salmon with vegetables.jpg](https://commons.wikimedia.org/wiki/File:Liat_Portal_for_Foodie_Disorder_-_Oven-baked_teriyaki_salmon_with_vegetables.jpg) | HaJunkiyada | CC BY-SA 4.0 |
 | `balaleet.webp` | [Balaleet 2019.jpg](https://commons.wikimedia.org/wiki/File:Balaleet_2019.jpg) | Droodkin | CC BY-SA 4.0 |
 | `bamia.webp` | [Du bamia avec du riz en février 2022.jpg](https://commons.wikimedia.org/wiki/File:Du_bamia_avec_du_riz_en_f%C3%A9vrier_2022.jpg) | Benoît Prieur | CC0 |
