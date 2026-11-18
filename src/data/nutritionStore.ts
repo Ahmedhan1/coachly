@@ -311,15 +311,7 @@ export class NutritionStore {
     }
     const table = starterIngredients();
     if ((await this.kv.get(NUTRITION_KEYS.ingredients)) === undefined) await this.saveIngredients(table);
-    const recipeIds: string[] = [];
-    const recipeKeys: string[] = [];
-    const keyMap: Record<string, string> = {};
-    for (const r of starterRecipes(table)) {
-      const created = await this.repos.recipes.create({ ...starterRecipeFields(r), imageId: null });
-      recipeIds.push(created.id);
-      recipeKeys.push(r.key);
-      keyMap[created.id] = r.key;
-    }
+    // Supplements first: a handful of rows, so the catalog is usable before the long recipe list is in.
     const settings = await this.repos.settings.get();
     const supplementIds: string[] = [];
     for (const s of starterSupplements()) {
@@ -333,6 +325,15 @@ export class NutritionStore {
         notes: '',
       });
       supplementIds.push(created.id);
+    }
+    const recipeIds: string[] = [];
+    const recipeKeys: string[] = [];
+    const keyMap: Record<string, string> = {};
+    for (const r of starterRecipes(table)) {
+      const created = await this.repos.recipes.create({ ...starterRecipeFields(r), imageId: null });
+      recipeIds.push(created.id);
+      recipeKeys.push(r.key);
+      keyMap[created.id] = r.key;
     }
     await this.kv.set(NUTRITION_KEYS.starterRecipes, recipeIds);
     await this.kv.set(NUTRITION_KEYS.starterRecipeKeys, recipeKeys);

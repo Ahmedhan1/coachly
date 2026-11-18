@@ -16,7 +16,7 @@ import styles from './Supplements.module.css';
 
 /** /clients/:id/supplements — products picked from the catalog, with per-client dose/timing text. */
 export function ClientSupplementsScreen() {
-  useStarterData();
+  const starterReady = useStarterData();
   const { clientId = '' } = useParams();
   const navigate = useNavigate();
   const repos = useRepos();
@@ -99,7 +99,11 @@ export function ClientSupplementsScreen() {
 
       {picking && (
         <Sheet open onClose={() => setPicking(false)} title={t('nutrition.supplements.pickTitle')} cancelLabel={t('common.cancel')}>
-          {catalog.length === 0 ? (
+          {catalog.length === 0 && !starterReady ? (
+            <p className={common.muted} role="status">
+              {t('app.loading')}
+            </p>
+          ) : catalog.length === 0 ? (
             <div className={common.form}>
               <p className={common.muted}>{t('nutrition.supplements.catalogEmpty')}</p>
               <Button onClick={() => navigate('/more/supplements')}>{t('nutrition.supplements.openCatalog')}</Button>
