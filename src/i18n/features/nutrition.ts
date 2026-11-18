@@ -799,6 +799,11 @@ export const nutrition = {
     optionsTitle: 'اختيارات للوجبة',
     option: 'اختيار {n}',
     pickForMe: 'اختارلي',
+    picksTitle: 'العميل اختار من صفحته',
+    picksLine: '{day} · {meal}: {food}',
+    picksApply: 'طبّق اختياراته على الخطة',
+    picksDismiss: 'تجاهل',
+    picksApplied: 'اتطبّقت اختيارات {name} ({n} وجبة)',
     optionsHint: 'نفس السعرات والماكروز بأكل مختلف. اختار واحد، والعميل يقدر يختار بنفسه من صفحته.',
     s: {
       kcalPerKgGain: 'سعرات الكيلو في الزيادة',

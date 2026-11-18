@@ -85,6 +85,15 @@ describe('meal options for the client to pick', () => {
 });
 
 describe('parseCheckin', () => {
+  it('carries the client meal picks; old check-ins without them stay valid; bad picks are rejected', () => {
+    const base = { v: 1, kind: 'checkin', createdAt: 1_700_000_000 } as const;
+    expect(parseCheckin(base)).toEqual(base);
+    expect(parseCheckin({ ...base, mealPicks: [{ id: 'm1', o: 2 }] })?.mealPicks).toEqual([{ id: 'm1', o: 2 }]);
+    expect(parseCheckin({ ...base, mealPicks: [{ id: 'm1', o: 7 }] })).toBeNull();
+    expect(parseCheckin({ ...base, mealPicks: [{ id: '', o: 1 }] })).toBeNull();
+    expect(parseWorkerDoc).toBeTypeOf('function');
+  });
+
   it('accepts a valid check-in and rejects out-of-range values', () => {
     expect(parseCheckin({ v: 1, kind: 'checkin', createdAt: 1_700_000_000, weightKg: 80.5, notes: 'تمام' })).toEqual({ v: 1, kind: 'checkin', createdAt: 1_700_000_000, weightKg: 80.5, notes: 'تمام' });
     expect(parseCheckin({ v: 1, kind: 'checkin', createdAt: 1, weightKg: 5 })).toBeNull();

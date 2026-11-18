@@ -10,6 +10,7 @@ import { t } from '@/i18n';
 import { pick } from '@/i18n/locale';
 import { Button, EmptyState, Icon, PageHeader, TextArea } from '@/ui';
 import { ClientNav } from '../shared/ClientNav';
+import { ClientPicksCard } from './ClientPicksCard';
 import { useBackTo, useClient } from '../shared/useClient';
 import { useNutritionStore, useStarterData } from '../shared/useNutritionStore';
 import { DayTotals } from './DayTotals';
@@ -154,6 +155,7 @@ function MealPlanView({ client, plans, saved, tolerance, recipes, foods, back }:
     <div className={common.page}>
       <PageHeader title={t('nutrition.plan.title')} subtitle={client.name} back={{ to: back, label: t('common.back') }} />
       <ClientNav clientId={client.id} />
+      <ClientPicksCard client={client} plans={plans} recipes={recipes} />
 
       {plans.length === 0 || !day ? (
         <div className={common.section}>

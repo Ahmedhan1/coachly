@@ -182,6 +182,8 @@ try {
     assert.equal(doc.waistCm, 80);
     assert.equal(doc.notes, 'الأسبوع ده كان كويس');
     assert.equal(doc.armCm, 33);
+    // The meal the client picked earlier (option 2 of lunch) travels with the check-in.
+    assert.deepEqual(doc.mealPicks, [{ id: 'meal-lunch-1', o: 1 }]);
     assert.equal(doc.sleepHours, 7.5);
     assert.equal(doc.adherence, 80);
     assert.equal(doc.energy, 4);

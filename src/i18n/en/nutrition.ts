@@ -799,6 +799,11 @@ export const nutrition: EnArea<'nutrition'> = {
     optionsTitle: 'Meal options',
     option: 'Option {n}',
     pickForMe: 'Pick for me',
+    picksTitle: 'The client picked on his page',
+    picksLine: '{day} · {meal}: {food}',
+    picksApply: 'Apply his picks to the plan',
+    picksDismiss: 'Dismiss',
+    picksApplied: '{name}’s picks applied ({n} meals)',
     optionsHint: 'Same calories and macros, different food. Pick one; the client can also pick on his page.',
     s: {
       kcalPerKgGain: 'Calories per kg gained',

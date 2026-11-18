@@ -2,6 +2,7 @@ import type { AppServices } from '@/app/services';
 import { buildPushSchedule, PUSH_MAX_ITEMS } from '@/domain/notifications';
 import { addDays } from '@/domain/schedule';
 import { computeOutbox } from '@/features/outbox/useOutbox';
+import { mealPicksKey } from '@/domain/meals';
 import { toIsoDate, type ClientId, type ImageId } from '@/domain/models';
 import { t } from '@/i18n';
 import { deviceZone } from '@/features/schedule/zone';
@@ -112,6 +113,8 @@ export async function pullCheckins(services: AppServices): Promise<number> {
       source: 'client',
     });
     if (photos.length > 0) await store.setEntryPhotos(entry.id, photos).catch(() => undefined);
+    // The client's meal picks: kept for the trainer to review and apply with one tap (newest check-in wins).
+    if (d.mealPicks && d.mealPicks.length > 0) await services.meta.set(mealPicksKey(clientId), { at: d.createdAt, picks: d.mealPicks });
     imported.push(c.id);
     await services.meta.set(IMPORTED_CHECKINS_KEY, imported.slice(-200));
     await page.acknowledge(c);
