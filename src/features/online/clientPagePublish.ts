@@ -33,7 +33,11 @@ const mealsOf = (plan: MealPlan, recipeName: ReadonlyMap<string, string>): Share
       .slice(0, 3)
       .map((o) => ({ items: o.items.flatMap((i) => itemRows(i, recipeName)).slice(0, 30).map((s) => s.trim().slice(0, 200)).filter(Boolean) }))
       .filter((o) => o.items.length > 0);
-    if (options.length > 0) meal.options = options;
+    if (options.length > 0) {
+      meal.options = options;
+      // Lets the client's pick come back with his check-in (a random id, no personal data).
+      meal.id = m.id.slice(0, 64);
+    }
     return meal;
   });
 

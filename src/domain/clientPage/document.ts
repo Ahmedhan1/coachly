@@ -104,7 +104,8 @@ function cleanMeal(m: ShareDocumentV1['meals'][number]): ShareDocumentV1['meals'
     .filter((o) => o.items.length > 0);
   const rest = { ...m };
   delete rest.options;
-  return options.length > 0 ? { ...rest, options } : rest;
+  delete rest.id;
+  return options.length > 0 ? { ...rest, options, ...(m.id ? { id: m.id.slice(0, 64) } : {}) } : rest;
 }
 
 function cleanExtras(x: ShareExtras): ShareExtras {
@@ -174,7 +175,7 @@ export function buildShareDocument(s: ShareSources): ShareDocumentV1 {
     const meal: ShareDocumentV1['meals'][number] = { title: cut(m.name, 80) || '—', items: m.items.slice(0, 30).map((i) => cut(s.mealItem(i), 200)).filter(Boolean) };
     if (m.time) meal.time = cut(m.time, 20);
     const options = (m.options ?? []).slice(0, 3).map((o) => ({ items: o.items.slice(0, 30).map((i) => cut(s.mealItem(i), 200)).filter(Boolean) }));
-    return cleanMeal(options.length > 0 ? { ...meal, options } : meal);
+    return cleanMeal(options.length > 0 ? { ...meal, options, id: m.id.slice(0, 64) } : meal);
   });
   const doc: ShareDocumentV1 = {
     v: 1,
