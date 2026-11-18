@@ -8,3 +8,4 @@ export * from './water';
 export * from './recipe';
 export * from './goalPlan';
 export * from './personalMacros';
+export * from './navyEstimate';

@@ -303,6 +303,7 @@ export const nutrition: EnArea<'nutrition'> = {
       chestCm: 'Chest',
       armCm: 'Arm',
       thighCm: 'Thigh',
+      neckCm: 'Neck',
     },
     metricUnits: {
       weightKg: 'kg',
@@ -335,6 +336,7 @@ export const nutrition: EnArea<'nutrition'> = {
     weight: 'Weight (kg)',
     bodyFat: 'Body fat %',
     waist: 'Waist (cm)',
+    neck: 'Neck (cm, for body fat)',
     hip: 'Hips (cm)',
     chest: 'Chest (cm)',
     arm: 'Arm (cm)',

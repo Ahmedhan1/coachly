@@ -28,3 +28,4 @@ export * from './dayView';
 export * from './dietProfile';
 export * from './goalSettings';
 export * from './mealOptions';
+export * from './mealPicks';
