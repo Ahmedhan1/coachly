@@ -756,6 +756,7 @@ export const nutrition: EnArea<'nutrition'> = {
     body: 'Weight {w} kg · height {h} cm · age {a}',
     bodyFat: 'Body fat {bf}%',
     bodyFatUnknown: 'Body fat unknown (estimate it in the calculator with the Navy formula for more precision)',
+    bodyFatNavy: 'Body fat estimated from measurements (Navy formula: neck, waist, height, and hips for women); BMR by Katch-McArdle.',
     experience: 'Training experience',
     exp: { beginner: 'Beginner', intermediate: 'Intermediate', advanced: 'Advanced' },
     target: 'Target weight',

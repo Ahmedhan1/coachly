@@ -1,6 +1,7 @@
 import { useDeferredValue, useMemo, useState, type ReactNode } from 'react';
 import { useUiStore } from '@/app/uiStore';
 import { useNavigate, useParams } from 'react-router-dom';
+import { useRepos } from '@/app/services';
 import { useLive } from '@/app/useLive';
 import {
   DIET_SCHEDULES,
@@ -36,7 +37,7 @@ import {
 } from '@/domain/meals';
 import type { Client } from '@/domain/models';
 import { t } from '@/i18n';
-import { waterIntake, type BodyNow } from '@/domain/nutrition';
+import { bodyFatForPlan, waterIntake, type BodyNow } from '@/domain/nutrition';
 import { Button, EmptyState, Icon, PageHeader, SegmentedControl, Select } from '@/ui';
 import { ClientNav } from '../shared/ClientNav';
 import { Slider } from '../shared/Slider';
@@ -191,16 +192,30 @@ function DietView({ client, saved, settings, dietSettings, recipes, foods, heade
   );
   // Goal planner: target weight + duration → calories (week 1, adaptive), protein from goal and body.
   const [now] = useState(() => new Date());
+  const repos = useRepos();
+  const entries = useLive(() => repos.progress.listByClient(client.id), [repos, client.id]);
+  // Body fat: the calculator's or a measured one; else the US Navy estimate from neck/waist(/hip) measurements.
+  const fat = useMemo(
+    () =>
+      bodyFatForPlan(
+        saved.input.bodyFatPercent ?? client.measurements.bodyFatPercent ?? null,
+        [{ date: '0000-00-00', measurements: client.measurements }, ...(entries ?? [])],
+        saved.input.sex,
+        saved.input.heightCm,
+        settings.navy,
+      ),
+    [saved, client, entries, settings],
+  );
   const body: BodyNow = useMemo(
     () => ({
       sex: saved.input.sex,
       ageYears: saved.input.ageYears,
       heightCm: saved.input.heightCm,
       weightKg: saved.input.weightKg,
-      bodyFatPercent: saved.input.bodyFatPercent ?? client.measurements.bodyFatPercent ?? null,
+      bodyFatPercent: fat.bodyFatPercent,
       activityFactor: settings.activityFactors[saved.input.activity],
     }),
-    [saved, client, settings],
+    [saved, fat, settings],
   );
   const gd = useMemo(
     () =>
@@ -358,7 +373,7 @@ function DietView({ client, saved, settings, dietSettings, recipes, foods, heade
             {t('nutrition.goal.enable')}
           </label>
           {profile.plan.enabled && (
-            <GoalPanel body={body} goal={goal} state={profile.plan} diet={gd} coeffs={goalCoefficientsFrom(dietSettings)} settings={settings} now={now} onChange={setPlan} />
+            <GoalPanel body={body} goal={goal} state={profile.plan} diet={gd} coeffs={goalCoefficientsFrom(dietSettings)} settings={settings} now={now} bodyFatSource={fat.source} onChange={setPlan} />
           )}
         </div>
       </section>
