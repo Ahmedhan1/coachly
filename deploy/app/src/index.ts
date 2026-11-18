@@ -4,6 +4,7 @@
  * the service worker then keeps everything on the phone, so D1 is read rarely.
  */
 import { APP_SECURITY_HEADERS } from '../../../shared/appHeaders';
+import { brandRoute } from './brand';
 
 export interface Env {
   APP: D1Database;
@@ -116,6 +117,8 @@ export default {
   async fetch(request: Request, env: Env, ctx: ExecutionContext): Promise<Response> {
     const url = new URL(request.url);
     if (url.pathname.startsWith('/__deploy/')) return deploy(request, env, url.pathname);
+    const brand = await brandRoute(request, env, url, ctx, SECURITY_HEADERS);
+    if (brand) return brand;
     if (request.method !== 'GET' && request.method !== 'HEAD') return new Response('Method not allowed', { status: 405 });
     let path: string;
     try {

@@ -71,6 +71,8 @@ test("a trainer's rename wins in English too", async ({ page }) => {
   const rename = page.getByRole('dialog', { name: 'اسم التمرين' });
   await rename.getByLabel('الاسم اللي هيظهر للعميل').fill('آر دي إل الكابتن');
   await rename.getByRole('button', { name: 'حفظ' }).click();
+  // Switch only once the new name is stored (the switch reloads the screen).
+  await expect(page.getByRole('heading', { level: 1, name: 'آر دي إل الكابتن' })).toBeVisible();
   await switchToEnglish(page);
   await expect(page.getByRole('heading', { level: 1, name: 'آر دي إل الكابتن' })).toBeVisible();
 });
