@@ -1,4 +1,5 @@
-import { describe, expect, it } from 'vitest';
+import { existsSync } from 'node:fs';
+import { beforeAll, describe, expect, it } from 'vitest';
 import {
   DIET_TAGS,
   defaultDietSettings,
@@ -79,6 +80,39 @@ describe('cookbook data', () => {
   });
 });
 
+describe('cookbook variety (wave 5)', () => {
+  const mains = (tag: string) => sources.filter((r) => r.tags.includes(tag) && !r.tags.includes(DIET_TAGS.side));
+  it('has 320+ recipes, 50+ per meal slot, 30+ vegetarian, 15+ vegan, no duplicate names', () => {
+    expect(sources.length).toBeGreaterThanOrEqual(320);
+    for (const tag of SLOT_TAGS) expect(mains(tag).length, tag).toBeGreaterThanOrEqual(50);
+    expect(mains(DIET_TAGS.vegetarian).length).toBeGreaterThanOrEqual(30);
+    expect(mains('نباتي صرف').length).toBeGreaterThanOrEqual(15);
+    expect(new Set(sources.map((r) => r.name)).size).toBe(sources.length);
+    expect(new Set(sources.map((r) => (r.nameEn ?? '').toLowerCase())).size).toBe(sources.length);
+  });
+
+  it('every recipe has a prep time and a cuisine; every cuisine is well represented', () => {
+    const per = new Map<string, number>();
+    for (const r of sources) {
+      expect(r.prepMin, r.id).toBeDefined();
+      expect(r.cuisine, r.id).toBeDefined();
+      per.set(r.cuisine ?? '', (per.get(r.cuisine ?? '') ?? 0) + 1);
+    }
+    for (const c of ['egyptian', 'levantine', 'gulf', 'mediterranean', 'asian', 'international']) expect(per.get(c) ?? 0, c).toBeGreaterThanOrEqual(8);
+    expect(sources.filter((r) => (r.prepMin ?? 99) <= 15).length).toBeGreaterThanOrEqual(80);
+  });
+
+  it('new vegetarian recipes contain no meat, poultry or fish', () => {
+    const animal = new Set(table.filter((f) => f.category === 'meat' || f.category === 'poultry' || f.category === 'fish').map((f) => f.id));
+    for (const r of sources.filter((x) => x.tags.includes(DIET_TAGS.vegetarian) && (x.since ?? 1) >= 4))
+      for (const i of r.items) expect(animal.has(i.ingredient), `${r.id} → ${i.ingredient}`).toBe(false);
+  });
+
+  it('recipe and food photos point at bundled files', () => {
+    for (const r of [...sources, ...table]) if (r.photo) expect(existsSync(new URL(`../../../public/food-img/photos/${r.photo}.webp`, import.meta.url)), r.photo).toBe(true);
+  });
+});
+
 describe('gram planner on the real cookbook', () => {
   const book: GramRecipe[] = starterRecipes(table).map((r) => gramRecipe({ id: r.key, servings: r.servings, tags: r.tags, ingredients: r.ingredients }, table));
   const ds = defaultDietSettings();
@@ -89,6 +123,8 @@ describe('gram planner on the real cookbook', () => {
     bulk: { kcal: 3100, proteinG: 160, carbG: 410, fatG: 90 },
     recomp: { kcal: 2300, proteinG: 180, carbG: 230, fatG: 70 },
   };
+  // One untimed run first, so the per-day timing below measures the planner, not the JIT warming up.
+  beforeAll(() => void planGramWeek(book, targets.maintain, { goal: 'maintain', schedule: 'normal', mealsPerDay: 4, days: 2 }, ds));
 
   for (const goal of ['cut', 'maintain', 'bulk', 'recomp'] as const) {
     for (const mealsPerDay of [3, 4, 5] as MealsPerDay[]) {

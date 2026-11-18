@@ -229,7 +229,7 @@ export const hub: EnArea<'hub'> = {
       safer: 'Safer options',
       saferTitle: 'Safer than {name}',
       noSafer: 'No safer option with the available equipment',
-      hidden: '{n} hidden (equipment not available or avoided for {name})',
+      hidden: '{n} hidden for {name} (missing equipment, injury or avoided)',
       noEquipment: 'Needs equipment they lack',
       favourite: 'Favourite',
       tailored: 'Tailored to {name}',

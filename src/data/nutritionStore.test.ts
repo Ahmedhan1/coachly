@@ -139,6 +139,43 @@ describe('NutritionStore', () => {
     expect((await repos.recipes.list()).length).toBe(2 + starterRecipes().filter((r) => r.since > 2).length);
   });
 
+  it('a data-v3 install gets the new recipes, prep times, cuisines and photos; edited recipes keep their text', async () => {
+    const { repos } = createTestData();
+    const kv = memoryKv();
+    await kv.set(NUTRITION_KEYS.ingredients, starterIngredients().map(({ photo: _p, ...f }) => f));
+    await kv.set(NUTRITION_KEYS.starterSeeded, 1);
+    await kv.set(NUTRITION_KEYS.foodsVersion, 4);
+    await kv.set(NUTRITION_KEYS.recipesVersion, 3);
+    await kv.set(NUTRITION_KEYS.recipesRefreshed, 3);
+    const shipped = starterRecipes().filter((r) => r.since <= 3);
+    await kv.set(NUTRITION_KEYS.starterRecipeKeys, shipped.map((r) => r.key));
+    const koshari = shipped.find((r) => r.key === 'koshari');
+    const foul = shipped.find((r) => r.key === 'foul');
+    if (!koshari || !foul) throw new Error('recipes missing');
+    const base = (r: typeof foul) => ({ name: r.name, servings: r.servings, ingredients: r.ingredients, instructions: r.instructions, imageId: null, tags: r.tags });
+    const untouched = await repos.recipes.create(base(koshari));
+    const edited = await repos.recipes.create({ ...base(foul), name: 'فول بتاعي', instructions: 'بطريقتي' });
+    await kv.set(NUTRITION_KEYS.starterRecipes, [untouched.id]);
+    await kv.set(NUTRITION_KEYS.starterRecipeKeyById, { [untouched.id]: 'koshari', [edited.id]: 'foul' });
+    const store = new NutritionStore(kv, repos);
+    await store.ensureStarter();
+    const k = await repos.recipes.get(untouched.id);
+    expect(k?.prepMin).toBe(koshari.prepMin);
+    expect(k?.cuisine).toBe('egyptian');
+    expect(k?.photo).toBe(starterRecipes().find((r) => r.key === 'koshari')?.photo);
+    const e = await repos.recipes.get(edited.id);
+    expect(e?.name).toBe('فول بتاعي');
+    expect(e?.instructions).toBe('بطريقتي');
+    expect(e?.cuisine).toBe('egyptian');
+    const fresh = starterRecipes().filter((r) => r.since === 4).length;
+    expect(fresh).toBeGreaterThanOrEqual(100);
+    expect((await repos.recipes.list()).length).toBe(2 + fresh);
+    const foods = await store.getIngredients();
+    expect(foods.some((f) => f.id === 'ginger')).toBe(true);
+    const shippedPhotos = starterIngredients().filter((f) => f.photo).length;
+    expect(foods.filter((f) => f.photo).length).toBe(shippedPhotos);
+  });
+
   it('stores diet settings with safe fallbacks', async () => {
     const { repos } = createTestData();
     const store = new NutritionStore(memoryKv(), repos);

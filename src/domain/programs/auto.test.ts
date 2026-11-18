@@ -50,7 +50,9 @@ describe('autoProgram', () => {
     const all = exercisesOf(body);
     expect(all.length).toBeGreaterThanOrEqual(12);
     for (const e of all) {
-      expect(['dumbbell', 'body_only']).toContain(e.equipment);
+      // 'other' (a mat, a step…) only when the catalog marks it doable at home.
+      if (e.equipment === 'other') expect(e.homeFriendly).toBe(true);
+      else expect(['dumbbell', 'body_only']).toContain(e.equipment);
       expect(e.category).not.toBe('plyometrics');
       expect(e.nameEn).not.toMatch(/jump|hop|barbell/i);
       expect(jointStressOf(e).knee ?? 'low').not.toBe('high');

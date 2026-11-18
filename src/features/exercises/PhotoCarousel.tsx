@@ -31,7 +31,15 @@ export function PhotoCarousel({ exercise }: { exercise: CatalogExercise }) {
             role="group"
             aria-label={t('training.library.detail.photo', { n: i + 1, total })}
           >
-            <ExercisePhoto exercise={exercise} image={image} fallbackSize={200} className={styles.photo} eager={i === 0} />
+            {image === undefined ? (
+              // No photo at all: the muscle picture, labelled so it never reads as an empty or broken box.
+              <span className={cx(styles.photo, styles.pictureSlide)}>
+                <IllustrationImage exercise={exercise} fallbackSize={200} />
+                <span className={styles.pictureBadge}>{t('exercises.detail.illustration')}</span>
+              </span>
+            ) : (
+              <ExercisePhoto exercise={exercise} image={image} fallbackSize={200} className={styles.photo} eager={i === 0} />
+            )}
           </div>
         ))}
         {withPicture && (
