@@ -16,6 +16,8 @@ test('backup: encrypted file export → change data → restore from the file br
   const add = page.getByRole('dialog', { name: 'عميل جديد' });
   await add.getByLabel('الاسم').fill('عميل بعد النسخة');
   await add.getByRole('button', { name: 'حفظ' }).click();
+  // Leave only once the save went through (a reload mid-write would drop it).
+  await expect(add).toBeHidden();
   await page.goto('/clients?standalone=1');
   await expect(page.getByRole('link', { name: /عميل بعد النسخة/ })).toBeVisible();
 
