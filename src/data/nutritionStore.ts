@@ -71,6 +71,18 @@ function starterRecipeFields(r: StarterRecipe) {
     instructions: r.instructions,
     ...(r.instructionsEn ? { instructionsEn: r.instructionsEn } : {}),
     tags: r.tags,
+    ...(r.prepMin !== undefined ? { prepMin: r.prepMin } : {}),
+    ...(r.cuisine ? { cuisine: r.cuisine } : {}),
+    ...(r.photo ? { photo: r.photo } : {}),
+  };
+}
+
+/** Facts an edited starter recipe may still lack (photo, prep time, cuisine): filled in, never overwritten. */
+function missingFacts(stored: { photo?: string | undefined; prepMin?: number | undefined; cuisine?: string | undefined }, r: StarterRecipe) {
+  return {
+    ...(stored.photo === undefined && r.photo ? { photo: r.photo } : {}),
+    ...(stored.prepMin === undefined && r.prepMin !== undefined ? { prepMin: r.prepMin } : {}),
+    ...(stored.cuisine === undefined && r.cuisine ? { cuisine: r.cuisine } : {}),
   };
 }
 
@@ -221,6 +233,7 @@ export class NutritionStore {
         ...(row.category === undefined && fresh.category !== undefined ? { category: fresh.category } : {}),
         ...(portions !== undefined ? { portions } : {}),
         ...(row.icon === undefined && fresh.icon !== undefined ? { icon: fresh.icon } : {}),
+        ...(row.photo === undefined && fresh.photo !== undefined ? { photo: fresh.photo } : {}),
         ...(row.unitG === undefined && fresh.unitG !== undefined ? { unitG: fresh.unitG, ...(fresh.unitHalf ? { unitHalf: true } : {}) } : {}),
       };
     });
@@ -256,8 +269,9 @@ export class NutritionStore {
 
   /**
    * Brings untouched starter recipes (still listed as starter, i.e. never edited) up to the shipped data: meal
-   * slot tags, English name and steps, ingredient names. Older installs have no id → key map, so recipes are
-   * matched by their (unique) shipped name. Edited recipes are the trainer's own and are never touched.
+   * slot tags, English name and steps, ingredient names, photo, prep time, cuisine. Older installs have no id → key
+   * map, so recipes are matched by their (unique) shipped name. Edited recipes are the trainer's own: only a
+   * missing photo / prep time / cuisine is filled in, nothing they typed changes.
    */
   private async refreshStarterRecipes(all: readonly StarterRecipe[], ids: readonly string[], keys: Record<string, string>): Promise<void> {
     if ((await this.kv.get(NUTRITION_KEYS.recipesRefreshed)) === STARTER_RECIPE_VERSION) return;
@@ -270,6 +284,15 @@ export class NutritionStore {
       if (!shipped) continue;
       keys[id] = shipped.key;
       await this.repos.recipes.update(id, starterRecipeFields(shipped));
+    }
+    const untouched = new Set(ids);
+    for (const [id, key] of Object.entries(keys)) {
+      if (untouched.has(id)) continue;
+      const shipped = byKey.get(key);
+      const stored = shipped ? await this.repos.recipes.get(id) : undefined;
+      if (!shipped || !stored) continue;
+      const facts = missingFacts(stored, shipped);
+      if (Object.keys(facts).length > 0) await this.repos.recipes.update(id, facts);
     }
     await this.kv.set(NUTRITION_KEYS.recipesRefreshed, STARTER_RECIPE_VERSION);
   }

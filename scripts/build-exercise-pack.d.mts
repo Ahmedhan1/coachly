@@ -18,6 +18,8 @@ export interface PackBuildOptions {
   manifestOnly: boolean;
   namesEn: string;
   cuesEn: string;
+  /** data-src/exercise-fixes.json (hand-reviewed photo / muscle / joint corrections). Optional. */
+  fixes?: string;
 }
 
 export interface PlannedImage {

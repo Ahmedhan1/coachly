@@ -1,0 +1,221 @@
+{
+ "_note": "Hand-reviewed corrections from the visual audit of the photos (contact sheets, wave 5). keepImages = 0-based photo indexes to keep. jointStress/homeFriendly here win over the rules in src/domain/exercises/jointStress.ts. Applied by scripts/build-exercise-pack.mjs.",
+ "fixes": {
+  "Quad_Stretch": {
+   "keepImages": [
+    1
+   ],
+   "reason": "photo 0 is the Hamstring Stretch start position (band on foot), not a quad stretch"
+  },
+  "Intermediate_Hip_Flexor_and_Quad_Stretch": {
+   "keepImages": [
+    1
+   ],
+   "reason": "photo 0 is the IT Band and Glute Stretch photo"
+  },
+  "Lower_Back-SMR": {
+   "keepImages": [
+    1
+   ],
+   "reason": "photo 0 is the Latissimus Dorsi-SMR photo (roller under the armpit)"
+  },
+  "Bicycling": {
+   "keepImages": [
+    0
+   ],
+   "reason": "photo 1 is a close-up of hands on the handlebar; no person visible"
+  },
+  "Skating": {
+   "keepImages": [
+    1
+   ],
+   "reason": "photo 0 is a face close-up putting on a helmet; the movement is not visible"
+  },
+  "Cable_Hip_Adduction": {
+   "primary": [
+    "adductors"
+   ],
+   "secondary": [],
+   "reason": "hip adduction works the adductors, not the quads"
+  },
+  "Cable_Deadlifts": {
+   "primary": [
+    "glutes",
+    "hamstrings"
+   ],
+   "secondary": [
+    "lower_back",
+    "quads",
+    "forearms"
+   ],
+   "reason": "a hip hinge: glutes and hamstrings lead"
+  },
+  "Box_Jump_Multiple_Response": {
+   "primary": [
+    "quads"
+   ],
+   "secondary": [
+    "glutes",
+    "hamstrings",
+    "calves"
+   ],
+   "reason": "jumping onto a box is quad-dominant"
+  },
+  "Front_Box_Jump": {
+   "primary": [
+    "quads"
+   ],
+   "secondary": [
+    "glutes",
+    "hamstrings",
+    "calves"
+   ],
+   "reason": "jumping onto a box is quad-dominant"
+  },
+  "Bench_Press_-_Powerlifting": {
+   "primary": [
+    "chest"
+   ],
+   "secondary": [
+    "triceps",
+    "shoulders"
+   ],
+   "reason": "a bench press: chest leads"
+  },
+  "Bench_Press_with_Chains": {
+   "primary": [
+    "chest"
+   ],
+   "secondary": [
+    "triceps",
+    "shoulders"
+   ],
+   "reason": "a bench press: chest leads"
+  },
+  "Reverse_Band_Bench_Press": {
+   "primary": [
+    "chest"
+   ],
+   "secondary": [
+    "triceps",
+    "shoulders"
+   ],
+   "reason": "a bench press: chest leads"
+  },
+  "Dumbbell_Floor_Press": {
+   "primary": [
+    "chest"
+   ],
+   "secondary": [
+    "triceps",
+    "shoulders"
+   ],
+   "reason": "a dumbbell press from the floor: chest leads"
+  },
+  "Band_Assisted_Pull-Up": {
+   "equipment": "bands",
+   "reason": "done with a band"
+  },
+  "Seated_Band_Hamstring_Curl": {
+   "equipment": "bands",
+   "reason": "done with a band"
+  },
+  "Crossover_Reverse_Lunge": {
+   "primary": [
+    "glutes"
+   ],
+   "secondary": [
+    "quads",
+    "hamstrings",
+    "adductors"
+   ],
+   "reason": "a lunge: glutes and quads, not the lower back"
+  },
+  "Hip_Flexion_with_Band": {
+   "primary": [
+    "hip_flexors"
+   ],
+   "secondary": [
+    "quads"
+   ],
+   "reason": "lifting the knee works the hip flexors"
+  },
+  "Intermediate_Groin_Stretch": {
+   "primary": [
+    "adductors"
+   ],
+   "secondary": [
+    "hamstrings"
+   ],
+   "reason": "a groin stretch targets the adductors"
+  },
+  "Lower_Back_Curl": {
+   "primary": [
+    "lower_back"
+   ],
+   "secondary": [
+    "glutes"
+   ],
+   "reason": "a prone back extension, not an ab exercise"
+  },
+  "Mixed_Grip_Chin": {
+   "primary": [
+    "lats"
+   ],
+   "secondary": [
+    "biceps",
+    "middle_back"
+   ],
+   "reason": "a chin-up: lats lead"
+  },
+  "One_Arm_Chin-Up": {
+   "primary": [
+    "lats"
+   ],
+   "secondary": [
+    "biceps",
+    "middle_back",
+    "forearms"
+   ],
+   "reason": "a chin-up: lats lead"
+  },
+  "Rear_Leg_Raises": {
+   "primary": [
+    "glutes"
+   ],
+   "secondary": [
+    "hamstrings"
+   ],
+   "reason": "the photos show a kneeling leg lift backwards: glutes"
+  },
+  "Reverse_Hyperextension": {
+   "primary": [
+    "glutes"
+   ],
+   "secondary": [
+    "hamstrings",
+    "lower_back"
+   ],
+   "reason": "reverse hyper is a glute exercise first"
+  },
+  "Side_Leg_Raises": {
+   "primary": [
+    "abductors"
+   ],
+   "secondary": [
+    "glutes"
+   ],
+   "reason": "raising the leg out to the side works the abductors"
+  },
+  "Split_Squats": {
+   "primary": [
+    "quads"
+   ],
+   "secondary": [
+    "glutes",
+    "hamstrings"
+   ],
+   "reason": "a split squat is quad-dominant"
+  }
+ }
+}

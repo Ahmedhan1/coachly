@@ -7,6 +7,8 @@ import { Badge, Button, Icon, ListRow, ListSection, Num, Tx, cx } from '@/ui';
 import { formatNumber } from '@/ui/format';
 import { useExerciseCatalog } from '@/features/programs/catalog';
 import { exerciseName, programDayName } from '@/features/programs/names';
+import { clientNoteText } from '@/domain/programs/tailor';
+import { TrainingProfileCard } from '../tailor/TrainingProfileCard';
 import { programUrl, sessionUrl } from './links';
 import type { HubData } from './useHubData';
 import styles from './Hub.module.css';
@@ -50,8 +52,11 @@ export function TrainingTab({ client, hub, scheduleId, go, onChooseProgram, onNe
   const unit = hub.unit;
   const unitLabel = t(`training.session.units.${unit}`);
 
+  const noteOf = (id: string) => clientNoteText(client.exerciseNotes?.[id], t('clientDetail.kg'));
+
   return (
     <>
+      <TrainingProfileCard client={client} catalog={catalog} hasProgram={program !== null} onProgramMade={(id) => go(programUrl(id))} />
       {program ? (
         <ListSection
           title={t('hub.training.active')}
@@ -100,7 +105,10 @@ export function TrainingTab({ client, hub, scheduleId, go, onChooseProgram, onNe
                       {day.items.map((item) => (
                         <li key={item.id}>
                           <button type="button" className={styles.exRow} onClick={() => onOpenExercise(item.exerciseId)}>
-                            <span className={styles.exName}>{name(item.exerciseId)}</span>
+                            <span className={styles.exName}>
+                              {name(item.exerciseId)}
+                              {noteOf(item.exerciseId) && <small className={styles.exNote}>{noteOf(item.exerciseId)}</small>}
+                            </span>
                             <span className={styles.exSpec}>
                               <Num>{t('hub.training.sets', { sets: item.sets, reps: displayReps(item.reps) })}</Num>
                             </span>

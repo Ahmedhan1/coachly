@@ -1,4 +1,5 @@
 import { exerciseAltName, exerciseName, muscleLabel, type ExerciseLocale } from '../exercises/display';
+import { clientNoteText, mergeItemNotes } from '../programs/tailor';
 import type { CatalogExercise } from '../exercises/types';
 import type { Measurements, PdfSection, ProgressEntry, Recipe } from '../models';
 import { chunkText } from './layout';
@@ -160,7 +161,7 @@ function programBlocks(input: PdfDocumentInput, withMuscleMaps: boolean): PdfBlo
         reps: item.reps,
         rest: `${item.restSec} ${input.labels.units.sec}`,
         extras,
-        notes: item.notes,
+        notes: mergeItemNotes(item.notes, clientNoteText(input.client?.exerciseNotes?.[item.exerciseId], input.labels.units.kg)),
         image: ex?.image ?? null,
         muscleMap: withMuscleMaps ? (ex?.muscleMap ?? null) : null,
         superset: item.supersetGroup ? `${L.superset} ${item.supersetGroup}` : null,

@@ -1,4 +1,5 @@
 import type { Client, MealPlan, Program } from '../models';
+import { mergeItemNotes } from '../programs/tailor';
 
 /** Mirror of worker/src/share/document.ts (ShareDocumentV1 / CheckinDocumentV1). Keep the two in sync. */
 export type ShareDocumentV1 = {
@@ -74,7 +75,8 @@ export interface ShareSources {
   client: Pick<Client, 'name'>;
   program: Program | null;
   /** Arabic name and (for built-in pack exercises) the photo file name inside /exercise-pack/img/. */
-  exercise: (id: string) => { name: string; imageFile: string | null };
+  /** `note`: the client's own note on the exercise (added to the item's notes). */
+  exercise: (id: string) => { name: string; imageFile: string | null; note?: string };
   dayTitle: (index: number, name: string) => string;
   mealPlan: MealPlan | null;
   /** Text for a meal item (recipe name or the free text) with its servings. */
@@ -148,7 +150,8 @@ export function buildShareDocument(s: ShareSources): ShareDocumentV1 {
       if (it.tempo) out.tempo = cut(it.tempo, 20);
       if (it.rpe !== null) out.rpe = it.rpe;
       if (ex.imageFile && IMAGE_FILE.test(ex.imageFile)) out.image = ex.imageFile;
-      if (it.notes) out.notes = cut(it.notes, 500);
+      const notes = mergeItemNotes(it.notes, ex.note ?? '');
+      if (notes) out.notes = cut(notes, 500);
       return out;
     }),
   }));

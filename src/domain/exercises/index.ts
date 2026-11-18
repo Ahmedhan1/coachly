@@ -10,3 +10,4 @@ export * from './alternatives';
 export * from './illustration';
 export * from './usage';
 export * from './display';
+export * from './jointStress';

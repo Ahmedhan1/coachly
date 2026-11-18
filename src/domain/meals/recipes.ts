@@ -49,6 +49,8 @@ export const ingredientEntrySchema = z.object({
   portions: z.array(portionSchema).max(8).optional(),
   /** Trainer's own photo (images table id); falls back to the illustration below. */
   imageId: z.string().min(1).max(64).nullable().optional(),
+  /** Bundled photo (file stem in public/food-img/photos/); shown before the illustration when it loads. */
+  photo: z.string().regex(/^[a-z0-9-]{1,60}$/).optional(),
   /** Twemoji file name (hex code point, no extension) of the illustration shipped in public/food. */
   icon: z.string().regex(/^[0-9a-f]{4,6}(-[0-9a-f]{4,6})*$/).optional(),
   /** Counted food: grams of one unit (an egg, a loaf). The planner then rounds to whole units. */

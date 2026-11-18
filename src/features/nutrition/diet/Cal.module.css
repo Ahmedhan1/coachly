@@ -1,0 +1,316 @@
+/* Calorie-control panels on the diet screen (macros, meal split, carb cycling, food prefs, trend, bars). */
+
+.panel {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-3);
+}
+
+.row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  gap: var(--sp-2);
+  padding-block: var(--sp-2);
+  border-block-end: 1px solid var(--line);
+}
+
+.row:last-child {
+  border-block-end: 0;
+}
+
+.rowHead {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-inline-size: 0;
+}
+
+.rowName {
+  margin: 0;
+  font: var(--t-headline);
+}
+
+.rowSub {
+  margin: 0;
+  color: var(--text-2);
+  font: var(--t-caption);
+}
+
+.controls {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-1);
+}
+
+.value {
+  inline-size: 64px;
+  min-block-size: var(--tap);
+  padding-inline: var(--sp-1);
+  border: 1px solid var(--line);
+  border-radius: var(--r-md);
+  background: var(--bg);
+  color: var(--text);
+  font: var(--t-headline);
+  text-align: center;
+}
+
+.shareValue {
+  display: grid;
+  place-items: center;
+}
+
+.value:focus {
+  outline: 2px solid var(--brand);
+  outline-offset: 1px;
+}
+
+.unitRow {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--sp-2);
+  grid-column: 1 / -1;
+}
+
+.unitRow .chip,
+.chip {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  min-block-size: 36px;
+  padding-inline: 12px;
+  border: 1px solid var(--line);
+  border-radius: var(--r-full);
+  background: var(--bg);
+  color: var(--text-2);
+  font: 500 14px/1 var(--font-ui);
+}
+
+.chip[aria-pressed='true'] {
+  border-color: var(--text);
+  background: var(--text);
+  color: var(--bg);
+}
+
+.chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--sp-2);
+}
+
+.tag {
+  display: inline-flex;
+  align-items: center;
+  padding: 2px 8px;
+  border-radius: var(--r-full);
+  background: var(--surface-2);
+  color: var(--text-2);
+  font: var(--t-caption);
+}
+
+.total {
+  margin: 0;
+  font: var(--t-caption);
+  color: var(--text-2);
+  text-align: end;
+}
+
+.bar {
+  position: relative;
+  block-size: 8px;
+  border-radius: var(--r-full);
+  background: var(--surface-2);
+  overflow: hidden;
+}
+
+.bar > span {
+  position: absolute;
+  inset-block: 0;
+  inset-inline-start: 0;
+  border-radius: inherit;
+  background: var(--brand);
+}
+
+.bar[data-status='over'] > span {
+  background: var(--warn);
+}
+
+.bar[data-status='under'] > span {
+  background: var(--text-3);
+}
+
+.bars {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--sp-3) var(--sp-4);
+  margin: 0;
+}
+
+.bars > div {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-inline-size: 0;
+}
+
+.bars dt {
+  display: flex;
+  justify-content: space-between;
+  gap: var(--sp-1);
+  color: var(--text-2);
+  font: var(--t-caption);
+}
+
+.bars dd {
+  margin: 0;
+}
+
+.mealBar {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  margin-block-end: var(--sp-2);
+}
+
+.cycleDays {
+  display: grid;
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+  gap: 4px;
+}
+
+.cycleDay {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+  min-block-size: 56px;
+  padding: 4px 0;
+  border: 1px solid var(--line);
+  border-radius: var(--r-md);
+  background: var(--bg);
+  color: var(--text-2);
+  font: 600 12px/1.2 var(--font-ui);
+}
+
+.cycleDay[data-type='training'] {
+  border-color: var(--brand);
+  background: var(--brand);
+  color: var(--brand-on);
+}
+
+.cycleDay[data-type='refeed'] {
+  border-color: var(--warn);
+  box-shadow: inset 0 0 0 1px var(--warn);
+  color: var(--text);
+}
+
+.cycleDay small {
+  font: 500 11px/1 var(--font-ui);
+  opacity: 0.85;
+}
+
+.trend {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-2);
+}
+
+.suggest {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--sp-2);
+  padding: var(--sp-3);
+  border-radius: var(--r-md);
+  background: var(--bg);
+  box-shadow: inset 0 0 0 1px var(--warn);
+}
+
+.suggest p {
+  margin: 0;
+  font: var(--t-body);
+  flex: 1 1 180px;
+}
+
+.foodList {
+  display: flex;
+  flex-direction: column;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.foodPick {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-3);
+  inline-size: 100%;
+  min-block-size: var(--tap);
+  padding: var(--sp-2) 0;
+  border: 0;
+  border-block-end: 1px solid var(--line);
+  background: none;
+  color: var(--text);
+  font: var(--t-body);
+  text-align: start;
+}
+
+.removable {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  min-block-size: 36px;
+  padding-inline: 12px 6px;
+  border: 1px solid var(--line);
+  border-radius: var(--r-full);
+  background: var(--bg);
+  color: var(--text);
+  font: 500 14px/1 var(--font-ui);
+}
+
+.removable svg {
+  inline-size: 16px;
+  block-size: 16px;
+  color: var(--text-3);
+}
+
+.shopList {
+  display: flex;
+  flex-direction: column;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.shopList li {
+  display: flex;
+  justify-content: space-between;
+  gap: var(--sp-3);
+  padding-block: var(--sp-2);
+  border-block-end: 1px solid var(--line);
+  font: var(--t-body);
+}
+
+.shopList li span:last-child {
+  color: var(--text-2);
+  white-space: nowrap;
+}
+
+.time {
+  min-block-size: var(--tap);
+  padding-inline: var(--sp-2);
+  border: 1px solid var(--line);
+  border-radius: var(--r-md);
+  background: var(--bg);
+  color: var(--text);
+  font: var(--t-headline);
+}
+
+@media print {
+  .noPrint {
+    display: none !important;
+  }
+}

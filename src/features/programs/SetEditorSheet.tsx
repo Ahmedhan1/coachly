@@ -22,6 +22,8 @@ export interface SetEditorSheetProps {
   canLinkNext: boolean;
   onSwap: () => void;
   onRemove: () => void;
+  /** When the program belongs to a client: their own note on this exercise and the editor for it. */
+  clientNote?: { label: string; text: string; onEdit: () => void } | null;
 }
 
 /** Bottom sheet editing one exercise of a day. Every change autosaves; "تم" just closes. */
@@ -45,7 +47,7 @@ export function SetEditorSheet(props: SetEditorSheetProps) {
   );
 }
 
-function EditorBody({ item, onChange, onMove, canMoveUp, canMoveDown, onToggleSuperset, canLinkNext, onSwap, onRemove, name }: SetEditorSheetProps & { item: ProgramItem }) {
+function EditorBody({ item, onChange, onMove, canMoveUp, canMoveDown, onToggleSuperset, canLinkNext, onSwap, onRemove, name, clientNote }: SetEditorSheetProps & { item: ProgramItem }) {
   const spec = parseReps(item.reps);
   const [tempo, setTempo] = useState(item.tempo);
   const [tempoError, setTempoError] = useState<string | null>(null);
@@ -180,6 +182,15 @@ function EditorBody({ item, onChange, onMove, canMoveUp, canMoveDown, onToggleSu
         maxLength={200}
         onBlur={(e) => e.target.value.trim() !== item.notes && onChange({ notes: e.target.value.trim() })}
       />
+
+      {clientNote && (
+        <div className={styles.clientNote}>
+          {clientNote.text && <p className={styles.clientNoteText}>{clientNote.text}</p>}
+          <Button variant="secondary" size="small" icon="edit" onClick={clientNote.onEdit}>
+            {clientNote.label}
+          </Button>
+        </div>
+      )}
 
       <div className={styles.editorActions}>
         <Button variant="secondary" size="small" disabled={!canMoveUp} onClick={() => onMove(-1)}>

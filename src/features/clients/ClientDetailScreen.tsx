@@ -33,6 +33,7 @@ import { SessionsTab } from './hub/SessionsTab';
 import { useHubTab } from './hub/tabs';
 import { TrainingTab } from './hub/TrainingTab';
 import { useHubData, type HubData } from './hub/useHubData';
+import { ClientNoteSheet } from './tailor/ClientNoteSheet';
 import styles from './ClientDetail.module.css';
 import hubStyles from './hub/Hub.module.css';
 
@@ -59,7 +60,7 @@ export function ClientDetailScreen() {
   return <ClientHub client={client} />;
 }
 
-type SheetName = null | 'edit' | 'package' | 'page' | 'ai' | 'whatsapp' | 'program' | { payment: Payment | null } | { exercise: string };
+type SheetName = null | 'edit' | 'package' | 'page' | 'ai' | 'whatsapp' | 'program' | { payment: Payment | null } | { exercise: string } | { note: string };
 
 function ClientHub({ client }: { client: Client }) {
   const hub = useHubData(client);
@@ -234,7 +235,12 @@ function ClientHub({ client }: { client: Client }) {
             setSheet(null);
             go(exerciseUrl(sheet.exercise));
           }}
+          client={client}
+          onNote={() => setSheet({ note: sheet.exercise })}
         />
+      )}
+      {sheet !== null && typeof sheet === 'object' && 'note' in sheet && (
+        <ClientNoteSheet client={client} exerciseId={sheet.note} onClose={() => setSheet(null)} />
       )}
       {sheet !== null && typeof sheet === 'object' && 'payment' in sheet && (
         <PaymentSheet

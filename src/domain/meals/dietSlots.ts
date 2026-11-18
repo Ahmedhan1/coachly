@@ -16,6 +16,8 @@ export interface DietSlot {
   time: string;
   /** Share of the day's calories, integers summing to 100 across the day. */
   sharePercent: number;
+  /** Carbs weight around training (1 = the meal's plain share; above 1 = more carbs, fat gives way). */
+  carbWeight?: number;
 }
 
 export type MealsPerDay = 3 | 4 | 5;

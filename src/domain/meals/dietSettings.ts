@@ -28,6 +28,20 @@ export const dietSettingsShape = {
   /** Warn when a cut is deeper / a bulk surplus is bigger than this share of the daily burn. */
   maxDeficitPercent: z.number().min(10).max(50),
   maxSurplusPercent: z.number().min(5).max(40),
+  /** Macro control: protein floor while cutting, protein ceiling, and the fat share that earns a warning. */
+  cutMinProteinPerKg: z.number().min(0.8).max(3),
+  maxProteinPerKg: z.number().min(2).max(5),
+  maxFatPercent: z.number().min(25).max(80),
+  /** Weekly weight change the goal aims for, in % of body weight (cut: loss, bulk: gain, maintain: ± band). */
+  cutRateMinPercent: z.number().min(0.1).max(1.5),
+  cutRateMaxPercent: z.number().min(0.2).max(2),
+  bulkRateMinPercent: z.number().min(0).max(1),
+  bulkRateMaxPercent: z.number().min(0.1).max(1.5),
+  maintainBandPercent: z.number().min(0.05).max(1),
+  /** Energy in one kg of body weight change, used to size a suggested calorie change. */
+  kcalPerKgChange: z.number().min(3000).max(9000),
+  /** Carb cycling: extra calories (all carbs) on a training day compared with a rest day. */
+  trainingDayExtraKcal: z.number().min(0).max(1000),
   /** Intermittent fasting: when the eating window opens (it lasts 8 hours). */
   ifWindowStart: timeText,
   iftarTime: timeText,
@@ -53,6 +67,16 @@ export function defaultDietSettings(): DietSettings {
     minFatPerKg: 0.5,
     maxDeficitPercent: 30,
     maxSurplusPercent: 20,
+    cutMinProteinPerKg: 1.6,
+    maxProteinPerKg: 3.3,
+    maxFatPercent: 45,
+    cutRateMinPercent: 0.4,
+    cutRateMaxPercent: 1,
+    bulkRateMinPercent: 0.1,
+    bulkRateMaxPercent: 0.5,
+    maintainBandPercent: 0.25,
+    kcalPerKgChange: 7700,
+    trainingDayExtraKcal: 300,
     ifWindowStart: '12:00',
     iftarTime: '18:00',
     suhoorTime: '03:30',
@@ -71,5 +95,6 @@ export function parseDietSettings(raw: unknown): DietSettings {
   }
   const parsed = dietSettingsSchema.safeParse(merged);
   if (!parsed.success || parsed.data.minServings > parsed.data.maxServings) return defaults;
+  if (parsed.data.cutRateMinPercent > parsed.data.cutRateMaxPercent || parsed.data.bulkRateMinPercent > parsed.data.bulkRateMaxPercent) return defaults;
   return parsed.data;
 }

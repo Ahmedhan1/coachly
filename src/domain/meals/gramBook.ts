@@ -23,10 +23,12 @@ export function gramRecipe(recipe: StoredRecipeForPlan, table: readonly Ingredie
     const entry = byName.get(row.name);
     const unitPortion = entry?.unitG !== undefined ? entry.portions?.find((p) => p.grams === entry.unitG) : undefined;
     lines.push({
+      ...(entry ? { foodId: entry.id } : {}),
       name: row.name,
       ...(entry?.nameEn ? { nameEn: entry.nameEn } : {}),
       grams: row.quantity / servings,
       per100g: { kcal: (row.kcal ?? 0) * k, proteinG: (row.proteinG ?? 0) * k, carbG: (row.carbsG ?? 0) * k, fatG: (row.fatG ?? 0) * k },
+      ...(entry?.per100g.fiberG !== undefined ? { fiberPer100g: entry.per100g.fiberG } : {}),
       ...(entry?.category ? { category: entry.category } : {}),
       ...(entry?.unitG !== undefined ? { unitG: entry.unitG } : {}),
       ...(entry?.unitHalf ? { unitHalf: true } : {}),

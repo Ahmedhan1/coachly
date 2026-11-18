@@ -9,6 +9,7 @@ import { mergeCatalog, type CatalogExercise } from '@/domain/exercises';
 import { mealItemRows } from '@/domain/meals';
 import { loadBuiltinCatalog } from '@/features/programs/catalog';
 import { exerciseName } from '@/features/programs/names';
+import { clientNoteText } from '@/domain/programs/tailor';
 import { clientPageLogo } from '@/features/identity/brandAssets';
 import { readShare, saveShare, type ShareRecord } from './prefs';
 
@@ -77,7 +78,8 @@ export async function buildClientShareDoc(services: AppServices, client: Client,
     program,
     exercise: (id) => {
       const img = byEx.get(id)?.images[0];
-      return { name: exName(id), imageFile: img?.kind === 'pack' ? (img.path.split('/').pop() ?? null) : null };
+      const note = clientNoteText(client.exerciseNotes?.[id], t('clientDetail.kg'));
+      return { name: exName(id), imageFile: img?.kind === 'pack' ? (img.path.split('/').pop() ?? null) : null, ...(note ? { note } : {}) };
     },
     dayTitle: (i, name) => `${t('training.programs.builder.dayDefault', { n: i + 1 })}${name ? ` — ${name}` : ''}`,
     mealPlan: sortedPlans[0] ?? null,

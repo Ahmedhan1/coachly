@@ -34,7 +34,8 @@ import {
   type SessionState,
 } from '@/domain/programs';
 import { lastTime, type LoggedSet } from '@/domain/strength';
-import { alternativesFor } from '@/domain/exercises';
+import { swapChoices } from '@/domain/exercises/fit';
+import { clientNoteText, fitProfileOf, hasTrainingProfile } from '@/domain/programs/tailor';
 import { t } from '@/i18n';
 import { Button, EmptyState, Icon, IconButton, Num, PageHeader, Sheet, Tx, cx } from '@/ui';
 import { useExerciseCatalog } from '@/features/programs/catalog';
@@ -370,6 +371,11 @@ function SessionRunner({ client, program, dayId: resolvedDayId, history, unit, s
             </div>
           </div>
 
+          {clientNoteText(client.exerciseNotes?.[ex.exerciseId], t('clientDetail.kg')) && (
+            <p className={styles.clientNote} data-testid="session-client-note">
+              {clientNoteText(client.exerciseNotes?.[ex.exerciseId], t('clientDetail.kg'))}
+            </p>
+          )}
           <p className={styles.last}>
             {prev ? (
               <>
@@ -516,7 +522,7 @@ function SessionRunner({ client, program, dayId: resolvedDayId, history, unit, s
           <ul className={styles.altList}>
             {(() => {
               const cur = byId.get(state.exercises[swapping]?.exerciseId ?? '');
-              return cur ? alternativesFor(cur, catalog.list, { limit: 8 }) : [];
+              return cur ? swapChoices(cur, catalog.list, hasTrainingProfile(client) ? fitProfileOf(client) : null, 8) : [];
             })().map((alt) => (
               <li key={alt.id}>
                 <button

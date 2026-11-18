@@ -41,9 +41,11 @@ import { NameSheet } from './NameSheet';
 import { SetEditorSheet } from './SetEditorSheet';
 import { useProgramEditor } from './useProgramEditor';
 import { usePushedScreen } from './usePushedScreen';
+import { clientNoteText, fitProfileOf } from '@/domain/programs/tailor';
+import { ClientNoteSheet } from '@/features/clients/tailor/ClientNoteSheet';
 import styles from './Builder.module.css';
 
-type SheetName = null | 'add' | 'swap' | 'menu' | 'copy' | 'assign' | 'copyToClient' | 'assignMany' | 'rename' | 'renameDay';
+type SheetName = null | 'add' | 'swap' | 'menu' | 'copy' | 'assign' | 'copyToClient' | 'assignMany' | 'rename' | 'renameDay' | 'clientNote';
 
 const ERROR_KEY: Record<ProgramEditError, 'training.programs.menu.tooManyDays' | 'training.programs.menu.tooManyItems' | 'training.programs.builder.notFoundTitle'> = {
   too_many_days: 'training.programs.menu.tooManyDays',
@@ -392,11 +394,30 @@ export function ProgramBuilderScreen() {
           favourites={catalog.favourites}
           title={sheet === 'swap' ? t('training.programs.picker.swapTitle') : t('training.programs.picker.title')}
           initialMuscle={sheet === 'swap' && editing ? (byId.get(editing.exerciseId)?.primaryMuscles[0] ?? null) : null}
+          tailor={client ? { name: client.name, profile: fitProfileOf(client) } : null}
+        />
+      )}
+
+      {sheet === 'clientNote' && client && editing && (
+        <ClientNoteSheet
+          client={client}
+          exerciseId={editing.exerciseId}
+          exerciseName={exerciseName(byId.get(editing.exerciseId), editing.exerciseId)}
+          onClose={() => setSheet(null)}
         />
       )}
 
       <SetEditorSheet
-        item={sheet === 'swap' ? null : editing}
+        item={sheet === 'swap' || sheet === 'clientNote' ? null : editing}
+        clientNote={
+          client && editing
+            ? {
+                label: t('hub.tailor.note.button', { name: client.name }),
+                text: clientNoteText(client.exerciseNotes?.[editing.exerciseId], t('clientDetail.kg')),
+                onEdit: () => setSheet('clientNote'),
+              }
+            : null
+        }
         name={editing ? exerciseName(byId.get(editing.exerciseId), editing.exerciseId) : ''}
         onClose={() => setEditingId(null)}
         onChange={(patch) => editing && day && apply((b) => updateItem(b, day.id, editing.id, patch))}

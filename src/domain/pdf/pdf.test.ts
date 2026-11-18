@@ -193,6 +193,15 @@ describe('workout table', () => {
     const ex = contentBlocks(doc).filter((b): b is Ex => b.type === 'exercise');
     expect(ex).toHaveLength(50);
   });
+  it("the client's own note on an exercise is added to that row's notes", () => {
+    const base = pdfTestCase('fifty_exercises', syntheticExercises(3, false));
+    const first = base.program?.days[0]?.items[0];
+    if (!first || !base.client) throw new Error('fixture');
+    const client = { ...base.client, exerciseNotes: { [first.exerciseId]: { note: 'ركّز على الجلوتس', maxKg: 20 } } };
+    const rows = buildContentBlocks({ ...base, client, sections: ['program'] }).filter((b): b is Ex => b.type === 'exercise');
+    expect(rows[0]?.notes).toContain('ركّز على الجلوتس · ≤ 20');
+    expect(rows[1]?.notes ?? '').not.toContain('الجلوتس');
+  });
   it('rows are compact: 50 exercises fit in at most 7 pages', () => {
     const doc = layoutPdfDocument({ ...pdfTestCase('fifty_exercises', syntheticExercises(50, true)), sections: ['program', 'muscle_map'] });
     expect(doc.pages.length).toBeLessThanOrEqual(7);

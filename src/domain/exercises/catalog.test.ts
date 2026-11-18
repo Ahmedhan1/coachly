@@ -32,6 +32,13 @@ describe('catalogFromPack cues', () => {
     expect(list.find((e) => e.id === 'A')?.cues).toEqual(['اعصر الجلوتس']);
     expect(list.find((e) => e.id === 'B')).not.toHaveProperty('cues');
   });
+
+  it('keeps the joint data from the pack and derives it when an older pack lacks it', () => {
+    const js = { knee: 'high', shoulder: 'low', lowerBack: 'low' } as const;
+    const list = catalogFromPack({ ...pack, exercises: [entry('A', { jointStress: js, homeFriendly: true }), entry('B')] }, 'exercise-pack/');
+    expect(list.find((e) => e.id === 'A')).toMatchObject({ jointStress: js, homeFriendly: true });
+    expect(list.find((e) => e.id === 'B')?.jointStress).toBeDefined();
+  });
 });
 
 describe('catalogFromPack', () => {
@@ -53,6 +60,9 @@ describe('catalogFromPack', () => {
         { kind: 'pack', path: 'exercise-pack/img/Hip_Thrust-1.webp' },
       ],
       isCustom: false,
+      // Derived by rule because this test pack has no joint data.
+      jointStress: { knee: 'low', shoulder: 'low', lowerBack: 'medium' },
+      homeFriendly: false,
     });
     expect(catalog[1]?.images).toEqual([]);
   });
