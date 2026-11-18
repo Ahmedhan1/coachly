@@ -15,7 +15,9 @@ describe('diet profile', () => {
       cycle: { enabled: true, trainingDays: [1, 3, 5], refeedDay: 6 },
       macro: { protein: { unit: 'perKg', value: 2 }, fat: { unit: 'percent', value: 25 }, carb: { unit: 'grams', value: 0 }, rest: 'carb' },
       prefs: { allergies: ['nuts'], budget: true },
+      plan: { enabled: true, targetWeightKg: 82, weeks: 16, experience: 'advanced', proteinPerKg: null },
     });
+    expect(p.plan).toEqual({ enabled: true, targetWeightKg: 82, weeks: 16, experience: 'advanced', proteinPerKg: null });
     expect(p.split).toBe('custom');
     expect(p.shares).toEqual([30, 40, 30]);
     expect(p.workoutTime).toBe('17:30');

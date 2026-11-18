@@ -53,7 +53,7 @@ export function FoodPhotosOffline({ stems }: { stems: readonly string[] }) {
           {t('nutrition.foodPhotos.downloading', { done: progress.done, total: progress.total })}
         </p>
       )}
-      {result && !running && (
+      {result && !running && (result.failed > 0 || ready) && (
         <p className={styles.body} aria-live="polite">
           {result.failed > 0 ? t('nutrition.foodPhotos.failed', { n: result.failed }) : t('nutrition.foodPhotos.done')}
         </p>

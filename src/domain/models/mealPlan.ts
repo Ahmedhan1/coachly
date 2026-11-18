@@ -39,6 +39,8 @@ export const mealSchema = z.object({
   name: shortTextSchema,
   time: timeOfDaySchema.nullable(),
   items: z.array(mealItemSchema).max(30),
+  /** Other ways to eat this meal on the same targets (from the gram planner); the client may pick one on his page. */
+  options: z.array(z.object({ items: z.array(mealItemSchema).max(30) })).max(3).optional(),
 });
 
 export const mealPlanSchema = z.object({

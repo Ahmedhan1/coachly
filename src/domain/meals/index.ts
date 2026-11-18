@@ -26,3 +26,5 @@ export * from './foodPrefs';
 export * from './weightTrend';
 export * from './dayView';
 export * from './dietProfile';
+export * from './goalSettings';
+export * from './mealOptions';

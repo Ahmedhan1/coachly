@@ -10,6 +10,8 @@ import {
   cycleTargets,
   dietNoteKeys,
   dietPlanTargets,
+  goalCoefficientsFrom,
+  goalDiet,
   goalDefaults,
   gramRecipe,
   macroControlWarnings,
@@ -34,7 +36,7 @@ import {
 } from '@/domain/meals';
 import type { Client } from '@/domain/models';
 import { t } from '@/i18n';
-import { waterIntake } from '@/domain/nutrition';
+import { waterIntake, type BodyNow } from '@/domain/nutrition';
 import { Button, EmptyState, Icon, PageHeader, SegmentedControl, Select } from '@/ui';
 import { ClientNav } from '../shared/ClientNav';
 import { Slider } from '../shared/Slider';
@@ -43,6 +45,7 @@ import { useBackTo, useClient } from '../shared/useClient';
 import { useNutritionStore, useStarterData } from '../shared/useNutritionStore';
 import { useRecipesWithNutrition } from '../meals/useRecipeLookup';
 import { CyclePanel } from './CyclePanel';
+import { GoalPanel } from './GoalPanel';
 import { DietSettingsSheet } from './DietSettingsSheet';
 import { DietWeek } from './DietWeek';
 import { MacroPanel } from './MacroPanel';
@@ -186,7 +189,35 @@ function DietView({ client, saved, settings, dietSettings, recipes, foods, heade
     () => dietPlanTargets({ saved, goal, style, percent, proteinPerKg, fatPerKg }, settings, dietSettings),
     [saved, goal, style, percent, proteinPerKg, fatPerKg, settings, dietSettings],
   );
-  const kcalTargets = useMemo(() => (kcalOverride === null ? plan.targets : withKcal(plan.targets, kcalOverride, settings.kcalPerGram)), [plan, kcalOverride, settings]);
+  // Goal planner: target weight + duration → calories (week 1, adaptive), protein from goal and body.
+  const [now] = useState(() => new Date());
+  const body: BodyNow = useMemo(
+    () => ({
+      sex: saved.input.sex,
+      ageYears: saved.input.ageYears,
+      heightCm: saved.input.heightCm,
+      weightKg: saved.input.weightKg,
+      bodyFatPercent: saved.input.bodyFatPercent ?? client.measurements.bodyFatPercent ?? null,
+      activityFactor: settings.activityFactors[saved.input.activity],
+    }),
+    [saved, client, settings],
+  );
+  const gd = useMemo(
+    () =>
+      goalDiet(
+        { body, goal, targetWeightKg: profile.plan.targetWeightKg, weeks: profile.plan.weeks, experience: profile.plan.experience, proteinPerKg: profile.plan.proteinPerKg },
+        settings,
+        dietSettings,
+      ),
+    [body, goal, profile.plan, settings, dietSettings],
+  );
+  const baseTargets = profile.plan.enabled ? gd.targets : plan.targets;
+  const setPlan = (p: DietProfile['plan']) => {
+    setKcalOverride(null);
+    setKcalText(null);
+    setProfile({ ...profile, plan: p });
+  };
+  const kcalTargets = useMemo(() => (kcalOverride === null ? baseTargets : withKcal(baseTargets, kcalOverride, settings.kcalPerGram)), [baseTargets, kcalOverride, settings]);
   // The trainer's own macro split (grams / g per kg / %) divides the same calories.
   const specTargets = useMemo(() => (profile.macro ? macroTargetsFromSpec(kcalTargets.kcal, weightKg, profile.macro, kpg) : null), [profile.macro, kcalTargets, weightKg, kpg]);
   const targets = useMemo(
@@ -295,7 +326,7 @@ function DietView({ client, saved, settings, dietSettings, recipes, foods, heade
             <input type="checkbox" checked={vegetarian} onChange={(e) => setVegetarian(e.target.checked)} />
             {t('nutrition.diet.vegetarian')}
           </label>
-          {(goal === 'cut' || goal === 'bulk') && (
+          {(goal === 'cut' || goal === 'bulk') && !profile.plan.enabled && (
             <Slider
               label={goal === 'cut' ? t('nutrition.diet.percentCut') : t('nutrition.diet.percentBulk')}
               value={percent}
@@ -306,11 +337,28 @@ function DietView({ client, saved, settings, dietSettings, recipes, foods, heade
               display={`${percent}%`}
             />
           )}
-          {!profile.macro && (
+          {!profile.macro && !profile.plan.enabled && (
             <>
               <Slider label={t('nutrition.diet.proteinPerKg')} value={proteinPerKg} min={settings.proteinPerKgRange.min} max={settings.proteinPerKgRange.max} step={0.1} onChange={setProteinPerKg} display={String(Math.round(proteinPerKg * 10) / 10)} />
               <Slider label={t('nutrition.diet.fatPerKg')} value={fatPerKg} min={settings.fatPerKgRange.min} max={settings.fatPerKgRange.max} step={0.1} onChange={setFatPerKg} display={String(Math.round(fatPerKg * 10) / 10)} />
             </>
+          )}
+        </div>
+      </section>
+
+      <section className={common.section} aria-label={t('nutrition.goal.title')}>
+        <div className={common.tile}>
+          <h2 className={common.sectionTitle}>{t('nutrition.goal.title')}</h2>
+          <label className={styles.check}>
+            <input
+              type="checkbox"
+              checked={profile.plan.enabled}
+              onChange={(e) => setPlan({ ...profile.plan, enabled: e.target.checked, ...(client.trainingProfile?.level && !profile.plan.enabled ? { experience: client.trainingProfile.level } : {}) })}
+            />
+            {t('nutrition.goal.enable')}
+          </label>
+          {profile.plan.enabled && (
+            <GoalPanel body={body} goal={goal} state={profile.plan} diet={gd} coeffs={goalCoefficientsFrom(dietSettings)} settings={settings} now={now} onChange={setPlan} />
           )}
         </div>
       </section>

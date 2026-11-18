@@ -12,7 +12,8 @@ export type ShareDocumentV1 = {
     title: string;
     exercises: Array<{ name: string; sets?: number; reps?: string; restSec?: number; tempo?: string; rpe?: number; image?: string; notes?: string }>;
   }>;
-  meals: Array<{ title: string; time?: string; items: string[]; notes?: string }>;
+  /** `options`: other ways to eat the meal on the same numbers; the client picks one on his page (optional). */
+  meals: Array<{ title: string; time?: string; items: string[]; notes?: string; options?: Array<{ items: string[] }> }>;
   supplements: Array<{ name: string; text: string }>;
   notes: string;
   checkinsEnabled: boolean;
@@ -92,6 +93,18 @@ const DATE = /^\d{4}-\d{2}-\d{2}$/;
 const num = (v: number | undefined, min: number, max: number) => (v !== undefined && Number.isFinite(v) && v >= min && v <= max ? v : undefined);
 
 /** Drops anything outside the Worker guard's ranges so one odd value never blanks the whole page. */
+/** Caps a meal's optional choices (≤ 3, ≤ 30 lines of ≤ 200 chars); drops empty ones. */
+function cleanMeal(m: ShareDocumentV1['meals'][number]): ShareDocumentV1['meals'][number] {
+  if (!m.options) return m;
+  const options = m.options
+    .slice(0, 3)
+    .map((o) => ({ items: o.items.slice(0, 30).map((i) => cut(i, 200)).filter(Boolean) }))
+    .filter((o) => o.items.length > 0);
+  const rest = { ...m };
+  delete rest.options;
+  return options.length > 0 ? { ...rest, options } : rest;
+}
+
 function cleanExtras(x: ShareExtras): ShareExtras {
   const out: ShareExtras = {};
   if (x.lang === 'en') out.lang = 'en';
@@ -113,7 +126,7 @@ function cleanExtras(x: ShareExtras): ShareExtras {
   }
   if (x.mealDays?.length) {
     out.mealDays = x.mealDays.slice(0, 7).map((d) => {
-      const day: NonNullable<ShareExtras['mealDays']>[number] = { title: cut(d.title, 80), meals: d.meals.slice(0, 12) };
+      const day: NonNullable<ShareExtras['mealDays']>[number] = { title: cut(d.title, 80), meals: d.meals.slice(0, 12).map(cleanMeal) };
       const k = num(d.kcal, 0, 20_000);
       if (k !== undefined) day.kcal = Math.round(k);
       return day;
@@ -158,7 +171,8 @@ export function buildShareDocument(s: ShareSources): ShareDocumentV1 {
   const meals = (s.mealPlan?.meals ?? []).slice(0, 12).map((m) => {
     const meal: ShareDocumentV1['meals'][number] = { title: cut(m.name, 80) || '—', items: m.items.slice(0, 30).map((i) => cut(s.mealItem(i), 200)).filter(Boolean) };
     if (m.time) meal.time = cut(m.time, 20);
-    return meal;
+    const options = (m.options ?? []).slice(0, 3).map((o) => ({ items: o.items.slice(0, 30).map((i) => cut(s.mealItem(i), 200)).filter(Boolean) }));
+    return cleanMeal(options.length > 0 ? { ...meal, options } : meal);
   });
   const doc: ShareDocumentV1 = {
     v: 1,

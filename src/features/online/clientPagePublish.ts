@@ -28,6 +28,12 @@ const mealsOf = (plan: MealPlan, recipeName: ReadonlyMap<string, string>): Share
         .filter(Boolean),
     };
     if (m.time) meal.time = m.time;
+    // Other ways to eat this meal (same numbers): the client picks one on his page.
+    const options = (m.options ?? [])
+      .slice(0, 3)
+      .map((o) => ({ items: o.items.flatMap((i) => itemRows(i, recipeName)).slice(0, 30).map((s) => s.trim().slice(0, 200)).filter(Boolean) }))
+      .filter((o) => o.items.length > 0);
+    if (options.length > 0) meal.options = options;
     return meal;
   });
 

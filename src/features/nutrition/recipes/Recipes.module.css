@@ -45,6 +45,15 @@
   flex: 1;
 }
 
+/* The picture keeps its size; the name field takes the rest. */
+.ingTop > .ingIcon {
+  flex: none;
+}
+
+.ingTop > .ingIcon + * {
+  flex: 1;
+}
+
 .ingGrid {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));

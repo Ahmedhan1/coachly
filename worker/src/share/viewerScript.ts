@@ -35,6 +35,8 @@ var AR = {
   goal: 'هدفك',
   noProgram: 'لسه المدرب ما حطش برنامج. هيظهر هنا أول ما يجهّزه.',
   noMeals: 'لسه مفيش خطة أكل. هتظهر هنا أول ما المدرب يجهّزها.',
+  mealOption: 'اختيار ',
+  mealOptionsHint: 'اختار اللي يعجبك، كلهم نفس السعرات والبروتين.',
   supplements: 'المكملات',
   notes: 'ملاحظات المدرب',
   setsTotal: ' سيت',
@@ -142,6 +144,8 @@ var EN = {
   goal: 'Your goal',
   noProgram: 'Your coach has not added a program yet. It shows here once it is ready.',
   noMeals: 'No meal plan yet. It shows here once your coach prepares it.',
+  mealOption: 'Option ',
+  mealOptionsHint: 'Pick the one you like; they all have the same calories and protein.',
   supplements: 'Supplements',
   notes: 'Coach notes',
   setsTotal: ' sets',
@@ -541,17 +545,46 @@ function targetsCard(t) {
   if (isNum(t.waterMinMl) && isNum(t.waterMaxMl)) card.appendChild(el('p', 'sub', T.water + fmt(t.waterMinMl / 1000) + '–' + fmt(t.waterMaxMl / 1000) + T.liter));
   return card;
 }
-function mealCards(meals) {
+/** The client's own pick among a meal's options, kept on this phone only. */
+function mealPickKey(day, meal) { return 'pt.mealPick.' + location.pathname + '.' + day + '.' + meal; }
+function readPick(day, meal, n) {
+  try {
+    var v = Number(localStorage.getItem(mealPickKey(day, meal)));
+    return v >= 0 && v < n && Math.floor(v) === v ? v : 0;
+  } catch (e) { return 0; }
+}
+function savePick(day, meal, i) {
+  try { localStorage.setItem(mealPickKey(day, meal), String(i)); } catch (e) { /* private mode: choice lasts this visit */ }
+}
+function itemList(items) {
+  var ul = el('ul', 'items');
+  arr(items).forEach(function (it) { if (isStr(it, 200)) ul.appendChild(el('li', '', it)); });
+  return ul;
+}
+function mealCards(meals, dayIndex) {
   var box = el('div');
-  meals.forEach(function (m) {
+  meals.forEach(function (m, mi) {
     if (!m) return;
     var card = el('div', 'card');
     var h = el('h3', '', isStr(m.title, 80) ? m.title : '');
     if (isStr(m.time, 20) && m.time) h.appendChild(el('span', 'time', m.time));
     card.appendChild(h);
-    var ul = el('ul', 'items');
-    arr(m.items).forEach(function (it) { if (isStr(it, 200)) ul.appendChild(el('li', '', it)); });
-    card.appendChild(ul);
+    var choices = [m.items].concat(arr(m.options).filter(function (o) { return o && Array.isArray(o.items); }).slice(0, 3).map(function (o) { return o.items; }));
+    if (choices.length > 1) {
+      var holder = el('div');
+      var show = function (i) {
+        holder.textContent = '';
+        holder.appendChild(itemList(choices[i]));
+        savePick(dayIndex || 0, mi, i);
+      };
+      var start = readPick(dayIndex || 0, mi, choices.length);
+      card.appendChild(el('p', 'sub', T.mealOptionsHint));
+      card.appendChild(pills(choices.map(function (_, i) { return T.mealOption + (i + 1); }), start, -1, show));
+      card.appendChild(holder);
+      show(start);
+    } else {
+      card.appendChild(itemList(m.items));
+    }
     if (isStr(m.notes, 500) && m.notes) card.appendChild(el('p', 'sub', m.notes));
     box.appendChild(card);
   });
@@ -571,7 +604,7 @@ function mealsSection(doc) {
     var d = days[i];
     if (!d) return;
     if (isNum(d.kcal) && days.length > 1) holder.appendChild(el('p', 'sub', Math.round(d.kcal) + T.dayKcal));
-    holder.appendChild(mealCards(d.meals));
+    holder.appendChild(mealCards(d.meals, i));
   };
   if (days.length > 1) s.appendChild(pills(days.map(function (d, i) { return isStr(d.title, 80) && d.title ? d.title : String(i + 1); }), 0, -1, showDay));
   s.appendChild(holder);

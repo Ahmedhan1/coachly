@@ -8,7 +8,7 @@ import { recipeIconHex } from '@/domain/meals';
 import type { Recipe } from '@/domain/models';
 import { t } from '@/i18n';
 import { pick } from '@/i18n/locale';
-import { Badge, Button, EmptyState, IconButton, ListRow, ListSection, PageHeader, SearchField, SwipeRow } from '@/ui';
+import { Button, EmptyState, IconButton, ListRow, ListSection, PageHeader, SearchField, SwipeRow } from '@/ui';
 import { useRecipesWithNutrition } from '../meals/useRecipeLookup';
 import { gramsText, kcalText } from '../shared/numbers';
 import { FoodPhotosOffline } from '../shared/FoodPhotosOffline';
@@ -114,7 +114,6 @@ export function RecipesScreen() {
                     ? t('nutrition.bookBrowse.meta', { kcal: kcalText(perServing.kcal), p: gramsText(perServing.proteinG), min: recipe.prepMin })
                     : t('nutrition.bookBrowse.metaNoTime', { kcal: kcalText(perServing.kcal), p: gramsText(perServing.proteinG) })
                 }
-                trailing={starterSet.has(recipe.id) ? <Badge>{t('nutrition.book.starter')}</Badge> : undefined}
                 onClick={() => setEditing(recipe)}
               />
             </SwipeRow>
@@ -123,7 +122,7 @@ export function RecipesScreen() {
       )}
       {query && shown.length === 0 && <p className={styles.none}>{t('nutrition.recipes.noMatch')}</p>}
       {!query && isFiltered(filter) && shown.length === 0 && <p className={styles.none}>{t('nutrition.bookBrowse.noMatch')}</p>}
-      {photoStems.length > 0 && <FoodPhotosOffline stems={photoStems} />}
+      {ready && photoStems.length > 0 && <FoodPhotosOffline stems={photoStems} />}
       {hasStarter && (
         <div className={common.actions}>
           <Button variant="plain" icon="trash" onClick={() => void removeStarter()}>

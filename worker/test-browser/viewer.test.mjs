@@ -129,6 +129,21 @@ try {
     assert.ok((await page.textContent('#p-meals')).includes('شوفان'));
   });
 
+  await step('meal options: the client picks one, its foods show, and the pick is remembered on this phone', async () => {
+    await page.click('#p-meals .pill >> nth=0');
+    const lunch = page.locator('#p-meals .card', { hasText: 'الغدا' });
+    assert.ok((await lunch.textContent()).includes('200 جم فراخ'));
+    await lunch.locator('.pill', { hasText: 'اختيار 2' }).click();
+    assert.ok((await lunch.textContent()).includes('250 جم سمك بلطي'));
+    assert.ok(!(await lunch.textContent()).includes('200 جم فراخ'));
+    await page.screenshot({ path: join(shotDir, 'viewer-meal-options.png'), fullPage: true });
+    await page.reload();
+    await page.click('#t-p-meals');
+    const again = page.locator('#p-meals .card', { hasText: 'الغدا' });
+    assert.ok((await again.textContent()).includes('250 جم سمك بلطي'));
+    assert.equal(await again.locator('.pill', { hasText: 'اختيار 2' }).getAttribute('aria-pressed'), 'true');
+  });
+
   await step('progress tab draws the weight trend and records', async () => {
     await page.click('#t-p-progress');
     const text = await page.textContent('#p-progress');

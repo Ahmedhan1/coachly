@@ -7,6 +7,8 @@ import {
   dishAlternatives,
   fiberTarget,
   fillRatio,
+  mealOptions,
+  withMealOption,
   nextDayNumber,
   nudgeStep,
   recipeIconHex,
@@ -23,6 +25,7 @@ import {
   type GramPlanOptions,
   type GramRecipe,
   type IngredientEntry,
+  type GramMeal,
   type LineRef,
   type MacroTargets,
 } from '@/domain/meals';
@@ -108,16 +111,23 @@ export function DietWeek({ client, week, book, recipes, foods, perServing, targe
       let n = nextDayNumber(replace ? [] : (existing ?? []).map((p) => (/\d+/.exec(p.name) ? Number(/\d+/.exec(p.name)?.[0]) : null)));
       const created: string[] = [];
       const notes = noteKeys.map((k) => `• ${t(`nutrition.diet.notes.${k}` as 'nutrition.diet.notes.water')}`).join('\n');
+      const itemsOf = (m: GramMeal): Meal['items'] =>
+        m.dishes.map((dish) => {
+          const s = savedDish(dish, perServing.get(dish.recipeId) ?? 0);
+          return { recipeId: s.recipeId as Meal['items'][number]['recipeId'], text: '', servings: s.servings, lines: s.lines };
+        });
       for (const [index, d] of days.entries()) {
-        const meals: Meal[] = d.meals.map((m) => ({
-          id: newId() as Meal['id'],
-          name: t(`nutrition.diet.slot.${m.slot.label}`),
-          time: m.slot.time as Meal['time'],
-          items: m.dishes.map((dish) => {
-            const s = savedDish(dish, perServing.get(dish.recipeId) ?? 0);
-            return { recipeId: s.recipeId as Meal['items'][number]['recipeId'], text: '', servings: s.servings, lines: s.lines };
-          }),
-        }));
+        const meals: Meal[] = d.meals.map((m, mi) => {
+          // The other ways to eat this meal (same targets): the client can pick one on his page.
+          const others = mealOptions(book, d, mi, options, ds, 3).slice(1);
+          return {
+            id: newId() as Meal['id'],
+            name: t(`nutrition.diet.slot.${m.slot.label}`),
+            time: m.slot.time as Meal['time'],
+            items: itemsOf(m),
+            ...(others.length > 0 ? { options: others.map((o) => ({ items: itemsOf(o.meal) })) } : {}),
+          };
+        });
         const created1 = await repos.mealPlans.create({
           clientId: client.id,
           name: t('nutrition.plan.dayName', { n: n++ }),
@@ -194,6 +204,19 @@ export function DietWeek({ client, week, book, recipes, foods, perServing, targe
                   <Tx k="nutrition.diet.mealOf" params={{ kcal: m.totals.kcal, target: Math.round(m.target.kcal) }} />
                 </p>
               </header>
+              <MealChoices
+                book={book}
+                day={day}
+                mealIndex={mi}
+                options={options}
+                ds={ds}
+                name={recipeName}
+                onPick={(o) => change(withMealOption(day, mi, o, ds))}
+                onAuto={() => {
+                  const id = week[selected]?.meals[mi]?.dishes[0]?.recipeId;
+                  if (id && id !== m.dishes[0]?.recipeId) change(swapDish(day, book, mi, 0, id, ds));
+                }}
+              />
               <Bar value={m.totals.kcal} target={m.target.kcal} tolerance={ds.kcalTolerancePercent * 2} label={t('nutrition.cal.mealBar', { kcal: m.totals.kcal, target: Math.round(m.target.kcal) })} />
               {m.dishes.map((dish, di) => {
                 const r = byId.get(dish.recipeId);
@@ -426,6 +449,34 @@ function DayBars({ day, water }: { day: GramDay; water: { minMl: number; maxMl: 
           </div>
         )}
       </dl>
+    </div>
+  );
+}
+
+/** 2–3 ways to eat this meal on the same numbers; the trainer taps one (or lets the planner pick). */
+function MealChoices(props: {
+  book: GramRecipe[];
+  day: GramDay;
+  mealIndex: number;
+  options: GramPlanOptions;
+  ds: DietSettings;
+  name: (id: string) => string;
+  onPick: (o: ReturnType<typeof mealOptions>[number]) => void;
+  onAuto: () => void;
+}) {
+  const { book, day, mealIndex, options, ds, name, onPick, onAuto } = props;
+  const list = useMemo(() => mealOptions(book, day, mealIndex, options, ds, 3), [book, day, mealIndex, options, ds]);
+  if (list.length < 2) return null;
+  return (
+    <div className={cal.chips} role="group" aria-label={t('nutrition.goal.optionsTitle')}>
+      {list.map((o, i) => (
+        <button key={o.recipeId} type="button" className={cal.chip} aria-pressed={i === 0} onClick={() => i > 0 && onPick(o)} title={t('nutrition.goal.option', { n: i + 1 })}>
+          {name(o.recipeId)} · <bdi className="num">{o.meal.totals.kcal}</bdi>
+        </button>
+      ))}
+      <button type="button" className={cal.chip} onClick={onAuto}>
+        {t('nutrition.goal.pickForMe')}
+      </button>
     </div>
   );
 }

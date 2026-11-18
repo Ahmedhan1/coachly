@@ -55,6 +55,35 @@ describe('buildShareDocument', () => {
   });
 });
 
+describe('meal options for the client to pick', () => {
+  it('carries up to 3 options per meal; the Worker accepts them; old documents (no options) still pass', () => {
+    const item = (text: string) => ({ recipeId: null, text, servings: 1 });
+    const mealPlan = {
+      meals: [{ id: 'm', name: 'غدا', time: '14:00', items: [item('فراخ ورز')], options: [{ items: [item('سمك ورز')] }, { items: [item('كفتة وبطاطس')] }, { items: [item('تونة')] }, { items: [item('زيادة')] }] }],
+    } as unknown as MealPlan;
+    const doc = buildShareDocument({
+      now: 0,
+      trainerName: 'x',
+      color: '#F25C1F',
+      client: { name: 'علي' },
+      program: null,
+      exercise: () => ({ name: '', imageFile: null }),
+      dayTitle: () => '',
+      mealPlan,
+      mealItem: (i) => i.text,
+      supplements: [],
+      notes: '',
+      checkinsEnabled: false,
+    });
+    expect(doc.meals[0]?.options).toEqual([{ items: ['سمك ورز'] }, { items: ['كفتة وبطاطس'] }, { items: ['تونة'] }]);
+    expect(parseWorkerDoc(doc)).not.toBeNull();
+    const old = { ...doc, meals: [{ title: 'غدا', items: ['فراخ ورز'] }] };
+    expect(parseWorkerDoc(old)).not.toBeNull();
+    const bad = { ...doc, meals: [{ title: 'غدا', items: ['x'], options: [{ items: 'nope' }] }] };
+    expect(parseWorkerDoc(bad)).toBeNull();
+  });
+});
+
 describe('parseCheckin', () => {
   it('accepts a valid check-in and rejects out-of-range values', () => {
     expect(parseCheckin({ v: 1, kind: 'checkin', createdAt: 1_700_000_000, weightKg: 80.5, notes: 'تمام' })).toEqual({ v: 1, kind: 'checkin', createdAt: 1_700_000_000, weightKg: 80.5, notes: 'تمام' });
