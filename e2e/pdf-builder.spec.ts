@@ -74,7 +74,17 @@ test('PDF: every section on its own renders', async ({ page }) => {
   await expect(page.getByRole('tablist', { name: 'الأيام' })).toBeVisible();
   await page.goto(`/clients/${id}/supplements?standalone=1`);
   await page.getByRole('button', { name: 'ضيف من الكتالوج' }).first().click();
-  await page.getByRole('dialog', { name: 'اختار منتج' }).getByRole('button').filter({ hasNotText: /إلغاء|إغلاق/ }).first().click();
+  // On a fresh install the starter catalog may still be loading: wait for a product row, not the "open catalog" button.
+  const picker = page.getByRole('dialog', { name: 'اختار منتج' });
+  const product = picker.getByRole('listitem').getByRole('button').first();
+  await expect(async () => {
+    if (!(await product.isVisible())) {
+      await page.keyboard.press('Escape');
+      await page.getByRole('button', { name: 'ضيف من الكتالوج' }).first().click();
+    }
+    await expect(product).toBeVisible({ timeout: 2_000 });
+  }).toPass({ timeout: 30_000 });
+  await product.click();
   await expect(page.getByRole('status').filter({ hasText: /^اتضاف / })).toBeVisible();
   await page.goto(`/more/pdf?client=${id}&standalone=1`);
   await page.getByLabel(/تعليمات وملاحظات للعميل/).fill('اشرب مية كتير ونام 8 ساعات.');
