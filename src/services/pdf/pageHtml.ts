@@ -130,7 +130,8 @@ export function blockHtml(b: PdfBlock, urlOf: UrlOf, color: string, ctx: BlockCo
       return (
         `<div class="blk b-ex${b.withMap ? ' wm' : ''}${b.index % 2 === 0 ? ' even' : ''}${b.last ? ' last' : ''}${b.superset ? ' ss' : ''}">` +
         `<div class="c-i"><span class="n"><bdi dir="ltr">${b.index}</bdi></span></div>` +
-        `<div class="c-p">${b.image ? img(urlOf(b.image), 'pic', b.name) : '<div class="pic ph"></div>'}</div>` +
+        `<div class="c-p">${b.image ? img(urlOf(b.image), b.imageIsMuscleMap ? 'pic mm' : 'pic', b.name) : '<div class="pic ph"></div>'}` +
+        `${b.image && b.imageCredit ? `<div class="cr">${bdi(b.imageCredit)}</div>` : ''}</div>` +
         `<div class="c-n"><div class="nm">${esc(b.name)}</div>` +
         (b.secondaryName ? `<div class="en">${bdi(b.secondaryName)}</div>` : '') +
         (b.muscles ? `<div class="mus">${b.muscles.split(/[،,] /).map((m) => `<span>${esc(m)}</span>`).join('')}</div>` : '') +

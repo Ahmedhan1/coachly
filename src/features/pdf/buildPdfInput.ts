@@ -23,7 +23,10 @@ export interface PdfSources {
   recipes: readonly Recipe[];
   supplements: readonly Supplement[];
   progress: readonly ProgressEntry[];
-  /** Muscle map picture per exercise id (only when the muscle_map section is on). */
+  /**
+   * Muscle picture per exercise id: every exercise when the muscle_map section is on, and always the ones
+   * without a photo (the picture then takes the photo's place in the exercise row).
+   */
   muscleMaps?: ReadonlyMap<string, PdfImageRef>;
 }
 

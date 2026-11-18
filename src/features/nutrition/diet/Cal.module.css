@@ -323,3 +323,14 @@
   color: var(--text-2);
   font: 500 11px/1.4 var(--font-ui);
 }
+
+.phaseList {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  color: var(--text-2);
+  font: var(--t-caption);
+}

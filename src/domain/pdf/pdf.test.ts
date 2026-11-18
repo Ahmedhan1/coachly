@@ -289,6 +289,42 @@ describe('presets and catalog mapping', () => {
     expect(e).toMatchObject({ name: 'Barbell Back Squat', secondaryName: 'سكوات بالبار', muscles: ['Glutes'], image: null });
   });
 
+  it('an exercise without a photo uses its muscle picture instead (never an empty box); credits travel with pack photos', () => {
+    const base = {
+      id: 'pt_X', nameEn: 'X', nameAr: 'إكس', primaryMuscles: ['quads'] as const, secondaryMuscles: [] as const,
+      equipment: 'bands' as const, level: 'beginner' as const, category: 'strength' as const, force: null, mechanic: null, isCustom: false,
+    };
+    const map = { kind: 'url' as const, url: 'data:image/png;base64,AAAA' };
+    const noPhoto = pdfExerciseFromCatalog({ ...base, images: [] }, map, '');
+    expect(noPhoto).toMatchObject({ image: map, imageIsMuscleMap: true, imageCredit: null });
+    expect(pdfExerciseFromCatalog({ ...base, images: [] }, null, '')).toMatchObject({ image: null, imageIsMuscleMap: false });
+    const credited = pdfExerciseFromCatalog(
+      { ...base, images: [{ kind: 'pack', path: 'img/pt_X-0.webp' }], imageCredit: 'Everkinetic, CC BY-SA 4.0' },
+      map,
+      '',
+    );
+    expect(credited).toMatchObject({ image: { kind: 'pack', path: 'img/pt_X-0.webp' }, imageIsMuscleMap: false, imageCredit: 'Everkinetic, CC BY-SA 4.0' });
+    const own = pdfExerciseFromCatalog({ ...base, images: [{ kind: 'stored', imageId: 'i1' }], imageCredit: 'Everkinetic, CC BY-SA 4.0' }, null, '');
+    expect(own.imageCredit).toBeNull();
+  });
+
+  it('exercise rows carry the stand-in picture and the credit, and a credit makes the row taller', () => {
+    const input = pdfTestCase('max_branding', syntheticExercises(2, false));
+    const [firstId, secondId] = [...input.exercises.keys()];
+    const exercises = new Map(input.exercises);
+    const map = { kind: 'url' as const, url: 'data:image/png;base64,AAAA' };
+    exercises.set(firstId!, { ...exercises.get(firstId!)!, image: map, imageIsMuscleMap: true });
+    exercises.set(secondId!, { ...exercises.get(secondId!)!, imageCredit: 'Everkinetic, CC BY-SA 4.0' });
+    const rows = buildContentBlocks({ ...input, exercises, sections: ['program'] }).filter(
+      (b): b is Extract<PdfBlock, { type: 'exercise' }> => b.type === 'exercise',
+    );
+    const a = rows.find((r) => r.imageIsMuscleMap);
+    const b = rows.find((r) => r.imageCredit);
+    expect(a?.image).toEqual(map);
+    expect(b?.imageCredit).toBe('Everkinetic, CC BY-SA 4.0');
+    expect(estimateBlockHeight({ ...b!, last: false })).toBeGreaterThan(estimateBlockHeight({ ...b!, imageCredit: null, last: false }));
+  });
+
   it('progress summary: weights sorted, first/last photos', () => {
     const input = pdfTestCase('max_branding', syntheticExercises(4, true));
     const s = progressSummary([...input.progress].reverse());

@@ -26,6 +26,8 @@ export const LOGO_BOXES = {
 
 /** Image box sizes the renderer uses (kept here so estimates match). */
 export const EXERCISE_IMAGE_PX = 60;
+/** Height of the small photo-credit line under an exercise image (CC BY-SA sources). */
+export const CREDIT_PX = 16;
 export const MUSCLE_MAP_PX = 52;
 /** Exercise table columns (CSS px); the name column takes the rest. */
 export const TABLE_COLS = { index: 30, image: 72, setsReps: 96, rest: 64, details: 128, map: 64 } as const;
@@ -101,7 +103,7 @@ export function estimateBlockHeight(block: PdfBlock): number {
         (block.muscles ? 22 : 0);
       const details =
         block.extras.length * 19 + (block.notes ? textHeight(block.notes, FONT.small - 1, C.details - 12) : 0) + (block.superset ? 22 : 0);
-      h = Math.max(EXERCISE_IMAGE_PX, block.muscleMap ? MUSCLE_MAP_PX : 0, text, details, 40) + ROW_PAD_PX + 1;
+      h = Math.max(EXERCISE_IMAGE_PX + (block.imageCredit ? CREDIT_PX : 0), block.muscleMap ? MUSCLE_MAP_PX : 0, text, details, 40) + ROW_PAD_PX + 1;
       return h + (block.last ? BLOCK_GAP_PX : 0);
     }
     case 'measureTable':

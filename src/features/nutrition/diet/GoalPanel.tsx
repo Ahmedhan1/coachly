@@ -151,7 +151,7 @@ export function GoalPanel({ body, goal, state, diet, coeffs, settings, now, onCh
       {moving && plan.phases.length > 1 && (
         <>
           <p className={styles.rowName}>{t('nutrition.goal.phasesTitle')}</p>
-          <ul className={styles.shopList}>
+          <ul className={styles.phaseList}>
             {plan.phases.map((p) => (
               <li key={p.fromWeek}>
                 <Tx k="nutrition.goal.phase" params={{ from: p.fromWeek, to: p.toWeek, kcal: p.kcal }} />
