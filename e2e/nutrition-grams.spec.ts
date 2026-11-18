@@ -98,6 +98,8 @@ test('English: the diet shows English food names, slots and units', async ({ pag
   await page.goto(`/clients/${id}/nutrition?standalone=1`);
   await page.getByLabel('Age').fill('30');
   await page.getByRole('button', { name: 'Save for client' }).click();
+  // Leave only once the calories are stored (the diet is built on them).
+  await expect(page.getByText(/Saved calories for/)).toBeVisible();
   await page.goto(`/clients/${id}/diet?standalone=1`);
   const breakfast = page.getByRole('region', { name: 'Breakfast' }).first();
   // The starter cookbook may still be seeding on a fresh install.

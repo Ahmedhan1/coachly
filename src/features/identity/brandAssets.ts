@@ -158,5 +158,3 @@ export async function clientPageLogo(services: Pick<AppServices, 'data'>): Promi
   }
 }
 
-/** Meta key: the "re-add the app to see the new icon" hint was shown once. */
-export const ICON_HINT_KEY = 'identity.iconHintShown';

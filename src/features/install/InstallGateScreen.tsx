@@ -8,6 +8,7 @@ import {
   SafariBarIllustration,
   ShareSheetIllustration,
 } from './Illustrations';
+import { BrandIconCard } from './BrandIconCard';
 import { detectPlatform, type PlatformInfo } from './platform';
 import styles from './InstallGateScreen.module.css';
 
@@ -128,6 +129,8 @@ export function InstallGateScreen({ platform: forced }: { platform?: PlatformInf
           </div>
         </div>
       )}
+
+      {mobile && !prompt.installed && <BrandIconCard />}
 
       {info.platform === 'ios' && <Steps steps={IOS_STEPS} />}
       {info.platform === 'android' && <Steps steps={ANDROID_STEPS} />}

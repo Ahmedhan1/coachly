@@ -37,6 +37,13 @@ Can see: license id, device fingerprint, activation code hash, the buyer's name 
 enters these), push subscription, notification time slots and generic text, encrypted blob sizes and
 timestamps, request IPs (Cloudflare logs).
 
+Also, only when the trainer chooses a logo on the install page (or asks for a "new icon" link inside the app):
+the generated home-screen icon set (180 px and 512 px icons, the logo ≤ 512 px, one launch image) and the brand
+colour, stored unencrypted in the app's D1 (`brands`, `brand_assets`) under a content hash, because iOS has to
+fetch them itself at "Add to Home Screen". Nothing else goes with them: no name, no device id, no license. The
+upload endpoint (`POST /api/brand`, deploy/app/src/brand.ts) accepts only same-origin requests with exact-size
+PNGs under fixed caps, and is rate-limited per IP (12 a day) and in total (1500 a day).
+
 Cannot see: any client name, phone, measurement, photo, program, payment, or note; the backup password; the
 client-page key. A full dump of D1 + R2 gives an attacker ciphertext only.
 
