@@ -53,7 +53,7 @@ for (const [w, h] of [
   }
 }
 
-test('food photos: offline download stores every photo, and a broken photo falls back to the icon', async ({ page }) => {
+test('food photos: offline download stores every photo', async ({ page }) => {
   await page.setViewportSize({ width: 412, height: 915 });
   await recipeBook(page);
   const box = page.getByTestId('food-photos-offline');
@@ -63,17 +63,14 @@ test('food photos: offline download stores every photo, and a broken photo falls
   await expect(box.getByText(/كل صور الأكل متخزنة/)).toBeVisible({ timeout: 20_000 });
   await page.screenshot({ path: `${SHOTS}/offline-done.png` });
 
-  // A missing photo file shows the illustration instead of a broken image.
-  await page.route('**/food-img/photos/*.webp', (route) => route.fulfill({ status: 404, body: '' }));
-  await page.evaluate(async () => {
-    for (const key of await caches.keys()) await caches.delete(key);
-  });
+  // Offline: a recipe far down the list (never shown before) still shows its photo.
+  await page.context().setOffline(true);
   await page.reload();
-  await expect(page.locator('[data-kind="icon"] img').first()).toBeVisible();
-  await expect(page.locator('[data-kind="photo"]')).toHaveCount(0, { timeout: 10_000 });
-
-  // Food table rows show photos too.
-  await page.unroute('**/food-img/photos/*.webp');
+  await page.getByRole('searchbox', { name: 'دوّر على وصفة' }).fill('harira');
+  const photo = page.locator('[data-kind="photo"] img').first();
+  await expect(photo).toBeVisible();
+  await expect.poll(() => photo.evaluate((img: HTMLImageElement) => img.complete && img.naturalWidth > 0)).toBe(true);
+  await page.context().setOffline(false);
 });
 
 test('food table shows food photos', async ({ page }) => {
@@ -84,4 +81,17 @@ test('food table shows food photos', async ({ page }) => {
   await expect(photo).toBeVisible();
   await expect.poll(() => photo.evaluate((img: HTMLImageElement) => img.complete && img.naturalWidth > 0)).toBe(true);
   await page.screenshot({ path: `${SHOTS}/foods-412.png` });
+});
+
+test.describe('photo fallback', () => {
+  test.use({ serviceWorkers: 'block' });
+  test('a photo that fails to load shows the illustration, never a broken image', async ({ page }) => {
+    await page.route('**/food-img/photos/*.webp', (route) => route.fulfill({ status: 404, body: '' }));
+    await page.setViewportSize({ width: 412, height: 915 });
+    await recipeBook(page);
+    await expect(page.locator('[data-kind="icon"] img').first()).toBeVisible();
+    // Rows on screen (lazy images below the fold never load) all switched to the illustration.
+    for (let i = 0; i < 5; i++) await expect(page.locator('[data-kind]').nth(i)).toHaveAttribute('data-kind', 'icon');
+    await page.screenshot({ path: `${SHOTS}/fallback-icons.png` });
+  });
 });

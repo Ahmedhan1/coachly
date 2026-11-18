@@ -223,8 +223,28 @@ Other agents are adding dependencies in `worker/` and the root **right now**. At
 - **free-exercise-db upstream checked again (2026-11-18):** `dist/exercises.json` still has 876 exercises, the same
   ids as our copy; its 3 entries without photos (Kettlebell Halo ×2, Kettlebell Overhead Triceps Extension) still
   have none upstream.
-- Not used: wger images (CC-BY-SA, and the project rule says never copy from wger), Everkinetic illustrations
-  (CC-BY-SA 3.0, would need share-alike attribution per image) — left for an owner decision.
+- Not used: wger images (the project rule says never copy from wger).
+
+### Everkinetic drawings — <https://github.com/everkinetic/data> (CC BY-SA 4.0)
+
+- **License:** Creative Commons Attribution-ShareAlike 4.0 (repo `LICENSE.md`, read 2026-11-18). "Open data project
+  based on everkinetic.com created by Greg Priday." Owner decision (wave 5): photos with attribution are fine.
+- **Used (8 files, 4 exercises), each checked by eye on a contact sheet:** converted with
+  `scripts/everkinetic-to-pack.py` (trimmed, centred on a white 480×320 canvas, WebP q70, 6–10 KB each). Our
+  conversion is an adaptation; it stays under CC BY-SA 4.0 (share-alike applies to these image files only).
+
+| Pack files | Everkinetic source | Exercise |
+| --- | --- | --- |
+| `pt_Barbell_Reverse_Lunge-0/1.webp` | `dist/png/0128-relaxation/tension.png` "Lunges: Barbell (Rear)" | Barbell Reverse Lunge |
+| `pt_Band_Biceps_Curl-0/1.webp` | `dist/png/0261-relaxation/tension.png` "Quick Alternating Biceps Curls with Band" | Band Biceps Curl |
+| `pt_Glute_Bridge_Hold-0/1.webp` | `dist/png/0109-relaxation/tension.png` "Bridging" | Glute Bridge Hold |
+| `pt_Lying_Leg_Raise-0/1.webp` | `dist/png/0021-relaxation/tension.png` "Flat Bench Leg Raises" (drawn on the floor) | Lying Leg Raise |
+
+- **Credit shown in the app:** the exercise detail shows «صورة: Everkinetic, CC BY-SA 4.0» under these images
+  (`imageCredit` in the pack). The PDF does not print the credit yet (see docs/EXERCISE_PACK.md).
+- **Why only 4:** Everkinetic's 289 exercises are almost all the same classic gym moves free-exercise-db already has
+  with photos; the other candidates for our photo-less exercises were cropped badly (walking lunge, Smith hack squat,
+  band squat) or showed a different variant (straight bar vs EZ bar, pullover along the bench vs across it).
 - Wave 5 food data: `ingredients.ar.json` v5 (13 new foods, 315 in total) and `recipes.ar.json` v4 (128 new original
   recipes, 342 in total, each with prep time and cuisine). Food photos: Wikimedia Commons only, each checked by eye,
   listed with author / license / source in `docs/FOOD_PHOTOS.md`; files cached at run time (not precached).

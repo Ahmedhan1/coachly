@@ -6,3 +6,5 @@ export * from './macros';
 export * from './body';
 export * from './water';
 export * from './recipe';
+export * from './goalPlan';
+export * from './personalMacros';

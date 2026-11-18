@@ -25,7 +25,7 @@ Last build (2026-11-16): **876 exercises, 1746 / 1746 images, 0 missing** (3 exe
 dataset at all), `exercises.json` 288 KB + images 21.1 MB = **21.4 MB** total.
 
 Wave 5 (2026-11-18, `--manifest-only`, no image changes): **1082 exercises** (876 dataset + 206 built-in extras),
-890 with photos (17 extras reuse dataset photos via `imagesFrom`), 192 shown with the labelled muscle picture,
+894 with photos (17 extras reuse dataset photos via `imagesFrom`, 4 use Everkinetic drawings), 188 shown with the labelled muscle picture,
 `exercises.json` 524 KB. Every exercise carries `jointStress` and `homeFriendly`. A sample photo goes from
 850×567 JPEG, 61 KB to 480×320 WebP, 10 KB.
 
@@ -49,6 +49,22 @@ Standing Low-Pulley Deltoid Raise, Cable Bar Curl ← Standing Biceps Cable Curl
 Foam Roll Upper Back ← Rhomboids SMR, Band Shoulder Dislocate ← Round the World Shoulder Stretch (stick),
 Dumbbell Bulgarian Split Squat ← Split Squat with Dumbbells (rear foot elevated), Cable Pullover ← Straight-Arm
 Pulldown. The upstream dataset has nothing else that matches the remaining extras.
+
+## Everkinetic drawings and the photo credit
+
+Extras can carry their own image files: `ownImages: ["pt_X-0.webp", "pt_X-1.webp"]` plus `imageCredit` in
+`data-src/exercise-extras.json` (the build keeps these files in `img/` and lists them; `ownImages` wins over
+`imagesFrom`). Four extras use Everkinetic drawings (CC BY-SA 4.0, list and sources in `LICENSES.md`): Barbell Reverse
+Lunge, Band Biceps Curl, Glute Bridge Hold, Lying Leg Raise. Made with `python3 -I scripts/everkinetic-to-pack.py
+<everkinetic clone> public/exercise-pack/img 0128=pt_Barbell_Reverse_Lunge …` (480×320 white canvas, WebP, 6–10 KB).
+`imageCredit` reaches `CatalogExercise.imageCredit`; the detail screen shows «صورة: {credit}» under the photos, and it
+is dropped when the trainer replaces the photos with their own. Open item: the PDF exercise table does not print it.
+
+## Suspension (TRX)
+
+Equipment id `suspension` (labels «TRX» / "Suspension (TRX)", dictionary key `suspension`). The 9 `pt_TRX_*` extras
+and the dataset's Suspended Fallout / Push-Up / Reverse Crunch / Row / Split Squat and Inverted Row with Straps (via
+`exercise-fixes.json`) use it; all are `homeFriendly` (a door anchor). Client tailoring offers it as home equipment.
 
 ## Joint stress and home-friendly (`jointStress`, `homeFriendly`)
 

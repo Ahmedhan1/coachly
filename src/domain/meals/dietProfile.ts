@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import type { TrainingExperience } from '@/domain/nutrition';
 import { EMPTY_PREFS, parseFoodPrefs, type FoodPrefs } from './foodPrefs';
 import type { MacroSpec } from './macroControl';
 import { SPLIT_PRESETS, type SplitPreset } from './mealSplit';
@@ -17,6 +18,11 @@ export interface DietProfile {
   /** Carb cycling; `extraKcal` null = the diet settings' training-day extra. */
   cycle: { enabled: boolean; trainingDays: number[]; refeedDay: number | null; extraKcal: number | null };
   macro: MacroSpec | null;
+  /**
+   * Goal planner: target weight and duration decide the calories; protein from goal and body. `proteinPerKg`
+   * null = the personal value; a number = the trainer moved the protein slider.
+   */
+  plan: { enabled: boolean; targetWeightKg: number | null; weeks: number; experience: TrainingExperience; proteinPerKg: number | null };
 }
 
 export const EMPTY_PROFILE: DietProfile = {
@@ -26,6 +32,7 @@ export const EMPTY_PROFILE: DietProfile = {
   workoutTime: null,
   cycle: { enabled: false, trainingDays: [0, 2, 4], refeedDay: null, extraKcal: null },
   macro: null,
+  plan: { enabled: false, targetWeightKg: null, weeks: 12, experience: 'intermediate', proteinPerKg: null },
 };
 
 const time = z.string().regex(/^([01]\d|2[0-3]):[0-5]\d$/);
@@ -41,6 +48,13 @@ const shape = {
     extraKcal: z.number().min(0).max(1000).nullable().default(null),
   }),
   macro: z.object({ protein: amount, fat: amount, carb: amount, rest: z.enum(['carb', 'fat']) }).nullable(),
+  plan: z.object({
+    enabled: z.boolean(),
+    targetWeightKg: z.number().min(20).max(400).nullable(),
+    weeks: z.number().int().min(1).max(260),
+    experience: z.enum(['beginner', 'intermediate', 'advanced']),
+    proteinPerKg: z.number().min(0.5).max(5).nullable(),
+  }),
 };
 
 /** Reads a stored profile field by field; a bad field falls back to its default (never throws). */

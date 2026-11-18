@@ -160,3 +160,72 @@ test('calorie control in English', async ({ page }) => {
   await expect(page.getByRole('dialog', { name: 'Week shopping in grams' })).toBeVisible();
   await page.screenshot({ path: `${SHOTS}/en-412-shopping.png` });
 });
+
+test('goal planner: target weight + weeks → calories and protein, what-if sliders, safety fixes, meal options', async ({ page }) => {
+  test.setTimeout(120_000);
+  await openDiet(page);
+  await page.getByLabel('احسب السعرات من الوزن المطلوب والمدة').check();
+  const summary = page.getByText(/^هتاخد \d+ سعر و\d+ جم بروتين في اليوم، وتوصل [\d.]+ كجم يوم/);
+  await expect(summary).toBeVisible();
+  const kcalNow = async () => Number((/هتاخد (\d+)/.exec(await summary.innerText()) ?? [])[1] ?? 0);
+  await expect(page.getByText(/بروتين [\d.]+ جم\/كجم .* لأنه بينشّف|بروتين [\d.]+ جم\/كجم/).first()).toBeVisible();
+  // Fewer weeks for the same target → bigger deficit → fewer calories; the targets follow.
+  const k0 = await kcalNow();
+  await page.getByLabel('المدة', { exact: true }).fill('6');
+  await expect.poll(kcalNow).toBeLessThan(k0);
+  await expect(page.getByLabel('اكتب السعرات')).toHaveValue(String(await kcalNow()));
+  // A far target in 6 weeks is unsafe: flags and one-tap fixes.
+  const targetSlider = page.getByLabel('الوزن المطلوب', { exact: true });
+  await targetSlider.fill((await targetSlider.getAttribute('min')) ?? '40');
+  await expect(page.getByText(/النزول أسرع من/)).toBeVisible();
+  await page.screenshot({ path: `${SHOTS}/goal-flags.png` });
+  await page.getByRole('button', { name: /مدة واقعية/ }).click();
+  await expect(page.getByText(/النزول أسرع من/)).toHaveCount(0);
+  // Protein slider overrides; reset returns to the personal value.
+  await page.getByLabel('البروتين', { exact: true }).fill('3');
+  await expect(page.getByText('البروتين متغيّر بإيدك.')).toBeVisible();
+  await page.getByRole('button', { name: 'رجّع البروتين المحسوب' }).click();
+  await expect(page.getByText('البروتين متغيّر بإيدك.')).toHaveCount(0);
+  await page.getByText('مخطط الهدف').scrollIntoViewIfNeeded();
+  await page.screenshot({ path: `${SHOTS}/goal-panel.png` });
+
+  // Meal options: pick the second way to eat lunch.
+  const lunch = page.getByRole('region', { name: 'غدا' }).first();
+  const choices = lunch.getByRole('group', { name: 'اختيارات للوجبة' });
+  await expect(choices.getByRole('button').nth(1)).toBeVisible();
+  const second = (await choices.getByRole('button').nth(1).innerText()).split(' · ')[0] ?? '';
+  await choices.getByRole('button').nth(1).click();
+  await expect(choices.getByRole('button').first()).toContainText(second);
+  await lunch.scrollIntoViewIfNeeded();
+  await page.screenshot({ path: `${SHOTS}/goal-options.png` });
+  await page.getByRole('button', { name: 'احفظ كخطة للعميل' }).click();
+  await expect(page.getByText(/اتحفظ 7 أيام/)).toBeVisible();
+});
+
+for (const [w, h, scheme, lang] of [
+  [412, 915, 'light', 'ar'],
+  [375, 667, 'dark', 'ar'],
+  [412, 915, 'dark', 'en'],
+  [375, 667, 'light', 'en'],
+] as const) {
+  test(`goal planner screen ${w}x${h} ${scheme} ${lang}`, async ({ page }) => {
+    await page.setViewportSize({ width: w, height: h });
+    await page.emulateMedia({ colorScheme: scheme });
+    await openDiet(page);
+    if (lang === 'en') {
+      await page.evaluate(() => localStorage.setItem('pt.locale', 'en'));
+      await page.reload();
+      await page.getByLabel('Set calories from target weight and duration').check();
+      await expect(page.getByText(/You’ll eat \d+ kcal/)).toBeVisible();
+    } else {
+      await page.getByLabel('احسب السعرات من الوزن المطلوب والمدة').check();
+    }
+    expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBeLessThanOrEqual(w);
+    await page.getByRole('region', { name: lang === 'en' ? 'Goal planner' : 'مخطط الهدف' }).scrollIntoViewIfNeeded();
+    await page.waitForTimeout(400);
+    await page.screenshot({ path: `${SHOTS}/goal-${lang}-${w}-${scheme}.png` });
+    await page.getByText(lang === 'en' ? /You’ll eat/ : /^هتاخد/).first().scrollIntoViewIfNeeded();
+    await page.waitForTimeout(400);
+    await page.screenshot({ path: `${SHOTS}/goal-${lang}-${w}-${scheme}-2.png` });
+  });
+}

@@ -34,9 +34,36 @@ const CAL_FIELDS = [
   'kcalPerKgChange',
   'trainingDayExtraKcal',
 ] as const;
-const ALL_FIELDS = [...FIELDS, ...CAL_FIELDS] as const;
+/** Goal planner and personal-protein coefficients (labels under nutrition.goal.s). */
+const GOAL_FIELDS = [
+  'kcalPerKgGain',
+  'maxLossPercentPerWeek',
+  'gainCapBeginner',
+  'gainCapIntermediate',
+  'gainCapAdvanced',
+  'lossFatShare',
+  'gainLeanShare',
+  'recompDeficitPercent',
+  'protCutFfmMin',
+  'protCutFfmMax',
+  'protCutBw',
+  'protBulkMin',
+  'protBulkMax',
+  'protRecomp',
+  'protMaintain',
+  'protAge50Bonus',
+  'obeseBmi',
+  'fatFloorPerKg',
+  'fatMinPercent',
+] as const;
+const ALL_FIELDS = [...FIELDS, ...CAL_FIELDS, ...GOAL_FIELDS] as const;
 type NumericKey = (typeof ALL_FIELDS)[number];
-const labelOf = (k: NumericKey) => ((CAL_FIELDS as readonly string[]).includes(k) ? t(`nutrition.cal.s.${k as (typeof CAL_FIELDS)[number]}`) : t(`nutrition.diet.s.${k as (typeof FIELDS)[number]}`));
+const labelOf = (k: NumericKey) =>
+  (GOAL_FIELDS as readonly string[]).includes(k)
+    ? t(`nutrition.goal.s.${k as (typeof GOAL_FIELDS)[number]}`)
+    : (CAL_FIELDS as readonly string[]).includes(k)
+      ? t(`nutrition.cal.s.${k as (typeof CAL_FIELDS)[number]}`)
+      : t(`nutrition.diet.s.${k as (typeof FIELDS)[number]}`);
 
 /** The planner's coefficients (high-protein level, low-carb share, tolerances, serving limits, safety floors). */
 export function DietSettingsSheet({ onClose, onSaved }: { onClose: () => void; onSaved: () => void }) {
@@ -62,7 +89,9 @@ function Form({ current, onClose, onSaved, store, showToast }: FormProps) {
     e.preventDefault();
     const next = { ...current, ...Object.fromEntries(ALL_FIELDS.map((k) => [k, parseDecimal(values[k])])) };
     const parsed = dietSettingsSchema.safeParse(next);
-    if (!parsed.success || parsed.data.minServings > parsed.data.maxServings || parsed.data.cutRateMinPercent > parsed.data.cutRateMaxPercent || parsed.data.bulkRateMinPercent > parsed.data.bulkRateMaxPercent) return setError(true);
+    const d = parsed.success ? parsed.data : null;
+    const ordered = d !== null && d.minServings <= d.maxServings && d.cutRateMinPercent <= d.cutRateMaxPercent && d.bulkRateMinPercent <= d.bulkRateMaxPercent && d.protCutFfmMin <= d.protCutFfmMax && d.protBulkMin <= d.protBulkMax;
+    if (!parsed.success || !ordered) return setError(true);
     await store.saveDietSettings(parsed.data);
     showToast({ message: t('nutrition.diet.settingsSaved'), duration: 2000 });
     onSaved();

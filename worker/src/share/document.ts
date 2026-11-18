@@ -50,6 +50,8 @@ export interface ShareMeal {
   /** One line per food item. Each ≤ 200 chars. */
   items: string[];
   notes?: string;
+  /** Up to 3 other ways to eat this meal on the same numbers; the client picks one (older viewers ignore it). */
+  options?: Array<{ items: string[] }>;
 }
 
 export interface ShareSupplement {
@@ -182,6 +184,7 @@ export const LIMITS = {
   exercisesPerDay: 40,
   meals: 12,
   itemsPerMeal: 30,
+  mealOptions: 3,
   supplements: 30,
   mealDays: 7,
   seriesPoints: 60,
@@ -303,7 +306,8 @@ function isMeal(value: unknown): boolean {
     str(value.title, LIMITS.title, false) &&
     optStr(value.time, LIMITS.shortText) &&
     arrayOf(value.items, LIMITS.itemsPerMeal, (item) => str(item, LIMITS.item)) &&
-    optStr(value.notes, LIMITS.note)
+    optStr(value.notes, LIMITS.note) &&
+    optArray(value.options, LIMITS.mealOptions, (o) => isObj(o) && arrayOf(o.items, LIMITS.itemsPerMeal, (item) => str(item, LIMITS.item)))
   );
 }
 

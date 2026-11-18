@@ -73,6 +73,7 @@ test('no-photo and drawing exercises in the program picker, builder, session and
   await openApp(page);
   await page.getByRole('link', { name: 'العملاء', exact: true }).click();
   await page.getByRole('link', { name: /سارة محمود/ }).click();
+  await expect(page.getByRole('heading', { level: 1, name: 'سارة محمود' })).toBeVisible();
   const clientId = page.url().split('/clients/')[1]?.split(/[/?]/)[0] ?? '';
   await page.getByRole('link', { name: /البرنامج/ }).first().click();
   await page.getByRole('button', { name: /فول بادي/ }).click();
@@ -119,10 +120,14 @@ test('no-photo and drawing exercises in the program picker, builder, session and
 
   await page.goto(`/more/pdf?client=${clientId}&standalone=1`);
   await page.getByLabel('نوع الملف').selectOption({ label: 'برنامج كامل' });
-  for (const name of ['الغلاف', 'جدول التمارين']) {
+  // Only the exercise table (as e2e/pdf-builder.spec.ts does for one section).
+  const sections = ['الغلاف', 'بيانات العميل', 'جدول التمارين', 'السعرات والماكروز', 'خطة الوجبات', 'المكملات', 'التقدم', 'تعليمات وملاحظات'];
+  for (const name of sections) {
     const box = page.getByRole('checkbox', { name, exact: true });
     if ((await box.isChecked()) !== (name === 'جدول التمارين')) await box.click();
   }
+  const muscle = page.getByRole('checkbox', { name: 'خريطة العضلات', exact: true });
+  if (await muscle.isChecked()) await muscle.click();
   await page.getByRole('button', { name: 'اعمل الملف' }).click();
   await expect(page.getByText(/الملف جاهز: \d+ صفحة/)).toBeVisible({ timeout: 120_000 });
   if (shot) await page.screenshot({ path: `${shot}/pdf-screen.png`, fullPage: true });
@@ -133,4 +138,14 @@ test('no-photo and drawing exercises in the program picker, builder, session and
     await page.waitForTimeout(400);
     await pages.nth(i).screenshot({ path: `${shot}/pdf-page-${i + 1}.png` });
   }
+});
+
+test('Everkinetic drawings show with their CC BY-SA credit; TRX moves are under the suspension equipment', async ({ page }) => {
+  await openApp(page, '/exercises/pt_Glute_Bridge_Hold');
+  const photo = page.getByRole('group', { name: /صورة 1 من/ }).locator('img').first();
+  await expect(photo).toHaveAttribute('src', /pt_Glute_Bridge_Hold-0\.webp/);
+  await expect(page.getByText('صورة: Everkinetic, CC BY-SA 4.0')).toBeVisible();
+  if (shot) await page.screenshot({ path: `${shot}/detail-everkinetic.png` });
+  await page.goto('/exercises/pt_TRX_Squat?standalone=1');
+  await expect(page.getByText('TRX', { exact: true }).first()).toBeVisible();
 });

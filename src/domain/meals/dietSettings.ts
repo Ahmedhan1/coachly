@@ -42,6 +42,30 @@ export const dietSettingsShape = {
   kcalPerKgChange: z.number().min(3000).max(9000),
   /** Carb cycling: extra calories (all carbs) on a training day compared with a rest day. */
   trainingDayExtraKcal: z.number().min(0).max(1000),
+  /** Goal planner: kcal per kg of lean gain, fastest loss (%/week), gain caps by training age (%/month). */
+  kcalPerKgGain: z.number().min(2000).max(9000),
+  maxLossPercentPerWeek: z.number().min(0.2).max(2),
+  gainCapBeginner: z.number().min(0.1).max(4),
+  gainCapIntermediate: z.number().min(0.1).max(4),
+  gainCapAdvanced: z.number().min(0.1).max(4),
+  /** Share of lost weight that is fat and of gained weight that is lean (0–1). */
+  lossFatShare: z.number().min(0.3).max(1),
+  gainLeanShare: z.number().min(0.1).max(1),
+  recompDeficitPercent: z.number().min(0).max(20),
+  /** Personal protein (g/kg): cut on fat-free mass (range), cut on body weight, bulk range, recomp, maintain. */
+  protCutFfmMin: z.number().min(1).max(4),
+  protCutFfmMax: z.number().min(1).max(4),
+  protCutBw: z.number().min(1).max(4),
+  protBulkMin: z.number().min(1).max(4),
+  protBulkMax: z.number().min(1).max(4),
+  protRecomp: z.number().min(1).max(4),
+  protMaintain: z.number().min(0.8).max(4),
+  protAge50Bonus: z.number().min(0).max(1),
+  /** From this BMI protein is counted on an adjusted weight. */
+  obeseBmi: z.number().min(25).max(45),
+  /** Fat floor of the personal plan: g/kg and % of calories. */
+  fatFloorPerKg: z.number().min(0.3).max(2),
+  fatMinPercent: z.number().min(10).max(40),
   /** Intermittent fasting: when the eating window opens (it lasts 8 hours). */
   ifWindowStart: timeText,
   iftarTime: timeText,
@@ -77,6 +101,25 @@ export function defaultDietSettings(): DietSettings {
     maintainBandPercent: 0.25,
     kcalPerKgChange: 7700,
     trainingDayExtraKcal: 300,
+    kcalPerKgGain: 5500,
+    maxLossPercentPerWeek: 1,
+    gainCapBeginner: 1.5,
+    gainCapIntermediate: 1,
+    gainCapAdvanced: 0.5,
+    lossFatShare: 0.75,
+    gainLeanShare: 0.5,
+    recompDeficitPercent: 0,
+    protCutFfmMin: 2.3,
+    protCutFfmMax: 3.1,
+    protCutBw: 2.2,
+    protBulkMin: 1.6,
+    protBulkMax: 2.2,
+    protRecomp: 2.2,
+    protMaintain: 1.8,
+    protAge50Bonus: 0.2,
+    obeseBmi: 30,
+    fatFloorPerKg: 0.8,
+    fatMinPercent: 20,
     ifWindowStart: '12:00',
     iftarTime: '18:00',
     suhoorTime: '03:30',
@@ -96,5 +139,6 @@ export function parseDietSettings(raw: unknown): DietSettings {
   const parsed = dietSettingsSchema.safeParse(merged);
   if (!parsed.success || parsed.data.minServings > parsed.data.maxServings) return defaults;
   if (parsed.data.cutRateMinPercent > parsed.data.cutRateMaxPercent || parsed.data.bulkRateMinPercent > parsed.data.bulkRateMaxPercent) return defaults;
+  if (parsed.data.protCutFfmMin > parsed.data.protCutFfmMax || parsed.data.protBulkMin > parsed.data.protBulkMax) return defaults;
   return parsed.data;
 }

@@ -33,7 +33,7 @@ export const SAMPLE_DOCUMENT: ShareDocument = {
       kcal: 1650,
       meals: [
         { title: 'الفطار', time: '9:00', items: ['3 بيض', 'عيش بلدي', 'خيار'] },
-        { title: 'الغدا', items: ['200 جم فراخ', 'رز'], notes: 'اشرب مية كتير' },
+        { title: 'الغدا', items: ['200 جم فراخ', 'رز'], notes: 'اشرب مية كتير', options: [{ items: ['250 جم سمك بلطي', 'رز'] }, { items: ['180 جم كفتة', 'بطاطس'] }] },
       ],
     },
     { title: 'اليوم 2', meals: [{ title: 'الفطار', items: ['زبادي يوناني', 'شوفان'] }] },

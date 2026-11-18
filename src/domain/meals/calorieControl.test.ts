@@ -93,3 +93,25 @@ describe('calorie control in the week planner', () => {
     expect(performance.now() - t0).toBeLessThan(1000);
   });
 });
+
+describe('meal options (trainer or client picks)', () => {
+  it('offers the planned meal plus other main dishes, each re-balanced to the meal target', async () => {
+    const { mealOptions, withMealOption } = await import('.');
+    const [day] = planGramWeek(BOOK, BASE, { goal: 'maintain', schedule: 'normal', mealsPerDay: 4, days: 1 }, DS);
+    if (!day) throw new Error('no day');
+    const lunch = day.meals.findIndex((m) => m.slot.kind === 'lunch');
+    const opts = mealOptions(BOOK, day, lunch, { goal: 'maintain' }, DS, 3);
+    expect(opts.length).toBeGreaterThanOrEqual(2);
+    expect(opts[0]?.recipeId).toBe(day.meals[lunch]?.dishes[0]?.recipeId);
+    expect(new Set(opts.map((o) => o.recipeId)).size).toBe(opts.length);
+    for (const o of opts) {
+      const t = o.meal.target.kcal;
+      expect(Math.abs(o.meal.totals.kcal - t) / t).toBeLessThan(0.15);
+    }
+    const second = opts[1];
+    if (!second) throw new Error('no option');
+    const next = withMealOption(day, lunch, second, DS);
+    expect(next.meals[lunch]?.dishes[0]?.recipeId).toBe(second.recipeId);
+    expect(next.totals.kcal).toBe(next.meals.reduce((a, m) => a + m.totals.kcal, 0));
+  });
+});
