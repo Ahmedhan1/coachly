@@ -12,7 +12,7 @@ interface MealCardProps {
   lookup: ReadonlyMap<string, MacroTotals>;
   names: ReadonlyMap<string, string>;
   /** Photo / illustration per recipe id. */
-  images: ReadonlyMap<string, { imageId: string | null; icon: string }>;
+  images: ReadonlyMap<string, { imageId: string | null; photo?: string | undefined; icon: string }>;
   onAdd: () => void;
   onSwap: (index: number) => void;
   onRemoveItem: (index: number) => void;
@@ -41,7 +41,7 @@ export function MealCard({ meal, lookup, names, images, onAdd, onSwap, onRemoveI
           const r = itemTotals(item, lookup);
           return (
             <li key={`${item.recipeId ?? item.text}-${index}`} className={styles.item}>
-              {item.recipeId && <FoodImage imageId={images.get(item.recipeId)?.imageId} icon={images.get(item.recipeId)?.icon} className={styles.itemImg} />}
+              {item.recipeId && <FoodImage imageId={images.get(item.recipeId)?.imageId} photo={images.get(item.recipeId)?.photo} icon={images.get(item.recipeId)?.icon} className={styles.itemImg} />}
               <div className={styles.itemText}>
                 <p className={styles.itemName}>{name}</p>
                 {item.lines && item.lines.length > 0 ? (
