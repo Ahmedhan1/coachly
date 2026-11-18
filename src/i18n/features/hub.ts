@@ -95,6 +95,10 @@ export const hub = {
     supplementsCount: '{n} منتج',
     noSupplements: 'مفيش مكملات',
     recipes: 'الوصفات',
+    clientPicks: 'اختيارات العميل في الوجبات',
+    clientPicksFrom: 'من متابعته يوم {date}',
+    clientPickOption: 'اختار «اختيار {n}»',
+    clientPicksKept: 'ماشي على الوجبات زي ما هي في الخطة.',
   },
   progress: {
     latest: 'آخر قياس',

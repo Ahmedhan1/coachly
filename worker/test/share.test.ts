@@ -288,6 +288,12 @@ describe('share document guard', () => {
       expect(parseCheckinDocument({ v: 1, kind: 'checkin', createdAt: 1, ...bad })).toBeNull();
     }
     expect(parseCheckinDocument({ v: 1, kind: 'checkin', createdAt: 1, armCm: 500 })).toBeNull();
+    expect(parseCheckinDocument({ v: 1, kind: 'checkin', createdAt: 1, neckCm: 38, mealPicks: [{ id: 'm1', o: 2 }, { id: 'm_2-x', o: 0 }] })).not.toBeNull();
+    for (const bad of [{ neckCm: 5 }, { mealPicks: [{ id: 'm1', o: 4 }] }, { mealPicks: [{ id: 'm1', o: 1.5 }] }, { mealPicks: [{ id: 'سارة', o: 1 }] }, { mealPicks: [{ o: 1 }] }, { mealPicks: 'm1' }]) {
+      expect(parseCheckinDocument({ v: 1, kind: 'checkin', createdAt: 1, ...bad })).toBeNull();
+    }
+    expect(parseShareDocument({ ...SAMPLE_DOCUMENT, meals: [{ id: 'm1', title: 'الفطار', items: ['فول'] }] })).not.toBeNull();
+    expect(parseShareDocument({ ...SAMPLE_DOCUMENT, meals: [{ id: 'bad id', title: 'الفطار', items: ['فول'] }] })).toBeNull();
   });
 });
 

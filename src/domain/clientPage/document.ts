@@ -13,7 +13,8 @@ export type ShareDocumentV1 = {
     exercises: Array<{ name: string; sets?: number; reps?: string; restSec?: number; tempo?: string; rpe?: number; image?: string; notes?: string }>;
   }>;
   /** `options`: other ways to eat the meal on the same numbers; the client picks one on his page (optional). */
-  meals: Array<{ title: string; time?: string; items: string[]; notes?: string; options?: Array<{ items: string[] }> }>;
+  /** `id`: the meal's random id (no names), so the client's pick can come back in his check-in. */
+  meals: Array<{ title: string; time?: string; items: string[]; notes?: string; options?: Array<{ items: string[] }>; id?: string }>;
   supplements: Array<{ name: string; text: string }>;
   notes: string;
   checkinsEnabled: boolean;
@@ -60,7 +61,12 @@ export interface CheckinDocumentV1 {
   energy?: number;
   /** How much of the plan the client followed this week, 0–100 %. */
   adherence?: number;
+  neckCm?: number;
+  /** The client's pick per meal with options (meal id → 0 = as planned, 1–3 = option). */
+  mealPicks?: Array<{ id: string; o: number }>;
 }
+
+const MEAL_ID = /^[A-Za-z0-9_-]{1,64}$/;
 
 const cut = (s: string, n: number) => s.trim().slice(0, n);
 const COLOR = /^#[0-9A-Fa-f]{6}$/;
@@ -93,15 +99,16 @@ const DATE = /^\d{4}-\d{2}-\d{2}$/;
 const num = (v: number | undefined, min: number, max: number) => (v !== undefined && Number.isFinite(v) && v >= min && v <= max ? v : undefined);
 
 /** Drops anything outside the Worker guard's ranges so one odd value never blanks the whole page. */
-/** Caps a meal's optional choices (≤ 3, ≤ 30 lines of ≤ 200 chars); drops empty ones. */
+/** Caps a meal's optional choices (≤ 3, ≤ 30 lines of ≤ 200 chars); drops empty ones and a malformed id. */
 function cleanMeal(m: ShareDocumentV1['meals'][number]): ShareDocumentV1['meals'][number] {
-  if (!m.options) return m;
+  const rest = { ...m };
+  delete rest.options;
+  if (rest.id !== undefined && !MEAL_ID.test(rest.id)) delete rest.id;
+  if (!m.options) return rest;
   const options = m.options
     .slice(0, 3)
     .map((o) => ({ items: o.items.slice(0, 30).map((i) => cut(i, 200)).filter(Boolean) }))
     .filter((o) => o.items.length > 0);
-  const rest = { ...m };
-  delete rest.options;
   return options.length > 0 ? { ...rest, options } : rest;
 }
 
@@ -171,6 +178,7 @@ export function buildShareDocument(s: ShareSources): ShareDocumentV1 {
   const meals = (s.mealPlan?.meals ?? []).slice(0, 12).map((m) => {
     const meal: ShareDocumentV1['meals'][number] = { title: cut(m.name, 80) || '—', items: m.items.slice(0, 30).map((i) => cut(s.mealItem(i), 200)).filter(Boolean) };
     if (m.time) meal.time = cut(m.time, 20);
+    if (MEAL_ID.test(m.id)) meal.id = m.id;
     const options = (m.options ?? []).slice(0, 3).map((o) => ({ items: o.items.slice(0, 30).map((i) => cut(s.mealItem(i), 200)).filter(Boolean) }));
     return cleanMeal(options.length > 0 ? { ...meal, options } : meal);
   });
@@ -219,7 +227,7 @@ export function parseCheckin(value: unknown): CheckinDocumentV1 | null {
     if (!Array.isArray(v.photos) || v.photos.length > 2 || !v.photos.every((p) => typeof p === 'string' && PHOTO.test(p) && p.length <= 4_000_000)) return null;
     out.photos = v.photos as string[];
   }
-  const ranges: Array<[keyof CheckinDocumentV1 & ('hipCm' | 'chestCm' | 'armCm' | 'thighCm' | 'sleepHours' | 'energy' | 'adherence'), number, number]> = [
+  const ranges: Array<[keyof CheckinDocumentV1 & ('hipCm' | 'chestCm' | 'armCm' | 'thighCm' | 'sleepHours' | 'energy' | 'adherence' | 'neckCm'), number, number]> = [
     ['hipCm', 30, 300],
     ['chestCm', 30, 300],
     ['armCm', 10, 150],
@@ -227,12 +235,23 @@ export function parseCheckin(value: unknown): CheckinDocumentV1 | null {
     ['sleepHours', 0, 24],
     ['energy', 1, 5],
     ['adherence', 0, 100],
+    ['neckCm', 20, 100],
   ];
   for (const [k, min, max] of ranges) {
     if (v[k] === undefined) continue;
     if (!inRange(v[k], min, max)) return null;
     if (k === 'energy' && !Number.isInteger(v[k])) return null;
     out[k] = v[k];
+  }
+  if (v.mealPicks !== undefined) {
+    if (!Array.isArray(v.mealPicks) || v.mealPicks.length > 84) return null;
+    const picks: Array<{ id: string; o: number }> = [];
+    for (const p of v.mealPicks as unknown[]) {
+      const q = p as { id?: unknown; o?: unknown } | null;
+      if (typeof q !== 'object' || q === null || typeof q.id !== 'string' || !MEAL_ID.test(q.id) || !Number.isInteger(q.o) || !inRange(q.o, 0, 3)) return null;
+      picks.push({ id: q.id, o: q.o });
+    }
+    out.mealPicks = picks;
   }
   return out;
 }

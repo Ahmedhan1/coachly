@@ -1,15 +1,24 @@
-import { useRepos } from '@/app/services';
+import { useServices } from '@/app/services';
 import { useLive } from '@/app/useLive';
-import type { Client } from '@/domain/models';
+import { effectivePicks, mealPicksKey, parseMealPicks } from '@/domain/meals';
+import { toIsoDate, type Client, type MealPlan } from '@/domain/models';
 import { t } from '@/i18n';
+import { pick } from '@/i18n/locale';
 import { Button, Icon, ListRow, ListSection, Num, Tx } from '@/ui';
-import { formatNumber, LIST_SEP } from '@/ui/format';
+import { formatIsoDate, formatNumber, LIST_SEP } from '@/ui/format';
 import { useNutritionStore } from '@/features/nutrition/shared/useNutritionStore';
 import styles from './Hub.module.css';
 
+type Item = MealPlan['meals'][number]['items'][number];
+
+/** One line per meal item: the recipe name, the food lines of a gram-planner item, or the free text. */
+const itemText = (i: Item, names: ReadonlyMap<string, string>) =>
+  (i.recipeId ? names.get(i.recipeId) : undefined) ?? (i.lines?.length ? i.lines.map((l) => pick(l.name, l.nameEn)).join(LIST_SEP) : i.text);
+
 /** Nutrition at a glance: saved targets, the meal plan days, supplements — each opens its editor for this client. */
 export function NutritionTab({ client, go }: { client: Client; go: (to: string) => void }) {
-  const repos = useRepos();
+  const { meta, data } = useServices();
+  const repos = data.repos;
   const store = useNutritionStore();
   const calc = useLive(() => store.getCalculation(client.id), [store, client.id]);
   const plans = useLive(async () => (await repos.mealPlans.listByClient(client.id)).sort((a, b) => a.createdAt - b.createdAt), [repos, client.id]);
@@ -18,6 +27,15 @@ export function NutritionTab({ client, go }: { client: Client; go: (to: string) 
     const names = new Map<string, string>(catalog.map((s) => [s.id, s.name]));
     return assigned.map((a) => names.get(a.supplementId)).filter((n): n is string => Boolean(n));
   }, [store, repos, client.id]);
+  // What the client picked among the meal options on his page (arrives with his check-in, encrypted).
+  const picks = useLive(async () => {
+    const stored = parseMealPicks(await meta.get(mealPicksKey(client.id)));
+    if (!stored) return null;
+    const [all, recipes] = await Promise.all([repos.mealPlans.listByClient(client.id), repos.recipes.list()]);
+    const names = new Map<string, string>(recipes.map((r) => [r.id, pick(r.name, r.nameEn)]));
+    const rows = effectivePicks(all, stored.picks).map((p) => ({ ...p, text: p.items.map((i) => itemText(i, names)).filter(Boolean).join(LIST_SEP) }));
+    return { date: toIsoDate(new Date(stored.at * 1000)), rows, multi: all.length > 1 };
+  }, [meta, repos, client.id]);
   const base = `/clients/${client.id}`;
 
   return (
@@ -89,6 +107,24 @@ export function NutritionTab({ client, go }: { client: Client; go: (to: string) 
           />
         ))}
       </ListSection>
+
+      {picks && (
+        <ListSection title={t('hub.nutrition.clientPicks')} footer={t('hub.nutrition.clientPicksFrom', { date: formatIsoDate(picks.date) })}>
+          {picks.rows.length === 0 ? (
+            <ListRow leading={<Icon name="check" />} title={t('hub.nutrition.clientPicksKept')} to={`${base}/meals`} />
+          ) : (
+            picks.rows.map((r) => (
+              <ListRow
+                key={`${r.planId}-${r.mealName}-${r.o}`}
+                leading={<Icon name="utensils" />}
+                title={`${picks.multi ? `${r.planName} · ` : ''}${r.mealName} — ${t('hub.nutrition.clientPickOption', { n: r.o + 1 })}`}
+                subtitle={r.text}
+                to={`${base}/meals`}
+              />
+            ))
+          )}
+        </ListSection>
+      )}
 
       <ListSection title={t('hub.nutrition.supplements')} count={supplements?.length || undefined}>
         <ListRow

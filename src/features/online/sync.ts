@@ -7,6 +7,8 @@ import { t } from '@/i18n';
 import { deviceZone } from '@/features/schedule/zone';
 import { storePhoto } from '@/features/nutrition/shared/photos';
 import { NutritionStore } from '@/data/nutritionStore';
+import { mealPicksKey, parseMealPicks } from '@/domain/meals';
+import { entryNavyEstimate } from '@/domain/nutrition';
 import { readPushPrefs, readShare, savePushPrefs } from './prefs';
 
 /** Rebuilds this device's push schedule from the next 40 days of sessions and subscription ends. */
@@ -69,6 +71,8 @@ export async function pullCheckins(services: AppServices): Promise<number> {
   const clientOf = new Map(shares.map((s) => [s.share.shareId, s.clientId]));
   const store = new NutritionStore(services.meta, repos);
   const imported = await readImportedCheckins(services);
+  const nutrition = await store.getSettings().catch(() => null);
+  const clientById = new Map(clients.map((c) => [c.id as string, c]));
   let stored = 0;
   for (const c of pending.value) {
     const clientId = clientOf.get(c.shareId);
@@ -94,8 +98,12 @@ export async function pullCheckins(services: AppServices): Promise<number> {
       }
     }
     const d = c.doc;
-    const measurements: Partial<Record<'weightKg' | 'waistCm' | 'hipCm' | 'chestCm' | 'armCm' | 'thighCm', number>> = {};
-    for (const k of ['weightKg', 'waistCm', 'hipCm', 'chestCm', 'armCm', 'thighCm'] as const) if (d[k] !== undefined) measurements[k] = d[k];
+    const measurements: Partial<Record<'weightKg' | 'waistCm' | 'neckCm' | 'hipCm' | 'chestCm' | 'armCm' | 'thighCm' | 'bodyFatPercent', number>> = {};
+    for (const k of ['weightKg', 'waistCm', 'neckCm', 'hipCm', 'chestCm', 'armCm', 'thighCm'] as const) if (d[k] !== undefined) measurements[k] = d[k];
+    // Neck + waist (+ hip for women) with the client's height on file: body fat by the Navy formula.
+    const client = clientById.get(clientId);
+    const navy = entryNavyEstimate(measurements, { sex: client?.gender ?? null, heightCm: client?.measurements.heightCm }, nutrition?.navy, nutrition?.limits);
+    if (navy.status === 'estimated') measurements.bodyFatPercent = navy.bodyFatPercent;
     // Sleep, energy and adherence have no field of their own: they go first in the entry's notes.
     const week = [
       d.sleepHours !== undefined ? t('settings.clientPage.checkinSleep', { n: d.sleepHours }) : '',
@@ -110,7 +118,9 @@ export async function pullCheckins(services: AppServices): Promise<number> {
       photoIds,
       notes: notes.slice(0, 4000),
       source: 'client',
+      ...(navy.status === 'estimated' ? { bodyFatSource: 'navy' as const } : {}),
     });
+    if (d.mealPicks) await saveMealPicks(services, clientId, d.createdAt, d.mealPicks);
     if (photos.length > 0) await store.setEntryPhotos(entry.id, photos).catch(() => undefined);
     imported.push(c.id);
     await services.meta.set(IMPORTED_CHECKINS_KEY, imported.slice(-200));
@@ -118,6 +128,14 @@ export async function pullCheckins(services: AppServices): Promise<number> {
     stored++;
   }
   return stored;
+}
+
+/** Keeps the newest check-in's meal picks for the trainer to see (an older check-in never overwrites them). */
+async function saveMealPicks(services: AppServices, clientId: ClientId, at: number, picks: { id: string; o: number }[]): Promise<void> {
+  const key = mealPicksKey(clientId);
+  const current = parseMealPicks(await services.meta.get(key));
+  if (current && current.at > at) return;
+  await services.meta.set(key, { at, picks });
 }
 
 /** Ids of check-ins already turned into progress entries (last 200), so a failed delete never duplicates one. */
