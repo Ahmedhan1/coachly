@@ -62,6 +62,21 @@ test('progress: add a measurement and see it listed', async ({ page }) => {
   await expect(page.getByText(/71\.5 كجم/).first()).toBeVisible();
 });
 
+test('progress: neck + waist + hip estimate body fat (Navy) when the body fat box is empty', async ({ page }) => {
+  await openSara(page); // female, 165 cm
+  await page.getByRole('link', { name: /التقدم والصور/ }).click();
+  await page.getByRole('button', { name: 'قياس جديد' }).first().click();
+  const sheet = page.getByRole('dialog', { name: 'قياس جديد' });
+  await sheet.getByLabel('الوسط (سم)').fill('80');
+  await sheet.getByLabel('الرقبة (سم، لحساب نسبة الدهون)').fill('32');
+  await expect(sheet.getByText(/محتاجين كمان: الهيب/)).toBeVisible();
+  await sheet.getByLabel('الهيب (سم)').fill('100');
+  await expect(sheet.getByTestId('navy-estimate')).toContainText('معادلة نيفي');
+  await page.screenshot({ path: 'test-results/shots/progress-navy-estimate.png' });
+  await sheet.getByRole('button', { name: 'حفظ' }).click();
+  await expect(page.getByText(/% \(تقدير نيفي\)/).first()).toBeVisible();
+});
+
 test('PDF builder makes a file for a client offline-capable, with share and download', async ({ page }) => {
   test.setTimeout(90_000);
   await openSara(page);

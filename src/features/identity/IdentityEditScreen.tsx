@@ -4,7 +4,7 @@ import { useUiStore } from '@/app/uiStore';
 import { t, type TKey } from '@/i18n';
 import { Button, PageHeader } from '@/ui';
 import { useIdentityDraft } from './identityDraft';
-import { useIconHint } from './IconHint';
+import { IconLinkSheet, useIconHint } from './IconHint';
 import { ColorSection, LogoSection, NameSection, UnitsSection } from './IdentitySections';
 import styles from './Identity.module.css';
 
@@ -21,6 +21,7 @@ export function IdentityEditScreen() {
   const navigate = useNavigate();
   const showToast = useUiStore((s) => s.showToast);
   const [saving, setSaving] = useState(false);
+  const [iconOpen, setIconOpen] = useState(false);
   const hint = useIconHint(() => navigate('/more/settings'));
   const back = { to: '/more/settings', label: t('screens.settings.title') };
   if (!draft) return <PageHeader title={t('screens.settings.identity')} back={back} />;
@@ -34,6 +35,23 @@ export function IdentityEditScreen() {
               {t(`identity.${key}.title` as TKey)}
             </h2>
             <Body draft={draft} update={update} />
+            {key === 'logo' && draft.logoImageId && (
+              <Button
+                variant="secondary"
+                block
+                className={styles.iconButton}
+                disabled={saving}
+                onClick={async () => {
+                  // The icon is built from the saved logo: save first, then offer the install link.
+                  setSaving(true);
+                  await save(draft);
+                  setSaving(false);
+                  setIconOpen(true);
+                }}
+              >
+                {t('identity.logo.iconUpdate')}
+              </Button>
+            )}
           </section>
         ))}
         <div className={styles.editSave}>
@@ -53,6 +71,7 @@ export function IdentityEditScreen() {
         </div>
       </div>
       {hint.sheet}
+      <IconLinkSheet open={iconOpen} onClose={() => setIconOpen(false)} />
     </>
   );
 }

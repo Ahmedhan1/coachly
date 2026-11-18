@@ -24,6 +24,8 @@
   </head>
   <body>
     <div id="root"></div>
+    <!-- The trainer's logo before anything else loads (public/boot.js; same-origin, allowed by the CSP). -->
+    <script src="/boot.js"></script>
     <script type="module" src="/src/main.tsx"></script>
   </body>
 </html>

@@ -54,9 +54,12 @@ test.describe('exercise library', () => {
     await expect(page.getByRole('button', { name: 'ورا' })).toBeInViewport();
     const box = await canvas.boundingBox();
     if (!box) throw new Error('no canvas');
-    // Sternum line: the ring of rays picks the chest, not the lats behind the gap.
-    await page.touchscreen.tap(box.x + box.width * 0.5, box.y + box.height * 0.27);
-    await expect(page.getByText('اخترت تشيست')).toBeVisible();
+    // Sternum line: the ring of rays picks the chest, not the lats behind the gap. Under load the first frames
+    // can still be framing the model, so the first tap is repeated until the camera has settled.
+    await expect(async () => {
+      await page.touchscreen.tap(box.x + box.width * 0.5, box.y + box.height * 0.27);
+      await expect(page.getByText('اخترت تشيست')).toBeVisible({ timeout: 1500 });
+    }).toPass({ timeout: 20_000 });
     // The abs used to sit under the obliques' sheath in the source model: they must be tappable.
     await page.touchscreen.tap(box.x + box.width * 0.52, box.y + box.height * 0.4);
     await expect(page.getByText('اخترت أبس')).toBeVisible();

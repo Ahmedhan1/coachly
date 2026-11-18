@@ -74,6 +74,8 @@ var AR = {
   chest: 'الصدر (سم)',
   arm: 'الدراع (سم)',
   thigh: 'الفخد (سم)',
+  neck: 'الرقبة (سم)',
+  picksSent: 'اختياراتك في الوجبات هتتبعت للمدرب مع المتابعة.',
   checkinNotes: 'ملاحظات للمدرب',
   photo: 'صور (اختياري، لحد 3)',
   send: 'ابعت للمدرب',
@@ -183,6 +185,8 @@ var EN = {
   chest: 'Chest (cm)',
   arm: 'Arm (cm)',
   thigh: 'Thigh (cm)',
+  neck: 'Neck (cm)',
+  picksSent: 'Your meal choices will be sent to your coach with this check-in.',
   checkinNotes: 'Notes for your coach',
   photo: 'Photos (optional, up to 3)',
   send: 'Send to coach',
@@ -545,31 +549,50 @@ function targetsCard(t) {
   if (isNum(t.waterMinMl) && isNum(t.waterMaxMl)) card.appendChild(el('p', 'sub', T.water + fmt(t.waterMinMl / 1000) + '–' + fmt(t.waterMaxMl / 1000) + T.liter));
   return card;
 }
-/** The client's own pick among a meal's options, kept on this phone only. */
+/** The client's own pick among a meal's options, kept on this phone (by the meal's id when the app sent one). */
 var MEAL_ID = /^[A-Za-z0-9_-]{1,64}$/;
-/** By the app's meal id when the document has one (so the pick can go back with a check-in), else by position. */
+var picksMemo = {};
+function mealId(m) { return m && typeof m.id === 'string' && MEAL_ID.test(m.id) ? m.id : null; }
 function mealPickKey(day, meal, id) { return 'pt.mealPick.' + location.pathname + '.' + (id ? 'id.' + id : day + '.' + meal); }
 function readPick(day, meal, n, id) {
+  var key = mealPickKey(day, meal, id);
+  var raw = picksMemo[key];
   try {
-    var v = Number(localStorage.getItem(mealPickKey(day, meal, id)));
-    return v >= 0 && v < n && Math.floor(v) === v ? v : 0;
-  } catch (e) { return 0; }
+    if (raw === undefined) raw = localStorage.getItem(key);
+    if (raw === null && id) raw = localStorage.getItem(mealPickKey(day, meal, null));
+  } catch (e) { /* private mode */ }
+  var v = Number(raw);
+  return raw !== null && raw !== undefined && v >= 0 && v < n && Math.floor(v) === v ? v : 0;
 }
 function savePick(day, meal, i, id) {
-  try { localStorage.setItem(mealPickKey(day, meal, id), String(i)); } catch (e) { /* private mode: choice lasts this visit */ }
+  var key = mealPickKey(day, meal, id);
+  picksMemo[key] = String(i);
+  try { localStorage.setItem(key, String(i)); } catch (e) { /* private mode: choice lasts this visit */ }
 }
-/** Every meal with options and an id, with the client's current pick (sent with the check-in). */
-function currentPicks(doc) {
-  var days = arr(doc && doc.mealDays).filter(function (d) { return d && Array.isArray(d.meals); });
-  if (!days.length && doc && Array.isArray(doc.meals)) days = [{ meals: doc.meals }];
+/** Every meal with options as [day index, meal index, meal] (same days the meals tab shows). */
+function mealsWithOptions(doc) {
+  var days = arr(doc.mealDays).filter(function (d) { return d && Array.isArray(d.meals); });
+  if (!days.length && arr(doc.meals).length) days = [{ meals: doc.meals }];
   var out = [];
   days.forEach(function (d, di) {
     d.meals.forEach(function (m, mi) {
-      if (!m || !isStr(m.id, 64) || !MEAL_ID.test(m.id) || !arr(m.options).length) return;
-      if (out.length < 84) out.push({ id: m.id, o: readPick(di, mi, Math.min(4, arr(m.options).length + 1), m.id) });
+      if (m && Array.isArray(m.items) && arr(m.options).some(function (o) { return o && Array.isArray(o.items); })) out.push([di, mi, m]);
     });
   });
   return out;
+}
+/** The picks the check-in carries: meal id → option (0 = as planned). Only meals the app gave an id. */
+function currentPicks(doc) {
+  var seen = {};
+  var picks = [];
+  mealsWithOptions(doc).forEach(function (x) {
+    var id = mealId(x[2]);
+    if (!id || seen[id]) return;
+    seen[id] = true;
+    var n = 1 + arr(x[2].options).filter(function (o) { return o && Array.isArray(o.items); }).slice(0, 3).length;
+    picks.push({ id: id, o: readPick(x[0], x[1], n, id) });
+  });
+  return picks.slice(0, 84);
 }
 function itemList(items) {
   var ul = el('ul', 'items');
@@ -590,10 +613,9 @@ function mealCards(meals, dayIndex) {
       var show = function (i) {
         holder.textContent = '';
         holder.appendChild(itemList(choices[i]));
-        savePick(dayIndex || 0, mi, i, mealId);
+        savePick(dayIndex || 0, mi, i, mealId(m));
       };
-      var mealId = isStr(m.id, 64) && MEAL_ID.test(m.id) ? m.id : '';
-      var start = readPick(dayIndex || 0, mi, choices.length, mealId);
+      var start = readPick(dayIndex || 0, mi, choices.length, mealId(m));
       card.appendChild(el('p', 'sub', T.mealOptionsHint));
       card.appendChild(pills(choices.map(function (_, i) { return T.mealOption + (i + 1); }), start, -1, show));
       card.appendChild(holder);
@@ -831,8 +853,8 @@ function downscale(file) {
   });
 }
 
-var RANGES = { weight: [20, 400], waist: [30, 300], hip: [30, 300], chest: [30, 300], arm: [10, 150], thigh: [20, 200], sleep: [0, 24], adherence: [0, 100] };
-var DOC_KEYS = { weight: 'weightKg', waist: 'waistCm', hip: 'hipCm', chest: 'chestCm', arm: 'armCm', thigh: 'thighCm', sleep: 'sleepHours', adherence: 'adherence' };
+var RANGES = { weight: [20, 400], waist: [30, 300], neck: [20, 100], hip: [30, 300], chest: [30, 300], arm: [10, 150], thigh: [20, 200], sleep: [0, 24], adherence: [0, 100] };
+var DOC_KEYS = { weight: 'weightKg', waist: 'waistCm', neck: 'neckCm', hip: 'hipCm', chest: 'chestCm', arm: 'armCm', thigh: 'thighCm', sleep: 'sleepHours', adherence: 'adherence' };
 
 function energyPicker() {
   var box = el('fieldset', 'energy');
@@ -852,7 +874,7 @@ function energyPicker() {
   return box;
 }
 
-function checkinSection(raw, shareDoc) {
+function checkinSection(raw, page) {
   var s = el('section', 'panel');
   s.id = 'p-checkin';
   var card = el('form', 'card');
@@ -872,6 +894,7 @@ function checkinSection(raw, shareDoc) {
   row2.appendChild(field(T.chest, inputs.chest));
   row2.appendChild(field(T.arm, inputs.arm));
   row2.appendChild(field(T.thigh, inputs.thigh));
+  row2.appendChild(field(T.neck, inputs.neck));
   more.appendChild(row2);
   card.appendChild(more);
   var week = el('div', 'week');
@@ -901,6 +924,7 @@ function checkinSection(raw, shareDoc) {
   card.appendChild(field(T.photo, photo));
   card.appendChild(thumbs);
   card.appendChild(field(T.checkinNotes, notes));
+  if (currentPicks(page).length) card.appendChild(el('p', 'sub picks-note', T.picksSent));
   var status = el('p', 'status'); status.setAttribute('role', 'status');
   var btn = el('button', 'btn', T.send); btn.type = 'submit';
   card.appendChild(btn);
@@ -922,10 +946,10 @@ function checkinSection(raw, shareDoc) {
     if (picked) { doc.energy = Number(picked.value); anyNumber = true; }
     var n = notes.value.trim();
     var files = Array.prototype.slice.call(photo.files || [], 0, 3);
-    var picks = currentPicks(shareDoc);
-    if (picks.length) doc.mealPicks = picks;
     if (!anyNumber && !n && !files.length) { say(T.empty, 'err'); return; }
     if (n) doc.notes = n.slice(0, 1000);
+    var picks = currentPicks(page);
+    if (picks.length) doc.mealPicks = picks;
     btn.disabled = true;
     say(T.sending);
     Promise.all(files.map(function (f) { return downscale(f); }))

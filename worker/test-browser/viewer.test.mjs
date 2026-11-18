@@ -163,6 +163,7 @@ try {
     await page.fill('textarea[name=notes]', 'الأسبوع ده كان كويس');
     await page.click('#p-checkin summary');
     await page.fill('input[name=arm]', '33');
+    await page.fill('input[name=neck]', '38');
     await page.fill('input[name=sleep]', '7.5');
     await page.fill('input[name=adherence]', '٨٠');
     await page.click('.seg-opt >> nth=3');
@@ -182,11 +183,11 @@ try {
     assert.equal(doc.waistCm, 80);
     assert.equal(doc.notes, 'الأسبوع ده كان كويس');
     assert.equal(doc.armCm, 33);
-    // The meal the client picked earlier (option 2 of lunch) travels with the check-in.
-    assert.deepEqual(doc.mealPicks, [{ id: 'meal-lunch-1', o: 1 }]);
+    assert.equal(doc.neckCm, 38);
     assert.equal(doc.sleepHours, 7.5);
     assert.equal(doc.adherence, 80);
     assert.equal(doc.energy, 4);
+    assert.deepEqual(doc.mealPicks, [{ id: 'meal-lunch', o: 1 }], 'the meal pick travels inside the encrypted check-in');
     assert.ok(doc.photo.startsWith('data:image/jpeg;base64,'));
     const size = await page.evaluate(async (src) => {
       const img = new Image();
