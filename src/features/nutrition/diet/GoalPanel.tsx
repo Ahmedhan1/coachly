@@ -18,6 +18,8 @@ interface Props {
   settings: NutritionSettings;
   /** Today (passed in; the domain never reads the clock). */
   now: Date;
+  /** 'navy' = estimated from neck/waist(/hip) measurements. */
+  bodyFatSource: 'given' | 'navy' | null;
   onChange: (state: PlanState) => void;
 }
 
@@ -26,7 +28,7 @@ const r2 = (n: number) => Math.round(n * 100) / 100;
 const signed = (n: number) => `${n > 0 ? '+' : ''}${n}`;
 
 /** Live "what if": target weight, weeks, weekly rate, calories and protein move together. */
-export function GoalPanel({ body, goal, state, diet, coeffs, settings, now, onChange }: Props) {
+export function GoalPanel({ body, goal, state, diet, coeffs, settings, now, bodyFatSource, onChange }: Props) {
   const { plan, macros, targetWeightKg } = diet;
   const w0 = body.weightKg;
   const moving = goal === 'cut' || goal === 'bulk';
@@ -51,6 +53,7 @@ export function GoalPanel({ body, goal, state, diet, coeffs, settings, now, onCh
         {' · '}
         {body.bodyFatPercent !== null ? <Tx k="nutrition.goal.bodyFat" params={{ bf: r1(body.bodyFatPercent) }} /> : t('nutrition.goal.bodyFatUnknown')}
       </p>
+      {bodyFatSource === 'navy' && <p className={styles.rowSub}>{t('nutrition.goal.bodyFatNavy')}</p>}
       <Select
         label={t('nutrition.goal.experience')}
         value={state.experience}
