@@ -428,7 +428,7 @@ function DietView({ client, saved, settings, dietSettings, recipes, foods, heade
               workoutTime={profile.workoutTime}
               onPreset={(p) => setProfile({ ...profile, split: p, shares: null, workoutTime: p === 'workout' && profile.workoutTime === null ? '17:00' : profile.workoutTime })}
               onShares={(sh) => setProfile({ ...profile, split: 'custom', shares: sh })}
-              onWorkout={(time) => setProfile({ ...profile, workoutTime: time, ...(profile.split === 'custom' ? {} : {}) })}
+              onWorkout={(time) => setProfile({ ...profile, workoutTime: time })}
             />
           </div>
         </details>
