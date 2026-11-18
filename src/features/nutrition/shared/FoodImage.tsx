@@ -25,14 +25,14 @@ export function FoodImage({ imageId, photo, icon, food, className }: FoodImagePr
   const stem = photo ?? food?.photo;
   if (stem && failed !== stem) {
     return (
-      <span className={cx(styles.box, styles.photo, className)}>
+      <span className={cx(styles.box, styles.photo, className)} data-kind="photo">
         <img src={foodPhotoUrl(stem)} alt="" loading="lazy" decoding="async" draggable={false} onError={() => setFailed(stem)} />
       </span>
     );
   }
   const hex = icon ?? foodIconHex(food ?? {});
   return (
-    <span className={cx(styles.box, styles.icon, className)}>
+    <span className={cx(styles.box, styles.icon, className)} data-kind="icon">
       <img src={foodIconUrl(hex)} alt="" loading="lazy" decoding="async" draggable={false} />
     </span>
   );

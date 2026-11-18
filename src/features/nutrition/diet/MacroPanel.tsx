@@ -35,7 +35,7 @@ export function MacroPanel({ spec, targets, weightKg, kpg, onChange }: Props) {
   };
   return (
     <div className={styles.panel}>
-      <p className={diet.intro}>{t('nutrition.cal.macroHint')}</p>
+      <p className={styles.rowSub}>{t('nutrition.cal.macroHint')}</p>
       <MacroRow name={t('nutrition.cal.macro.protein')} amount={spec.protein} units={UNITS.protein} sub={line('protein')} onSet={(a) => setKey('protein', a)} onUnit={(u) => setUnit('protein', u)} />
       <SegmentedControl
         label={t('nutrition.cal.restTitle')}

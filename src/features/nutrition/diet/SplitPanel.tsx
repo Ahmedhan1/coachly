@@ -25,7 +25,7 @@ export function SplitPanel({ slots, kcal, preset, workoutTime, onPreset, onShare
   const move = (i: number, d: number) => onShares(setShare(shares, i, (shares[i] ?? 0) + d));
   return (
     <div className={styles.panel}>
-      <p className={diet.intro}>{t('nutrition.cal.splitHint')}</p>
+      <p className={styles.rowSub}>{t('nutrition.cal.splitHint')}</p>
       <div className={styles.chips} role="group" aria-label={t('nutrition.cal.presetTitle')}>
         {[...SPLIT_PRESETS, 'custom' as const].map((p) => (
           <button

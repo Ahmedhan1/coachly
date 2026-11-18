@@ -22,8 +22,67 @@ photos, for the "download all" button).
 writes our own short Arabic cues.
 
 Last build (2026-11-16): **876 exercises, 1746 / 1746 images, 0 missing** (3 exercises have no image in the
-dataset at all), `exercises.json` 288 KB + images 21.1 MB = **21.4 MB** total. A sample photo goes from
+dataset at all), `exercises.json` 288 KB + images 21.1 MB = **21.4 MB** total.
+
+Wave 5 (2026-11-18, `--manifest-only`, no image changes): **1082 exercises** (876 dataset + 206 built-in extras),
+890 with photos (17 extras reuse dataset photos via `imagesFrom`), 192 shown with the labelled muscle picture,
+`exercises.json` 524 KB. Every exercise carries `jointStress` and `homeFriendly`. A sample photo goes from
 850×567 JPEG, 61 KB to 480×320 WebP, 10 KB.
+
+## Visual audit and hand fixes (`data-src/exercise-fixes.json`)
+
+All 873 photo exercises were checked on contact sheets (40 per sheet, both photos, id + muscles + equipment) plus an
+automatic pass (corrupt / blank / tiny / over 40 KB / byte-identical photos across exercises). Result: no corrupt,
+blank or oversized file; one small subject (Heavy Bag Thrust, 275 px, kept). Byte-identical photos are mostly a
+shared start position of stretches (fine); where a photo showed a *different* exercise or no person it is dropped.
+`exercise-fixes.json` maps an id to `{ keepImages?, primary?, secondary?, equipment?, jointStress?, homeFriendly?,
+reason }`; `keepImages` are 0-based photo indexes. Current fixes: 5 photo fixes (Quad Stretch, Intermediate Hip
+Flexor and Quad Stretch, Lower Back SMR, Bicycling, Skating), 18 muscle fixes (e.g. Cable Hip Adduction → adductors,
+bench-press variants → chest, Box Jump → quads, Reverse Hyperextension → glutes), 2 equipment fixes (→ bands).
+`--manifest-only` rebuilds the image list from the files on disk, so removing a fix brings the photo back.
+
+Extras with dataset photos (`imagesFrom`, same movement): Bicycle Crunch ← Air Bike, Toes to Bar ← Hanging Pike,
+V-Up ← Jackknife Sit-Up, Medicine Ball Slam ← Overhead Slam, Chest-Supported Machine Row ← Leverage Iso Row, Spin
+Bike ← Stationary Bike, Incline Treadmill Walk ← Walking Treadmill, Treadmill Sprint ← Running Treadmill, Skater
+Jump ← Lateral Bound, Standing Cable Glute Kickback ← One-Legged Cable Kickback, Single-Arm Cable Lateral Raise ←
+Standing Low-Pulley Deltoid Raise, Cable Bar Curl ← Standing Biceps Cable Curl, Foam Roll Glutes ← Piriformis SMR,
+Foam Roll Upper Back ← Rhomboids SMR, Band Shoulder Dislocate ← Round the World Shoulder Stretch (stick),
+Dumbbell Bulgarian Split Squat ← Split Squat with Dumbbells (rear foot elevated), Cable Pullover ← Straight-Arm
+Pulldown. The upstream dataset has nothing else that matches the remaining extras.
+
+## Joint stress and home-friendly (`jointStress`, `homeFriendly`)
+
+Every pack entry has `jointStress: { knee, shoulder, lowerBack }` (`'low' | 'medium' | 'high'`) and
+`homeFriendly: boolean`, for tailoring programs to a client's injuries and to training at home. Built by
+`deriveJointStress` / `deriveHomeFriendly` in `src/domain/exercises/jointStress.ts`; hand-set values (in
+`exercise-extras.json` per extra, `exercise-fixes.json` per dataset id) win per joint. Catalog exercises from an
+older pack and custom exercises get the rule values at runtime. The rules (conservative — unsure means medium):
+
+- **Every stretch** is low on all three joints (except shoulder for named high-risk positions).
+- **Knee:** high for plyometrics on the legs, jumps/hops/bounds/sprints, olympic and strongman lifts, deep or shear-heavy
+  bends (pistol, sissy, front/full/overhead/hack squat, Jefferson, Nordic) and any barbell squat/lunge/split/step-up
+  (box squat = medium); low for carries, sleds and drags, hinges, leg curls, bridges, hip thrusts, calves, abduction,
+  bikes, elliptical, walking; medium for other squats, lunges, leg press, leg extension, step-ups, running, rope,
+  quad-led compounds; low otherwise.
+- **Shoulder:** high for overhead barbell/kettlebell pressing (military, push press, Arnold), behind-the-neck, dips,
+  upright rows, snatch/jerk, overhead squat, handstand, kipping, muscle-up, guillotine press, iron cross, Turkish
+  get-up; low for rotator-cuff and scapular work, rows on a cable/machine, shrugs, carries, curls and forearm work;
+  medium for presses, push-ups, flies, raises, pull-ups/pulldowns, pullovers, triceps extensions, hanging core,
+  throws, swings, planks and crawls; low otherwise.
+- **Lower back:** high for barbell deadlifts, good mornings, unsupported barbell rows, strongman and olympic lifts,
+  barbell squats/lunges/standing presses (medium when the same hinge uses a machine, dumbbell, kettlebell, band, cable
+  or one leg; carries and sleds medium); low for machines, seated/lying/supported moves, core stability (bird dog, dead
+  bug, plank, McGill, Pallof), bridges, pulldowns, bikes; medium for swings, free-standing rows, sit-ups and leg
+  raises, back extensions, overhead presses, thrusters, running and jumps, and loaded squats/lunges.
+- **homeFriendly:** equipment is body weight, bands, dumbbell, kettlebell, a ball or a foam roller (or "other" for a
+  stretch, TRX, towel or wall) and the name needs no station (machine, cable, Smith, bench press, incline/decline,
+  bar, pull-up/dip station, treadmill, sled, …).
+
+Hand review: 105 of the 108 wave-5 extras carry hand-set joint values (rehab moves are low on all three; the other 3 are barbell moves where the rules are right); the rule output
+for the whole library was reviewed on samples and the rules corrected where wrong. `fitsJointLimits(stress, limits)`
+and `maxJointStress()` are the helpers for the client-tailoring code. Tests: `src/domain/exercises/jointStress.test.ts`,
+`scripts/exercise-pack-data.test.ts` (shipped pack: no duplicate ids/names, ar + en names, every photo on disk and
+≤ 40 KB, joint data on every exercise).
 
 ## Building it
 

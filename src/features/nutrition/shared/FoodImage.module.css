@@ -22,7 +22,8 @@
   background: var(--surface-2);
 }
 
-.photo img {
+.photo img,
+.photo[data-kind='photo'] img {
   display: block;
   inline-size: 100%;
   block-size: 100%;

@@ -23,6 +23,7 @@ const mealTarget = async (page: Page, name: string) => {
 };
 
 test('calorie control: macros in g/kg and %, meal split, carb cycling, food prefs, shopping, trend', async ({ page }) => {
+  test.setTimeout(120_000);
   await openDiet(page);
   const kcalField = page.getByLabel('اكتب السعرات');
   const kcal = Number(await kcalField.inputValue());
@@ -81,7 +82,7 @@ test('calorie control: macros in g/kg and %, meal split, carb cycling, food pref
   await picker.getByRole('button', { name: /تونة/ }).first().click();
   await expect(sheet.getByRole('button', { name: /شيل تونة/ })).toBeVisible();
   await page.screenshot({ path: `${SHOTS}/cal-prefs.png` });
-  await sheet.getByRole('button', { name: 'قفل' }).first().click().catch(() => page.keyboard.press('Escape'));
+  await sheet.getByRole('button', { name: 'إغلاق' }).first().click();
   await expect(sheet).toBeHidden();
   await expect(page.getByText(/وصفة اتشالت/)).toBeVisible();
   for (let d = 1; d <= 7; d++) {

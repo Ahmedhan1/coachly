@@ -74,7 +74,7 @@ export default defineConfig({
         // first load. Exercise photos (~21 MB) are NOT precached: they are cached on first view (route below).
         globPatterns: ['**/*.{js,css,html,png,svg,ico,woff2,json,webmanifest,glb}'],
         // Draco decoders: the shipped model is not Draco-compressed, so never precache them (~0.8 MB).
-        globIgnores: ['exercise-pack/img/**', 'assets/draco_*', 'draco/**'],
+        globIgnores: ['exercise-pack/img/**', 'assets/draco_*', 'draco/**', 'food-img/**'],
         maximumFileSizeToCacheInBytes: 15 * 1024 * 1024,
         importScripts: ['push-sw.js'],
         navigateFallback: '/index.html',
@@ -84,6 +84,17 @@ export default defineConfig({
         // No skipWaiting: updates activate on the trainer's tap (SKIP_WAITING message) or on the next cold start.
         clientsClaim: true,
         runtimeCaching: [
+          {
+            // Food photos (~4 MB): cached on first view or by "download all food photos"; same cache name as
+            // src/features/nutrition/shared/foodPhotos.ts.
+            urlPattern: ({ url, sameOrigin }) => sameOrigin && url.pathname.startsWith('/food-img/'),
+            handler: 'CacheFirst',
+            options: {
+              cacheName: 'food-photos',
+              expiration: { maxEntries: 1000, purgeOnQuotaError: false },
+              cacheableResponse: { statuses: [200] },
+            },
+          },
           {
             urlPattern: ({ url, sameOrigin }) => sameOrigin && url.pathname.startsWith('/exercise-pack/img/'),
             handler: 'CacheFirst',
