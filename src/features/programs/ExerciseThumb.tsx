@@ -2,6 +2,8 @@ import { useState } from 'react';
 import { muscleLoadForExercise, type CatalogExercise } from '@/domain/exercises';
 import { cx } from '@/ui';
 import { MuscleMap, intensitiesFromLoad } from '@/ui/MuscleMap';
+import { IllustrationImage } from '@/features/exercises/IllustrationImage';
+import { t } from '@/i18n';
 import styles from './Shared.module.css';
 
 export interface ExerciseThumbProps {
@@ -31,6 +33,12 @@ export function ExerciseThumb({ exercise, size = 'md', tag, className }: Exercis
     <div className={cx(styles.photo, styles[size], className)} aria-hidden="true">
       {showPhoto ? (
         <img src={src} alt="" loading="lazy" decoding="async" className={styles.img} onError={() => setFailed(src)} draggable={false} />
+      ) : exercise ? (
+        // Same muscle-target picture as the exercise library (3D still, flat map while it renders), labelled.
+        <>
+          <IllustrationImage exercise={exercise} fallbackSize={size === 'sm' ? 44 : size === 'md' ? 76 : 120} />
+          {size !== 'sm' && <span className={styles.pictureBadge}>{t('exercises.detail.illustrationShort')}</span>}
+        </>
       ) : (
         <MuscleMap intensities={intensities} view={view} size={size === 'sm' ? 48 : size === 'md' ? 84 : 120} className={styles.fallbackMap} />
       )}

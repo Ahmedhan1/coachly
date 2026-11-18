@@ -54,6 +54,22 @@
   block-size: 100%;
 }
 
+.pictureBadge {
+  position: absolute;
+  inset-block-end: 3px;
+  inset-inline: 3px;
+  padding: 1px 4px;
+  border-radius: var(--r-xs);
+  background: var(--surface);
+  color: var(--text-2);
+  font: var(--t-caption);
+  font-size: 10px;
+  text-align: center;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
 .mapBadge {
   position: absolute;
   inset-inline-end: 4px;

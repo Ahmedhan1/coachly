@@ -120,6 +120,8 @@ export function pdfStyles(): string {
 .b-ex .c-p { padding-inline: 0 6px; }
 .b-ex .pic { width: ${EXERCISE_IMAGE_PX}px; height: ${EXERCISE_IMAGE_PX}px; border-radius: 8px; background: #f2f2f4; object-fit: cover; display: block; }
 .b-ex .pic.ph { background: var(--tint1); }
+.b-ex .pic.mm { object-fit: contain; background: #fff; border: 1px solid #ececef; }
+.b-ex .cr { width: ${EXERCISE_IMAGE_PX}px; margin-top: 2px; font-size: 6px; line-height: 1.2; color: #8e8e93; text-align: center; overflow-wrap: anywhere; }
 .b-ex .nm { font-size: ${FONT.name - 1}px; font-weight: 800; line-height: 1.4; overflow-wrap: anywhere; }
 .b-ex .en { font-size: ${FONT.small - 1}px; color: #6e6e73; line-height: 1.45; overflow-wrap: anywhere; }
 .b-ex .mus { display: flex; flex-wrap: wrap; gap: 3px; margin-block-start: 3px; height: 19px; overflow: hidden; }

@@ -17,17 +17,21 @@ export function pdfExerciseFromCatalog(
   locale: ExerciseLocale = 'ar',
 ): PdfExercise {
   const first = e.images[0];
-  const image: PdfImageRef | null = !first
+  const photo: PdfImageRef | null = !first
     ? null
     : first.kind === 'pack'
       ? { kind: 'pack', path: `${packBase}${first.path}` }
       : { kind: 'stored', imageId: first.imageId };
+  // No photo: the muscle picture takes the photo's place, so the row never shows an empty box.
+  const image = photo ?? muscleMap;
   return {
     name: exerciseName(e, locale),
     secondaryName: locale === 'ar' ? (e.nameEn && e.nameEn !== e.nameAr ? e.nameEn : null) : exerciseAltName(e, locale),
     muscles: e.primaryMuscles.map((m) => muscleLabel(m, locale)),
     image,
     muscleMap,
+    imageIsMuscleMap: photo === null && muscleMap !== null,
+    imageCredit: first?.kind === 'pack' ? (e.imageCredit ?? null) : null,
   };
 }
 
@@ -163,6 +167,8 @@ function programBlocks(input: PdfDocumentInput, withMuscleMaps: boolean): PdfBlo
         extras,
         notes: mergeItemNotes(item.notes, clientNoteText(input.client?.exerciseNotes?.[item.exerciseId], input.labels.units.kg)),
         image: ex?.image ?? null,
+        imageIsMuscleMap: ex?.imageIsMuscleMap ?? false,
+        imageCredit: ex?.imageCredit ?? null,
         muscleMap: withMuscleMaps ? (ex?.muscleMap ?? null) : null,
         superset: item.supersetGroup ? `${L.superset} ${item.supersetGroup}` : null,
         withMap: withMuscleMaps,

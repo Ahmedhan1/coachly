@@ -9,6 +9,7 @@ export const exercises: EnArea<'exercises'> = {
     illustrationAlt: 'Target muscles drawing for {name}',
     illustrationLegend: 'Dark: primary muscle, light: secondary muscles',
     illustrationSlide: 'Muscle drawing',
+    illustrationShort: 'Muscles',
     photoCredit: 'Image: {credit}',
     clients: 'Your clients doing this exercise',
     clientsHint: 'Clients who have this exercise in their program.',

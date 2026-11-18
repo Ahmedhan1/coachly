@@ -23,6 +23,10 @@ export interface PdfExercise {
   image: PdfImageRef | null;
   /** Still snapshot of the 3D model with the target muscle coloured. */
   muscleMap: PdfImageRef | null;
+  /** True when `image` is the muscle picture standing in for a missing photo (drawn whole, not cropped). */
+  imageIsMuscleMap?: boolean;
+  /** Attribution printed small under the photo (CC BY-SA sources), e.g. "Everkinetic, CC BY-SA 4.0". */
+  imageCredit?: string | null;
 }
 
 export interface PdfNutrition {
@@ -188,6 +192,10 @@ export type PdfBlock =
       extras: KeyValue[];
       notes: string;
       image: PdfImageRef | null;
+      /** The image is the muscle picture standing in for a missing photo. */
+      imageIsMuscleMap?: boolean;
+      /** Small attribution line under the image, or null. */
+      imageCredit?: string | null;
       muscleMap: PdfImageRef | null;
       superset: string | null;
       /** Same table as the head (muscle-map column on/off). */

@@ -135,7 +135,10 @@ export function PdfBuilderScreen() {
       const e = catalog?.byId.get(id);
       return e ? [e] : [];
     });
-    const muscleMaps = program && sections.includes('muscle_map') ? await muscleMapRefs(usedExercises, settings.primaryColor) : undefined;
+    // Muscle pictures for the muscle-map column, and always for exercises without a photo (they stand in for it).
+    const withMaps = sections.includes('muscle_map');
+    const needMaps = withMaps ? usedExercises : usedExercises.filter((e) => e.images.length === 0);
+    const muscleMaps = program && needMaps.length > 0 ? await muscleMapRefs(needMaps, settings.primaryColor) : undefined;
     const input = buildPdfInput({
       muscleMaps,
       sections: usable,
