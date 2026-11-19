@@ -1,6 +1,7 @@
 import type { AppDatabase } from '../db';
 import { randomId, systemClock, type Clock, type IdFactory } from '../clock';
 import { ClientRepository } from './clientRepository';
+import { CloudFileRepository } from './cloudFileRepository';
 import type { RepositoryContext } from './entityRepository';
 import { ImageRepository } from './imageRepository';
 import { PaymentRepository } from './paymentRepository';
@@ -31,6 +32,7 @@ export interface Repositories {
   progress: ProgressRepository;
   pdfTemplates: PdfTemplateRepository;
   images: ImageRepository;
+  cloudFiles: CloudFileRepository;
 }
 
 export function createRepositories(db: AppDatabase, clock: Clock = systemClock, newId: IdFactory = randomId): Repositories {
@@ -49,8 +51,10 @@ export function createRepositories(db: AppDatabase, clock: Clock = systemClock, 
     progress: new ProgressRepository(ctx),
     pdfTemplates: new PdfTemplateRepository(ctx),
     images: new ImageRepository(ctx),
+    cloudFiles: new CloudFileRepository(ctx),
   };
 }
 
 export { NotFoundError, type NewEntity, type EntityPatch } from './entityRepository';
 export type { SettingsPatch } from './settingsRepository';
+export type { CloudFileContent } from './cloudFileRepository';

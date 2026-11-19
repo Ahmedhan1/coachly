@@ -29,7 +29,8 @@ export function isDeviceLocalMetaKey(key: string): boolean {
 
 /** Every table that is exported as rows (the images table is exported as metadata + separate files). */
 export function rowTableNames(db: AppDatabase): string[] {
-  return db.tables.map((t) => t.name).filter((n) => n !== TABLES.images).sort();
+  // cloudFiles is this device's upload queue (may hold raw PDF bytes); the remote copies are found again by kind + ref.
+  return db.tables.map((t) => t.name).filter((n) => n !== TABLES.images && n !== TABLES.cloudFiles).sort();
 }
 
 /** All rows of one table, soft-deleted rows included. Meta rows bound to this device are left out. */
