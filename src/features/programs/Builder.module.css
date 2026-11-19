@@ -376,8 +376,10 @@
   display: flex;
   gap: var(--sp-2);
   padding: var(--sp-3) calc(var(--gutter) + var(--safe-right)) calc(var(--safe-bottom) + var(--sp-2)) calc(var(--gutter) + var(--safe-left));
-  border-block-start: var(--hairline) solid var(--line);
+  border-block-start: var(--hairline) solid var(--material-line);
   background: var(--bg);
+  -webkit-backdrop-filter: var(--material-blur);
+  backdrop-filter: var(--material-blur);
 }
 
 .stack {
@@ -421,4 +423,10 @@
   content: '';
   position: absolute;
   inset: -12px -6px;
+}
+
+@supports ((-webkit-backdrop-filter: blur(1px)) or (backdrop-filter: blur(1px))) {
+  .actionbar {
+    background: var(--material-bg);
+  }
 }

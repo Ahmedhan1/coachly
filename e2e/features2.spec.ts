@@ -22,6 +22,8 @@ test('food table: search, add a custom food', async ({ page }) => {
   await d.getByLabel('كارب جم / 100 جم').fill('66');
   await d.getByLabel('دهون جم / 100 جم').fill('7');
   await d.getByRole('button', { name: 'حفظ' }).click();
+  // The sheet keeps the page inert while it closes; typing before that is lost.
+  await expect(d).toBeHidden();
   await page.getByLabel('دوّر على صنف').fill('شوفان بالتمر');
   await expect(page.getByRole('button', { name: /^شوفان بالتمر/ })).toBeVisible();
 });

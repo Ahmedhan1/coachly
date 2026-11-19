@@ -1,10 +1,11 @@
+import { ClientAvatar } from '@/features/clients/ClientAvatar';
 import { useState } from 'react';
 import { useRepos } from '@/app/services';
 import { useLive } from '@/app/useLive';
 import type { Client } from '@/domain/models';
 import { searchItems } from '@/data';
 import { t } from '@/i18n';
-import { Avatar, Badge, Icon, SearchField, Sheet } from '@/ui';
+import { Badge, Icon, SearchField, Sheet } from '@/ui';
 import styles from './Shared.module.css';
 
 export interface ClientPickerSheetProps {
@@ -72,7 +73,7 @@ export function ClientPickerSheet({ open, title, onClose, onPick, currentId, exc
                 aria-pressed={onPickMany ? picked.has(c.id) : undefined}
                 onClick={() => (onPickMany ? toggle(c.id) : onPick(c))}
               >
-                <Avatar name={c.name} />
+                <ClientAvatar client={c} />
                 <span className={styles.pickerText}>
                   <span className={styles.pickerName}>{c.name}</span>
                 </span>

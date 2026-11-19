@@ -28,10 +28,48 @@
   color: var(--photo-ink);
 }
 
-.photo svg {
+.photo {
+  position: relative;
+  cursor: pointer;
+}
+
+.photo > svg {
   inline-size: 46px;
   block-size: 46px;
   stroke-width: 1.6;
+}
+
+.photoImg {
+  inline-size: 100%;
+  block-size: 100%;
+  object-fit: cover;
+  border-radius: inherit;
+}
+
+/* Small camera chip on the corner: says "tap to change" without a label. */
+.photoBadge {
+  position: absolute;
+  inset-block-end: -6px;
+  inset-inline-end: -6px;
+  display: grid;
+  place-items: center;
+  inline-size: 30px;
+  block-size: 30px;
+  border-radius: var(--r-full);
+  border: 2px solid var(--bg);
+  background: var(--text);
+  color: var(--bg);
+}
+
+.photoBadge svg {
+  inline-size: 16px;
+  block-size: 16px;
+  stroke-width: 2;
+}
+
+.photo:active .photoImg,
+.photo:active > svg {
+  opacity: 0.7;
 }
 
 .whoText {
@@ -206,7 +244,9 @@
   gap: var(--sp-2);
   padding: var(--sp-3) calc(var(--gutter) + var(--safe-right)) calc(var(--safe-bottom) + var(--sp-2)) calc(var(--gutter) + var(--safe-left));
   background: var(--bg);
-  border-block-start: var(--hairline) solid var(--line);
+  -webkit-backdrop-filter: var(--material-blur);
+  backdrop-filter: var(--material-blur);
+  border-block-start: var(--hairline) solid var(--material-line);
 }
 
 @media (max-height: 700px) {
@@ -294,4 +334,10 @@
   background: var(--ok);
   color: #fff;
   font: 600 16px/1 var(--font-ui);
+}
+
+@supports ((-webkit-backdrop-filter: blur(1px)) or (backdrop-filter: blur(1px))) {
+  .actionbar {
+    background: var(--material-bg);
+  }
 }

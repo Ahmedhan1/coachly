@@ -2,6 +2,7 @@ import type { Strings } from '../ar';
 import { assistant } from './assistant';
 import { core } from './core';
 import { exercises } from './exercises';
+import { files } from './files';
 import { hub } from './hub';
 import { nutrition } from './nutrition';
 import { outbox } from './outbox';
@@ -27,6 +28,7 @@ export const en: DeepPartial<StringShape<Strings>> = {
   pdf,
   settings,
   storage,
+  files,
   schedule,
   assistant,
   hub,

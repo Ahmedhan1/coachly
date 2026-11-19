@@ -27,6 +27,12 @@ export const RULES = {
   checkinIpHour: { name: 'checkin-ip-h', limit: 6, windowSeconds: 3600 },
   checkinIpDay: { name: 'checkin-ip-d', limit: 20, windowSeconds: 86_400 },
   checkinPage: { name: 'checkin-page', limit: 10, windowSeconds: 86_400 },
+  /** Cloud files: per license. */
+  filesWrite: { name: 'files-write', limit: 400, windowSeconds: 86_400 },
+  filesRead: { name: 'files-read', limit: 2000, windowSeconds: 86_400 },
+  /** Client-page uploads (public, write token): per IP and per page. */
+  clientFileIpHour: { name: 'client-file-ip-h', limit: 10, windowSeconds: 3600 },
+  clientFilePage: { name: 'client-file-page', limit: 20, windowSeconds: 86_400 },
   /** Memory only (no D1 write): the static viewer page and the public VAPID key. */
   viewerPage: { name: 'viewer', limit: 120, windowSeconds: 600 },
   vapidKey: { name: 'vapid', limit: 60, windowSeconds: 600 },

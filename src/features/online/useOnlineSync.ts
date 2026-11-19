@@ -7,6 +7,7 @@ import { useBrandAssets } from '@/features/identity/useBrandAssets';
 import { runWebhooks } from './integrations';
 import { pagesSignature, republishChangedPages } from './clientPagePublish';
 import { pullCheckins, syncPush } from './sync';
+import { pullClientPhotos } from '@/features/files/pullClientPhotos';
 
 /** Wait after the last data change before re-uploading pages (editing a program is many small saves). */
 const REPUBLISH_DEBOUNCE_MS = 20_000;
@@ -34,6 +35,11 @@ export function useOnlineSync(active: boolean): void {
         await runWebhooks(services).catch(() => 0);
         const n = await pullCheckins(services).catch(() => 0);
         if (n > 0) showToast({ message: t('settings.clientPage.checkinArrived', { n }), duration: 4000 });
+        // Photos clients sent from their page, then every queued upload/delete of photos, receipts and PDFs.
+        const photos = await pullClientPhotos(services).catch(() => [] as string[]);
+        if (photos.length === 1) showToast({ message: t('files.clientPhoto.arrived', { name: photos[0] ?? '' }), duration: 4000 });
+        else if (photos.length > 1) showToast({ message: t('files.clientPhoto.arrivedMany', { n: photos.length }), duration: 4000 });
+        await services.online?.files?.run().catch(() => null);
         // Pages whose data changed (or failed to upload last time) go up again; unchanged ones are skipped.
         await republishChangedPages(services).catch(() => 0);
       } finally {

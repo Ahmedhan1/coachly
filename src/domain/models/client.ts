@@ -78,6 +78,8 @@ export const clientSchema = z
     remainingSessions: z.number().int().min(0).max(1000),
     notes: longTextSchema,
     photoId: imageIdSchema.nullable(),
+    /** Small copy of the photo for lists (≤320 px). Optional: clients saved before photos had none. */
+    photoThumbId: imageIdSchema.nullable().optional(),
     trainingProfile: trainingProfileSchema.optional(),
     /** Per-client exercise notes, keyed by exercise id. */
     exerciseNotes: z.record(exerciseRefSchema, clientExerciseNoteSchema).optional(),

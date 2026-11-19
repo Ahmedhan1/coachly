@@ -1,7 +1,8 @@
 import { generateShortCode } from '../../shared/license';
 import { D1LicenseStore, D1RateLimiter } from './d1Store';
 import { base64UrlEncode } from '../../shared/license';
-import { cloudConfigFromEnv } from './cloud/config';
+import { cloudConfigFromEnv, filesDepsFromEnv } from './cloud/config';
+import type { ObjectStore } from './files/objectStore';
 import type { Env } from './env';
 import type { CloudConfig, Deps, RateLimiter, ServerCrypto, VapidSource } from './ports';
 import { importVapidKeys, type VapidKeys } from './push/vapid';
@@ -22,6 +23,8 @@ export interface DepsOverrides {
   cloudConfig?: Partial<CloudConfig>;
   pushFetch?: typeof fetch;
   vapid?: VapidSource;
+  /** Object store for cloud files (tests pass memory; null = not configured). */
+  objectStore?: ObjectStore | null;
 }
 
 let cachedVapid: { fingerprint: string; value: Promise<VapidKeys | null> } | null = null;
@@ -86,6 +89,7 @@ export async function depsFromEnv(env: Env, overrides: DepsOverrides = {}): Prom
       pushFetch: overrides.pushFetch ?? ((input, init) => fetch(input, init)),
       vapid: overrides.vapid ?? vapidFor(env),
       config: cloudConfigFromEnv(env, overrides.cloudConfig),
+      files: filesDepsFromEnv(env, overrides.objectStore),
       newId: randomId,
     },
   };

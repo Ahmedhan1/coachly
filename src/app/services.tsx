@@ -4,6 +4,7 @@ import type { ActivationService } from '@/services/activation/types';
 import type { BackupServices } from '@/services/backup';
 import type { ClientPageService } from '@/services/clientPage/clientPageService';
 import type { PushService } from '@/services/push/pushService';
+import type { FileSyncService } from '@/services/files/fileSyncService';
 import type { MetaStore } from '@/services/license/metaStore';
 import type { ImageDownscaler, StorageService } from '@/services/storage';
 
@@ -16,8 +17,8 @@ export interface AppServices {
   images: ImageDownscaler;
   /** Local backup file + automatic encrypted cloud backup. Absent in tests that do not need it. */
   backup?: BackupServices;
-  /** Optional online extras (Web Push, client page). Each call fails quietly. */
-  online?: { push: PushService; clientPage: ClientPageService };
+  /** Optional online extras (Web Push, client page, cloud files). Each call fails quietly. */
+  online?: { push: PushService; clientPage: ClientPageService; files?: FileSyncService };
 }
 
 const ServicesContext = createContext<AppServices | null>(null);

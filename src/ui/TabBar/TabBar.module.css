@@ -5,8 +5,10 @@
   z-index: 40;
   padding-block-end: var(--safe-bottom);
   padding-inline: var(--safe-left) var(--safe-right);
-  background: var(--surface);
-  border-block-start: var(--hairline) solid var(--line);
+  background: var(--bg);
+  -webkit-backdrop-filter: var(--material-blur);
+  backdrop-filter: var(--material-blur);
+  border-block-start: var(--hairline) solid var(--material-line);
 }
 
 .list {
@@ -65,4 +67,10 @@
   inline-size: 26px;
   block-size: 26px;
   stroke-width: 2.4;
+}
+
+@supports ((-webkit-backdrop-filter: blur(1px)) or (backdrop-filter: blur(1px))) {
+  .bar {
+    background: var(--material-bg);
+  }
 }

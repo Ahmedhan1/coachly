@@ -98,7 +98,17 @@ input[type=file]{padding:10px 0;background:transparent;border:0}
 details{margin-block:12px;border:1px solid var(--line);border-radius:var(--r-md);padding:0 12px}
 summary{min-block-size:var(--tap);display:flex;align-items:center;font-weight:600;cursor:pointer}
 details[open]{padding-block-end:12px}
-.thumbs{display:flex;gap:8px;flex-wrap:wrap}.thumbs img{inline-size:72px;block-size:72px;object-fit:cover;border-radius:10px}
+.thumbs{display:flex;gap:10px;flex-wrap:wrap;margin-block-end:4px}.thumbs:empty{display:none}
+.thumb{position:relative;inline-size:88px;block-size:88px}.thumb img{inline-size:100%;block-size:100%;object-fit:cover;border-radius:12px;background:var(--surface-2)}
+.thumb-x{position:absolute;inset-block-start:-8px;inset-inline-end:-8px;inline-size:32px;block-size:32px;border-radius:50%;border:2px solid var(--surface);background:var(--text);color:var(--surface);font:700 16px/1 var(--font);padding:0}
+.thumb-x::after{content:"";position:absolute;inset:-6px}
+.add-photo,.pick-photo{display:flex;align-items:center;justify-content:center;gap:8px;min-block-size:52px;border:2px dashed var(--brand);border-radius:var(--r-md);color:var(--brand);font:700 16px var(--font);cursor:pointer}
+.add-photo input,.pick-photo input{position:absolute;inline-size:1px;block-size:1px;opacity:0;pointer-events:none}
+.trainer-photo{inline-size:44px;block-size:44px;border-radius:50%;object-fit:cover;flex:none;border:2px solid rgba(255,255,255,.7)}
+.my-photo{margin-block-start:12px}.my-photo-row{display:flex;align-items:center;gap:12px}.my-photo-row .pick-photo{flex:1}
+.my-photo-face{inline-size:64px;block-size:64px;border-radius:50%;overflow:hidden;flex:none;background:var(--surface-2);border:1px solid var(--line)}
+.my-photo-face img{inline-size:100%;block-size:100%;object-fit:cover}
+.add-photo:focus-within,.pick-photo:focus-within{outline:3px solid var(--brand);outline-offset:2px}.add-photo[hidden]{display:none}
 .btn{min-block-size:52px;inline-size:100%;border:0;border-radius:var(--r-full);background:var(--brand);color:var(--brand-on);font:700 17px var(--font);padding:0 20px}
 .btn:disabled{opacity:.6}.status{min-block-size:1.5em;margin:12px 0 0;font-weight:600}
 .status.ok{color:var(--ok)}.status.err{color:var(--danger)}
