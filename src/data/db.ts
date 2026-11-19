@@ -14,6 +14,7 @@ import type {
   TrainerSettings,
   WorkoutLog,
 } from '@/domain/models';
+import type { FileKind } from '../../shared/files';
 import { MIGRATIONS, type EntityTableName, type Migration } from './schema';
 import { StorageProblems, storageProblemMiddleware } from './storageProblems';
 
@@ -21,6 +22,29 @@ export const DB_NAME = 'pt-coach';
 
 export interface ImageRecord extends ImageMeta {
   blob: Blob;
+}
+
+/**
+ * One cloud file on this device. `kind` + `ref` name it (e.g. client_photo + client id); the remote copy is
+ * found by the same pair, so a restore or a lost answer never uploads it twice.
+ */
+export interface CloudFileRecord {
+  id: string;
+  kind: FileKind;
+  ref: string | null;
+  /** Content is a stored image (images table) ... */
+  imageId: string | null;
+  /** ... or bytes kept here until uploaded (PDF, invoice file). ArrayBuffer, not Blob: iOS Safari is unreliable with Blobs in IndexedDB. */
+  bytes: ArrayBuffer | null;
+  mime: string;
+  name: string | null;
+  remoteId: string | null;
+  /** pending: upload due · synced: the server has this version · deleting: remove remotely, then forget. */
+  state: 'pending' | 'synced' | 'deleting';
+  attempts: number;
+  nextAttemptAt: number;
+  createdAt: number;
+  updatedAt: number;
 }
 
 export interface MetaRecord {
@@ -59,6 +83,7 @@ export class AppDatabase extends Dexie {
   pdfTemplates!: Table<PdfTemplate, string>;
   images!: Table<ImageRecord, string>;
   deletions!: Table<DeletionRecord, number>;
+  cloudFiles!: Table<CloudFileRecord, string>;
   /** Full disk, refused writes and other-tab upgrades; the app shell turns them into toasts. */
   readonly problems = new StorageProblems();
 

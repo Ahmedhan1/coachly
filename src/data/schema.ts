@@ -32,6 +32,7 @@ export const TABLES = {
   pdfTemplates: 'pdfTemplates',
   images: 'images',
   deletions: 'deletions',
+  cloudFiles: 'cloudFiles',
 } as const;
 
 export type TableName = (typeof TABLES)[keyof typeof TABLES];
@@ -90,6 +91,14 @@ export const MIGRATIONS: readonly Migration[] = [
       [TABLES.supplements]: 'id, name, deletedAt',
       [TABLES.progress]: 'id, clientId, date, [clientId+date], deletedAt',
       [TABLES.pdfTemplates]: 'id, name, deletedAt',
+    },
+  },
+  {
+    // Cloud files (photos, thumbnails, invoices, PDFs on iDrive e2): the upload/delete queue and the link between
+    // a local item and its remote copy. Device-local, never in the backup (see backupIO). New table only.
+    version: 3,
+    stores: {
+      [TABLES.cloudFiles]: 'id, state, nextAttemptAt, [kind+ref], remoteId',
     },
   },
 ];

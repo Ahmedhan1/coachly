@@ -13,6 +13,7 @@ import { createBackupServices } from '@/services/backup';
 import { ClientPageService } from '@/services/clientPage/clientPageService';
 import { BrowserNetworkStatus } from '@/services/cloud/networkStatus';
 import { WorkerApi } from '@/services/cloud/workerApi';
+import { FileSyncService, HttpCloudFilesClient } from '@/services/files';
 import { BrowserPushService } from '@/services/push/pushService';
 import { META_KEYS } from '@/services/license/licenseActivationService';
 import { buildEnv, createActivationService } from './activationFactory';
@@ -41,10 +42,22 @@ export function createBrowserServices(): AppServices {
     return typeof v === 'string' && v ? v : null;
   };
   const tokens = { getToken: () => text(LICENSE_TOKEN_KEY) };
-  const api = new WorkerApi({ baseUrl: buildEnv.workerUrl, tokens, network: new BrowserNetworkStatus() });
+  const network = new BrowserNetworkStatus();
+  const api = new WorkerApi({ baseUrl: buildEnv.workerUrl, tokens, network });
+  // Photos and PDFs are bigger than the JSON calls: a longer (still bounded) timeout for the files API.
+  const filesApi = new WorkerApi({ baseUrl: buildEnv.workerUrl, tokens, network, timeoutMs: 60_000 });
+  const data = createDataLayer(db);
+  const files = new FileSyncService({
+    client: new HttpCloudFilesClient(filesApi),
+    files: data.repos.cloudFiles,
+    images: data.repos.images,
+    meta,
+    downscaler: images,
+    now: () => Date.now(),
+  });
   return {
-    online: { push: new BrowserPushService(api), clientPage: new ClientPageService(api) },
-    data: createDataLayer(db),
+    online: { push: new BrowserPushService(api), clientPage: new ClientPageService(api), files },
+    data,
     storage: new BrowserStorageService(),
     activation: createActivationService(db),
     meta,

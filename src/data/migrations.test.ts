@@ -15,7 +15,7 @@ describe('schema migrations', () => {
     expect(db.verno).toBe(LATEST_VERSION);
     expect(db.tables.map((t) => t.name).sort()).toEqual(
       [
-        'clients', 'deletions', 'exercises', 'images', 'mealPlans', 'meta', 'payments', 'pdfTemplates', 'programs',
+        'clients', 'cloudFiles', 'deletions', 'exercises', 'images', 'mealPlans', 'meta', 'payments', 'pdfTemplates', 'programs',
         'progress', 'recipes', 'sessions', 'settings', 'supplements', 'workoutLogs',
       ].sort(),
     );
