@@ -10,7 +10,7 @@ export function PackageSection({ client, next, onEdit, onRenew }: { client: Clie
   const pkg = client.package;
   if (!pkg || pkg.totalSessions <= 0) {
     return (
-      <ListSection title={t('clientDetail.package')}>
+      <ListSection icon="tag" title={t('clientDetail.package')}>
         <div className={styles.pkgEmpty}>
           <p className={styles.pkgTitle}>{t('clientDetail.noPackage')}</p>
           <p className={styles.pkgSub}>{t('clientDetail.noPackageBody')}</p>
@@ -28,7 +28,7 @@ export function PackageSection({ client, next, onEdit, onRenew }: { client: Clie
   const nextTime = next ? timeParts(next.startsAt) : null;
   const nextIsToday = next ? toIsoDate(new Date(next.startsAt)) === toIsoDate(new Date()) : false;
   return (
-    <ListSection title={t('clientDetail.package')}>
+    <ListSection icon="tag" title={t('clientDetail.package')}>
       <div className={styles.pkg}>
         <PackageRing
           total={pkg.totalSessions}
@@ -84,7 +84,7 @@ export function MeasurementsSection({ client }: { client: Client }) {
     m.waistCm !== undefined && { label: t('clientDetail.waist'), value: m.waistCm, unit: t('clientDetail.cm') },
   ].filter((x): x is { label: string; value: number; unit: string } => Boolean(x));
   return (
-    <ListSection title={t('clientDetail.goal')}>
+    <ListSection icon="flag" title={t('clientDetail.goal')}>
       <div className={styles.goal}>
         <p className={styles.goalLabel}>
           <Icon name="target" />
@@ -111,7 +111,7 @@ export function MeasurementsSection({ client }: { client: Client }) {
 
 export function InjuriesSection({ client }: { client: Client }) {
   return (
-    <ListSection title={t('clientDetail.injuries')} count={client.injuries.length || undefined}>
+    <ListSection icon="bandage" title={t('clientDetail.injuries')} count={client.injuries.length || undefined}>
       {client.injuries.length === 0 ? (
         <ListRow leading={<Icon name="check" />} title={t('clientDetail.noInjuries')} />
       ) : (
@@ -156,7 +156,7 @@ export function PaymentsSection({ payments, today, owed, packagePaid = null, cur
         <ListRow leading={<Icon name="wallet" />} title={t('clientDetail.noPayments')} />
       ) : (
         payments.map((p) => (
-          <ListRow
+          <ListRow leading={<Icon name="money" />}
             key={p.id}
             title={<Money minor={p.amountMinor} currency={p.currency} className={styles.amount} />}
             subtitle={

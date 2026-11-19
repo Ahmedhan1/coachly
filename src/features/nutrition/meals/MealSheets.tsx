@@ -60,7 +60,7 @@ export function AddItemSheet({ recipes, onClose, onAdd }: { recipes: RecipeWithN
         {shown.length === 0 && <p className={common.muted}>{t('nutrition.recipes.noMatch')}</p>}
         <div className={styles.freeText}>
           <TextField label={t('nutrition.plan.freeText')} hint={t('nutrition.plan.freeTextHint')} value={text} onChange={(e) => setText(e.target.value)} />
-          <Button variant="secondary" disabled={!text.trim()} onClick={() => onAdd({ recipeId: null, text: text.trim(), servings })}>
+          <Button icon="plus" variant="secondary" disabled={!text.trim()} onClick={() => onAdd({ recipeId: null, text: text.trim(), servings })}>
             {t('common.add')}
           </Button>
         </div>

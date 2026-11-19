@@ -41,7 +41,7 @@ export function WhatsappTemplatesScreen() {
       />
       {templates && (
         <>
-          <ListSection title={t('schedule.wa.builtins')}>
+          <ListSection icon="chat" title={t('schedule.wa.builtins')}>
             {builtins.map((tpl) => (
               <ListRow
                 key={tpl.id}
@@ -52,7 +52,7 @@ export function WhatsappTemplatesScreen() {
               />
             ))}
           </ListSection>
-          <ListSection title={t('schedule.wa.custom')} count={custom.length || undefined} bare={custom.length === 0}>
+          <ListSection icon="edit" title={t('schedule.wa.custom')} count={custom.length || undefined} bare={custom.length === 0}>
             {custom.length === 0 ? (
               <div className={styles.emptyTile}>
                 <EmptyState

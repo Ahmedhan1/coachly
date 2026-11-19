@@ -47,14 +47,14 @@ export function MoreScreen() {
             />
           ))}
         </ListSection>
-        <ListSection title={t('schedule.income.title')}>
+        <ListSection icon="money" title={t('schedule.income.title')}>
  <ListRow to="/more/assistant" leading={<Icon name="chat" />} title={t('assistant.title')} subtitle={t('assistant.hint')} />
  <ListRow to="/more/outbox" leading={<Icon name="chat" />} title={t('outbox.title')} subtitle={t('outbox.hint')} />
           <ListRow to="/more/income" leading={<Icon name="wallet" />} title={t('schedule.more.income')} subtitle={t('schedule.more.incomeHint')} />
           <ListRow to="/more/whatsapp-templates" leading={<Icon name="chat" />} title={t('schedule.more.whatsapp')} subtitle={t('schedule.more.whatsappHint')} />
           <ListRow to="/more/recipes" leading={<Icon name="utensils" />} title={t('nutrition.hub.recipesTitle')} subtitle={t('nutrition.hub.recipesHint')} />
         </ListSection>
-        <ListSection
+        <ListSection icon="storage"
           title={t('screens.more.storage')}
           footer={persisted ? t('screens.more.persisted') : t('screens.more.notPersisted')}
         >

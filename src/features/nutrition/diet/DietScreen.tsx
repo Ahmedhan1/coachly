@@ -115,7 +115,7 @@ export function DietScreen() {
             icon="target"
             title={t('nutrition.diet.needCalc')}
             body={t('nutrition.diet.intro')}
-            action={<Button onClick={() => navigate(`/clients/${client.id}/nutrition`, { replace: true })}>{t('nutrition.diet.goToCalc')}</Button>}
+            action={<Button icon="chart" onClick={() => navigate(`/clients/${client.id}/nutrition`, { replace: true })}>{t('nutrition.diet.goToCalc')}</Button>}
           />
         </div>
       </div>

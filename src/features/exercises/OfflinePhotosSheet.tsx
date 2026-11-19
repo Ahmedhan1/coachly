@@ -57,7 +57,7 @@ export function OfflinePhotosPanel({ pack }: { pack: ExercisePack }) {
         </Button>
       ) : (
         !complete && (
-          <Button block onClick={() => void start(pack)}>
+          <Button icon="download" block onClick={() => void start(pack)}>
             {partial ? t('training.library.offline.resume') : t('training.library.offline.start')}
           </Button>
         )

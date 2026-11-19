@@ -68,7 +68,7 @@ export function AssistantScreen() {
               {t('assistant.privacyNotice.title')}
             </h2>
             <p className={styles.body}>{t('assistant.privacyNotice.body')}</p>
-            <Button block onClick={() => void saveAiSettings(meta, { ...settings, privacyAck: true })}>
+            <Button icon="check" block onClick={() => void saveAiSettings(meta, { ...settings, privacyAck: true })}>
               {t('assistant.privacyNotice.ack')}
             </Button>
           </section>

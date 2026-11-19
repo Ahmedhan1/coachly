@@ -57,7 +57,7 @@ export function TrendCard({ clientId, goal, ds, onApply }: Props) {
                 {t(`nutrition.cal.reason.${suggestion.reason}`, { weeks: suggestion.weeks })}{' '}
                 {t(suggestion.deltaKcal < 0 ? 'nutrition.cal.suggestDown' : 'nutrition.cal.suggestUp', { kcal: Math.abs(suggestion.deltaKcal) })}
               </p>
-              <Button variant="secondary" onClick={() => onApply(suggestion.deltaKcal)}>
+              <Button icon="check" variant="secondary" onClick={() => onApply(suggestion.deltaKcal)}>
                 {t('nutrition.cal.apply')}
               </Button>
             </div>

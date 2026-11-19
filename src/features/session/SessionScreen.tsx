@@ -197,7 +197,7 @@ function SessionRunner({ client, program, dayId: resolvedDayId, history, unit, s
           body={t('training.session.pendingBody', { n: done })}
           action={
             <div className={styles.pendingActions}>
-              <Button
+              <Button icon="play"
                 block
                 onClick={() =>
                   navigate(
@@ -208,7 +208,7 @@ function SessionRunner({ client, program, dayId: resolvedDayId, history, unit, s
               >
                 {t('training.session.pendingResume')}
               </Button>
-              <Button
+              <Button icon="check"
                 block
                 variant="secondary"
                 disabled={saving}
@@ -227,7 +227,7 @@ function SessionRunner({ client, program, dayId: resolvedDayId, history, unit, s
               >
                 {t('training.session.pendingSaveAndNew')}
               </Button>
-              <Button block variant="plain" onClick={startNew}>
+              <Button icon="trash" block variant="plain" onClick={startNew}>
                 {t('training.session.pendingDiscard')}
               </Button>
             </div>
@@ -244,7 +244,7 @@ function SessionRunner({ client, program, dayId: resolvedDayId, history, unit, s
           icon="list"
           title={t('training.session.noProgramTitle')}
           body={t('training.session.noProgramBody')}
-          action={<Button onClick={() => navigate(`/more/programs?client=${client.id}`)}>{t('training.session.buildProgram')}</Button>}
+          action={<Button icon="plus" onClick={() => navigate(`/more/programs?client=${client.id}`)}>{t('training.session.buildProgram')}</Button>}
         />
       </>
     );
@@ -257,7 +257,7 @@ function SessionRunner({ client, program, dayId: resolvedDayId, history, unit, s
           icon="dumbbell"
           title={t('training.session.emptyDayTitle')}
           body={t('training.session.emptyDayBody')}
-          action={program ? <Button onClick={() => navigate(`/programs/${program.id}`)}>{t('training.session.openProgram')}</Button> : undefined}
+          action={program ? <Button icon="list" onClick={() => navigate(`/programs/${program.id}`)}>{t('training.session.openProgram')}</Button> : undefined}
         />
       </>
     );
@@ -323,10 +323,10 @@ function SessionRunner({ client, program, dayId: resolvedDayId, history, unit, s
             {t('training.session.whatsappPr')}
           </a>
         )}
-        <Button block onClick={() => navigate(`/clients/${client.id}?tab=training`, { replace: true })}>
+        <Button icon="user" block onClick={() => navigate(`/clients/${client.id}?tab=training`, { replace: true })}>
           {t('hub.session.openClient', { name: client.name })}
         </Button>
-        <Button block variant="plain" onClick={() => navigate('/', { replace: true })}>
+        <Button icon="home" block variant="plain" onClick={() => navigate('/', { replace: true })}>
           {t('training.session.backHome')}
         </Button>
       </div>
@@ -345,7 +345,7 @@ function SessionRunner({ client, program, dayId: resolvedDayId, history, unit, s
             <Tx k="training.session.summarySets" params={{ done: summary.doneSets, total: summary.totalSets }} />
           </p>
         </div>
-        <Button size="small" variant="secondary" onClick={() => setPhase('summary')}>
+        <Button icon="check" size="small" variant="secondary" onClick={() => setPhase('summary')}>
           {t('training.session.finish')}
         </Button>
       </header>
@@ -440,7 +440,7 @@ function SessionRunner({ client, program, dayId: resolvedDayId, history, unit, s
           <Icon name="check" />
           <h1>{t('training.session.allDone')}</h1>
           <p>{t('training.session.allDoneBody')}</p>
-          <Button size="large" block onClick={() => setPhase('summary')}>
+          <Button icon="check" size="large" block onClick={() => setPhase('summary')}>
             {t('training.session.finish')}
           </Button>
         </section>
@@ -476,16 +476,16 @@ function SessionRunner({ client, program, dayId: resolvedDayId, history, unit, s
                   ))}
                 </span>
                 <span className={styles.rowActions}>
-                  <Button size="small" variant="plain" onClick={() => update((s) => addSet(s, i))}>
+                  <Button icon="plus" size="small" variant="plain" onClick={() => update((s) => addSet(s, i))}>
                     {t('training.session.addSet')}
                   </Button>
                   {!finished && !e.skipped && (
-                    <Button size="small" variant="plain" onClick={() => update((s) => skipExercise(s, i))}>
+                    <Button icon="skip" size="small" variant="plain" onClick={() => update((s) => skipExercise(s, i))}>
                       {t('training.session.skip')}
                     </Button>
                   )}
                   {!finished && catalog && (
-                    <Button size="small" variant="plain" onClick={() => setSwapping(i)}>
+                    <Button icon="swap" size="small" variant="plain" onClick={() => setSwapping(i)}>
                       {t('training.session.swap')}
                     </Button>
                   )}
@@ -511,7 +511,7 @@ function SessionRunner({ client, program, dayId: resolvedDayId, history, unit, s
             </Button>
           </div>
           {ex && <p className={styles.restNext}>{t('training.session.upNext', { name })}</p>}
-          <Button size="large" block onClick={() => update(endRest)}>
+          <Button icon="skip" size="large" block onClick={() => update(endRest)}>
             {t('training.session.skipRest')}
           </Button>
         </div>
@@ -567,7 +567,7 @@ function SessionRunner({ client, program, dayId: resolvedDayId, history, unit, s
               </div>
             )}
           </dl>
-          <Button size="large" block disabled={saving || summary.doneSets === 0} onClick={() => void save()}>
+          <Button icon="check" size="large" block disabled={saving || summary.doneSets === 0} onClick={() => void save()}>
             {t('training.session.save')}
           </Button>
         </Sheet>

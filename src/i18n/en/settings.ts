@@ -205,7 +205,7 @@ export const settings: EnArea<'settings'> = {
     model: 'Muscle model: Z-Anatomy - The libre 3D atlas of anatomy (CC BY-SA 4.0), based on BodyParts3D - The Database Center for Life Science (CC BY-SA 2.1 Japan). Modified (muscles grouped, triangles reduced, exported to GLB); the modified file is available under the same license at /models/muscles.glb.',
     exercises: 'Exercise data from free-exercise-db (Unlicense).',
     foodImages: 'Food drawings: Twemoji (CC BY 4.0). Food photos: Wikimedia Commons (CC0 / CC BY / CC BY-SA); photographers listed in docs/FOOD_PHOTOS.md.',
-    fonts: 'Fonts: Readex Pro and Alexandria (SIL Open Font License).',
+    fonts: 'Fonts: Readex Pro and Alexandria (SIL Open Font License). Icons: Material Symbols Rounded by Google (Apache License 2.0).',
     licenses: 'All libraries are open source; their licenses are in LICENSES.md shipped with the app.',
     disclaimer: 'Content is guidance from the coach and does not replace medical advice.',
   },

@@ -38,7 +38,7 @@ function SearchBody({ onClose }: { onClose: () => void }) {
         {typed &&
           results &&
           GROUPS.filter((g) => results[g.group].length > 0).map(({ group, icon }) => (
-            <ListSection key={group} title={t(`hub.search.${group}`)}>
+            <ListSection key={group} icon={icon} title={t(`hub.search.${group}`)}>
               {results[group].map((hit) => (
                 <ListRow
                   key={`${group}-${hit.id}`}

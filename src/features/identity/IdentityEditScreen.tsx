@@ -36,7 +36,7 @@ export function IdentityEditScreen() {
             </h2>
             <Body draft={draft} update={update} />
             {key === 'logo' && draft.logoImageId && (
-              <Button
+              <Button icon="image"
                 variant="secondary"
                 block
                 className={styles.iconButton}
@@ -62,7 +62,7 @@ export function IdentityEditScreen() {
           <TrainerPhotoSection draft={draft} update={update} />
         </section>
         <div className={styles.editSave}>
-          <Button
+          <Button icon="check"
             size="large"
             block
             disabled={saving}

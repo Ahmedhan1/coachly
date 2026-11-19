@@ -87,7 +87,7 @@ export function IncomeScreen() {
             </div>
           </dl>
 
-          <ListSection title={t('schedule.income.overdue')} count={dash.overdue.length || undefined}>
+          <ListSection icon="warning" title={t('schedule.income.overdue')} count={dash.overdue.length || undefined}>
             {dash.overdue.length === 0 ? (
               <p className={styles.none}>{t('schedule.income.noOverdue')}</p>
             ) : (
@@ -109,7 +109,7 @@ export function IncomeScreen() {
           </ListSection>
 
           {current && (
-          <ListSection title={t('schedule.income.renewingSoon')} count={dash.renewingSoon.length || undefined}>
+          <ListSection icon="refresh" title={t('schedule.income.renewingSoon')} count={dash.renewingSoon.length || undefined}>
             {dash.renewingSoon.length === 0 ? (
               <p className={styles.none}>{t('schedule.income.noRenewing')}</p>
             ) : (

@@ -139,7 +139,7 @@ function ExerciseDetail({ exercise, catalog }: { exercise: CatalogExercise; cata
       </header>
 
       {cues.length > 0 && (
-        <ListSection title={t('exercises.detail.cues')}>
+        <ListSection icon="checklist" title={t('exercises.detail.cues')}>
           <ol className={styles.cues}>
             {cues.map((cue) => (
               <li key={cue}>{cue}</li>
@@ -148,7 +148,7 @@ function ExerciseDetail({ exercise, catalog }: { exercise: CatalogExercise; cata
         </ListSection>
       )}
 
-      <ListSection title={t('training.library.detail.muscles')} footer={t('exercises.detail.illustrationLegend')}>
+      <ListSection icon="body" title={t('training.library.detail.muscles')} footer={t('exercises.detail.illustrationLegend')}>
         <div className={styles.mapTile}>
           <MuscleMap view="both" size={200} intensities={intensities} captions />
           <dl className={styles.facts}>
@@ -181,9 +181,9 @@ function ExerciseDetail({ exercise, catalog }: { exercise: CatalogExercise; cata
       </ListSection>
 
       {usedBy !== undefined && usedBy.length > 0 && (
-        <ListSection title={t('exercises.detail.clients')} footer={t('exercises.detail.clientsHint')}>
+        <ListSection icon="users" title={t('exercises.detail.clients')} footer={t('exercises.detail.clientsHint')}>
           {usedBy.map((use) => (
-            <ListRow
+            <ListRow leading={<Icon name="user" />}
               key={use.clientId}
               title={use.clientName}
               subtitle={t('exercises.detail.clientsPrograms', { programs: use.programNames.join(pick('، ', ', ')) })}
@@ -194,7 +194,7 @@ function ExerciseDetail({ exercise, catalog }: { exercise: CatalogExercise; cata
       )}
 
       {alternatives.length > 0 && (
-        <ListSection title={t('training.library.detail.alternatives')} footer={t('training.library.detail.alternativesHint')}>
+        <ListSection icon="swap" title={t('training.library.detail.alternatives')} footer={t('training.library.detail.alternativesHint')}>
           {alternatives.map((alt) => (
             <ListRow
               key={alt.id}
@@ -207,7 +207,7 @@ function ExerciseDetail({ exercise, catalog }: { exercise: CatalogExercise; cata
         </ListSection>
       )}
 
-      <ListSection title={t('training.library.detail.actions')}>
+      <ListSection icon="edit" title={t('training.library.detail.actions')}>
         <ListRow leading={<Icon name="edit" />} title={t('training.library.detail.rename')} onClick={() => setRenaming(true)} />
         <label className={styles.fileRow}>
           <Icon name="image" />

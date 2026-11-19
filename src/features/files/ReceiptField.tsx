@@ -50,7 +50,7 @@ export function ReceiptField({ value, onChange }: { value: string | null; onChan
           }}
         />
         {value && (
-          <Button variant="secondary" size="small" onClick={() => onChange(null)}>
+          <Button icon="trash" variant="secondary" size="small" onClick={() => onChange(null)}>
             {t('files.invoice.remove')}
           </Button>
         )}

@@ -106,7 +106,7 @@ export function ClientSupplementsScreen() {
           ) : catalog.length === 0 ? (
             <div className={common.form}>
               <p className={common.muted}>{t('nutrition.supplements.catalogEmpty')}</p>
-              <Button onClick={() => navigate('/more/supplements')}>{t('nutrition.supplements.openCatalog')}</Button>
+              <Button icon="pill" onClick={() => navigate('/more/supplements')}>{t('nutrition.supplements.openCatalog')}</Button>
             </div>
           ) : (
             <ul className={styles.pickList}>

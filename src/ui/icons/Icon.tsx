@@ -1,4 +1,4 @@
-import { ICON_PATHS, MIRRORED, type IconName } from './paths';
+import { ICON_PATHS, ICON_VIEWBOX, MIRRORED, type IconName } from './paths';
 import styles from './Icon.module.css';
 
 export interface IconProps {
@@ -8,17 +8,14 @@ export interface IconProps {
   className?: string;
 }
 
+/** One filled, rounded icon (currentColor). Size comes from CSS: --icon by default. */
 export function Icon({ name, label, className }: IconProps) {
   const classes = [styles.icon, MIRRORED.has(name) ? styles.mirror : '', className ?? ''].filter(Boolean).join(' ');
   return (
     <svg
       className={classes}
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth={1.75}
-      strokeLinecap="round"
-      strokeLinejoin="round"
+      viewBox={ICON_VIEWBOX}
+      fill="currentColor"
       role={label ? 'img' : undefined}
       aria-label={label}
       aria-hidden={label ? undefined : true}

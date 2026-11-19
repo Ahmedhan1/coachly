@@ -89,7 +89,7 @@ export function TrainingTab({ client, hub, scheduleId, go, onChooseProgram, onNe
                       </span>
                     </button>
                     {day.items.length > 0 && (
-                      <Button
+                      <Button icon="play"
                         size="small"
                         variant={isNext ? 'primary' : 'secondary'}
                         className={styles.startBtn}
@@ -124,7 +124,7 @@ export function TrainingTab({ client, hub, scheduleId, go, onChooseProgram, onNe
           </ol>
         </ListSection>
       ) : (
-        <ListSection title={t('hub.training.active')}>
+        <ListSection icon="play" title={t('hub.training.active')}>
           <div className={styles.emptyTile}>
             <p className={styles.emptyTitle}>{t('hub.training.none')}</p>
             <p className={styles.emptyBody}>{t('hub.training.noneBody')}</p>
@@ -141,11 +141,11 @@ export function TrainingTab({ client, hub, scheduleId, go, onChooseProgram, onNe
       )}
 
       {hub.programs.past.length > 0 && (
-        <ListSection title={t('hub.training.past')} count={hub.programs.past.length}>
+        <ListSection icon="history" title={t('hub.training.past')} count={hub.programs.past.length}>
           {hub.programs.past.map((p) => (
             <div key={p.id} className={styles.splitRow}>
               <ListRow leading={<Icon name="list" />} title={p.name} subtitle={daysLabel(p.days.length)} to={programUrl(p.id)} className={styles.splitMain} />
-              <Button size="small" variant="secondary" className={styles.splitAction} aria-label={t('hub.training.makeActiveFor', { name: p.name })} onClick={() => onMakeActive(p)}>
+              <Button icon="check" size="small" variant="secondary" className={styles.splitAction} aria-label={t('hub.training.makeActiveFor', { name: p.name })} onClick={() => onMakeActive(p)}>
                 {t('hub.training.makeActive')}
               </Button>
             </div>
@@ -153,7 +153,7 @@ export function TrainingTab({ client, hub, scheduleId, go, onChooseProgram, onNe
         </ListSection>
       )}
 
-      <ListSection title={t('hub.training.history')} count={history.length || undefined}>
+      <ListSection icon="checkCircle" title={t('hub.training.history')} count={history.length || undefined}>
         {history.length === 0 ? (
           <p className={styles.emptyTile}>{t('hub.training.historyEmpty')}</p>
         ) : (
@@ -185,7 +185,7 @@ export function TrainingTab({ client, hub, scheduleId, go, onChooseProgram, onNe
         )}
         {history.length > historyShown && (
           <div className={styles.more}>
-            <Button size="small" variant="plain" onClick={() => setHistoryShown((n) => n + HISTORY_STEP)}>
+            <Button icon="chevronDown" size="small" variant="plain" onClick={() => setHistoryShown((n) => n + HISTORY_STEP)}>
               {t('hub.training.showMore', { n: history.length - historyShown })}
             </Button>
           </div>

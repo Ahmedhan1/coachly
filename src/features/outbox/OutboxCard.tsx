@@ -10,7 +10,7 @@ export function OutboxCard() {
   const navigate = useNavigate();
   if (!outbox || outbox.items.length === 0) return null;
   return (
-    <ListSection
+    <ListSection icon="send"
       title={t('outbox.title')}
       count={outbox.items.length}
       action={outbox.items.length > 3 ? <SectionLink onClick={() => navigate('/more/outbox')}>{t('outbox.openAll')}</SectionLink> : undefined}

@@ -79,10 +79,10 @@ export function ShoppingSheet({ days, clientName, onClose }: { days: readonly Gr
         <Button icon="share" onClick={() => void share()}>
           {t('nutrition.cal.shopShare')}
         </Button>
-        <Button variant="secondary" onClick={() => void copy()}>
+        <Button icon="copy" variant="secondary" onClick={() => void copy()}>
           {t('nutrition.cal.shopCopy')}
         </Button>
-        <Button variant="secondary" onClick={() => printList(header, lines.map((l) => [pick(l.name, l.nameEn), amountText(l)]))}>
+        <Button icon="printer" variant="secondary" onClick={() => printList(header, lines.map((l) => [pick(l.name, l.nameEn), amountText(l)]))}>
           {t('nutrition.cal.shopPrint')}
         </Button>
       </div>

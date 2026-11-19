@@ -24,7 +24,7 @@ export function ProgressTab({ client, hub, go }: { client: Client; hub: HubData;
         </Button>
       </div>
       <MeasurementsSection client={client} />
-      <ListSection title={t('hub.progress.timeline')} count={items.length || undefined}>
+      <ListSection icon="trend" title={t('hub.progress.timeline')} count={items.length || undefined}>
         {items.length === 0 ? (
           <div className={styles.emptyTile}>
             <p className={styles.emptyTitle}>{t('hub.progress.empty')}</p>

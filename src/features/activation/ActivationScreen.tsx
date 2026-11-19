@@ -135,7 +135,7 @@ export function ActivationScreen({ locked = null, onActivated }: ActivationScree
             ltr
           />
         )}
-        <Button type="submit" size="large" block disabled={busy}>
+        <Button icon="key" type="submit" size="large" block disabled={busy}>
           {busy ? t('activation.working') : t('activation.submit')}
         </Button>
         <Button

@@ -40,6 +40,11 @@
   font: var(--t-button-sm);
 }
 
+.small svg {
+  inline-size: var(--icon-sm);
+  block-size: var(--icon-sm);
+}
+
 .small::after {
   content: '';
   position: absolute;

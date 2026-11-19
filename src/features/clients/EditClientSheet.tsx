@@ -105,7 +105,7 @@ export function EditClientSheet({ client, onClose }: { client: Client; onClose: 
         <TextArea label={t('clientDetail.injuriesField')} hint={t('clientDetail.injuriesHint')} value={injuries} onChange={(e) => setInjuries(e.target.value)} />
         <TextArea label={t('clientDetail.notesField')} value={notes} onChange={(e) => setNotes(e.target.value)} />
         {client.photoId && (
-          <Button
+          <Button icon="trash"
             variant="danger"
             size="small"
             onClick={async () => {

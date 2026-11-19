@@ -74,7 +74,7 @@ export function LogoSection({ draft, update }: SectionProps) {
           }}
         />
         {draft.logoImageId && (
-          <Button
+          <Button icon="trash"
             variant="danger"
             size="small"
             onClick={async () => {
@@ -284,7 +284,7 @@ export function TrainerPhotoSection({ draft, update }: SectionProps) {
           }}
         />
         {draft.photoImageId && (
-          <Button variant="danger" size="small" onClick={() => update({ photoImageId: null })}>
+          <Button icon="trash" variant="danger" size="small" onClick={() => update({ photoImageId: null })}>
             {t('files.trainerPhoto.remove')}
           </Button>
         )}

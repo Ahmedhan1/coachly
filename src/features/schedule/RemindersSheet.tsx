@@ -13,7 +13,7 @@ export function RemindersSheet({ onClose }: { onClose: () => void }) {
         </span>
         <p>{t('schedule.reminders.body')}</p>
         <p className={styles.remindersHint}>{t('schedule.reminders.calendarHint')}</p>
-        <Button
+        <Button icon="bell"
           block
           onClick={() => {
             void onRemindersPromptAccepted();

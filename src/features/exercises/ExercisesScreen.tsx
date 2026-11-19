@@ -147,7 +147,7 @@ export function ExercisesScreen() {
           icon="alert"
           title={t('training.library.loadErrorTitle')}
           body={t('training.library.loadErrorBody')}
-          action={<Button onClick={catalog.retry}>{t('training.library.retry')}</Button>}
+          action={<Button icon="refresh" onClick={catalog.retry}>{t('training.library.retry')}</Button>}
         />
       )}
       {ready && results.length === 0 && <Empty filters={filters} onClear={() => setFilters(NO_FILTERS)} onAdd={() => setSheet('add', true)} />}
@@ -216,7 +216,7 @@ function Empty({ filters, onClear, onAdd }: { filters: LibraryFilters; onClear: 
       body={t('training.library.emptyBody')}
       action={
         activeFilterCount(filters) > 0 ? (
-          <Button variant="secondary" onClick={onClear}>
+          <Button icon="close" variant="secondary" onClick={onClear}>
             {t('training.library.clearFilters')}
           </Button>
         ) : undefined

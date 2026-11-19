@@ -23,7 +23,7 @@ export function NameSheet({ open, title, label, initial, required, onClose, onSa
 
 function SaveButton({ form }: { form: string }) {
   return (
-    <Button size="small" type="submit" form={form}>
+    <Button icon="check" size="small" type="submit" form={form}>
       {t('common.save')}
     </Button>
   );

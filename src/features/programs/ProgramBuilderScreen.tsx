@@ -363,7 +363,7 @@ export function ProgramBuilderScreen() {
               <Icon name="close" />
               {t('common.cancel')}
             </button>
-            <Button size="large" className={styles.primary} disabled={selected.size < 2} onClick={onLinkSelected}>
+            <Button icon="link" size="large" className={styles.primary} disabled={selected.size < 2} onClick={onLinkSelected}>
               {t('training.programs.builder.link', { n: selected.size })}
             </Button>
           </>

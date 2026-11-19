@@ -63,7 +63,7 @@ export function FoodsScreen() {
           </button>
         ))}
       </div>
-      <ListSection title={t('nutrition.foods.count', { n: list.length })}>
+      <ListSection icon="nutrition" title={t('nutrition.foods.count', { n: list.length })}>
         {list.map((f) => (
           <SwipeRow key={f.id} onDelete={() => void remove(f)} deleteLabel={t('common.delete')} deleteAccessibleLabel={t('nutrition.foods.deleteLabel', { name: f.name })}>
             <ListRow

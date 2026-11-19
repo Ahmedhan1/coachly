@@ -4,7 +4,7 @@ import { useUiStore } from '@/app/uiStore';
 import { useLive } from '@/app/useLive';
 import { t } from '@/i18n';
 import type { ShareService } from '@/services/share';
-import { ListRow, ListSection } from '@/ui';
+import { ListRow, ListSection, Icon } from '@/ui';
 import { formatIsoDate } from '@/ui/format';
 import { toIsoDate } from '@/domain/models';
 
@@ -38,9 +38,9 @@ export function PdfArchive({ share }: { share: ShareService }) {
   };
 
   return (
-    <ListSection title={t('files.pdfArchive.title')}>
+    <ListSection icon="file" title={t('files.pdfArchive.title')}>
       {rows.map((r) => (
-        <ListRow
+        <ListRow leading={<Icon name="file" />}
           key={r.id}
           title={r.name ?? 'PDF'}
           subtitle={opening === r.id ? t('files.pdfArchive.opening') : r.state === 'pending' ? t('files.pdfArchive.pending') : formatIsoDate(toIsoDate(new Date(r.createdAt)))}

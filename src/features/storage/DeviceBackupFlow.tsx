@@ -46,7 +46,7 @@ export function DeviceBackupFlow({ onSaved, saver, showSettings }: Props) {
         </Button>
       )}
       {showSettings && state.kind === 'idle' && (
-        <Button block variant="plain" onClick={flow.openSetup}>
+        <Button icon="settings" block variant="plain" onClick={flow.openSetup}>
           {t('storage.device.changeSettings')}
         </Button>
       )}

@@ -132,7 +132,7 @@ export function StorageScreen() {
           {persist === 'on' ? t('storage.screen.persistOn') : persist === 'unsupported' ? t('storage.screen.persistUnsupported') : t('storage.screen.persistOff')}
         </p>
         {persist === 'off' && (
-          <Button block variant="secondary" onClick={() => void requestPersist()}>
+          <Button icon="lock" block variant="secondary" onClick={() => void requestPersist()}>
             {t('storage.screen.persistButton')}
           </Button>
         )}
@@ -162,7 +162,7 @@ export function StorageScreen() {
                 : t('storage.screen.shrinkBody', { n: report.oversized.ids.length, size: formatBytes(report.oversized.bytes) })}
             </p>
             {report.oversized.ids.length > 0 && (
-              <Button block variant="secondary" disabled={!fresh || busy !== null} onClick={() => void shrink()}>
+              <Button icon="image" block variant="secondary" disabled={!fresh || busy !== null} onClick={() => void shrink()}>
                 {t('storage.screen.shrinkButton', { n: report.oversized.ids.length })}
               </Button>
             )}
@@ -263,7 +263,7 @@ function ArchivesCard({ registry, onRestored }: { registry: PhotoArchiveEntry[];
       {needsPassword && (
         <TextField label={t('storage.archive.password')} type="password" autoComplete="current-password" value={password} onChange={(e) => setPassword(e.target.value)} ltr />
       )}
-      <Button block disabled={!file || working || (needsPassword && !password)} onClick={() => void restore()}>
+      <Button icon="undo" block disabled={!file || working || (needsPassword && !password)} onClick={() => void restore()}>
         {working ? t('storage.archive.restoring') : t('storage.archive.restore')}
       </Button>
       {error && (

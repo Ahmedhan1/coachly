@@ -61,7 +61,7 @@ export function BackupReminderCard({ now: nowProp }: { now?: Date }) {
       </p>
       <DeviceBackupFlow onSaved={() => setTick((n) => n + 1)} />
       {card.due && (
-        <Button
+        <Button icon="clock"
           block
           variant="plain"
           onClick={async () => {

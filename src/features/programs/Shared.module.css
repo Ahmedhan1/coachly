@@ -1,9 +1,8 @@
 /* Shared pieces of the programs area: glyphs, steppers, exercise thumbs, pickers and action sheets. */
 
 .glyph {
-  inline-size: var(--icon, 22px);
-  block-size: var(--icon, 22px);
-  stroke-width: var(--icon-stroke, 1.8);
+  inline-size: var(--icon);
+  block-size: var(--icon);
 }
 
 .grip {

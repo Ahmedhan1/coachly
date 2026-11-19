@@ -58,7 +58,7 @@ function WebhookCard({ initial }: { initial: WebhookSettings }) {
         onChange={(v) => setW({ ...w, endingDays: Number(v) })}
         options={[1, 2, 3, 5, 7].map((n) => ({ value: String(n), label: String(n) }))}
       />
-      <Button
+      <Button icon="check"
         block
         onClick={async () => {
           if (!valid(w.url)) return setError(t('settings.integrations.invalidUrl'));
@@ -68,7 +68,7 @@ function WebhookCard({ initial }: { initial: WebhookSettings }) {
       >
         {t('settings.integrations.save')}
       </Button>
-      <Button
+      <Button icon="send"
         block
         variant="secondary"
         disabled={!w.url}

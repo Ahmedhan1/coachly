@@ -112,7 +112,7 @@ export function InstallGateScreen({ platform: forced }: { platform?: PlatformInf
         prompt.canPrompt && (
           <div className={styles.installBox}>
             {!mobile && <p className={styles.stepBody}>{t('install.desktopInstall')}</p>}
-            <Button size="large" block onClick={() => void install()} disabled={busy}>
+            <Button icon="download" size="large" block onClick={() => void install()} disabled={busy}>
               {t('install.installButton')}
             </Button>
             {mobile && <p className={styles.installHint}>{t('install.installButtonHint')}</p>}

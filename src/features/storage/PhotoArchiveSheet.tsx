@@ -149,7 +149,7 @@ export function PhotoArchiveSheet({ onClose, onDone, saver: saverProp }: { onClo
           <>
             <p className={styles.strong}>{t('storage.archive.verified', { n: step.verified.originals.size })}</p>
             <p className={styles.strong}>{t('storage.archive.stepCommit')}</p>
-            <Button block variant="danger" onClick={() => void commit(step.made, step.verified)}>
+            <Button icon="check" block variant="danger" onClick={() => void commit(step.made, step.verified)}>
               {t('storage.archive.commit', { size: formatBytes(step.made.file.manifest.files.reduce((s, f) => s + (f.path.startsWith('images/') ? f.bytes : 0), 0)) })}
             </Button>
           </>

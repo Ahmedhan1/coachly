@@ -71,7 +71,7 @@ export function FilterSheet({ initial, countFor, onApply, onClose }: FilterSheet
         </ChipGroup>
       </div>
       <div className={styles.footer}>
-        <Button block size="large" onClick={() => onApply(draft)}>
+        <Button icon="check" block size="large" onClick={() => onApply(draft)}>
           {t('training.library.filterSheet.apply', { n: count })}
         </Button>
       </div>

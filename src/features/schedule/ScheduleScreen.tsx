@@ -353,7 +353,7 @@ function SearchResults({ query, sessions, byId, lateIds, dateOf, onOpen, onMark 
     );
   }
   return (
-    <ListSection
+    <ListSection icon="search"
       title={t('schedule.searchResults')}
       count={all.length}
       className={styles.dayList}

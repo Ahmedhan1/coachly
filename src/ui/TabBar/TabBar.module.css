@@ -66,7 +66,6 @@
 .add svg {
   inline-size: 26px;
   block-size: 26px;
-  stroke-width: 2.4;
 }
 
 @supports ((-webkit-backdrop-filter: blur(1px)) or (backdrop-filter: blur(1px))) {

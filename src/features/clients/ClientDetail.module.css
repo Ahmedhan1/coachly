@@ -36,7 +36,6 @@
 .photo > svg {
   inline-size: 46px;
   block-size: 46px;
-  stroke-width: 1.6;
 }
 
 .photoImg {
@@ -64,7 +63,6 @@
 .photoBadge svg {
   inline-size: 16px;
   block-size: 16px;
-  stroke-width: 2;
 }
 
 .photo:active .photoImg,

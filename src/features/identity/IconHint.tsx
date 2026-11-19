@@ -53,7 +53,7 @@ export function IconLinkPanel() {
           <p className={styles.error} role="alert">
             {t('identity.logo.iconLinkFailed')}
           </p>
-          <Button variant="secondary" onClick={make}>
+          <Button icon="refresh" variant="secondary" onClick={make}>
             {t('identity.logo.iconLinkRetry')}
           </Button>
         </>
@@ -63,7 +63,7 @@ export function IconLinkPanel() {
           <p className={styles.iconLinkUrl} dir="ltr">
             {state.link}
           </p>
-          <Button
+          <Button icon="copy"
             block
             onClick={async () => {
               try {

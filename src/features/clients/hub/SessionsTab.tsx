@@ -74,7 +74,7 @@ export function SessionsTab({ client, hub, go }: { client: Client; hub: HubData;
           {t('hub.sessions.book')}
         </Button>
       </div>
-      <ListSection title={t('hub.sessions.upcoming')} count={upcoming.length || undefined}>
+      <ListSection icon="event" title={t('hub.sessions.upcoming')} count={upcoming.length || undefined}>
         {upcoming.length === 0 ? (
           <ListRow leading={<Icon name="calendar" />} title={t('hub.sessions.none')} />
         ) : (
@@ -89,7 +89,7 @@ export function SessionsTab({ client, hub, go }: { client: Client; hub: HubData;
           ))
         )}
       </ListSection>
-      <ListSection title={t('hub.sessions.past')} count={past.length || undefined}>
+      <ListSection icon="history" title={t('hub.sessions.past')} count={past.length || undefined}>
         {past.length === 0 ? (
           <ListRow leading={<Icon name="calendar" />} title={t('hub.sessions.pastNone')} />
         ) : (
@@ -110,7 +110,7 @@ export function SessionsTab({ client, hub, go }: { client: Client; hub: HubData;
         )}
         {past.length > pastShown && (
           <div className={styles.more}>
-            <Button size="small" variant="plain" onClick={() => setPastShown((n) => n + PAST_STEP)}>
+            <Button icon="chevronDown" size="small" variant="plain" onClick={() => setPastShown((n) => n + PAST_STEP)}>
               {t('hub.sessions.showMore', { n: past.length - pastShown })}
             </Button>
           </div>

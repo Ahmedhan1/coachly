@@ -62,7 +62,7 @@ function DemoNotice() {
         </h2>
         <p className={styles.demoBody}>{t('home.demoBody')}</p>
       </div>
-      <Button
+      <Button icon="trash"
         variant="secondary"
         size="small"
         onClick={async () => {
@@ -153,7 +153,7 @@ function AgendaTime({ startsAt }: { startsAt: number }) {
 function RestOfDay({ items, plans }: { items: AgendaItem[]; plans: ReadonlyMap<string, string> }) {
   const navigate = useNavigate();
   return (
-    <ListSection title={t('home.rest')} action={<SectionLink onClick={() => navigate('/schedule')}>{t('home.scheduleLink')}</SectionLink>}>
+    <ListSection icon="calendar" title={t('home.rest')} action={<SectionLink onClick={() => navigate('/schedule')}>{t('home.scheduleLink')}</SectionLink>}>
       {items.length === 0 ? (
         <ListRow leading={<Icon name="calendar" />} title={t('home.noRest')} />
       ) : (
@@ -189,7 +189,7 @@ function RestOfDay({ items, plans }: { items: AgendaItem[]; plans: ReadonlyMap<s
 function EndingSoon({ home }: { home: HomeData }) {
   const go = useGo();
   return (
-    <ListSection title={t('home.endingSoon')} count={home.attention.length || undefined}>
+    <ListSection icon="timer" title={t('home.endingSoon')} count={home.attention.length || undefined}>
       {home.attention.length === 0 ? (
         <ListRow leading={<Icon name="check" />} title={t('home.nothingEnding')} />
       ) : (
@@ -210,7 +210,7 @@ function EndingSoon({ home }: { home: HomeData }) {
                   )}
                 </span>
               </button>
-              <Button
+              <Button icon="refresh"
                 size="small"
                 variant={hot ? 'primary' : 'secondary'}
                 aria-label={t('home.renewFor', { name: client.name })}
@@ -257,7 +257,7 @@ function FollowUp({ home }: { home: HomeData }) {
   const [all, setAll] = useState(false);
   const shown = all ? home.followUp : home.followUp.slice(0, FOLLOW_UP_SHOWN);
   return (
-    <ListSection title={t('hub.followUp.title')} count={home.followUp.length || undefined}>
+    <ListSection icon="chat" title={t('hub.followUp.title')} count={home.followUp.length || undefined}>
       {home.followUp.length === 0 ? (
         <ListRow leading={<Icon name="check" />} title={t('hub.followUp.none')} />
       ) : (
@@ -279,12 +279,12 @@ function FollowUp({ home }: { home: HomeData }) {
                 ))}
               />
               {top?.kind === 'overdue_payment' && (
-                <Button size="small" className={styles.followBtn} aria-label={t('hub.followUp.payFor', { name: client.name })} onClick={() => go(`/clients/${client.id}?tab=payments&pay=1`)}>
+                <Button icon="wallet" size="small" className={styles.followBtn} aria-label={t('hub.followUp.payFor', { name: client.name })} onClick={() => go(`/clients/${client.id}?tab=payments&pay=1`)}>
                   {t('hub.followUp.pay')}
                 </Button>
               )}
               {top?.kind === 'no_session_week' && (
-                <Button size="small" variant="secondary" className={styles.followBtn} aria-label={t('hub.followUp.bookFor', { name: client.name })} onClick={() => go(bookUrl(client.id))}>
+                <Button icon="calendarPlus" size="small" variant="secondary" className={styles.followBtn} aria-label={t('hub.followUp.bookFor', { name: client.name })} onClick={() => go(bookUrl(client.id))}>
                   {t('hub.followUp.book')}
                 </Button>
               )}
@@ -299,7 +299,7 @@ function FollowUp({ home }: { home: HomeData }) {
       )}
       {home.followUp.length > FOLLOW_UP_SHOWN && (
         <div className={styles.followMore}>
-          <Button size="small" variant="plain" onClick={() => setAll((v) => !v)}>
+          <Button icon="chevronDown" size="small" variant="plain" onClick={() => setAll((v) => !v)}>
             {all ? t('hub.followUp.showLess') : t('hub.followUp.showAll', { n: home.followUp.length })}
           </Button>
         </div>

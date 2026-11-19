@@ -126,7 +126,7 @@ function Form({ current, onClose, onSaved, store, showToast }: FormProps) {
             {t('nutrition.foods.invalid')}
           </p>
         )}
-        <Button variant="plain" onClick={() => void reset()}>
+        <Button icon="undo" variant="plain" onClick={() => void reset()}>
           {t('nutrition.diet.settingsReset')}
         </Button>
       </form>

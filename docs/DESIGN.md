@@ -146,7 +146,11 @@ Brand usage is **sparse**: next-session row tint + dot, active tab, primary butt
 - **Toast/undo**: inverted (`--text` bg), 48pt, "تراجع" underlined, 5s, above the action bar.
 
 ### Iconography
-Stroke icons on a 24 grid, 1.6 stroke, round caps/joins, drawn in `design/icons.svg`. No filled icons except status-bar glyphs.
+**Updated 2026-11-19 (owner):** filled, rounded icons everywhere — Material Symbols Rounded, fill 1, weight 400
+(Apache-2.0), path data in `src/ui/icons/paths.ts`, rendered by `<Icon>` in `currentColor`. Every section title has
+one in a brand-tinted tile, rows have a leading icon, actions have an icon before the label, section footers start
+with an info icon. The only outline icon is the empty favourite star (to show the off state).
+`design/icons.svg` (the old stroke set) is kept for the design mockups only.
 
 ### Photo / 3D treatment
 Photo slots: 60×60 square, radius 6, hairline frame, neutral `--photo` fill; real photos are shown

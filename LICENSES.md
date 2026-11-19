@@ -28,6 +28,7 @@ condition or risk to manage · **RED** = do not ship.
 | dexie | 4.4.7 | Apache-2.0 | installed (LICENSE: Apache License) | OK — keep NOTICE/attribution in "About" |
 | dexie-react-hooks | 4.4.0 | Apache-2.0 | installed | OK |
 | react | 19.3.1 | MIT | installed | OK |
+| Material Symbols Rounded (icon path data only, copied into `src/ui/icons/paths.ts`; not an npm dependency) | @material-symbols/svg-400@0.48.2 | Apache-2.0 (© Google) | tarball (LICENSE: "Apache License Version 2.0, January 2004"), 2026-11-19 | OK — keep attribution in "About" |
 | react-dom | 19.3.1 | MIT | installed | OK |
 | react-router-dom | 7.18.6 | MIT | installed (LICENSE.md) | OK |
 | zod | 4.6.7 | MIT | installed | OK |

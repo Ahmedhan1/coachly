@@ -4,7 +4,7 @@ import { filterExercises, MUSCLE_GROUPS, type MuscleGroupId } from '@/domain/exe
 import { muscleName } from '@/features/exercises/localized';
 import { useCatalog } from '@/features/exercises/useCatalog';
 import { t } from '@/i18n';
-import { Button, ListRow, ListSection, PageHeader, SegmentedControl, Tx } from '@/ui';
+import { Button, ListRow, ListSection, PageHeader, SegmentedControl, Tx, Icon } from '@/ui';
 import { MuscleMap } from '@/ui/MuscleMap';
 import styles from './MuscleMap.module.css';
 
@@ -76,9 +76,9 @@ export function MuscleMapScreen() {
           </>
         )}
       </div>
-      <ListSection title={t('training.library.muscleMap.list')}>
+      <ListSection icon="dumbbell" title={t('training.library.muscleMap.list')}>
         {MUSCLE_GROUPS.map((g) => (
-          <ListRow
+          <ListRow leading={<Icon name="body" />}
             key={g.id}
             to={exercisesLink(g.id)}
             title={muscleName(g.id)}

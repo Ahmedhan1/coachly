@@ -129,10 +129,10 @@ function AiForm({ initial, initialKey }: { initial: AiSettings; initialKey: stri
       {custom && <TextField label={t('assistant.settings.modelCustomLabel')} value={s.model} onChange={(e) => setS({ ...s, model: e.target.value })} autoCapitalize="off" spellCheck={false} ltr />}
       <p className={styles.meta}>{t('assistant.settings.modelHint')}</p>
 
-      <Button block onClick={() => void save()}>
+      <Button icon="check" block onClick={() => void save()}>
         {t('assistant.settings.save')}
       </Button>
-      <Button block variant="secondary" disabled={testing || !key.trim()} onClick={() => void test()}>
+      <Button icon="send" block variant="secondary" disabled={testing || !key.trim()} onClick={() => void test()}>
         {testing ? t('assistant.settings.testing') : t('assistant.settings.test')}
       </Button>
       {result && (

@@ -6,7 +6,7 @@ import type { ProgressEntry, WorkoutLog } from '@/domain/models';
 import { workoutLogsToSets } from '@/domain/programs';
 import { estimateOneRepMax, personalRecordTimeline } from '@/domain/strength';
 import { t } from '@/i18n';
-import { Badge, Button, EmptyState, IconButton, ListRow, ListSection, Num, PageHeader, SegmentedControl, Sheet, Tx } from '@/ui';
+import { Badge, Button, EmptyState, IconButton, ListRow, ListSection, Num, PageHeader, SegmentedControl, Sheet, Tx, Icon } from '@/ui';
 import { formatIsoDate, formatNumber } from '@/ui/format';
 import { useExerciseCatalog } from '@/features/programs/catalog';
 import { exerciseName } from '@/features/programs/names';
@@ -178,7 +178,7 @@ export function ClientProgressScreen() {
             )}
           </section>
 
-          <ListSection title={t('nutrition.progress.entries')} count={sorted.length}>
+          <ListSection icon="ruler" title={t('nutrition.progress.entries')} count={sorted.length}>
             {[...sorted].reverse().map((e) => (
               <ListRow
                 key={e.id}
@@ -193,12 +193,12 @@ export function ClientProgressScreen() {
         </>
       )}
 
-      <ListSection title={t('nutrition.progress.records')} count={records.length || undefined}>
+      <ListSection icon="award" title={t('nutrition.progress.records')} count={records.length || undefined}>
         {records.length === 0 ? (
           <p className={styles.none}>{t('nutrition.progress.noRecords')}</p>
         ) : (
           records.map((s) => (
-            <ListRow
+            <ListRow leading={<Icon name="award" />}
               key={s.exerciseId}
               onClick={() => setHistoryOf(s.exerciseId)}
               title={exerciseName(catalog?.byId.get(s.exerciseId), s.exerciseId)}

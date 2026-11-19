@@ -58,11 +58,11 @@ export function SettingsScreen() {
           <LanguageSwitch />
         </div>
       </ListSection>
-      <ListSection title={t('settings.page.backupTitle')}>
+      <ListSection icon="backup" title={t('settings.page.backupTitle')}>
         <ListRow to="/more/settings/backup" leading={<Icon name="database" />} title={t('settings.backup.title')} subtitle={t('settings.backup.hint')} />
         <ListRow to="/more/settings/storage" leading={<Icon name="database" />} title={t('storage.screen.title')} subtitle={t('storage.screen.hint')} />
       </ListSection>
-      <ListSection title={t('settings.page.online')}>
+      <ListSection icon="cloud" title={t('settings.page.online')}>
         <ListRow to="/more/settings/notifications" leading={<Icon name="clock" />} title={t('settings.notifications.title')} subtitle={t('settings.notifications.hint')} />
         <ListRow
           leading={<Icon name="share" />}
@@ -76,7 +76,7 @@ export function SettingsScreen() {
         />
         <ListRow to="/more/settings/integrations" leading={<Icon name="key" />} title={t('settings.integrations.title')} subtitle={t('settings.integrations.hint')} />
       </ListSection>
-      <ListSection title={t('screens.settings.license')}>
+      <ListSection icon="key" title={t('screens.settings.license')}>
         <LicenseRow />
         <ListRow
           leading={<Icon name="cloudOk" />}

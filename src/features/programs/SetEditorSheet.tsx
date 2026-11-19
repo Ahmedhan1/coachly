@@ -37,7 +37,7 @@ export function SetEditorSheet(props: SetEditorSheetProps) {
       cancelLabel={t('common.close')}
       initialFocusId="set-editor-done"
       primaryAction={
-        <Button size="small" id="set-editor-done" onClick={onClose}>
+        <Button icon="check" size="small" id="set-editor-done" onClick={onClose}>
           {t('training.programs.editor.done')}
         </Button>
       }
@@ -193,10 +193,10 @@ function EditorBody({ item, onChange, onMove, canMoveUp, canMoveDown, onToggleSu
       )}
 
       <div className={styles.editorActions}>
-        <Button variant="secondary" size="small" disabled={!canMoveUp} onClick={() => onMove(-1)}>
+        <Button icon="arrowUp" variant="secondary" size="small" disabled={!canMoveUp} onClick={() => onMove(-1)}>
           {t('training.programs.builder.moveUp', { name })}
         </Button>
-        <Button variant="secondary" size="small" disabled={!canMoveDown} onClick={() => onMove(1)}>
+        <Button icon="arrowDown" variant="secondary" size="small" disabled={!canMoveDown} onClick={() => onMove(1)}>
           {t('training.programs.builder.moveDown', { name })}
         </Button>
       </div>

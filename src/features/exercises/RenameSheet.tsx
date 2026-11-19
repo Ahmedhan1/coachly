@@ -113,7 +113,7 @@ export function RenameSheet({
       <form id={FORM_ID} className={styles.form} onSubmit={submit} noValidate>
         {english ? [enField, arField] : [arField, enField]}
         {changedFromDefault && (
-          <Button variant="secondary" onClick={() => void onSave({ nameAr: '', nameEn: '' })}>
+          <Button icon="undo" variant="secondary" onClick={() => void onSave({ nameAr: '', nameEn: '' })}>
             {t('training.library.detail.renameReset')}
           </Button>
         )}

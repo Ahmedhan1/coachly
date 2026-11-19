@@ -71,7 +71,7 @@ export function OverviewTab({ client, hub, actions, go }: { client: Client; hub:
         {actions.onPage && <QuickButton icon="share" label={t('hub.overview.page')} onClick={actions.onPage} />}
       </nav>
 
-      <ListSection title={t('hub.overview.facts')}>
+      <ListSection icon="info" title={t('hub.overview.facts')}>
         <ListRow
           leading={<Icon name="calendar" />}
           title={t('hub.overview.next')}
@@ -102,7 +102,7 @@ export function OverviewTab({ client, hub, actions, go }: { client: Client; hub:
         />
       </ListSection>
 
-      <ListSection title={t('clientDetail.payments')}>
+      <ListSection icon="money" title={t('clientDetail.payments')}>
         <ListRow
           leading={<Icon name="wallet" />}
           title={
@@ -117,7 +117,7 @@ export function OverviewTab({ client, hub, actions, go }: { client: Client; hub:
         />
       </ListSection>
 
-      <ListSection title={t('clientDetail.plan')}>
+      <ListSection icon="dumbbell" title={t('clientDetail.plan')}>
         <ListRow
           leading={<Icon name="list" />}
           title={t('clientDetail.program')}
@@ -135,7 +135,7 @@ export function OverviewTab({ client, hub, actions, go }: { client: Client; hub:
 
       <MeasurementsSection client={client} />
       <InjuriesSection client={client} />
-      <ListSection title={t('clientDetail.notes')}>
+      <ListSection icon="note" title={t('clientDetail.notes')}>
         <p className={client.notes ? base.note : `${base.note} ${base.muted}`}>{client.notes || t('clientDetail.noNotes')}</p>
       </ListSection>
     </>

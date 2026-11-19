@@ -46,7 +46,7 @@ export function NavyHelper({ sex, heightCm, waistCm, hipCm, navy, limits, onUse 
             <p>
               {t('nutrition.navy.result')} <Num>{oneDecimal(result.value)}</Num>%
             </p>
-            <Button size="small" variant="secondary" onClick={() => onUse(result.value)}>
+            <Button icon="check" size="small" variant="secondary" onClick={() => onUse(result.value)}>
               {t('nutrition.navy.use')}
             </Button>
           </div>

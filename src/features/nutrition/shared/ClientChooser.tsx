@@ -21,7 +21,7 @@ export function ClientChooser({ path, title, emptyBody }: { path: string; title:
           <SearchField value={query} onChange={setQuery} label={t('common.search')} placeholder={t('common.search')} clearLabel={t('common.clearSearch')} />
         </div>
       )}
-      <ListSection title={title} count={shown.length}>
+      <ListSection icon="users" title={title} count={shown.length}>
         {shown.map((c) => (
           <ListRow key={c.id} leading={<ClientAvatar client={c} />} title={c.name} to={`/clients/${c.id}/${path}`} />
         ))}

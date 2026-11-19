@@ -190,10 +190,10 @@ function FormulasForm({ initial, store }: { initial: NutritionSettings; store: N
             {error}
           </p>
         )}
-        <Button block onClick={() => void save()}>
+        <Button icon="check" block onClick={() => void save()}>
           {t('settings.formulas.save')}
         </Button>
-        <Button
+        <Button icon="undo"
           block
           variant="plain"
           onClick={async () => {

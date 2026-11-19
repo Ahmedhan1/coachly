@@ -172,23 +172,23 @@ export function ProgramsScreen() {
       )}
 
       {assigned.length > 0 && (
-        <ListSection title={forClient ? undefined : t('training.programs.clients')} count={forClient ? undefined : assigned.length}>
+        <ListSection icon="users" title={forClient ? undefined : t('training.programs.clients')} count={forClient ? undefined : assigned.length}>
           {assigned.map(row)}
         </ListSection>
       )}
       {templates.length > 0 && (
-        <ListSection title={t('training.programs.mine')} count={templates.length}>
+        <ListSection icon="star" title={t('training.programs.mine')} count={templates.length}>
           {templates.map(row)}
         </ListSection>
       )}
       {loose.length > 0 && (
-        <ListSection title={t('training.programs.unassigned')} count={loose.length}>
+        <ListSection icon="box" title={t('training.programs.unassigned')} count={loose.length}>
           {loose.map(row)}
         </ListSection>
       )}
       {forClient && (
         <div className={styles.showAll}>
-          <Button variant="plain" onClick={() => navigate('/more/programs')}>
+          <Button icon="list" variant="plain" onClick={() => navigate('/more/programs')}>
             {t('training.programs.showAll')}
           </Button>
         </div>

@@ -19,6 +19,21 @@
   font: var(--t-title);
 }
 
+.titleIcon {
+  display: inline-grid;
+  place-items: center;
+  inline-size: 32px;
+  block-size: 32px;
+  border-radius: var(--r-sm);
+  background: var(--brand-tint);
+  color: var(--brand-ink);
+}
+
+.titleIcon svg {
+  inline-size: var(--icon-sm);
+  block-size: var(--icon-sm);
+}
+
 .count {
   display: inline-grid;
   place-items: center;
@@ -35,9 +50,15 @@
   display: inline-flex;
   align-items: center;
   min-block-size: var(--tap);
+  gap: var(--sp-0);
   padding-inline: var(--sp-1);
   color: var(--brand-ink);
   font: var(--t-callout);
+}
+
+.link svg {
+  inline-size: var(--icon-sm);
+  block-size: var(--icon-sm);
 }
 
 .tile {
@@ -51,8 +72,18 @@
 }
 
 .footer {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--sp-1-5);
   margin-block-start: var(--sp-2);
   padding-inline: var(--sp-1);
   font: var(--t-caption);
   color: var(--text-2);
+}
+
+.footer svg {
+  inline-size: 16px;
+  block-size: 16px;
+  margin-block-start: 1px;
+  color: var(--text-3);
 }

@@ -40,7 +40,7 @@ export function NutritionTab({ client, go }: { client: Client; go: (to: string) 
 
   return (
     <>
-      <ListSection title={t('hub.nutrition.targets')}>
+      <ListSection icon="flame" title={t('hub.nutrition.targets')}>
         {calc ? (
           <button type="button" className={styles.targets} onClick={() => go(`${base}/nutrition`)}>
             <p className={styles.kcal}>
@@ -85,7 +85,7 @@ export function NutritionTab({ client, go }: { client: Client; go: (to: string) 
         )}
       </ListSection>
 
-      <ListSection title={t('hub.nutrition.plans')} count={plans?.length || undefined}>
+      <ListSection icon="utensils" title={t('hub.nutrition.plans')} count={plans?.length || undefined}>
         {plans && plans.length === 0 && <ListRow leading={<Icon name="note" />} title={t('hub.nutrition.noPlans')} to={`${base}/meals`} />}
         {plans?.map((plan) => (
           <ListRow
@@ -109,7 +109,7 @@ export function NutritionTab({ client, go }: { client: Client; go: (to: string) 
       </ListSection>
 
       {picks && (
-        <ListSection title={t('hub.nutrition.clientPicks')} footer={t('hub.nutrition.clientPicksFrom', { date: formatIsoDate(picks.date) })}>
+        <ListSection icon="checklist" title={t('hub.nutrition.clientPicks')} footer={t('hub.nutrition.clientPicksFrom', { date: formatIsoDate(picks.date) })}>
           {picks.rows.length === 0 ? (
             <ListRow leading={<Icon name="check" />} title={t('hub.nutrition.clientPicksKept')} to={`${base}/meals`} />
           ) : (
@@ -126,7 +126,7 @@ export function NutritionTab({ client, go }: { client: Client; go: (to: string) 
         </ListSection>
       )}
 
-      <ListSection title={t('hub.nutrition.supplements')} count={supplements?.length || undefined}>
+      <ListSection icon="pill" title={t('hub.nutrition.supplements')} count={supplements?.length || undefined}>
         <ListRow
           leading={<Icon name="pill" />}
           title={supplements && supplements.length > 0 ? supplements.join(LIST_SEP) : t('hub.nutrition.noSupplements')}

@@ -108,7 +108,7 @@ export function BackupScreen() {
             </Button>
           </>
         )}
-        <Button block variant={cloudOn ? 'secondary' : 'primary'} onClick={() => setSheet('cloud')}>
+        <Button icon="key" block variant={cloudOn ? 'secondary' : 'primary'} onClick={() => setSheet('cloud')}>
           {cloudOn ? t('settings.backup.cloudChangePassword') : t('settings.backup.cloudEnable')}
         </Button>
         {cloudOn && (
