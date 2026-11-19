@@ -13,7 +13,11 @@ import {
 } from '@/domain/meals';
 import { DEFAULT_CURRENCY } from '@/domain/models';
 import type { Repositories } from './repositories';
-import { STARTER_FOOD_VERSION, STARTER_RECIPE_VERSION, starterFoodRenames, starterIngredients, starterRecipes, starterSupplements, type StarterRecipe } from './seeds/starter';
+import type { StarterRecipe } from './seeds/starter';
+import { STARTER_FOOD_VERSION, STARTER_RECIPE_VERSION } from './seeds/versions';
+
+/** The seed tables (~350 KB) stay out of the startup bundle: loaded only when a data version needs applying. */
+const loadSeeds = () => import('./seeds/starter');
 
 /**
  * Nutrition, supplements and progress data that has no column in the entity tables lives in the `meta`
@@ -212,6 +216,7 @@ export class NutritionStore {
     const raw = await this.kv.get(NUTRITION_KEYS.ingredients);
     if (raw === undefined) return;
     if ((await this.kv.get(NUTRITION_KEYS.foodsVersion)) === STARTER_FOOD_VERSION) return;
+    const { starterIngredients, starterFoodRenames } = await loadSeeds();
     const current = await this.getIngredients();
     const shipped = new Map(starterIngredients().map((i) => [i.id, i]));
     const ids = new Set(current.map((i) => i.id));
@@ -249,18 +254,21 @@ export class NutritionStore {
    */
   private async mergeNewRecipes(): Promise<void> {
     if ((await this.kv.get(NUTRITION_KEYS.recipesVersion)) === STARTER_RECIPE_VERSION) return;
+    const { starterRecipes } = await loadSeeds();
     const all = starterRecipes();
     const known = new Set(parseOr(idList, await this.kv.get(NUTRITION_KEYS.starterRecipeKeys), all.filter((r) => r.since <= 1).map((r) => r.key)));
     const ids = await this.getStarterRecipeIds();
     const keys = parseOr(keyById, await this.kv.get(NUTRITION_KEYS.starterRecipeKeyById), {});
     await this.refreshStarterRecipes(all, ids, keys);
-    for (const r of all) {
-      if (known.has(r.key)) continue;
-      const created = await this.repos.recipes.create({ ...starterRecipeFields(r), imageId: null });
-      ids.push(created.id);
-      keys[created.id] = r.key;
+    const fresh = all.filter((r) => !known.has(r.key));
+    const created = await this.repos.recipes.createMany(fresh.map((r) => ({ ...starterRecipeFields(r), imageId: null })));
+    fresh.forEach((r, i) => {
+      const row = created[i];
+      if (!row) return;
+      ids.push(row.id);
+      keys[row.id] = r.key;
       known.add(r.key);
-    }
+    });
     await this.kv.set(NUTRITION_KEYS.starterRecipes, ids);
     await this.kv.set(NUTRITION_KEYS.starterRecipeKeyById, keys);
     await this.kv.set(NUTRITION_KEYS.starterRecipeKeys, [...known]);
@@ -309,6 +317,7 @@ export class NutritionStore {
       await this.mergeNewRecipes();
       return;
     }
+    const { starterIngredients, starterRecipes, starterSupplements } = await loadSeeds();
     const table = starterIngredients();
     if ((await this.kv.get(NUTRITION_KEYS.ingredients)) === undefined) await this.saveIngredients(table);
     // Supplements first: a handful of rows, so the catalog is usable before the long recipe list is in.
@@ -326,15 +335,11 @@ export class NutritionStore {
       });
       supplementIds.push(created.id);
     }
-    const recipeIds: string[] = [];
-    const recipeKeys: string[] = [];
-    const keyMap: Record<string, string> = {};
-    for (const r of starterRecipes(table)) {
-      const created = await this.repos.recipes.create({ ...starterRecipeFields(r), imageId: null });
-      recipeIds.push(created.id);
-      recipeKeys.push(r.key);
-      keyMap[created.id] = r.key;
-    }
+    const starter = starterRecipes(table);
+    const created = await this.repos.recipes.createMany(starter.map((r) => ({ ...starterRecipeFields(r), imageId: null })));
+    const recipeIds = created.map((c) => c.id);
+    const recipeKeys = starter.map((r) => r.key);
+    const keyMap: Record<string, string> = Object.fromEntries(created.map((c, i) => [c.id, recipeKeys[i] ?? '']));
     await this.kv.set(NUTRITION_KEYS.starterRecipes, recipeIds);
     await this.kv.set(NUTRITION_KEYS.starterRecipeKeys, recipeKeys);
     await this.kv.set(NUTRITION_KEYS.starterRecipeKeyById, keyMap);
