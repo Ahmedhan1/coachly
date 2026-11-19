@@ -2,8 +2,8 @@
  * Joint load (knee / shoulder / lower back) and "can be done at home" for every exercise, by rule.
  *
  * The build script (scripts/build-exercise-pack.mjs) imports this file directly with Node, so it has only
- * type imports and erasable TypeScript. Hand-reviewed exceptions live in data-src/exercise-fixes.json
- * (dataset exercises) and data-src/exercise-extras.json (our own); they win over these rules.
+ * type imports and erasable TypeScript. Hand-reviewed exceptions live in assets-src/exercises/exercise-fixes.json
+ * (dataset exercises) and assets-src/exercises/exercise-extras.json (our own); they win over these rules.
  * The rules are documented in docs/EXERCISE_PACK.md ("Joint stress and home-friendly").
  */
 import type { EquipmentId, ExerciseCategory, JointStress, MuscleGroupId, StressLevel } from './pack';

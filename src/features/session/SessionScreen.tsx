@@ -5,7 +5,7 @@ import { useUiStore } from '@/app/uiStore';
 import { useLive } from '@/app/useLive';
 import { toIsoDate, type Client, type Program, type WorkoutLog } from '@/domain/models';
 import { overloadHint, plannedDay, splitClientPrograms } from '@/domain/clientHub';
-import { useGo } from '@/app/nav';
+import { useGo } from '@/app/shell/nav';
 import { readActivePrograms } from '@/features/programs/activePrograms';
 import { readSessionDays } from '@/features/schedule/sessionDays';
 import { useScheduleWriter } from '@/features/schedule/hooks';

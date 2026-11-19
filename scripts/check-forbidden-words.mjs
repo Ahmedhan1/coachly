@@ -4,7 +4,7 @@
 //
 // Scanned (relative to --root, default = repo root):
 //   - src/i18n/**            (.ts .tsx .js .mjs .json .md), excluding *.test.* / *.spec.*
-//   - src/**/*.ar.json, data-src/**/*.ar.json
+//   - src/**/*.ar.json, assets-src/exercises/**/*.ar.json
 //   - public/**/*.json       (public data shipped with the app, incl. future exercise data)
 //   - worker/src/share/**, worker/src/admin/** (.ts .js .mjs .html), excluding tests: the Arabic client
 //     page and owner dashboard rendered by the Cloudflare Worker
@@ -37,7 +37,7 @@ function listFiles(dir) {
 const targets = new Set([
   ...listFiles('src/i18n').filter((p) => TEXT_EXT.test(p) && !TEST_FILE.test(p)),
   ...listFiles('src').filter((p) => p.endsWith('.ar.json')),
-  ...listFiles('data-src').filter((p) => p.endsWith('.ar.json')),
+  ...listFiles('assets-src/exercises').filter((p) => p.endsWith('.ar.json')),
   ...listFiles('public').filter((p) => p.endsWith('.json')),
   ...['worker/src/share', 'worker/src/admin'].flatMap((dir) =>
     listFiles(dir).filter((p) => WORKER_PAGE_EXT.test(p) && !TEST_FILE.test(p)),

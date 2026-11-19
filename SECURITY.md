@@ -161,11 +161,11 @@ Contract in CLAUDE.md; implemented in `shared/license.ts` (phase 3, in progress 
 - Every endpoint except `/api/activate` and the public client-page read requires a valid license token
   (signature + not revoked) or a page write token.
 - Limits (starting values): activation 10 attempts / 10 min per IP and 5 per code; status check 60 / hour per
-  license; backup upload 4 / day per license and the per-license size cap from LIMITS.md; client-page reads 120 /
+  license; backup upload 4 / day per license and the per-license size cap from docs/LIMITS.md; client-page reads 120 /
   hour per pageId; check-in writes 20 / day per pageId, max 5 MB each.
-- Mechanism: Cloudflare's Rate Limiting binding if it is confirmed available on the Free plan (LIMITS.md says
+- Mechanism: Cloudflare's Rate Limiting binding if it is confirmed available on the Free plan (docs/LIMITS.md says
   this is not yet verified; it is approximate and per location), otherwise a D1 counter table keyed by
-  `(key, minute bucket)` with an index and daily cleanup (fits the D1 write budget in LIMITS.md). **Not KV**
+  `(key, minute bucket)` with an index and daily cleanup (fits the D1 write budget in docs/LIMITS.md). **Not KV**
   (1,000 writes/day).
 - Responses never reveal whether a code exists vs. is used beyond the contract's `invalid | used | expired |
   rate_limited`.

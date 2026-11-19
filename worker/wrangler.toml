@@ -13,7 +13,7 @@ compatibility_date = "2026-08-01"
 APP_ORIGIN = "https://pt-coach.nexus-ahmed.workers.dev"
 # Public key printed by tools/keygen.mjs (hex). Not secret. Must match LICENSE_PRIVATE_KEY.
 LICENSE_PUBLIC_KEY = "f7b05d930a69c89ddaec69450fbf3e2d03934f222507e3a2d03256def880e301"
-# Cloud backup cap per trainer, bytes (100 MiB). LIMITS.md explains the R2 budget.
+# Cloud backup cap per trainer, bytes (100 MiB). docs/LIMITS.md explains the R2 budget.
 BACKUP_MAX_BYTES = "104857600"
 # Above this total (9 GiB of the 10 GB free R2), uploads that would grow storage get `storage_full`.
 STORAGE_GUARD_BYTES = "9663676416"

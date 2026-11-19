@@ -16,20 +16,20 @@ import { WorkerApi } from '@/services/cloud/workerApi';
 import { BrowserPushService } from '@/services/push/pushService';
 import { META_KEYS } from '@/services/license/licenseActivationService';
 import { buildEnv, createActivationService } from './activationFactory';
-import { afterFirstPaint } from './afterFirstPaint';
+import { afterFirstPaint } from './pwa/afterFirstPaint';
 import { importHostedBrand } from '@/features/identity/hostedBrand';
 import { HttpBrandHosting } from '@/services/brand/brandHosting';
-import { createAppRouter } from './router';
+import { createAppRouter } from './shell/router';
 import { CLOUD_PASSWORD_KEY, IDENTITY_SETUP_KEY, ServicesProvider, useServices, type AppServices } from './services';
 
 const LICENSE_TOKEN_KEY = META_KEYS.token;
 const APP_VERSION = import.meta.env.VITE_APP_VERSION ?? '0.1.0';
-import { browserStandaloneEnv, bypassAllowedInThisBuild, canSkipInstallGate } from './standalone';
-import { UpdateBanner } from './UpdateBanner';
+import { browserStandaloneEnv, bypassAllowedInThisBuild, canSkipInstallGate } from './pwa/standalone';
+import { UpdateBanner } from './pwa/UpdateBanner';
 import { useBrandTheme } from './useBrandTheme';
 import { useOnlineSync } from '@/features/online/useOnlineSync';
 import { useLive } from './useLive';
-import styles from './AppShell.module.css';
+import styles from './shell/AppShell.module.css';
 
 /** Real services for the browser. Activation: real license service in production (see activationFactory). */
 export function createBrowserServices(): AppServices {

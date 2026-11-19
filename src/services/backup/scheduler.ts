@@ -61,7 +61,7 @@ export interface CloudBackupDone {
 export interface BackupSchedulerConfig {
   /** Quiet time after the last change before uploading. */
   debounceMs: number;
-  /** At most one upload per this interval (LIMITS.md: at most once per 6 h). */
+  /** At most one upload per this interval (docs/LIMITS.md: at most once per 6 h). */
   minIntervalMs: number;
   /** Delays between retries after a transient failure; the last one repeats. */
   retryDelaysMs: readonly number[];

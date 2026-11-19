@@ -58,7 +58,7 @@ describe('parseArgs', () => {
   });
 
   it('knows the English data files and the manifest-only mode', () => {
-    expect(parseArgs([], '/repo')).toMatchObject({ manifestOnly: false, namesEn: '/repo/data-src/exercise-names.en.json', cuesEn: '/repo/data-src/exercise-cues.en.json' });
+    expect(parseArgs([], '/repo')).toMatchObject({ manifestOnly: false, namesEn: '/repo/assets-src/exercises/exercise-names.en.json', cuesEn: '/repo/assets-src/exercises/exercise-cues.en.json' });
     expect(parseArgs(['--manifest-only'], '/r').manifestOnly).toBe(true);
   });
 });

@@ -1,8 +1,8 @@
 import { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
 import { App } from '@/app/App';
-import { startAppUpdates } from '@/app/appUpdate';
-import { applyHeadIcons, hideBootSplashWhenReady, readBrandCache, showBootSplash } from '@/app/BootSplash';
+import { startAppUpdates } from '@/app/pwa/appUpdate';
+import { applyHeadIcons, hideBootSplashWhenReady, readBrandCache, showBootSplash } from '@/app/pwa/BootSplash';
 import { t } from '@/i18n';
 import { applyDocumentLocale } from '@/i18n/locale';
 import '@/ui/base.css';

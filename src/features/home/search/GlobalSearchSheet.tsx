@@ -1,5 +1,5 @@
 import { useDeferredValue, useState } from 'react';
-import { useGo } from '@/app/nav';
+import { useGo } from '@/app/shell/nav';
 import { useUiStore } from '@/app/uiStore';
 import { t } from '@/i18n';
 import { Icon, ListRow, ListSection, SearchField, Sheet, type IconName } from '@/ui';

@@ -4,7 +4,7 @@
 > ملف Z-Anatomy الأصلي: 18 مجموعة عضلية + طبقة الجسم، حوالي 120 ألف مثلث، 2.07 ميجا بضغط Draco
 > (`public/models/muscles.glb`). مش محتاج تعمل الخطوات اللي تحت غير لو عايز تعيد التصدير بإعدادات تانية
 > (مثلاً `-- --triangles 160000` لتفاصيل أكتر). الرخصة CC BY-SA 4.0 ومذكورة في «عن التطبيق»، وملف المجسم المعدّل
-> متاح للكل على عنوان التطبيق نفسه (`/models/muscles.glb`) ونسخة منه في `model-repo-template/`.
+> متاح للكل على عنوان التطبيق نفسه (`/models/muscles.glb`) ونسخة منه في `assets-src/model3d/repo-template/`.
 
 # تجهيز مجسم العضلات الـ 3D (المرحلة 6)
 
@@ -47,7 +47,7 @@
 
 ## 3. تجهيز ملفات السكربت
 
-- من ريبو التطبيق، من فولدر `blender/`، خد الملفين دول:
+- من ريبو التطبيق، من فولدر `assets-src/model3d/blender/`، خد الملفين دول:
   - `export_muscles.py` (السكربت الأساسي)
   - `muscle_groups.py` (قاموس العضلات: أنهي عضلة تروح لأنهي مجموعة)
 - حطهم **مع بعض في نفس الفولدر**، مثلاً `Desktop/muscles-export/`. لو اتفصلوا السكربت مش هيشتغل.
@@ -96,15 +96,15 @@
   shoulders, biceps, triceps, forearms, abs, obliques, neck, body_base`
   - طريقة سهلة: في Blender جديد (**File ← New ← General**)، امسح المكعب (اختاره واضغط **X** ← Delete)، وبعدين
     **File ← Import ← glTF 2.0 (.glb/.gltf)** واختار `muscles.glb`. هتلاقي الأسماء في لوحة **Outliner** فوق على اليمين.
-  - أو Claude Code يشغّل: `node blender/validate_glb.mjs public/models/muscles.glb` ويقولك النتيجة.
+  - أو Claude Code يشغّل: `node assets-src/model3d/blender/validate_glb.mjs public/models/muscles.glb` ويقولك النتيجة.
 
 ## 7. تسليم الملف للتطبيق
 
 1. ابعت `muscles.glb` و `muscles.report.json` لـ Claude Code (أو حطهم في ريبو التطبيق).
 2. مكانه في التطبيق: **`public/models/muscles.glb`** (Claude Code هيحطه ويختبر المجسم).
 3. لازم كمان يترفع على **ريبو GitHub عام** برخصة CC BY-SA 4.0 (شرط Z-Anatomy). الملفات الجاهزة للريبو ده في
-   فولدر `model-repo-template/` في ريبو التطبيق: انسخ محتواه، وحط `muscles.glb` جنب `README.md`، وانسخ
-   `blender/export_muscles.py` و `blender/muscle_groups.py` في فولدر `scripts/`. التفاصيل في `model-repo-template/README.md`.
+   فولدر `assets-src/model3d/repo-template/` في ريبو التطبيق: انسخ محتواه، وحط `muscles.glb` جنب `README.md`، وانسخ
+   `assets-src/model3d/blender/export_muscles.py` و `assets-src/model3d/blender/muscle_groups.py` في فولدر `scripts/`. التفاصيل في `assets-src/model3d/repo-template/README.md`.
 
 ---
 
@@ -128,7 +128,7 @@
 Claude Code يشغّلها لو Blender متسطب على نفس الجهاز):
 
 ```bash
-blender --background Z-Anatomy/Startup.blend --python blender/export_muscles.py -- --out muscles.glb --triangles 120000
+blender --background Z-Anatomy/Startup.blend --python assets-src/model3d/blender/export_muscles.py -- --out muscles.glb --triangles 120000
 ```
 
 خيارات تانية: `--triangles 80000` (أخف)، `--compression none` (من غير ضغط Draco)، `--height 1.8` (طول المجسم بالمتر)،
@@ -151,10 +151,10 @@ blender --background Z-Anatomy/Startup.blend --python blender/export_muscles.py 
 ## المجسم المؤقت (placeholder)
 
 - لحد ما تشغّل السكربت، التطبيق شغال على ملف **مؤقت**:
-  `model-repo-template/placeholder/muscles.placeholder.glb` (حوالي 143 كيلوبايت).
+  `assets-src/model3d/repo-template/placeholder/muscles.placeholder.glb` (حوالي 143 كيلوبايت).
 - ده **مش تشريح حقيقي**: أشكال بيضاوية بسيطة في أماكن العضلات التقريبية، بنفس الـ 19 اسم، عشان نبني ونختبر
   عارض الـ 3D (اللف، التكبير، التلوين، الضغط). فيه "مناخير" صغيرة وقدم متجهة لقدّام عشان تفرّق الأمامي من الخلفي.
-- اتعمل بـ `node blender/make_placeholder.mjs` ومن غير أي بيانات من Z-Anatomy.
+- اتعمل بـ `node assets-src/model3d/blender/make_placeholder.mjs` ومن غير أي بيانات من Z-Anatomy.
 - **ممنوع** يتشحن للمدربين كأنه المجسم النهائي.
 
 ## اتفاق الإحداثيات (للمطوّر)

@@ -1,13 +1,13 @@
-import { assistant } from './features/assistant';
-import { exercises } from './features/exercises';
-import { hub } from './features/hub';
-import { nutrition } from './features/nutrition';
-import { outbox } from './features/outbox';
-import { pdf } from './features/pdf';
-import { settings } from './features/settings';
-import { storage } from './features/storage';
-import { schedule } from './features/schedule';
-import { training } from './features/training';
+import { assistant } from './ar/assistant';
+import { exercises } from './ar/exercises';
+import { hub } from './ar/hub';
+import { nutrition } from './ar/nutrition';
+import { outbox } from './ar/outbox';
+import { pdf } from './ar/pdf';
+import { settings } from './ar/settings';
+import { storage } from './ar/storage';
+import { schedule } from './ar/schedule';
+import { training } from './ar/training';
 
 /**
  * Every user-visible string in the app. Egyptian Arabic, Western digits.
@@ -412,48 +412,30 @@ export const ar = {
     activation: { title: 'التفعيل والإعداد الأول' },
     schedule: {
       title: 'المواعيد',
-      emptyTitle: 'التقويم جاي في المرحلة الجاية',
-      emptyBody: 'هنا هتحجز الحصص، تكررها كل أسبوع، وتسجل الحضور.',
     },
     exercises: {
       title: 'مكتبة التمارين',
-      emptyTitle: 'المكتبة لسه بتتجهز',
-      emptyBody: 'هنا هتلاقي التمارين بالصور، وتقدر تضيف تمارينك بصورك.',
     },
     muscleMap: {
       title: 'خريطة العضلات',
-      emptyTitle: 'الخريطة جاية قريب',
-      emptyBody: 'اضغط على أي عضلة تفتح تمارينها، ومعاها المجسم الـ 3D.',
     },
     programs: {
       title: 'بناء البرامج',
-      emptyTitle: 'مفيش برامج لسه',
-      emptyBody: 'هنا هتبني البرامج من القوالب وتعيّنها للعملاء.',
     },
     nutrition: {
       title: 'التغذية',
-      emptyTitle: 'التغذية جاية قريب',
-      emptyBody: 'حاسبة السعرات والماكروز، خطط الوجبات، وكتيّب وصفاتك.',
     },
     supplements: {
       title: 'المكملات والمنتجات',
-      emptyTitle: 'الكتالوج فاضي',
-      emptyBody: 'ضيف المنتجات اللي بتنصح بيها: صورة، سعر، والجرعة والتوقيت اللي إنت بتكتبهم.',
     },
     progress: {
       title: 'التقدم',
-      emptyTitle: 'مفيش قياسات لسه',
-      emptyBody: 'سجل الوزن والمقاسات والصور، وهتظهر الرسوم هنا.',
     },
     pdf: {
       title: 'منشئ الـ PDF',
-      emptyTitle: 'منشئ الـ PDF جاي قريب',
-      emptyBody: 'اختار الأقسام والغلاف، عاين، وابعت على واتساب.',
     },
     settings: {
       title: 'الإعدادات',
-      emptyTitle: 'الإعدادات جاية قريب',
-      emptyBody: 'هويتك، المعادلات، النسخ الاحتياطي، والترخيص.',
       identity: 'الهوية',
       identityHint: 'الاسم واللوجو واللون والعملة',
       license: 'الترخيص',

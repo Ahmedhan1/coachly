@@ -1,4 +1,4 @@
-// English for src/i18n/features/outbox.ts (daily WhatsApp outbox).
+// English for src/i18n/ar/outbox.ts (daily WhatsApp outbox).
 import type { EnArea } from './types';
 
 export const outbox: EnArea<'outbox'> = {

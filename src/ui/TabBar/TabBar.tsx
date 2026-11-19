@@ -12,7 +12,7 @@ export interface TabItem {
 }
 
 export interface TabBarProps {
-  /** Four tabs: two on each side of the center add button (DESIGN.md §5). */
+  /** Four tabs: two on each side of the center add button (docs/DESIGN.md §5). */
   items: readonly TabItem[];
   label: string;
   center: { label: string; onClick: () => void };

@@ -1,6 +1,6 @@
 // Instant launch splash: runs before the app bundle, so the trainer's logo is the very first thing on screen.
 // Reads the cache written by src/features/identity/brandAssets.ts (same element id and look as
-// src/app/BootSplash.ts, which takes over and fades it out). On the first launch of an app installed from a
+// src/app/pwa/BootSplash.ts, which takes over and fades it out). On the first launch of an app installed from a
 // branded install page there is no cache yet, so the hosted logo (/?brand=<id>) is used. Classic script, no
 // dependencies, every failure ignored (the app's own splash still runs).
 (function () {

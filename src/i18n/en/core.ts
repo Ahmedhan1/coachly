@@ -404,48 +404,30 @@ export const core: StringShape<Pick<Strings, CoreKeys>> = {
     activation: { title: 'Activation and first setup' },
     schedule: {
       title: 'Schedule',
-      emptyTitle: 'The calendar comes in the next phase',
-      emptyBody: 'Here you will book sessions, repeat them weekly, and track attendance.',
     },
     exercises: {
       title: 'Exercise library',
-      emptyTitle: 'The library is still being prepared',
-      emptyBody: 'Here you will find exercises with pictures, and you can add your own.',
     },
     muscleMap: {
       title: 'Muscle map',
-      emptyTitle: 'The map is coming soon',
-      emptyBody: 'Tap any muscle to open its exercises, with the 3D model.',
     },
     programs: {
       title: 'Program builder',
-      emptyTitle: 'No programs yet',
-      emptyBody: 'Here you will build programs from templates and assign them to clients.',
     },
     nutrition: {
       title: 'Nutrition',
-      emptyTitle: 'Nutrition is coming soon',
-      emptyBody: 'Calorie and macro calculator, meal plans, and your recipe book.',
     },
     supplements: {
       title: 'Supplements and products',
-      emptyTitle: 'The catalog is empty',
-      emptyBody: 'Add the products you recommend: photo, price, and the dose and timing you write yourself.',
     },
     progress: {
       title: 'Progress',
-      emptyTitle: 'No measurements yet',
-      emptyBody: 'Log weight, measurements and photos, and the charts show up here.',
     },
     pdf: {
       title: 'PDF builder',
-      emptyTitle: 'The PDF builder is coming soon',
-      emptyBody: 'Choose the sections and cover, preview, and send on WhatsApp.',
     },
     settings: {
       title: 'Settings',
-      emptyTitle: 'Settings are coming soon',
-      emptyBody: 'Your brand, formulas, backup and license.',
       identity: 'Brand',
       identityHint: 'Name, logo, color and currency',
       license: 'License',

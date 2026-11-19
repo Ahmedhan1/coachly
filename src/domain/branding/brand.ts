@@ -1,5 +1,5 @@
 /**
- * One brand color → every brand token, for light and dark (DESIGN.md §2).
+ * One brand color → every brand token, for light and dark (docs/DESIGN.md §2).
  * Port of design/brand-derive.mjs with two additions that turn its intent into guarantees:
  *  - brand-ink must also read on the brand tint (chips, selected rows), not only on the page background;
  *  - text on a brand fill always reaches 4.5:1 — when neither white nor near-black does, the fill is
