@@ -41,7 +41,7 @@
   inline-size: var(--tap);
   block-size: var(--tap);
   border: 0;
-  border-radius: var(--r-full);
+  border-radius: var(--r-control);
   background: none;
   color: var(--text-3);
 }
@@ -59,7 +59,7 @@
   gap: var(--sp-1);
   min-block-size: var(--tap);
   padding-inline: var(--sp-3);
-  border-radius: var(--r-full);
+  border-radius: var(--r-control);
   background: var(--ok);
   color: #fff;
   font: var(--t-button);

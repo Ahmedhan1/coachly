@@ -81,7 +81,7 @@
   min-block-size: 36px;
   padding-inline: var(--sp-3);
   border: 1px solid var(--line);
-  border-radius: var(--r-full);
+  border-radius: var(--r-control);
   background: var(--bg);
   color: var(--text-2);
   font: var(--t-control);
@@ -103,7 +103,7 @@
   display: inline-flex;
   align-items: center;
   padding: var(--sp-0) var(--sp-2);
-  border-radius: var(--r-full);
+  border-radius: var(--r-control);
   background: var(--surface-2);
   color: var(--text-2);
   font: var(--t-caption);
@@ -265,7 +265,7 @@
   min-block-size: 36px;
   padding-inline: var(--sp-3) var(--sp-1-5);
   border: 1px solid var(--line);
-  border-radius: var(--r-full);
+  border-radius: var(--r-control);
   background: var(--bg);
   color: var(--text);
   font: var(--t-control);
@@ -318,7 +318,7 @@
 .pillTag {
   margin-inline-start: var(--sp-1-5);
   padding: var(--sp-0) var(--sp-1-5);
-  border-radius: var(--r-full);
+  border-radius: var(--r-control);
   background: var(--surface-2);
   color: var(--text-2);
   font: var(--t-micro);

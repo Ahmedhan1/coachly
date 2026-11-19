@@ -107,7 +107,7 @@
 .bar {
   block-size: 10px;
   overflow: hidden;
-  border-radius: 5px;
+  border-radius: var(--r-full);
   background: var(--surface-2);
 }
 

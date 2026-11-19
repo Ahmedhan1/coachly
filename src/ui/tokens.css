@@ -60,8 +60,10 @@
 
   /* Shape */
   --r-xs: 6px;
-  --r-sm: 10px;
+  --r-sm: 12px;
   --r-md: 14px;
+  /* Every button, chip, segment, input and icon button: rounded, never a full pill. */
+  --r-control: 14px;
   --r-lg: 18px;
   --r-sheet: 22px;
   --r-full: 999px;

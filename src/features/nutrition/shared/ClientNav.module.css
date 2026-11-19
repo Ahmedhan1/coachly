@@ -3,7 +3,7 @@
   gap: var(--sp-0);
   margin: var(--sp-4) var(--gutter) 0;
   padding: var(--sp-0);
-  border-radius: var(--r-md);
+  border-radius: var(--r-control);
   background: var(--surface);
 }
 
@@ -14,7 +14,7 @@
   place-items: center;
   min-block-size: 38px;
   padding-inline: var(--sp-1);
-  border-radius: 11px;
+  border-radius: calc(var(--r-control) - var(--sp-0));
   color: var(--text-2);
   font: var(--t-control);
   text-align: center;

@@ -14,7 +14,7 @@
   min-block-size: var(--field-h);
   padding-inline: var(--sp-4);
   border: var(--field-border, 0);
-  border-radius: var(--r-md);
+  border-radius: var(--r-control);
   background: var(--field-bg, var(--surface));
   font: var(--t-body); /* 16px so iOS does not zoom on focus */
   inline-size: 100%;

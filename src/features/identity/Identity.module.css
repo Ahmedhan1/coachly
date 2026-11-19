@@ -297,7 +297,7 @@
   align-items: center;
   block-size: 28px;
   padding-inline: var(--sp-2);
-  border-radius: var(--r-full);
+  border-radius: var(--r-control);
   background: var(--brand-tint);
   color: var(--brand-ink);
   font: var(--t-label);
@@ -381,7 +381,7 @@
 }
 
 .round {
-  border-radius: var(--r-full);
+  border-radius: var(--r-control);
   overflow: hidden;
 }
 

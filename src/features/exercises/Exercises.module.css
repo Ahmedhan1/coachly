@@ -3,7 +3,7 @@
   place-items: center;
   inline-size: var(--tap);
   block-size: var(--tap);
-  border-radius: var(--r-full);
+  border-radius: var(--r-control);
   background: var(--surface);
   color: var(--text);
 }
@@ -86,7 +86,7 @@
   gap: var(--sp-1);
   min-block-size: 36px;
   padding-inline: var(--sp-3) var(--sp-2);
-  border-radius: var(--r-full);
+  border-radius: var(--r-control);
   background: var(--brand-tint);
   color: var(--brand-ink);
   font: var(--t-button-sm);

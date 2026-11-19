@@ -58,7 +58,7 @@
   place-items: center;
   inline-size: 52px;
   block-size: 44px;
-  border-radius: var(--r-md);
+  border-radius: var(--r-control);
   background: var(--brand);
   color: var(--brand-on);
 }

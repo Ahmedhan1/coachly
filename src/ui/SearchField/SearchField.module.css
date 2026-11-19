@@ -18,7 +18,7 @@
   min-block-size: var(--field-h);
   padding-inline: calc(var(--sp-3) + 20px + var(--sp-2)) var(--tap);
   border: 0;
-  border-radius: var(--r-md);
+  border-radius: var(--r-control);
   background: var(--surface);
   font: var(--t-body);
   appearance: none;

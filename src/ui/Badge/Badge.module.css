@@ -4,7 +4,7 @@
   gap: var(--sp-1);
   block-size: 28px;
   padding-inline: var(--sp-2);
-  border-radius: var(--r-full);
+  border-radius: var(--r-control);
   font: var(--t-label);
   white-space: nowrap;
 }

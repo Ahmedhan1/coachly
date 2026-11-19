@@ -30,7 +30,7 @@
 .heroTop i {
   inline-size: 8px;
   block-size: 8px;
-  border-radius: 50%;
+  border-radius: var(--r-full);
   background: currentColor;
 }
 
@@ -220,7 +220,7 @@
   flex: none;
   inline-size: var(--tap);
   block-size: var(--tap);
-  border-radius: var(--r-full);
+  border-radius: var(--r-control);
   background: var(--surface-2);
   color: var(--text);
 }

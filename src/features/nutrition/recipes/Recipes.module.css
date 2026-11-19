@@ -159,7 +159,7 @@
   min-block-size: 36px;
   padding-inline: var(--sp-3);
   border: 1px solid var(--line);
-  border-radius: var(--r-full);
+  border-radius: var(--r-control);
   background: var(--surface);
   color: var(--text);
   font: var(--t-caption);
@@ -189,7 +189,7 @@
   min-block-size: 40px;
   padding-inline: var(--sp-3);
   border: 1px solid var(--line);
-  border-radius: var(--r-full);
+  border-radius: var(--r-control);
   background: var(--surface);
   color: var(--text);
   font: var(--t-label);

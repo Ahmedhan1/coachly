@@ -5,7 +5,7 @@
   place-items: center;
   inline-size: var(--tap);
   block-size: var(--tap);
-  border-radius: var(--r-full);
+  border-radius: var(--r-control);
   background: var(--surface);
   color: var(--text);
 }

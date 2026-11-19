@@ -52,7 +52,7 @@
   align-items: center;
   block-size: 24px;
   padding-inline: var(--sp-2);
-  border-radius: var(--r-full);
+  border-radius: var(--r-control);
   background: var(--surface-2);
   color: var(--text);
   font: var(--t-label);
