@@ -104,6 +104,10 @@ details[open]{padding-block-end:12px}
 .thumb-x::after{content:"";position:absolute;inset:-6px}
 .add-photo{display:flex;align-items:center;justify-content:center;gap:8px;min-block-size:52px;border:2px dashed var(--brand);border-radius:var(--r-md);color:var(--brand);font:700 16px var(--font);cursor:pointer}
 .add-photo input{position:absolute;inline-size:1px;block-size:1px;opacity:0;pointer-events:none}
+.trainer-photo{inline-size:44px;block-size:44px;border-radius:50%;object-fit:cover;flex:none;border:2px solid rgba(255,255,255,.7)}
+.my-photo{margin-block-end:12px}.my-photo-row{display:flex;align-items:center;gap:12px}.my-photo-row .add-photo{flex:1}
+.my-photo-face{inline-size:64px;block-size:64px;border-radius:50%;overflow:hidden;flex:none;background:var(--surface-2);border:1px solid var(--line)}
+.my-photo-face img{inline-size:100%;block-size:100%;object-fit:cover}
 .add-photo:focus-within{outline:3px solid var(--brand);outline-offset:2px}.add-photo[hidden]{display:none}
 .btn{min-block-size:52px;inline-size:100%;border:0;border-radius:var(--r-full);background:var(--brand);color:var(--brand-on);font:700 17px var(--font);padding:0 20px}
 .btn:disabled{opacity:.6}.status{min-block-size:1.5em;margin:12px 0 0;font-weight:600}

@@ -1,5 +1,6 @@
 import { assistant } from './features/assistant';
 import { exercises } from './features/exercises';
+import { files } from './features/files';
 import { hub } from './features/hub';
 import { nutrition } from './features/nutrition';
 import { outbox } from './features/outbox';
@@ -478,6 +479,7 @@ export const ar = {
   pdf,
   settings,
   storage,
+  files,
   assistant,
   hub,
   units: {

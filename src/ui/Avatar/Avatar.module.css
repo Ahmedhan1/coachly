@@ -10,3 +10,14 @@
   font: 700 17px/1 var(--font-display);
   white-space: nowrap;
 }
+
+.avatar {
+  overflow: hidden;
+}
+
+.photo {
+  inline-size: 100%;
+  block-size: 100%;
+  object-fit: cover;
+  display: block;
+}

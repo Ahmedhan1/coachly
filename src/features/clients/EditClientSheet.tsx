@@ -1,10 +1,11 @@
 import { useState, type FormEvent } from 'react';
-import { useRepos } from '@/app/services';
+import { useRepos, useServices } from '@/app/services';
+import { removeClientPhoto } from './clientPhoto';
 import { useUiStore } from '@/app/uiStore';
 import { clientGoalSchema, type Client, type ClientGoal } from '@/domain/models';
 import { cleanPhoneInput, phoneProblem } from '@/domain/whatsapp';
 import { t } from '@/i18n';
-import { Select, SegmentedControl, Sheet, TextArea, TextField } from '@/ui';
+import { Button, Select, SegmentedControl, Sheet, TextArea, TextField } from '@/ui';
 import styles from './AddClientSheet.module.css';
 
 const FORM_ID = 'edit-client-form';
@@ -19,6 +20,7 @@ const text = (n: number | undefined) => (n === undefined ? '' : String(n));
 /** Everything about a client besides package and payments. */
 export function EditClientSheet({ client, onClose }: { client: Client; onClose: () => void }) {
   const repos = useRepos();
+  const services = useServices();
   const showToast = useUiStore((s) => s.showToast);
   const [name, setName] = useState(client.name);
   const [phone, setPhone] = useState(client.phone);
@@ -102,6 +104,18 @@ export function EditClientSheet({ client, onClose }: { client: Client; onClose: 
         </div>
         <TextArea label={t('clientDetail.injuriesField')} hint={t('clientDetail.injuriesHint')} value={injuries} onChange={(e) => setInjuries(e.target.value)} />
         <TextArea label={t('clientDetail.notesField')} value={notes} onChange={(e) => setNotes(e.target.value)} />
+        {client.photoId && (
+          <Button
+            variant="danger"
+            size="small"
+            onClick={async () => {
+              await removeClientPhoto(services, client);
+              showToast({ message: t('files.clientPhoto.removed'), duration: 2500 });
+            }}
+          >
+            {t('files.clientPhoto.remove')}
+          </Button>
+        )}
       </form>
     </Sheet>
   );

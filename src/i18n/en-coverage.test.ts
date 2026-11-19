@@ -21,7 +21,7 @@ function get(root: unknown, key: string): unknown {
 }
 
 const arTree = ar as unknown as Tree;
-const featureAreas = new Set(['schedule', 'training', 'exercises', 'nutrition', 'outbox', 'pdf', 'settings', 'storage', 'assistant', 'hub']);
+const featureAreas = new Set(['schedule', 'training', 'exercises', 'nutrition', 'outbox', 'pdf', 'settings', 'storage', 'assistant', 'hub', 'files']);
 
 /** A top-level area is checked when its English file exists (src/i18n/en/<area>.ts, or core.ts for shared sections). */
 function enFileExists(area: string): boolean {

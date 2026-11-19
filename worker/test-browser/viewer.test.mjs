@@ -25,7 +25,8 @@ writeFileSync(
   `export { viewerHtml, viewerHeaders } from ${JSON.stringify(join(here, '../src/share/page.ts'))};
 export { sealWithKey, openWithKey, generateRawKey } from ${JSON.stringify(join(here, '../../shared/envelope.ts'))};
 export { parseCheckinDocument } from ${JSON.stringify(join(here, '../src/share/document.ts'))};
-export { SAMPLE_DOCUMENT } from ${JSON.stringify(join(here, '../test/sampleDocument.ts'))};`,
+export { SAMPLE_DOCUMENT } from ${JSON.stringify(join(here, '../test/sampleDocument.ts'))};
+export { unpackFile } from ${JSON.stringify(join(here, '../../src/domain/files/pack.ts'))};`,
 );
 await build({ entryPoints: [entry], bundle: true, format: 'esm', platform: 'node', outfile: join(outDir, 'bundle.mjs'), logLevel: 'error' });
 const lib = await import(pathToFileURL(join(outDir, 'bundle.mjs')).href);
@@ -52,6 +53,7 @@ const step = async (name, fn) => {
 
 const browser = await chromium.launch();
 let posted = null;
+let postedFile = null;
 let shareStatus = 200;
 try {
   const context = await browser.newContext({ viewport: { width: 390, height: 844 }, deviceScaleFactor: 2, isMobile: true, hasTouch: true });
@@ -79,6 +81,10 @@ try {
     if (url.origin === ORIGIN && url.pathname === `/api/share/${shareId}/checkins` && req.method() === 'POST') {
       posted = { body: req.postDataBuffer(), token: req.headers()['x-checkin-token'], referer: req.headers()['referer'] };
       return route.fulfill({ status: 201, contentType: 'application/json', body: '{"id":"x"}' });
+    }
+    if (url.origin === ORIGIN && url.pathname === `/api/share/${shareId}/files` && req.method() === 'POST') {
+      postedFile = { body: req.postDataBuffer(), token: req.headers()['x-checkin-token'], kind: url.searchParams.get('kind') };
+      return route.fulfill({ status: 201, contentType: 'application/json', body: '{"id":"f"}' });
     }
     if (url.origin === APP && url.pathname.startsWith('/exercise-pack/img/')) {
       return route.fulfill({ status: 200, contentType: 'image/png', body: bigPhoto });
@@ -286,6 +292,29 @@ try {
     assert.ok(png.corner.slice(0, 3).every((v) => v > 245), `clear background must turn white, got ${png.corner}`);
     assert.ok(png.middle[0] > 150 && png.middle[1] < 80, `red shape missing: ${png.middle}`);
     await safari.close();
+  });
+
+  await step("client's own photo: downscaled, packed like the app expects, encrypted with the link key; trainer photo in the header", async () => {
+    const withPhoto = { ...lib.SAMPLE_DOCUMENT, brand: { ...lib.SAMPLE_DOCUMENT.brand, photo: lib.SAMPLE_DOCUMENT.brand.logo } };
+    envelope = await lib.sealWithKey(key, new TextEncoder().encode(JSON.stringify(withPhoto)));
+    await page.goto(`${ORIGIN}/c/${shareId}#k=${b64url(key)}`);
+    await page.waitForSelector('body[data-ready="1"]', { timeout: 10_000 });
+    assert.equal(await page.locator('#brand img.trainer-photo').count(), 1, 'trainer photo in the header');
+    await page.click('#t-p-checkin');
+    assert.equal((await page.locator('.my-photo h3').textContent()).trim(), 'صورتك');
+    await page.setInputFiles('input[name=my-photo]', { name: 'me.png', mimeType: 'image/png', buffer: bigPhoto });
+    await page.waitForFunction(() => document.querySelector('.my-photo .status')?.textContent?.includes('وصلت'), null, { timeout: 10_000 });
+    await page.locator('.my-photo').screenshot({ path: join(shotDir, 'viewer-my-photo.png') });
+    assert.ok(postedFile, 'no file POST seen');
+    assert.equal(postedFile.kind, 'client_photo');
+    assert.equal(postedFile.token, await expectedWriteToken(key));
+    const opened = await lib.openWithKey(key, new Uint8Array(postedFile.body));
+    assert.ok(opened.ok, 'shared/envelope.ts could not open the photo');
+    const unpacked = lib.unpackFile(opened.data);
+    assert.ok(unpacked, "the app's unpackFile could not read it");
+    assert.equal(unpacked.header.mime, 'image/jpeg');
+    assert.deepEqual([...unpacked.bytes.subarray(0, 3)], [0xff, 0xd8, 0xff], 'JPEG bytes');
+    envelope = await lib.sealWithKey(key, new TextEncoder().encode(JSON.stringify(lib.SAMPLE_DOCUMENT)));
   });
 
   await step('no CSP violations, no requests outside the page and app origins', async () => {

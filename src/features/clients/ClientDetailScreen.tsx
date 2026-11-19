@@ -1,4 +1,5 @@
 import { lazy, Suspense, useEffect, useRef, useState } from 'react';
+import { ClientPhotoPicker } from './ClientPhotoPicker';
 import { useNavigate, useParams, useSearchParams } from 'react-router-dom';
 import { useRepos, useServices } from '@/app/services';
 import { useGo } from '@/app/nav';
@@ -148,9 +149,7 @@ function ClientHub({ client }: { client: Client }) {
         }
       />
       <header className={styles.who} ref={who}>
-        <div className={styles.photo} aria-hidden="true">
-          <Icon name="user" />
-        </div>
+        <ClientPhotoPicker client={client} />
         <div className={styles.whoText}>
           <h1 className={styles.name}>{client.name}</h1>
           <p className={styles.meta}>

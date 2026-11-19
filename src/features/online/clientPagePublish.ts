@@ -10,7 +10,7 @@ import { mealItemRows } from '@/domain/meals';
 import { loadBuiltinCatalog } from '@/features/programs/catalog';
 import { exerciseName } from '@/features/programs/names';
 import { clientNoteText } from '@/domain/programs/tailor';
-import { clientPageLogo } from '@/features/identity/brandAssets';
+import { clientPageLogo, clientPageTrainerPhoto } from '@/features/identity/brandAssets';
 import { readShare, saveShare, type ShareRecord } from './prefs';
 
 /** Meal items as client-page lines: exact grams per food when the item came from the gram planner. */
@@ -60,7 +60,7 @@ export async function buildClientShareDoc(services: AppServices, client: Client,
   const { meta } = services;
   const repos = services.data.repos;
   const store = new NutritionStore(meta, repos);
-  const [settings, programs, plans, recipes, rows, supplements, catalog, progress, sessions, logs, calc, logo] = await Promise.all([
+  const [settings, programs, plans, recipes, rows, supplements, catalog, progress, sessions, logs, calc, logo, trainerPhoto] = await Promise.all([
     repos.settings.get(),
     repos.programs.listByClient(client.id),
     repos.mealPlans.listByClient(client.id),
@@ -73,6 +73,7 @@ export async function buildClientShareDoc(services: AppServices, client: Client,
     repos.workoutLogs.listByClient(client.id),
     store.getCalculation(client.id).catch(() => null),
     clientPageLogo(services).catch(() => null),
+    clientPageTrainerPhoto(services).catch(() => null),
   ]);
   const program = [...programs].sort((a, b) => b.updatedAt - a.updatedAt)[0] ?? null;
   const byEx = new Map((catalog ?? []).map((e) => [e.id, e]));
@@ -86,6 +87,7 @@ export async function buildClientShareDoc(services: AppServices, client: Client,
     trainerName: settings.name,
     color: settings.primaryColor,
     logo,
+    trainerPhoto,
     client,
     program,
     exercise: (id) => {
@@ -174,7 +176,7 @@ export async function pagesSignature(services: AppServices): Promise<string> {
   const clients = await repos.clients.list();
   const parts: string[] = [];
   const settings = await repos.settings.get();
-  parts.push(`${settings.name}|${settings.primaryColor}|${settings.logoImageId ?? ''}`);
+  parts.push(`${settings.name}|${settings.primaryColor}|${settings.logoImageId ?? ''}|${settings.photoImageId ?? ''}`);
   for (const c of clients) {
     const share = await readShare(services.meta, c.id);
     if (!share?.publishedAt) continue;

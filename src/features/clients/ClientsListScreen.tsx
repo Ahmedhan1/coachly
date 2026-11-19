@@ -1,3 +1,4 @@
+import { ClientAvatar } from '@/features/clients/ClientAvatar';
 import { useDeferredValue, useMemo, useState } from 'react';
 import { useRepos } from '@/app/services';
 import { useUiStore } from '@/app/uiStore';
@@ -5,7 +6,7 @@ import { useLive } from '@/app/useLive';
 import { filterPrepared, prepareSearch } from '@/data';
 import { subscriptionAttention, toIsoDate, type Client } from '@/domain/models';
 import { t } from '@/i18n';
-import { Avatar, Badge, Button, EmptyState, IconButton, ListRow, ListSection, PageHeader, SearchField, SwipeRow, Tx } from '@/ui';
+import { Badge, Button, EmptyState, IconButton, ListRow, ListSection, PageHeader, SearchField, SwipeRow, Tx } from '@/ui';
 import { attentionLabel, attentionTone } from './attention';
 import { useDeleteClient } from './useDeleteClient';
 import styles from './Clients.module.css';
@@ -86,7 +87,7 @@ function ClientRow({ client, today }: { client: Client; today: string }) {
   return (
     <ListRow
       to={`/clients/${client.id}`}
-      leading={<Avatar name={client.name} />}
+      leading={<ClientAvatar client={client} />}
       title={client.name}
       subtitle={subtitle}
       trailing={attention ? <Badge tone={attentionTone(attention)}>{attentionLabel(attention)}</Badge> : undefined}

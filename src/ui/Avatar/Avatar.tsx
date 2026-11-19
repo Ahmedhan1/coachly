@@ -5,10 +5,11 @@ export function initials(name: string): string {
   return name.trim().charAt(0);
 }
 
-export function Avatar({ name }: { name: string }) {
+/** 44pt square: the person's photo when there is one, otherwise the first letter of their name. */
+export function Avatar({ name, src }: { name: string; src?: string | null }) {
   return (
     <span className={styles.avatar} aria-hidden="true">
-      {initials(name)}
+      {src ? <img src={src} alt="" className={styles.photo} draggable={false} /> : initials(name)}
     </span>
   );
 }

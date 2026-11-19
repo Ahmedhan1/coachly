@@ -18,6 +18,8 @@ import { muscleMapRefs } from './muscleMapImage';
 import { BrandingSheet } from './BrandingSheet';
 import { readPdfBranding } from './pdfBranding';
 import styles from './Pdf.module.css';
+import { PdfArchive } from './PdfArchive';
+import { queueBytesCopy } from '@/features/files/cloudCopies';
 
 const ALL_SECTIONS = pdfSectionSchema.options;
 const NONE = '__none__';
@@ -73,6 +75,7 @@ export function PdfBuilderScreen() {
   const [sent, setSent] = useState<Sent>(null);
 
   const share = useMemo(() => new BrowserShareService(), []);
+  const archived = useRef(new WeakSet<RenderedPdf>());
   // Android Chrome (and desktop browsers) often cannot hand a PDF to the share sheet: say so up front.
   const canSharePdf = useMemo(
     () => share.canShareFiles({ data: new Blob(['%PDF-1.4'], { type: 'application/pdf' }), fileName: 'probe.pdf', mimeType: 'application/pdf' }),
@@ -189,6 +192,14 @@ export function PdfBuilderScreen() {
       },
       { prefer },
     );
+    if (r.outcome === 'shared' || r.outcome === 'downloaded') {
+      // Sent to the client: keep an encrypted cloud copy (once per rendered file).
+      if (!archived.current.has(status.pdf)) {
+        archived.current.add(status.pdf);
+        const bytes = new Uint8Array(await status.pdf.blob.arrayBuffer());
+        await queueBytesCopy(services, 'pdf', crypto.randomUUID().replace(/-/g, ''), bytes, 'application/pdf', status.pdf.fileName).catch(() => undefined);
+      }
+    }
     if (r.outcome === 'shared') {
       setSent(null);
       showToast({ message: t('pdf.shared'), duration: 2500 });
@@ -295,6 +306,8 @@ export function PdfBuilderScreen() {
         </section>
       )}
       {status.kind === 'failed' && <p className={styles.warn}>{t('pdf.failed')}</p>}
+
+      <PdfArchive share={share} />
 
       <nav className={styles.actionbar} aria-label={t('pdf.title')}>
         {status.kind === 'working' ? (

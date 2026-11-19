@@ -88,6 +88,11 @@ var AR = {
   failed: 'ما اتبعتش. اتأكد من النت وجرّب تاني.',
   photoFailed: 'مش قادرين نقرا الصورة دي.',
   addPhoto: '+ أضف صورة',
+  myPhotoTitle: 'صورتك',
+  myPhotoHint: 'حط صورة ليك، والمدرب هيشوفها في ملفك عنده.',
+  myPhotoPick: 'اختار صورة',
+  myPhotoSending: 'بنبعت الصورة…',
+  myPhotoSent: 'الصورة وصلت للمدرب.',
   removePhoto: 'شيل الصورة',
   photoCount: function (n) { return n + ' من 3 صور'; },
   privateNote: 'الصفحة دي خاصة بيك. ما تبعتش اللينك لحد.',
@@ -202,6 +207,11 @@ var EN = {
   failed: 'Not sent. Check your internet and try again.',
   photoFailed: 'We could not read this photo.',
   addPhoto: '+ Add a photo',
+  myPhotoTitle: 'Your photo',
+  myPhotoHint: 'Add a photo of yourself; your coach sees it in your file.',
+  myPhotoPick: 'Choose a photo',
+  myPhotoSending: 'Sending the photo…',
+  myPhotoSent: 'Your coach has the photo.',
   removePhoto: 'Remove photo',
   photoCount: function (n) { return n + ' of 3 photos'; },
   privateNote: 'This page is private to you. Do not share the link.',
@@ -375,6 +385,12 @@ function hero(doc) {
     img.alt = '';
     img.src = doc.brand.logo;
     top.appendChild(img);
+  }
+  if (typeof doc.brand.photo === 'string' && /^data:image\/(png|jpeg|webp);base64,[A-Za-z0-9+\/]+=*$/.test(doc.brand.photo)) {
+    var face = el('img', 'trainer-photo');
+    face.alt = '';
+    face.src = doc.brand.photo;
+    top.appendChild(face);
   }
   top.appendChild(el('span', 'brand-name', doc.brand.name));
   wrap.appendChild(top);
@@ -893,6 +909,67 @@ function downscale(file) {
       return url;
     });
 }
+/** Same layout as the app's domain/files packFile: "PF1\0", 4-byte big-endian header length, JSON header, bytes. */
+function packFile(mime, bytes) {
+  var head = enc.encode(JSON.stringify({ mime: mime }));
+  var out = new Uint8Array(8 + head.length + bytes.length);
+  out.set([0x50, 0x46, 0x31, 0], 0);
+  new DataView(out.buffer).setUint32(4, head.length);
+  out.set(head, 8);
+  out.set(bytes, 8 + head.length);
+  return out;
+}
+function dataUrlBytes(url) {
+  var bin = atob(url.slice(url.indexOf(',') + 1));
+  var out = new Uint8Array(bin.length);
+  for (var i = 0; i < bin.length; i++) out[i] = bin.charCodeAt(i);
+  return out;
+}
+/** The client's own profile photo: downscaled, encrypted with the link key, sent to the trainer. */
+function myPhotoCard(raw) {
+  var card = el('div', 'card my-photo');
+  card.appendChild(el('h3', '', T.myPhotoTitle));
+  card.appendChild(el('p', 'sub', T.myPhotoHint));
+  var row = el('div', 'my-photo-row');
+  var face = el('div', 'my-photo-face');
+  var input = el('input'); input.type = 'file'; input.accept = 'image/*'; input.name = 'my-photo';
+  var pick = el('label', 'add-photo');
+  pick.appendChild(input);
+  pick.appendChild(el('span', '', T.myPhotoPick));
+  row.appendChild(face);
+  row.appendChild(pick);
+  card.appendChild(row);
+  var status = el('p', 'status'); status.setAttribute('role', 'status');
+  card.appendChild(status);
+  var say = function (text, cls) { status.textContent = text; status.className = 'status' + (cls ? ' ' + cls : ''); };
+  input.addEventListener('change', function () {
+    var f = input.files && input.files[0];
+    input.value = '';
+    if (!f) return;
+    say(T.myPhotoSending);
+    downscale(f)
+      .then(function (url) {
+        face.textContent = '';
+        var img = el('img'); img.alt = ''; img.src = url;
+        face.appendChild(img);
+        return Promise.all([sealEnvelope(raw, packFile('image/jpeg', dataUrlBytes(url))), writeToken(raw)]);
+      }, function () { throw new Error('photo'); })
+      .then(function (r) {
+        return fetch('/api/share/' + shareId + '/files?kind=client_photo', {
+          method: 'POST', body: r[0], cache: 'no-store', credentials: 'omit',
+          headers: { 'Content-Type': 'application/octet-stream', 'X-Checkin-Token': r[1] }
+        });
+      })
+      .then(function (res) {
+        if (res.status === 201) say(T.myPhotoSent, 'ok');
+        else if (res.status === 429) say(T.tooMany, 'err');
+        else if (res.status === 413) say(T.tooBig, 'err');
+        else say(T.failed, 'err');
+      }, function (e) { say(e && e.message === 'photo' ? T.photoFailed : T.failed, 'err'); });
+  });
+  return card;
+}
+
 /** One photo at a time: three full-size iPhone photos decoded at once can run Safari out of memory. */
 function downscaleAll(files) {
   var out = [];
@@ -925,6 +1002,7 @@ function energyPicker() {
 function checkinSection(raw, page) {
   var s = el('section', 'panel');
   s.id = 'p-checkin';
+  s.appendChild(myPhotoCard(raw));
   var card = el('form', 'card');
   card.noValidate = true;
   card.appendChild(el('h3', '', T.checkinTitle));

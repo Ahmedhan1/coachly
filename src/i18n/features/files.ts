@@ -1,0 +1,41 @@
+// Strings for photos and cloud files: client photo, trainer photo, payment receipts, PDF archive. Merged as `files`.
+export const files = {
+  clientPhoto: {
+    add: 'أضف صورة',
+    change: 'غيّر الصورة',
+    remove: 'شيل الصورة',
+    alt: 'صورة {name}',
+    processing: 'بنجهّز الصورة…',
+    failed: 'الصورة دي ما فتحتش. جرّب صورة تانية.',
+    saved: 'اتحفظت صورة {name}',
+    removed: 'اتشالت الصورة',
+    arrived: 'وصلت صورة جديدة من {name}',
+    arrivedMany: 'وصلت {n} صور جديدة من العملاء',
+  },
+  trainerPhoto: {
+    title: 'صورتك',
+    lead: 'اختياري. بتظهر للعميل في صفحته جنب اللوجو.',
+    pick: 'اختار صورتك',
+    change: 'غيّر صورتك',
+    remove: 'شيل صورتك',
+    alt: 'صورتك',
+  },
+  invoice: {
+    label: 'صورة الإيصال',
+    hint: 'اختياري: سكرين شوت إنستاباي أو فودافون كاش أو صورة الإيصال.',
+    attach: 'أرفق صورة',
+    change: 'غيّر الصورة',
+    remove: 'شيل الصورة',
+    alt: 'إيصال الدفعة',
+    attached: 'فيه إيصال',
+  },
+  pdfArchive: {
+    title: 'ملفات اتبعتت قبل كده',
+    lead: 'نسخة مشفّرة من كل ملف PDF بتتحفظ أونلاين، تقدر تفتحها تاني من أي موبايل بعد الاسترجاع.',
+    open: 'افتح',
+    opening: 'بنفتح الملف…',
+    openFailed: 'ما قدرناش نفتح الملف دلوقتي. اتأكد إن النت شغال وجرّب تاني.',
+    pending: 'هيترفع أول ما النت يرجع',
+    empty: 'لسه مفيش ملفات.',
+  },
+} as const;

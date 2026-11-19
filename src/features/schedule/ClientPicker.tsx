@@ -1,9 +1,10 @@
+import { ClientAvatar } from '@/features/clients/ClientAvatar';
 import { useState } from 'react';
 import { useUiStore } from '@/app/uiStore';
 import { matchesQuery } from '@/data';
 import type { Client } from '@/domain/models';
 import { t } from '@/i18n';
-import { Avatar, Button, SearchField, cx } from '@/ui';
+import { Button, SearchField, cx } from '@/ui';
 import styles from './Schedule.module.css';
 
 export interface ClientPickerProps {
@@ -39,7 +40,7 @@ export function ClientPicker({ clients, value, error, onChange }: ClientPickerPr
       <div className={styles.picker}>
         <p className={styles.fieldLabel}>{t('schedule.sheet.client')}</p>
         <div className={styles.picked}>
-          <Avatar name={selected.name} />
+          <ClientAvatar client={selected} />
           <span className={styles.pickedName}>{selected.name}</span>
           <button type="button" className={styles.change} onClick={() => setPicking(true)}>
             {t('schedule.sheet.change')}
@@ -73,7 +74,7 @@ export function ClientPicker({ clients, value, error, onChange }: ClientPickerPr
                 setQuery('');
               }}
             >
-              <Avatar name={c.name} />
+              <ClientAvatar client={c} />
               <span>{c.name}</span>
             </button>
           </li>

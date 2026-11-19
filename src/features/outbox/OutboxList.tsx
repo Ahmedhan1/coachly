@@ -1,10 +1,11 @@
+import { ClientAvatar } from '@/features/clients/ClientAvatar';
 import { Link } from 'react-router-dom';
 import { useServices } from '@/app/services';
 import { useUiStore } from '@/app/uiStore';
 import type { Client } from '@/domain/models';
 import type { OutboxItem } from '@/domain/outbox';
 import { t } from '@/i18n';
-import { Avatar, Badge, Icon, useFromHere } from '@/ui';
+import { Badge, Icon, useFromHere } from '@/ui';
 import { useWhatsappTemplates, defaultTemplate } from '@/features/whatsapp/templatesStore';
 import { linkFor } from '@/features/whatsapp/useWhatsappLink';
 import { renderTemplate, templateFor } from '@/domain/whatsapp';
@@ -42,7 +43,7 @@ export function OutboxList({ items, clients, onChange, limit }: { items: OutboxI
         const preview = renderTemplate(template.body, templateValues(client, extra)).text;
         return (
           <li key={item.id} className={styles.row}>
-            <Avatar name={client.name} />
+            <ClientAvatar client={client} />
             <div className={styles.text}>
               <p className={styles.name}>
                 <Link to={`/clients/${client.id}`} state={{ from: here }} className={styles.nameLink}>

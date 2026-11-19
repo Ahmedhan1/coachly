@@ -13,6 +13,8 @@ export interface ShareBrand {
   color: string;
   /** Optional small logo: `data:image/(png|jpeg|webp);base64,...`, ≤ 100 000 chars. */
   logo?: string;
+  /** Optional trainer photo, same format, ≤ 60 000 chars (shown round next to the name). */
+  photo?: string;
 }
 
 export interface ShareExercise {
@@ -181,6 +183,7 @@ export const MEAL_ID_PATTERN = /^[A-Za-z0-9_-]{1,64}$/;
 export const LIMITS = {
   brandName: 80,
   logo: 100_000,
+  trainerPhoto: 60_000,
   firstName: 40,
   title: 80,
   exerciseName: 120,
@@ -333,7 +336,8 @@ function isBrand(value: unknown): boolean {
     str(value.name, LIMITS.brandName) &&
     typeof value.color === 'string' &&
     COLOR_PATTERN.test(value.color) &&
-    (value.logo === undefined || (typeof value.logo === 'string' && value.logo.length <= LIMITS.logo && LOGO_PATTERN.test(value.logo)))
+    (value.logo === undefined || (typeof value.logo === 'string' && value.logo.length <= LIMITS.logo && LOGO_PATTERN.test(value.logo))) &&
+    (value.photo === undefined || (typeof value.photo === 'string' && value.photo.length <= LIMITS.trainerPhoto && LOGO_PATTERN.test(value.photo)))
   );
 }
 
