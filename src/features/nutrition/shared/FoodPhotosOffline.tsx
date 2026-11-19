@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import { t } from '@/i18n';
-import { Button } from '@/ui';
+import { Button, TitleIcon } from '@/ui';
 import { cachedFoodPhotoCount, downloadFoodPhotos, type FoodPhotoProgress } from './foodPhotos';
 import styles from './FoodPhotosOffline.module.css';
 
@@ -41,7 +41,7 @@ export function FoodPhotosOffline({ stems }: { stems: readonly string[] }) {
   const ready = stored !== null && stored >= total;
   return (
     <section className={styles.box} aria-label={t('nutrition.foodPhotos.offlineTitle')} data-testid="food-photos-offline">
-      <h2 className={styles.title}>{t('nutrition.foodPhotos.offlineTitle')}</h2>
+      <h2 className={styles.title}><TitleIcon name="download" />{t('nutrition.foodPhotos.offlineTitle')}</h2>
       <p className={styles.body}>
         {ready
           ? t('nutrition.foodPhotos.offlineReady', { n: total })

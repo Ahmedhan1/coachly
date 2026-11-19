@@ -4,7 +4,7 @@ import { useUiStore } from '@/app/uiStore';
 import { useLive } from '@/app/useLive';
 import { toIsoDate } from '@/domain/models';
 import { t } from '@/i18n';
-import { Badge, Button, PageHeader, Select } from '@/ui';
+import { Badge, Button, PageHeader, Select, TitleIcon } from '@/ui';
 import { formatIsoDate, formatTime } from '@/ui/format';
 import { readPushPrefs, savePushPrefs, type PushPrefs } from '@/features/online/prefs';
 import { enablePushNotifications } from '@/features/online/enablePush';
@@ -67,7 +67,7 @@ export function NotificationsScreen() {
       <PageHeader title={t('settings.notifications.title')} back={back} subtitle={t('settings.notifications.lead')} />
       <section className={styles.card}>
         <div className={styles.cardHead}>
-          <h2 className={styles.cardTitle}>{t('settings.notifications.title')}</h2>
+          <h2 className={styles.cardTitle}><TitleIcon name="bell" />{t('settings.notifications.title')}</h2>
           <Badge tone={prefs.enabled ? 'ok' : 'neutral'}>{prefs.enabled ? t('settings.notifications.on') : t('settings.notifications.off')}</Badge>
         </div>
         <p className={styles.body}>{t('settings.notifications.privacy')}</p>

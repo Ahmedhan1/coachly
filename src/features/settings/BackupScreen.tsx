@@ -5,7 +5,7 @@ import { useLive } from '@/app/useLive';
 import { t, type TKey } from '@/i18n';
 import { MIN_BACKUP_PASSWORD_LENGTH, type ImportSummary, type SchedulerState } from '@/services/backup';
 import { DeviceBackupFlow } from '@/features/storage/DeviceBackupFlow';
-import { Badge, Button, Icon, ListRow, ListSection, PageHeader, Sheet, TextField } from '@/ui';
+import { Badge, Button, Icon, ListRow, ListSection, PageHeader, Sheet, TextField, TitleIcon } from '@/ui';
 import { formatBytes, formatIsoDate, formatTime } from '@/ui/format';
 import { toIsoDate } from '@/domain/models';
 import styles from './Settings.module.css';
@@ -61,7 +61,7 @@ export function BackupScreen() {
       <PageHeader title={t('settings.backup.title')} back={{ to: '/more/settings', label: t('screens.settings.title') }} subtitle={t('settings.backup.lead')} />
 
       <section className={styles.card} aria-labelledby="local-title">
-        <h2 id="local-title" className={styles.cardTitle}>
+        <h2 id="local-title" className={styles.cardTitle}><TitleIcon name="download" />
           {t('settings.backup.localTitle')}
         </h2>
         <p className={styles.body}>{t('settings.backup.localBody')}</p>
@@ -80,7 +80,7 @@ export function BackupScreen() {
 
       <section className={styles.card} aria-labelledby="cloud-title">
         <div className={styles.cardHead}>
-          <h2 id="cloud-title" className={styles.cardTitle}>
+          <h2 id="cloud-title" className={styles.cardTitle}><TitleIcon name="cloud" />
             {t('settings.backup.cloudTitle')}
           </h2>
           <Badge tone={cloudOn ? 'ok' : 'neutral'}>{cloudOn ? t('settings.backup.cloudOn') : t('settings.backup.cloudOff')}</Badge>

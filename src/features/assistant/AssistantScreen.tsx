@@ -5,7 +5,7 @@ import { useUiStore } from '@/app/uiStore';
 import { useLive } from '@/app/useLive';
 import { deviceZone } from '@/features/schedule/zone';
 import { t, type TKey } from '@/i18n';
-import { Button, IconButton, PageHeader } from '@/ui';
+import { Button, IconButton, PageHeader, TitleIcon } from '@/ui';
 import { readAiSettings, readGroqKey, saveAiSettings } from './aiSettings';
 import { localNow } from './assistantData';
 import { ProposalCard } from './ProposalCard';
@@ -48,7 +48,7 @@ export function AssistantScreen() {
         <PageHeader title={t('assistant.title')} back={back} />
         <div className={styles.screen}>
           <section className={styles.card}>
-            <h2 className={styles.cardTitle}>{t('assistant.settings.setupTitle')}</h2>
+            <h2 className={styles.cardTitle}><TitleIcon name="key" />{t('assistant.settings.setupTitle')}</h2>
             <p className={styles.body}>{t('assistant.settings.setupBody')}</p>
             <Link className={styles.linkButton} to={SETTINGS_PATH}>
               {t('assistant.settings.openSettings')}
@@ -64,7 +64,7 @@ export function AssistantScreen() {
         <PageHeader title={t('assistant.title')} back={back} />
         <div className={styles.screen}>
           <section className={styles.card} aria-labelledby="ai-privacy">
-            <h2 id="ai-privacy" className={styles.cardTitle}>
+            <h2 id="ai-privacy" className={styles.cardTitle}><TitleIcon name="lock" />
               {t('assistant.privacyNotice.title')}
             </h2>
             <p className={styles.body}>{t('assistant.privacyNotice.body')}</p>

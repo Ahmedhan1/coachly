@@ -3,7 +3,7 @@ import { useServices } from '@/app/services';
 import { useUiStore } from '@/app/uiStore';
 import { useLive } from '@/app/useLive';
 import { t } from '@/i18n';
-import { Button, PageHeader, Select, TextField } from '@/ui';
+import { Button, PageHeader, Select, TextField, TitleIcon } from '@/ui';
 import { postWebhook } from '@/services/integrations/webhook';
 import { readWebhook, saveWebhook, type WebhookSettings } from '@/features/online/integrations';
 import { AiSettingsCard } from './AiSettingsCard';
@@ -32,7 +32,7 @@ function WebhookCard({ initial }: { initial: WebhookSettings }) {
   const valid = (url: string) => url === '' || /^https:\/\/\S+$/.test(url);
   return (
     <section className={styles.card}>
-      <h2 className={styles.cardTitle}>{t('settings.integrations.webhookTitle')}</h2>
+      <h2 className={styles.cardTitle}><TitleIcon name="link" />{t('settings.integrations.webhookTitle')}</h2>
       <p className={styles.body}>{t('settings.integrations.webhookBody')}</p>
       <TextField
         label={t('settings.integrations.webhookUrl')}

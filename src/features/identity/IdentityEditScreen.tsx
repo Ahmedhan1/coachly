@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useUiStore } from '@/app/uiStore';
 import { t, type TKey } from '@/i18n';
-import { Button, PageHeader } from '@/ui';
+import { Button, PageHeader, TitleIcon } from '@/ui';
 import { useIdentityDraft } from './identityDraft';
 import { IconLinkSheet, useIconHint } from './IconHint';
 import { ColorSection, LogoSection, NameSection, TrainerPhotoSection, UnitsSection } from './IdentitySections';
@@ -14,6 +14,8 @@ const SECTIONS = [
   { key: 'color', Body: ColorSection },
   { key: 'units', Body: UnitsSection },
 ] as const;
+
+const SECTION_ICONS = { name: 'user', logo: 'image', color: 'palette', units: 'ruler' } as const;
 
 /** Settings → identity: the same four parts as first-run setup, on one page. */
 export function IdentityEditScreen() {
@@ -31,7 +33,7 @@ export function IdentityEditScreen() {
       <div className={styles.editBody}>
         {SECTIONS.map(({ key, Body }) => (
           <section key={key} className={`${styles.editSection} ${styles.editSave}`} aria-labelledby={`identity-${key}`}>
-            <h2 id={`identity-${key}`} className={styles.editTitle}>
+            <h2 id={`identity-${key}`} className={styles.editTitle}><TitleIcon name={SECTION_ICONS[key]} />
               {t(`identity.${key}.title` as TKey)}
             </h2>
             <Body draft={draft} update={update} />
@@ -55,7 +57,7 @@ export function IdentityEditScreen() {
           </section>
         ))}
         <section className={`${styles.editSection} ${styles.editSave}`} aria-labelledby="identity-photo">
-          <h2 id="identity-photo" className={styles.editTitle}>
+          <h2 id="identity-photo" className={styles.editTitle}><TitleIcon name="camera" />
             {t('files.trainerPhoto.title')}
           </h2>
           <p className={styles.editLead}>{t('files.trainerPhoto.lead')}</p>

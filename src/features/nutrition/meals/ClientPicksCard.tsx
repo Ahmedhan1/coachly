@@ -6,7 +6,7 @@ import { applyMealPicks, effectivePicks, mealPicksKey, parseMealPicks } from '@/
 import type { Client, MealPlan } from '@/domain/models';
 import { t } from '@/i18n';
 import { pick } from '@/i18n/locale';
-import { Button } from '@/ui';
+import { Button, TitleIcon } from '@/ui';
 import type { RecipeWithNutrition } from './useRecipeLookup';
 import common from '../shared/common.module.css';
 
@@ -38,7 +38,7 @@ export function ClientPicksCard({ client, plans, recipes }: { client: Client; pl
   return (
     <section className={common.section} aria-label={t('nutrition.goal.picksTitle')}>
       <div className={common.tile}>
-        <h2 className={common.sectionTitle}>{t('nutrition.goal.picksTitle')}</h2>
+        <h2 className={common.sectionTitle}><TitleIcon name="checklist" />{t('nutrition.goal.picksTitle')}</h2>
         <ul className={common.caption}>
           {picks.map((p) => (
             <li key={`${p.planId}-${p.mealName}-${p.o}`}>{t('nutrition.goal.picksLine', { day: p.planName, meal: p.mealName, food: food(p.items) })}</li>

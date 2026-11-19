@@ -4,7 +4,7 @@ import { useRepos } from '@/app/services';
 import { useLive } from '@/app/useLive';
 import { goalRate, suggestKcalChange, weightTrend, type DietGoal, type DietSettings } from '@/domain/meals';
 import { t } from '@/i18n';
-import { Button, Tx } from '@/ui';
+import { Button, Tx, TitleIcon } from '@/ui';
 import common from '../shared/common.module.css';
 import styles from './Cal.module.css';
 
@@ -35,7 +35,7 @@ export function TrendCard({ clientId, goal, ds, onApply }: Props) {
   const suggestion = trend ? suggestKcalChange(trend, goal, ds) : null;
   return (
     <div className={`${common.tile} ${styles.trend}`} aria-label={t('nutrition.cal.trendTitle')} role="group">
-      <h2 className={common.sectionTitle}>{t('nutrition.cal.trendTitle')}</h2>
+      <h2 className={common.sectionTitle}><TitleIcon name="trend" />{t('nutrition.cal.trendTitle')}</h2>
       {!trend ? (
         <>
           <p className={common.caption}>{t('nutrition.cal.trendNone')}</p>

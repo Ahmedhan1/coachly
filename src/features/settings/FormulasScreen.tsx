@@ -5,7 +5,7 @@ import { useLive } from '@/app/useLive';
 import { NutritionStore } from '@/data/nutritionStore';
 import { nutritionSettingsSchema, settingsProblems, type NutritionSettings } from '@/domain/meals';
 import { t, type TKey } from '@/i18n';
-import { Button, PageHeader, Select, TextField } from '@/ui';
+import { Button, PageHeader, Select, TextField, TitleIcon } from '@/ui';
 import { parseDecimal } from '@/features/nutrition/shared/numbers';
 import styles from './Settings.module.css';
 
@@ -163,7 +163,7 @@ function FormulasForm({ initial, store }: { initial: NutritionSettings; store: N
       </section>
       {GROUPS.map((g) => (
         <section key={g.title} className={styles.card}>
-          <h2 className={styles.cardTitle}>{t(g.title)}</h2>
+          <h2 className={styles.cardTitle}><TitleIcon name="filter" />{t(g.title)}</h2>
           <div className={styles.grid}>
             {g.fields.map((x) => {
               const k = x.path.join('.');

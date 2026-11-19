@@ -6,7 +6,7 @@ import type { ProgressEntry, WorkoutLog } from '@/domain/models';
 import { workoutLogsToSets } from '@/domain/programs';
 import { estimateOneRepMax, personalRecordTimeline } from '@/domain/strength';
 import { t } from '@/i18n';
-import { Badge, Button, EmptyState, IconButton, ListRow, ListSection, Num, PageHeader, SegmentedControl, Sheet, Tx, Icon } from '@/ui';
+import { Badge, Button, EmptyState, IconButton, ListRow, ListSection, Num, PageHeader, SegmentedControl, Sheet, Tx, Icon, TitleIcon } from '@/ui';
 import { formatIsoDate, formatNumber } from '@/ui/format';
 import { useExerciseCatalog } from '@/features/programs/catalog';
 import { exerciseName } from '@/features/programs/names';
@@ -117,7 +117,7 @@ export function ClientProgressScreen() {
           <section className={common.section} aria-labelledby="w-title">
             <div className={common.tile}>
               <div className={styles.chartHead}>
-                <h2 id="w-title" className={common.sectionTitle}>
+                <h2 id="w-title" className={common.sectionTitle}><TitleIcon name="chart" />
                   {t('nutrition.progress.chartTitle')}
                 </h2>
                 {delta !== null && (
@@ -147,7 +147,7 @@ export function ClientProgressScreen() {
           </section>
 
           <section className={common.section} aria-labelledby="ba-title">
-            <h2 id="ba-title" className={common.sectionTitle}>
+            <h2 id="ba-title" className={common.sectionTitle}><TitleIcon name="image" />
               {t('nutrition.progress.beforeAfter')}
             </h2>
             {before && after ? (

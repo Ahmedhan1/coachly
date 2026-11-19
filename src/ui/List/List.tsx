@@ -1,6 +1,7 @@
 import type { ReactNode } from 'react';
 import { cx } from '../cx';
 import { Icon, type IconName } from '../icons/Icon';
+import { TitleIcon } from '../TitleIcon/TitleIcon';
 import styles from './List.module.css';
 
 export interface ListSectionProps {
@@ -28,11 +29,7 @@ export function ListSection({ title, icon, count, footer, children, action, bare
         <div className={styles.header}>
           {title && (
             <h2 className={styles.title}>
-              {icon && (
-                <span className={styles.titleIcon}>
-                  <Icon name={icon} />
-                </span>
-              )}
+              {icon && <TitleIcon name={icon} />}
               {title}
               {count !== undefined && <bdi className={cx('num', styles.count)}>{count}</bdi>}
             </h2>

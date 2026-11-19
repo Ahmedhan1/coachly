@@ -6,7 +6,7 @@ import { KNOWN_MODELS } from '@/domain/ai';
 import { aiClients } from '@/features/assistant/aiClient';
 import { looksLikeGroqKey, readAiSettings, readGroqKey, saveAiSettings, saveGroqKey, type AiSettings } from '@/features/assistant/aiSettings';
 import { t } from '@/i18n';
-import { Button, Select, TextField } from '@/ui';
+import { Button, Select, TextField, TitleIcon } from '@/ui';
 import styles from './Settings.module.css';
 
 const CUSTOM = '__custom__';
@@ -66,7 +66,7 @@ function AiForm({ initial, initialKey }: { initial: AiSettings; initialKey: stri
 
   return (
     <section className={styles.card} aria-labelledby="ai-settings-title">
-      <h2 id="ai-settings-title" className={styles.cardTitle}>
+      <h2 id="ai-settings-title" className={styles.cardTitle}><TitleIcon name="spark" />
         {t('assistant.settings.title')}
       </h2>
       <p className={styles.body}>{t('assistant.settings.body')}</p>

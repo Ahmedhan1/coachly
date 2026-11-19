@@ -4,7 +4,7 @@ import type { CatalogExercise } from '@/domain/exercises';
 import type { Client } from '@/domain/models';
 import { clientNoteText, fitProfileOf, hasTrainingProfile } from '@/domain/programs/tailor';
 import { getLocale, t } from '@/i18n';
-import { Button, cx } from '@/ui';
+import { Button, cx, TitleIcon } from '@/ui';
 import { exerciseName } from '@/features/programs/names';
 import { ClientNoteSheet } from './ClientNoteSheet';
 import { TrainingProfileSheet } from './TrainingProfileSheet';
@@ -56,7 +56,7 @@ export function TrainingProfileCard({ client, catalog, hasProgram, onProgramMade
   return (
     <section className={styles.card} aria-labelledby="tailor-card-title" data-testid="training-profile-card">
       <div className={styles.cardHead}>
-        <h2 id="tailor-card-title" className={styles.cardTitle}>
+        <h2 id="tailor-card-title" className={styles.cardTitle}><TitleIcon name="idCard" />
           {t('hub.tailor.card')}
         </h2>
         {has && (

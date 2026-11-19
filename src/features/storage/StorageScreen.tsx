@@ -6,7 +6,7 @@ import { hasFreshBackup, STORAGE_CATEGORIES, storagePressure, type PhotoArchiveE
 import { FILE_PASSWORD_KEY } from '@/data/backupMeta';
 import { t, type TKey } from '@/i18n';
 import type { DeviceStorageReport } from '@/services/storage';
-import { Badge, Button, PageHeader, TextField } from '@/ui';
+import { Badge, Button, PageHeader, TextField, TitleIcon } from '@/ui';
 import { formatBytes } from '@/ui/format';
 import { DeviceBackupFlow } from './DeviceBackupFlow';
 import { PhotoArchiveSheet } from './PhotoArchiveSheet';
@@ -80,7 +80,7 @@ export function StorageScreen() {
       <PageHeader title={t('storage.screen.title')} back={back} subtitle={t('storage.screen.lead')} />
 
       <section className={styles.card} aria-labelledby="usage-title">
-        <h2 id="usage-title" className={styles.cardTitle}>
+        <h2 id="usage-title" className={styles.cardTitle}><TitleIcon name="storage" />
           {t('storage.screen.usageTitle')}
         </h2>
         {estimate ? (
@@ -123,7 +123,7 @@ export function StorageScreen() {
 
       <section className={styles.card} aria-labelledby="persist-title">
         <div className={styles.cardHead}>
-          <h2 id="persist-title" className={styles.cardTitle}>
+          <h2 id="persist-title" className={styles.cardTitle}><TitleIcon name="lock" />
             {t('storage.screen.persistTitle')}
           </h2>
           <Badge tone={persist === 'on' ? 'ok' : 'neutral'}>{persist === 'on' ? t('settings.backup.cloudOn') : t('settings.backup.cloudOff')}</Badge>
@@ -139,7 +139,7 @@ export function StorageScreen() {
       </section>
 
       <section className={styles.card} aria-labelledby="save-title">
-        <h2 id="save-title" className={styles.cardTitle}>
+        <h2 id="save-title" className={styles.cardTitle}><TitleIcon name="download" />
           {t('storage.screen.saveTitle')}
         </h2>
         {!fresh && (
@@ -242,7 +242,7 @@ function ArchivesCard({ registry, onRestored }: { registry: PhotoArchiveEntry[];
 
   return (
     <section className={styles.card} aria-labelledby="archives-title">
-      <h2 id="archives-title" className={styles.cardTitle}>
+      <h2 id="archives-title" className={styles.cardTitle}><TitleIcon name="box" />
         {t('storage.archive.listTitle')}
       </h2>
       {registry.length > 0 && (

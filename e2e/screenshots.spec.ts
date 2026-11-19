@@ -11,6 +11,8 @@ const SCHEMES = ['light', 'dark'] as const;
 const NOW = new Date('2026-11-16T17:20:00+02:00');
 
 async function shot(page: Page, name: string, fullPage = false) {
+  // The cold-start splash fades out after the first screen renders; shoot the screen, not the splash.
+  await page.locator('#boot-splash').waitFor({ state: 'detached', timeout: 10_000 });
   await page.evaluate(() => document.fonts.ready);
   await page.screenshot({ path: `${OUT}/${name}.png`, fullPage, animations: 'disabled' });
 }

@@ -4,7 +4,7 @@ import { dayLabel } from './names';
 import type { ProgramDay } from '@/domain/models';
 import { dayMuscleLoad, estimateDayMinutes, totalSets, weeklySetsPerMuscle, type ProgramBody } from '@/domain/programs';
 import { t } from '@/i18n';
-import { Icon, Num, Tx, cx } from '@/ui';
+import { Icon, Num, Tx, cx, TitleIcon } from '@/ui';
 import { MuscleMap, intensitiesFromLoad } from '@/ui/MuscleMap';
 import styles from './Builder.module.css';
 
@@ -81,7 +81,7 @@ export function WeekSummary({ body, catalog }: { body: ProgramBody; catalog: Rea
   const max = Math.max(1, ...rows.map((r) => r.direct));
   return (
     <section className={styles.week} aria-labelledby="week-title">
-      <h2 id="week-title" className={styles.weekTitle}>
+      <h2 id="week-title" className={styles.weekTitle}><TitleIcon name="calendar" />
         {t('training.programs.builder.week')}
       </h2>
       <p className={styles.weekHint}>{t('training.programs.builder.weekHint')}</p>

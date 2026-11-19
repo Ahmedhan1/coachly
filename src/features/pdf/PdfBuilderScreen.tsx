@@ -9,7 +9,7 @@ import { normalizeSections, PDF_PRESET_IDS, PDF_PRESETS, presetTemplate, type Pd
 import { whatsappLink } from '@/domain/whatsapp';
 import { t } from '@/i18n';
 import { formatBytes } from '@/ui/format';
-import { Button, Icon, IconButton, PageHeader, Select, Sheet, TextArea, TextField, cx } from '@/ui';
+import { Button, Icon, IconButton, PageHeader, Select, Sheet, TextArea, TextField, cx, TitleIcon } from '@/ui';
 import { createImageSource, HtmlPdfRenderer, type PdfRenderProgress, type RenderedPdf } from '@/services/pdf';
 import { BrowserShareService } from '@/services/share';
 import { useExerciseCatalog } from '@/features/programs/catalog';
@@ -241,7 +241,7 @@ export function PdfBuilderScreen() {
       </section>
 
       <section className={styles.block} aria-labelledby="sec-title">
-        <h2 id="sec-title" className={styles.title}>
+        <h2 id="sec-title" className={styles.title}><TitleIcon name="list" />
           {t('pdf.sections')}
         </h2>
         <p className={styles.hint}>{t('pdf.sectionsHint')}</p>

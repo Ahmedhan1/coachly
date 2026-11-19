@@ -6,7 +6,7 @@ import { useLive } from '@/app/useLive';
 import { calcSteps, calculate, toSavedCalculation, type CalcInput, type NutritionSettings, type SavedCalculation } from '@/domain/meals';
 import type { Client, ProgressEntry } from '@/domain/models';
 import { t } from '@/i18n';
-import { Button, EmptyState, Icon, Num, PageHeader, SegmentedControl, Select, TextField } from '@/ui';
+import { Button, EmptyState, Icon, Num, PageHeader, SegmentedControl, Select, TextField, TitleIcon } from '@/ui';
 import { formatIsoDate } from '@/ui/format';
 import { toIsoDate } from '@/domain/models';
 import { ClientNav } from '../shared/ClientNav';
@@ -109,7 +109,7 @@ function Calculator({ client, settings: s, saved, latest, back }: CalculatorProp
       <ClientNav clientId={client.id} />
 
       <section className={common.section} aria-labelledby="calc-body">
-        <h2 id="calc-body" className={common.sectionTitle}>
+        <h2 id="calc-body" className={common.sectionTitle}><TitleIcon name="body" />
           {t('nutrition.calc.body')}
         </h2>
         <div className={common.tile}>
@@ -159,7 +159,7 @@ function Calculator({ client, settings: s, saved, latest, back }: CalculatorProp
       </section>
 
       <section className={common.section} aria-labelledby="calc-formula">
-        <h2 id="calc-formula" className={common.sectionTitle}>
+        <h2 id="calc-formula" className={common.sectionTitle}><TitleIcon name="filter" />
           {t('nutrition.calc.formulaTitle')}
         </h2>
         <div className={common.tile}>
@@ -224,7 +224,7 @@ function Calculator({ client, settings: s, saved, latest, back }: CalculatorProp
       </section>
 
       <section className={common.section} aria-labelledby="calc-result" aria-live="polite">
-        <h2 id="calc-result" className={common.sectionTitle}>
+        <h2 id="calc-result" className={common.sectionTitle}><TitleIcon name="flame" />
           {t('nutrition.calc.result')}
         </h2>
         {errorText !== null || !result.ok ? (

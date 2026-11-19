@@ -38,7 +38,7 @@ import {
 import type { Client } from '@/domain/models';
 import { t } from '@/i18n';
 import { bodyFatForPlan, waterIntake, type BodyNow } from '@/domain/nutrition';
-import { Button, EmptyState, Icon, PageHeader, SegmentedControl, Select } from '@/ui';
+import { Button, EmptyState, Icon, PageHeader, SegmentedControl, Select, TitleIcon } from '@/ui';
 import { ClientNav } from '../shared/ClientNav';
 import { Slider } from '../shared/Slider';
 import { parseDecimal } from '../shared/numbers';
@@ -363,7 +363,7 @@ function DietView({ client, saved, settings, dietSettings, recipes, foods, heade
 
       <section className={common.section} aria-label={t('nutrition.goal.title')}>
         <div className={common.tile}>
-          <h2 className={common.sectionTitle}>{t('nutrition.goal.title')}</h2>
+          <h2 className={common.sectionTitle}><TitleIcon name="flag" />{t('nutrition.goal.title')}</h2>
           <label className={styles.check}>
             <input
               type="checkbox"
@@ -383,7 +383,7 @@ function DietView({ client, saved, settings, dietSettings, recipes, foods, heade
       </section>
 
       <section className={common.section} aria-label={t('nutrition.diet.targetsTitle')}>
-        <h2 className={common.sectionTitle}>{t('nutrition.diet.targetsTitle')}</h2>
+        <h2 className={common.sectionTitle}><TitleIcon name="target" />{t('nutrition.diet.targetsTitle')}</h2>
         <div className={styles.kcalRow}>
           <span className={styles.kcalLabel}>{t('nutrition.diet.kcalTarget')}</span>
           <div className={styles.stepper}>
@@ -513,7 +513,7 @@ function DietView({ client, saved, settings, dietSettings, recipes, foods, heade
           </div>
         </details>
         <div className={`${common.tile} ${cal.panel}`}>
-          <h2 className={common.sectionTitle}>{t('nutrition.cal.prefsTitle')}</h2>
+          <h2 className={common.sectionTitle}><TitleIcon name="favorite" />{t('nutrition.cal.prefsTitle')}</h2>
           <p className={common.caption}>
             {prefsCount === 0 ? t('nutrition.cal.prefsNone') : t('nutrition.cal.prefsSummary', { blocked: exclude.size, loves: profile.prefs.loves.length })}
           </p>

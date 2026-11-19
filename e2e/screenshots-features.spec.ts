@@ -8,6 +8,8 @@ const DEVICES = [
 ] as const;
 
 async function shot(page: Page, name: string) {
+  // The cold-start splash fades out after the first screen renders; shoot the screen, not the splash.
+  await page.locator('#boot-splash').waitFor({ state: 'detached', timeout: 10_000 });
   await page.evaluate(() => document.fonts.ready);
   await page.waitForTimeout(150);
   await page.screenshot({ path: `${OUT}/${name}.png`, animations: 'disabled' });

@@ -32,7 +32,7 @@ import {
 import type { Client, Meal } from '@/domain/models';
 import { t } from '@/i18n';
 import { pick } from '@/i18n/locale';
-import { Badge, Button, Icon, Sheet, Tx } from '@/ui';
+import { Badge, Button, Icon, Sheet, Tx, TitleIcon } from '@/ui';
 import { FoodImage } from '../shared/FoodImage';
 import { parseDecimal } from '../shared/numbers';
 import { useNutritionStore } from '../shared/useNutritionStore';
@@ -156,7 +156,7 @@ export function DietWeek({ client, week, book, recipes, foods, perServing, targe
   return (
     <>
       <section className={common.section} aria-label={t('nutrition.diet.weekTitle')}>
-        <h2 className={common.sectionTitle}>{t('nutrition.diet.weekTitle')}</h2>
+        <h2 className={common.sectionTitle}><TitleIcon name="calendar" />{t('nutrition.diet.weekTitle')}</h2>
         <div className={styles.days} role="tablist" aria-label={t('nutrition.plan.days')}>
           {days.map((d, i) => (
             <button key={i} type="button" role="tab" aria-selected={i === selected} className={plan.dayPill} onClick={() => setSelected(i)}>
@@ -259,7 +259,7 @@ export function DietWeek({ client, week, book, recipes, foods, perServing, targe
 
       <section className={common.section}>
         <div className={common.tile}>
-          <h2 className={common.sectionTitle}>{t('nutrition.diet.notesTitle')}</h2>
+          <h2 className={common.sectionTitle}><TitleIcon name="note" />{t('nutrition.diet.notesTitle')}</h2>
           <ul className={styles.notes}>
             {noteKeys.map((k) => (
               <li key={k}>{t(`nutrition.diet.notes.${k}` as 'nutrition.diet.notes.water')}</li>

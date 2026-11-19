@@ -2,7 +2,7 @@ import { useMemo, useState } from 'react';
 import { ALLERGENS, type FoodPrefs, type IngredientEntry } from '@/domain/meals';
 import { t } from '@/i18n';
 import { pick } from '@/i18n/locale';
-import { Icon, SearchField, Sheet } from '@/ui';
+import { Icon, SearchField, Sheet, TitleIcon } from '@/ui';
 import { FoodImage } from '../shared/FoodImage';
 import common from '../shared/common.module.css';
 import styles from './Cal.module.css';
@@ -35,7 +35,7 @@ export function PrefsSheet({ prefs, foods, onChange, onClose }: Props) {
   return (
     <Sheet open onClose={onClose} title={t('nutrition.cal.prefsTitle')} cancelLabel={t('common.close')}>
       <div className={styles.panel}>
-        <h3 className={common.sectionTitle}>{t('nutrition.cal.allergyTitle')}</h3>
+        <h3 className={common.sectionTitle}><TitleIcon name="warning" />{t('nutrition.cal.allergyTitle')}</h3>
         <div className={styles.chips}>
           {ALLERGENS.map((a) => (
             <button key={a} type="button" className={styles.chip} aria-pressed={prefs.allergies.includes(a)} onClick={() => toggleAllergy(a)}>
@@ -51,7 +51,7 @@ export function PrefsSheet({ prefs, foods, onChange, onClose }: Props) {
         <p className={styles.rowSub}>{t('nutrition.cal.budgetHint')}</p>
         {(['dislikes', 'loves'] as const).map((key) => (
           <div key={key} className={styles.panel}>
-            <h3 className={common.sectionTitle}>{t(key === 'loves' ? 'nutrition.cal.lovesTitle' : 'nutrition.cal.dislikesTitle')}</h3>
+            <h3 className={common.sectionTitle}><TitleIcon name="favorite" />{t(key === 'loves' ? 'nutrition.cal.lovesTitle' : 'nutrition.cal.dislikesTitle')}</h3>
             <div className={styles.chips}>
               {prefs[key].map((id) => {
                 const f = byId.get(id);

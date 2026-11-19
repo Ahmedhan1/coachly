@@ -8,7 +8,7 @@ import type { Client, ClientId, Program } from '@/domain/models';
 import { BUILTIN_TEMPLATES, duplicateProgram, instantiateTemplate, type BuiltinTemplate } from '@/domain/programs';
 import { searchItems } from '@/data';
 import { t } from '@/i18n';
-import { Badge, Button, EmptyState, Icon, IconButton, ListRow, ListSection, PageHeader, SearchField, SwipeRow, Tx } from '@/ui';
+import { Badge, Button, EmptyState, Icon, IconButton, ListRow, ListSection, PageHeader, SearchField, SwipeRow, Tx, TitleIcon } from '@/ui';
 import { markActiveProgram } from './activePrograms';
 import { newLocalId } from './ids';
 import { templateDayName, templateName } from './names';
@@ -123,7 +123,7 @@ export function ProgramsScreen() {
       />
 
       <section className={styles.builtins} aria-labelledby="builtin-title">
-        <h2 id="builtin-title" className={styles.sectionTitle}>
+        <h2 id="builtin-title" className={styles.sectionTitle}><TitleIcon name="list" />
           {t('training.programs.builtin')}
         </h2>
         <p className={styles.hint}>{t('training.programs.builtinHint')}</p>

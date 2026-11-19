@@ -5,7 +5,7 @@ import { useLive } from '@/app/useLive';
 import { backupCard, snoozeUntil } from '@/domain/backup';
 import { toIsoDate } from '@/domain/models';
 import { t } from '@/i18n';
-import { Button, Icon, cx } from '@/ui';
+import { Button, Icon, cx, TitleIcon } from '@/ui';
 import { formatIsoDate, formatTime } from '@/ui/format';
 import { DeviceBackupFlow } from './DeviceBackupFlow';
 import styles from './Storage.module.css';
@@ -48,7 +48,7 @@ export function BackupReminderCard({ now: nowProp }: { now?: Date }) {
   return (
     <section className={cx(styles.card, card.due && styles.due)} aria-labelledby="backup-card-title">
       <div className={styles.cardHead}>
-        <h2 id="backup-card-title" className={styles.cardTitle}>
+        <h2 id="backup-card-title" className={styles.cardTitle}><TitleIcon name="backup" />
           {t('storage.card.title')}
         </h2>
         <Icon name={card.due ? 'alert' : 'cloudOk'} />

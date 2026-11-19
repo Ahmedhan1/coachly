@@ -37,7 +37,7 @@ import { lastTime, type LoggedSet } from '@/domain/strength';
 import { swapChoices } from '@/domain/exercises/fit';
 import { clientNoteText, fitProfileOf, hasTrainingProfile } from '@/domain/programs/tailor';
 import { t } from '@/i18n';
-import { Button, EmptyState, Icon, IconButton, Num, PageHeader, Sheet, Tx, cx } from '@/ui';
+import { Button, EmptyState, Icon, IconButton, Num, PageHeader, Sheet, Tx, cx, TitleIcon } from '@/ui';
 import { useExerciseCatalog } from '@/features/programs/catalog';
 import { ExerciseThumb } from '@/features/programs/ExerciseThumb';
 import { exerciseName } from '@/features/programs/names';
@@ -447,7 +447,7 @@ function SessionRunner({ client, program, dayId: resolvedDayId, history, unit, s
       )}
 
       <section className={styles.list} aria-labelledby="ex-list">
-        <h2 id="ex-list" className={styles.listTitle}>
+        <h2 id="ex-list" className={styles.listTitle}><TitleIcon name="dumbbell" />
           {t('training.session.exercises')}
         </h2>
         <ol className={styles.exList}>
