@@ -1,4 +1,4 @@
-// English for src/i18n/features/pdf.ts (PDF builder and every word printed inside the PDF).
+// English for src/i18n/ar/pdf.ts (PDF builder and every word printed inside the PDF).
 import type { EnArea } from './types';
 
 export const pdf: EnArea<'pdf'> = {

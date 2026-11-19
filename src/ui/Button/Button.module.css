@@ -31,7 +31,7 @@
   font-size: 17px;
 }
 
-/* 36pt visual, 44pt hit area (DESIGN.md §1.5) */
+/* 36pt visual, 44pt hit area (docs/DESIGN.md §1.5) */
 .small {
   min-block-size: 36px;
   min-inline-size: 0;

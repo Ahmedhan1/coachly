@@ -1,5 +1,5 @@
 import type { AppServices } from '@/app/services';
-import { readBrandCache, writeBrandCache, applyHeadIcons, type BrandCache } from '@/app/BootSplash';
+import { readBrandCache, writeBrandCache, applyHeadIcons, type BrandCache } from '@/app/pwa/BootSplash';
 import { contrastRatio, normalizeHex, ON_DARK, ON_LIGHT, DEFAULT_BRAND } from '@/domain/branding';
 
 /** Where a `w × h` picture lands inside a `box` square with `pad` (fraction of the box) on each side, aspect kept. */

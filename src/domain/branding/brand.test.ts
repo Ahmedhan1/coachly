@@ -45,7 +45,7 @@ describe('mixHex', () => {
 });
 
 describe('deriveBrand', () => {
-  it('keeps the default signal orange and puts dark text on it (DESIGN.md §2)', () => {
+  it('keeps the default signal orange and puts dark text on it (docs/DESIGN.md §2)', () => {
     const theme = deriveBrand(DEFAULT_BRAND);
     expect(theme.light.brand).toBe('#F25C1F');
     expect(theme.light.brandOn).toBe(ON_DARK);

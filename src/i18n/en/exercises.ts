@@ -1,4 +1,4 @@
-// English for src/i18n/features/exercises.ts (exercise detail extras).
+// English for src/i18n/ar/exercises.ts (exercise detail extras).
 import type { EnArea } from './types';
 
 export const exercises: EnArea<'exercises'> = {

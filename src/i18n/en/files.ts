@@ -1,4 +1,4 @@
-// English for src/i18n/features/files.ts (client photo, trainer photo, payment receipts, PDF archive).
+// English for src/i18n/ar/files.ts (client photo, trainer photo, payment receipts, PDF archive).
 import type { EnArea } from './types';
 
 export const files: EnArea<'files'> = {

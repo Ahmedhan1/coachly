@@ -43,7 +43,7 @@ Body = one PTP1 envelope (password envelope). The Worker checks the first 4 byte
 | `DELETE /api/backup/uploads/:uploadId` *Bearer* | — | `{ok:true}` (abort) |
 
 - **Cap**: `BACKUP_MAX_BYTES` (default 100 MiB) per backup. Why multipart: the Free plan refuses request bodies
-  over 100 MB (LIMITS.md), and smaller parts are friendlier to a phone on mobile data. Use `PUT /api/backup` for
+  over 100 MB (docs/LIMITS.md), and smaller parts are friendlier to a phone on mobile data. Use `PUT /api/backup` for
   anything ≤ 90 MiB (typical backups are ~10 MB); use parts above that, or always, if the app wants resumable uploads.
   One multipart upload per license at a time; starting a new one (or a single PUT) aborts the old one.
 - **Storage layout**: two slots, `backups/<lid>/0` and `backups/<lid>/1`; D1 (`backups` table) says which is
@@ -96,7 +96,7 @@ The workerd figure is from local workerd on the build machine, not Cloudflare's 
 Worker's CPU time for cron invocations in the Cloudflare dashboard and lower `PUSH_BATCH_SIZE`
 (`worker/src/cloud/config.ts`) if it approaches 10 ms.
 
-**Capacity**: every minute × 20 = 1,200/hour = **28,800/day**, the design LIMITS.md assumed and well above its
+**Capacity**: every minute × 20 = 1,200/hour = **28,800/day**, the design docs/LIMITS.md assumed and well above its
 *heavy* 12,500/day; a backlog is sent on the following runs (1 min late each). The cron costs 1,440 Worker
 requests/day (fits). If even that is not enough, raise `PUSH_BATCH_SIZE` only after checking cron CPU time on the dashboard.
 
@@ -233,7 +233,7 @@ D1 migration `worker/migrations/0002_cloud.sql` adds `storage_usage`, `backups`,
 
 - Not deployed and not run against real Cloudflare (no credentials here); real push delivery to an iPhone is a
   MANUAL_QA item (needs the installed PWA on iOS 16.4+).
-- LIMITS.md's 70–90 % tier (lower per-trainer cap) and "delete backups of revoked licenses after 30 days" are not
+- docs/LIMITS.md's 70–90 % tier (lower per-trainer cap) and "delete backups of revoked licenses after 30 days" are not
   implemented; only the 9 GiB guard is. Usage per trainer is visible in D1 (`backups`, `shares`, `checkins`).
 - Unfinished multipart uploads are aborted when the trainer starts a new one; abandoned ones rely on R2's own
   cleanup of incomplete multipart uploads (R2 docs describe a default 7-day rule; not re-verified here).

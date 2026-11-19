@@ -1,5 +1,6 @@
 import { daysBetween, subscriptionAttention, type Client, type MealPlan, type Payment, type Program, type ProgressEntry, type Recipe } from '../models';
-import { mealItemText } from '../meals/mealItemText';
+import { mealItemText } from '../meals/foods/mealItemText';
+import { packageBalance } from '../finance/packageBalance';
 import type { Task } from './tasks';
 
 /**
@@ -35,7 +36,7 @@ export function clientDetailView(
   today: string,
   opts: PrivacyOptions,
 ) {
-  const due = rel.payments.filter((p) => p.status === 'due');
+  const balance = packageBalance(c.package ? { priceMinor: c.package.priceMinor, startDate: c.startDate } : null, rel.payments);
   const last = [...rel.progress].sort((a, b) => b.date.localeCompare(a.date))[0];
   return {
     id: c.id,
@@ -55,7 +56,7 @@ export function clientDetailView(
     notes: c.notes.slice(0, 800),
     programs: rel.programs.map((p) => ({ id: p.id, name: p.name, days: p.days.length })),
     mealPlans: rel.mealPlans.map((m) => ({ id: m.id, name: m.name, targetKcal: m.targetKcal })),
-    balanceDue: money(due.reduce((s, p) => s + p.amountMinor, 0)),
+    balanceDue: money(balance.owedMinor),
     lastCheckIn: last ? { date: last.date, weightKg: last.measurements.weightKg ?? null } : null,
   };
 }

@@ -7,7 +7,7 @@ export function PaymentsTab(props: { client: Client; hub: HubData; onEditPackage
   return (
     <>
       <PackageSection client={client} next={hub.overview.next} onEdit={props.onEditPackage} onRenew={props.onRenew} />
-      <PaymentsSection payments={hub.payments} today={hub.today} owed={hub.overview.owedMinor} currency={hub.currency} onAdd={props.onAdd} onOpen={props.onOpen} />
+      <PaymentsSection payments={hub.payments} today={hub.today} owed={hub.overview.owedMinor} packagePaid={hub.overview.packagePaid} currency={hub.currency} onAdd={props.onAdd} onOpen={props.onOpen} />
     </>
   );
 }

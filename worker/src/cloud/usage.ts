@@ -13,7 +13,7 @@ export function adjustUsage(db: D1Database, delta: number): D1PreparedStatement 
 }
 
 /**
- * Global guard (LIMITS.md, "Policy when R2 fills"): once the total would pass `storageGuardBytes`, an upload is
+ * Global guard (docs/LIMITS.md, "Policy when R2 fills"): once the total would pass `storageGuardBytes`, an upload is
  * refused only when it would make this trainer's footprint bigger (`newSize > replacedSize`). Re-uploading a
  * backup of the same or smaller size always works, so nobody loses their only cloud copy.
  */

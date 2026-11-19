@@ -1093,7 +1093,7 @@ export function transliterateExerciseName(english: string): TransliterationResul
  * or stance after a dash — "Incline Dumbbell Press" → "برس إنكلاين بالدامبل",
  * "Wide-Grip Lat Pulldown" → "لات بول داون - قبضة واسعة". Connectors are plain Egyptian Arabic; the gym
  * terms themselves stay transliterated (transliterateExerciseName). Hand-curated names
- * (data-src/exercise-names.overrides.ar.json) win over this rule.
+ * (assets-src/exercises/exercise-names.overrides.ar.json) win over this rule.
  */
 type DescriptorSlot = 'angle' | 'tool' | 'position' | 'side' | 'grip';
 

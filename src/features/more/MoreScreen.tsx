@@ -1,11 +1,20 @@
 import { useServices } from '@/app/services';
 import { useUiStore } from '@/app/uiStore';
 import { useLive } from '@/app/useLive';
-import { SCREEN_ICONS } from '@/features/placeholders/PlaceholderScreens';
 import { t, type TKey } from '@/i18n';
-import { Button, Icon, ListRow, ListSection, PageHeader } from '@/ui';
+import { Button, Icon, ListRow, ListSection, PageHeader, type IconName } from '@/ui';
 import { formatBytes } from '@/ui/format';
 import styles from './MoreScreen.module.css';
+
+const SCREEN_ICONS = {
+  programs: 'list',
+  muscleMap: 'body',
+  nutrition: 'utensils',
+  supplements: 'pill',
+  progress: 'chart',
+  pdf: 'file',
+  settings: 'settings',
+} as const satisfies Record<string, IconName>;
 
 const LINKS: ReadonlyArray<{ to: string; key: keyof typeof SCREEN_ICONS }> = [
   { to: '/more/programs', key: 'programs' },

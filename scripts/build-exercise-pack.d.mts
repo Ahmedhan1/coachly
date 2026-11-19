@@ -14,11 +14,11 @@ export interface PackBuildOptions {
   limit: number;
   budgetMb: number;
   offline: boolean;
-  /** Rewrite exercises.json from data-src only, keeping the existing image list (no image work). */
+  /** Rewrite exercises.json from assets-src/exercises only, keeping the existing image list (no image work). */
   manifestOnly: boolean;
   namesEn: string;
   cuesEn: string;
-  /** data-src/exercise-fixes.json (hand-reviewed photo / muscle / joint corrections). Optional. */
+  /** assets-src/exercises/exercise-fixes.json (hand-reviewed photo / muscle / joint corrections). Optional. */
   fixes?: string;
 }
 
