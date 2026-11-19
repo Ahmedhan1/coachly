@@ -8,6 +8,7 @@ import { routePush } from './push/routes';
 import { RULES } from './rateLimit';
 import { viewerHeaders, viewerHtml } from './share/page';
 import { routeShare, SHARE_ID } from './share/routes';
+import { postClientFile, routeFiles } from './files/routes';
 
 /** Routes one request. All I/O goes through `deps`, so tests can swap the clock, store or limiter. */
 export async function handleRequest(request: Request, deps: Deps, hooks: AdminHooks = {}): Promise<Response> {
@@ -49,6 +50,12 @@ async function routeApi(request: Request, path: string, deps: Deps, clientKey: s
   if (request.method === 'POST' && path === '/api/activate') return handleActivate(request, deps, clientKey);
   if (request.method === 'GET' && path === '/api/license/status') return handleStatus(request, deps, clientKey);
   if (request.method === 'POST' && path === AI_RELAY_PATH) return handleAiRelay(request, deps, clientKey);
+  // Cloud files live in the external object store (not R2), so they do not depend on the R2 binding.
+  if (path === '/api/files' || path.startsWith('/api/files/')) return (await routeFiles(request, path, deps, clientKey)) ?? notFound(deps, clientKey);
+  const clientFile = /^\/api\/share\/([^/]+)\/files$/.exec(path);
+  if (clientFile !== null) {
+    return request.method === 'POST' ? postClientFile(request, deps, clientKey, clientFile[1] ?? '') : json({ error: 'method_not_allowed' }, 405);
+  }
   const storage = path === '/api/backup' || path.startsWith('/api/backup/') || path === '/api/checkins' || path.startsWith('/api/share/');
   // R2 not bound yet (owner has not enabled R2): those features answer 503 and the app keeps its local copy.
   if (storage && !deps.cloud.bucket) return json({ error: 'storage_unavailable' }, 503);

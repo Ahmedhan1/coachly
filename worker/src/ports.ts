@@ -1,4 +1,5 @@
 import type { LicensePayload, VerifyResult } from '../../shared/license';
+import type { ObjectStore } from './files/objectStore';
 import type { VapidKeys } from './push/vapid';
 
 export type LicenseStatus = 'issued' | 'active' | 'revoked' | 'replaced';
@@ -90,6 +91,20 @@ export interface VapidSource {
   keys(): Promise<VapidKeys | null>;
 }
 
+/** Cloud files (photos, thumbnails, invoices, PDFs) in the external object store. */
+export interface FilesDeps {
+  /** null when the object store is not configured: the files API answers 503 `files_unavailable`. */
+  store: ObjectStore | null;
+  /** Largest file from the trainer's app. */
+  maxBytes: number;
+  /** Largest file from a client page. */
+  clientMaxBytes: number;
+  /** Total stored per trainer account. */
+  accountMaxBytes: number;
+  /** Most `client_upload` files waiting per client page. */
+  clientPendingMax: number;
+}
+
 /** Bindings and settings for phase 9 (backup, push, client page). */
 export interface CloudDeps {
   db: D1Database;
@@ -98,6 +113,7 @@ export interface CloudDeps {
   pushFetch: typeof fetch;
   vapid: VapidSource;
   config: CloudConfig;
+  files: FilesDeps;
   /** Random 128-bit base64url id. */
   newId(): string;
 }
