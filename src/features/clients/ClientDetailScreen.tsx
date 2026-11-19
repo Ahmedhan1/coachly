@@ -82,6 +82,7 @@ function ClientHub({ client }: { client: Client }) {
 
   // "/clients/:id?renew=1" (Home «جدّد») renews once on arrival; "?pay=1" (Home «حصّل») opens a payment.
   const handled = useRef<string | null>(null);
+  const who = useRef<HTMLElement | null>(null);
   useEffect(() => {
     const renewing = params.get('renew') === '1';
     const paying = params.get('pay') === '1';
@@ -133,6 +134,8 @@ function ClientHub({ client }: { client: Client }) {
       <PageHeader
         title=""
         back={BACK}
+        compactTitle={client.name}
+        watch={who}
         actions={
           <>
             <IconButton icon="edit" label={t('clientDetail.editClient')} onClick={() => setSheet('edit')} />
@@ -144,7 +147,7 @@ function ClientHub({ client }: { client: Client }) {
           </>
         }
       />
-      <header className={styles.who}>
+      <header className={styles.who} ref={who}>
         <div className={styles.photo} aria-hidden="true">
           <Icon name="user" />
         </div>
