@@ -1,4 +1,5 @@
 import type { PdfImageRef } from '@/domain/pdf';
+import { drawImageToCanvas, fillBehind } from '@/services/storage/drawImage';
 import { DEFAULT_MAX_IMAGE_SIDE, type ImageDownscaler } from '@/services/storage/types';
 
 /** Loads the original bytes behind a PdfImageRef. null = not available (the page shows an empty frame). */
@@ -107,34 +108,26 @@ export class PdfCanvasDownscaler implements ImageDownscaler {
   constructor(private readonly jpegQuality = 0.85) {}
 
   async downscale(input: Blob, maxSide = DEFAULT_MAX_IMAGE_SIDE) {
-    const bitmap = await createImageBitmap(input, { imageOrientation: 'from-image' });
+    const png = input.type === 'image/png';
+    const drawn = await drawImageToCanvas(input, (w, h) => {
+      const scale = Math.min(1, maxSide / Math.max(w, h));
+      return { width: Math.max(1, Math.round(w * scale)), height: Math.max(1, Math.round(h * scale)) };
+    });
+    const { canvas } = drawn;
     try {
-      const longest = Math.max(bitmap.width, bitmap.height);
-      if (longest <= maxSide && (input.type === 'image/jpeg' || input.type === 'image/png')) {
-        return { blob: input, width: bitmap.width, height: bitmap.height };
+      const longest = Math.max(drawn.sourceWidth, drawn.sourceHeight);
+      // Small JPEG/PNG go in untouched; everything else (WebP pack photos included) is re-encoded.
+      if (longest <= maxSide && (input.type === 'image/jpeg' || png)) {
+        return { blob: input, width: drawn.sourceWidth, height: drawn.sourceHeight };
       }
-      const scale = Math.min(1, maxSide / longest);
-      const width = Math.max(1, Math.round(bitmap.width * scale));
-      const height = Math.max(1, Math.round(bitmap.height * scale));
-      const canvas = document.createElement('canvas');
-      canvas.width = width;
-      canvas.height = height;
-      const ctx = canvas.getContext('2d');
-      if (!ctx) throw new Error('canvas 2d unavailable');
-      const png = input.type === 'image/png';
-      if (!png) {
-        ctx.fillStyle = '#ffffff';
-        ctx.fillRect(0, 0, width, height);
-      }
-      ctx.drawImage(bitmap, 0, 0, width, height);
+      if (!png) fillBehind(drawn, '#ffffff');
       const blob = await new Promise<Blob>((resolve, reject) =>
         canvas.toBlob((b) => (b ? resolve(b) : reject(new Error('encode failed'))), png ? 'image/png' : 'image/jpeg', this.jpegQuality),
       );
+      return { blob, width: canvas.width, height: canvas.height };
+    } finally {
       canvas.width = 0;
       canvas.height = 0;
-      return { blob, width, height };
-    } finally {
-      bitmap.close();
     }
   }
 }

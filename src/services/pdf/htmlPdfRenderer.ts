@@ -28,8 +28,9 @@ export interface HtmlPdfRendererOptions {
   /** Longest side for embedded pictures before rendering (spec: ~1200 px). */
   maxImageSide?: number;
   /**
-   * Extra snapshot passes before the kept one. WebKit sometimes paints <img> inside the SVG snapshot only on
-   * the second pass; set to 1 on Safari if images come out blank (MANUAL_QA).
+   * Extra snapshot passes before the kept one. WebKit (every browser on iPhone) paints <img> inside the SVG
+   * snapshot only from the second pass on, so the first one comes out with white boxes. Default: 2 on WebKit,
+   * 0 elsewhere (see snapshotWarmupPasses).
    */
   warmupPasses?: number;
   /** Width in px of the small JPEG preview kept per page (0 = none). Default 360. */
@@ -41,6 +42,14 @@ export interface HtmlPdfRendererOptions {
 }
 
 const STYLE_ID = 'ptpdf-styles';
+
+/** Warm-up snapshots needed by this browser: WebKit leaves pictures blank on the first pass (html-to-image). */
+export function snapshotWarmupPasses(userAgent: string, maxTouchPoints = 0): number {
+  const chromiumOrGecko = /Chrome\/|Chromium\/|Firefox\/|Edg\//.test(userAgent) && !/CriOS|FxiOS|EdgiOS/.test(userAgent);
+  const iOS = /iPhone|iPad|iPod/.test(userAgent) || (/Macintosh/.test(userAgent) && maxTouchPoints > 1);
+  if (iOS) return 2;
+  return /AppleWebKit\//.test(userAgent) && !chromiumOrGecko ? 2 : 0;
+}
 
 function ensureStyles(): void {
   if (document.getElementById(STYLE_ID)) return;
@@ -156,6 +165,7 @@ export class HtmlPdfRenderer implements PdfRenderer {
       const quality = this.o.jpegQuality ?? 0.82;
       const previewWidth = this.o.previewWidth ?? 360;
       const previews: Blob[] = [];
+      const warmups = this.o.warmupPasses ?? snapshotWarmupPasses(navigator.userAgent, navigator.maxTouchPoints);
       for (let i = 0; i < doc.pages.length; i++) {
         if (cancelled()) return err('cancelled');
         const page = doc.pages[i]!;
@@ -174,7 +184,7 @@ export class HtmlPdfRenderer implements PdfRenderer {
           skipAutoScale: true,
           cacheBust: false,
         };
-        for (let w = 0; w < (this.o.warmupPasses ?? 0); w++) {
+        for (let w = 0; w < warmups; w++) {
           const c = await toCanvas(node, snap);
           c.width = 0;
           c.height = 0;

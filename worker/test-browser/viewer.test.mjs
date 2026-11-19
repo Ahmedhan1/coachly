@@ -88,6 +88,7 @@ try {
   });
 
   const page = await context.newPage();
+  page.on('pageerror', (e) => console.log('[pageerror]', e.message));
   page.on('console', (msg) => {
     if (/Content Security Policy|Refused/.test(msg.text())) cspErrors.push(msg.text());
   });
@@ -197,6 +198,94 @@ try {
     }, doc.photo);
     assert.deepEqual(size, [1200, 800]);
     assert.ok(posted.body.length < 3 * 1024 * 1024);
+  });
+
+  await step('check-in on iPhone Safari: createImageBitmap that draws nothing falls back to <img>; 3 photos, transparent → white', async () => {
+    // Three camera-sized photos: two opaque JPEGs and a PNG with a clear background.
+    const maker = await context.newPage();
+    await maker.setViewportSize({ width: 2016, height: 1512 });
+    const shots = [];
+    for (const [bg, type] of [['linear-gradient(135deg,#1b7040,#f2c14e)', 'jpeg'], ['linear-gradient(45deg,#2b4a9b,#c81e3a)', 'jpeg']]) {
+      await maker.setContent(`<body style="margin:0;background:${bg}"></body>`);
+      shots.push({ type, buffer: await maker.screenshot({ type, quality: 90 }) });
+    }
+    await maker.setViewportSize({ width: 900, height: 1200 });
+    await maker.setContent('<body style="margin:0;background:transparent"><div style="margin:300px auto;width:300px;height:600px;background:#c81e3a;border-radius:150px"></div></body>');
+    shots.push({ type: 'png', buffer: await maker.screenshot({ type: 'png', omitBackground: true }) });
+    await maker.close();
+
+    const safari = await context.newPage();
+    // What WebKit does on some iPhones: a bitmap of the right size that paints nothing.
+    await safari.addInitScript(() => {
+      const real = window.createImageBitmap.bind(window);
+      window.__bitmapCalls = 0;
+      window.createImageBitmap = async (src) => {
+        window.__bitmapCalls++;
+        const b = await real(src);
+        const empty = await real(new ImageData(b.width, b.height));
+        b.close();
+        return empty;
+      };
+    });
+    posted = null;
+    await safari.goto(`${ORIGIN}/c/${shareId}#k=${b64url(key)}`);
+    await safari.waitForSelector('body[data-ready="1"]', { timeout: 10_000 });
+    await safari.click('#t-p-checkin');
+    await safari.fill('input[name=weight]', '71');
+    const files = shots.map((s, i) => ({ name: `p${i}.${s.type === 'png' ? 'png' : 'jpg'}`, mimeType: `image/${s.type}`, buffer: s.buffer }));
+    const thumbCount = () => safari.locator('#p-checkin .thumb').count();
+    const addButton = safari.locator('#p-checkin .add-photo');
+    assert.equal((await addButton.textContent()).trim(), '+ أضف صورة', 'Arabic add-photo button, not the browser\'s "Choose Files"');
+    const addBox = await addButton.boundingBox();
+    assert.ok(addBox && addBox.height >= 44, `add-photo height ${addBox?.height}`);
+    await safari.locator('#p-checkin .add-photo').scrollIntoViewIfNeeded();
+    await safari.screenshot({ path: join(shotDir, 'viewer-checkin-add-photo.png') });
+    // Picks add up (front, then side, then back), they do not replace each other.
+    await safari.setInputFiles('input[name=photo]', files.slice(0, 2));
+    assert.equal(await thumbCount(), 2);
+    await safari.setInputFiles('input[name=photo]', files.slice(2));
+    assert.equal(await thumbCount(), 3);
+    assert.ok(await addButton.isHidden(), 'add button hides at 3 photos');
+    // Remove one, add it back.
+    await safari.locator('#p-checkin .thumb-x').nth(2).click();
+    assert.equal(await thumbCount(), 2);
+    assert.ok(await addButton.isVisible());
+    await safari.screenshot({ path: join(shotDir, 'viewer-checkin-two-photos.png') });
+    await safari.setInputFiles('input[name=photo]', files.slice(2));
+    assert.equal(await thumbCount(), 3);
+    await safari.waitForFunction(() => [...document.querySelectorAll('#p-checkin .thumb img')].filter((i) => i.complete && i.naturalWidth > 0).length === 3);
+    await safari.locator('#p-checkin .card').screenshot({ path: join(shotDir, 'viewer-checkin-photos.png') });
+    await safari.click('#p-checkin .btn');
+    await safari.waitForFunction(() => document.querySelector('#p-checkin .status')?.textContent?.includes('وصلت'), null, { timeout: 15_000 });
+    assert.equal(await thumbCount(), 0, 'photos clear after sending');
+    assert.equal(await safari.evaluate(() => window.__bitmapCalls), 3, 'createImageBitmap was tried for each photo');
+    const opened = await lib.openWithKey(key, new Uint8Array(posted.body));
+    assert.ok(opened.ok);
+    const doc = lib.parseCheckinDocument(JSON.parse(new TextDecoder().decode(opened.data)));
+    assert.ok(doc && doc.photo && doc.photos?.length === 2, 'all three photos arrive');
+    const pixels = await safari.evaluate(async (srcs) => {
+      const out = [];
+      for (const src of srcs) {
+        const img = new Image();
+        img.src = src;
+        await img.decode();
+        const c = document.createElement('canvas');
+        c.width = img.naturalWidth; c.height = img.naturalHeight;
+        const ctx = c.getContext('2d');
+        ctx.drawImage(img, 0, 0);
+        const corner = [...ctx.getImageData(2, 2, 1, 1).data];
+        const middle = [...ctx.getImageData(c.width >> 1, c.height >> 1, 1, 1).data];
+        out.push({ w: c.width, h: c.height, corner, middle });
+      }
+      return out;
+    }, [doc.photo, ...doc.photos]);
+    assert.deepEqual(pixels.map((p) => [p.w, p.h]), [[1200, 900], [1200, 900], [900, 1200]]);
+    // A blank draw comes out solid white (over a fill) or solid black (JPEG of clear pixels): demand real colour.
+    for (const p of pixels.slice(0, 2)) assert.ok(Math.max(...p.middle.slice(0, 3)) - Math.min(...p.middle.slice(0, 3)) > 40, `photo came out blank: ${p.middle}`);
+    const png = pixels[2];
+    assert.ok(png.corner.slice(0, 3).every((v) => v > 245), `clear background must turn white, got ${png.corner}`);
+    assert.ok(png.middle[0] > 150 && png.middle[1] < 80, `red shape missing: ${png.middle}`);
+    await safari.close();
   });
 
   await step('no CSP violations, no requests outside the page and app origins', async () => {
