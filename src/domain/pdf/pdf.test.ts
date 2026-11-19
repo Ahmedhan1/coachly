@@ -325,6 +325,29 @@ describe('presets and catalog mapping', () => {
     expect(estimateBlockHeight({ ...b!, last: false })).toBeGreaterThan(estimateBlockHeight({ ...b!, imageCredit: null, last: false }));
   });
 
+  it("client card carries the client's photo, and the photo makes the card taller", () => {
+    const input = pdfTestCase('max_branding', syntheticExercises(2, false));
+    const client = { ...input.client!, photoId: 'client-photo' as NonNullable<typeof input.client>['photoId'] };
+    const card = buildContentBlocks({ ...input, client, sections: ['client_info'] }).find(
+      (b): b is Extract<PdfBlock, { type: 'clientCard' }> => b.type === 'clientCard',
+    );
+    expect(card?.photo).toEqual({ kind: 'stored', imageId: 'client-photo' });
+    expect(estimateBlockHeight(card!)).toBeGreaterThanOrEqual(estimateBlockHeight({ ...card!, photo: null }));
+    const noPhoto = buildContentBlocks({ ...input, client: { ...client, photoId: null }, sections: ['client_info'] }).find((b) => b.type === 'clientCard');
+    expect(noPhoto).toMatchObject({ photo: null });
+  });
+
+  it('progress shows a single photo when only one check-in has photos', () => {
+    const input = pdfTestCase('max_branding', syntheticExercises(2, true));
+    const progress = input.progress.map((e, i) => (i === 0 ? e : { ...e, photoIds: [] }));
+    const withPhoto = progress.find((e) => e.photoIds.length > 0)!;
+    const pair = buildContentBlocks({ ...input, progress, sections: ['progress'] }).find(
+      (b): b is Extract<PdfBlock, { type: 'photoPair' }> => b.type === 'photoPair',
+    );
+    expect(pair?.before.image).toEqual({ kind: 'stored', imageId: withPhoto.photoIds[0] });
+    expect(pair?.after).toBeNull();
+  });
+
   it('progress summary: weights sorted, first/last photos', () => {
     const input = pdfTestCase('max_branding', syntheticExercises(4, true));
     const s = progressSummary([...input.progress].reverse());

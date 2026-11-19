@@ -97,6 +97,7 @@ export const FIXTURE_IMAGE_IDS = {
   cover: 'fixture-cover',
   before: 'fixture-before',
   after: 'fixture-after',
+  client: 'fixture-client',
   recipe: 'fixture-recipe',
   supplement: 'fixture-supplement',
 } as const;
@@ -151,7 +152,7 @@ function client(id: PdfTestCaseId): Client {
     endDate: '2027-01-31',
     remainingSessions: 10,
     notes: '',
-    photoId: null,
+    photoId: id === 'max_branding' || id === 'long_names' ? FIXTURE_IMAGE_IDS.client : null,
     ...META,
   });
 }

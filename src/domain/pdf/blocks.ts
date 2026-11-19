@@ -79,7 +79,8 @@ function clientBlocks(input: PdfDocumentInput): PdfBlock[] {
     if (v === undefined) continue;
     tiles.push({ label: L.measurements[key], value: formatNumber(v, 1), unit: measurementUnit(key, input), emphasis: key === 'weightKg' });
   }
-  const out: PdfBlock[] = [{ type: 'clientCard', name: c.name, chips, tiles }];
+  const photo: PdfImageRef | null = c.photoId ? { kind: 'stored', imageId: c.photoId } : null;
+  const out: PdfBlock[] = [{ type: 'clientCard', name: c.name, chips, tiles, photo }];
   if (c.goalNote) out.push(...paragraphs(`${L.goalNote}: ${c.goalNote}`));
   if (c.injuries.length > 0) out.push(...paragraphs(`${L.injuries}: ${c.injuries.join(listSep(input))}`));
   return out;
@@ -378,11 +379,11 @@ function progressBlocks(input: PdfDocumentInput): PdfBlock[] {
       }
     }
   }
-  if (s.before && s.after) {
+  if (s.before) {
     out.push({
       type: 'photoPair',
       before: { image: { kind: 'stored', imageId: s.before.photoIds[0]! }, caption: `${L.before} · ${formatDate(s.before.date)}` },
-      after: { image: { kind: 'stored', imageId: s.after.photoIds[0]! }, caption: `${L.after} · ${formatDate(s.after.date)}` },
+      after: s.after ? { image: { kind: 'stored', imageId: s.after.photoIds[0]! }, caption: `${L.after} · ${formatDate(s.after.date)}` } : null,
     });
   }
   return out;

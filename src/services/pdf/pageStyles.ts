@@ -1,6 +1,7 @@
 import {
   BLOCK_GAP_PX,
   CHART_HEIGHT_PX,
+  CLIENT_PHOTO_PX,
   CLOSING_LOGO_PX,
   CONTENT_HEIGHT_PX,
   CONTENT_WIDTH_PX,
@@ -70,7 +71,9 @@ export function pdfStyles(): string {
 .b-sub .meta { flex: none; color: #48484a; background: #fff; border-radius: 999px; padding: 1px 10px; font-size: ${FONT.small}px; font-weight: 600; }
 
 .b-client { padding: 0; overflow: hidden; }
-.b-client .hd { background: var(--tint1); padding: 14px 16px; border-block-end: 1px solid #e6e6e9; }
+.b-client .hd { background: var(--tint1); padding: 14px 16px; border-block-end: 1px solid #e6e6e9; display: flex; align-items: center; gap: 16px; }
+.b-client .who { flex: 1; min-width: 0; }
+.b-client .av { flex: none; width: ${CLIENT_PHOTO_PX}px; height: ${CLIENT_PHOTO_PX}px; border-radius: 50%; object-fit: cover; background: #f2f2f4; border: 3px solid #fff; }
 .b-client .nm { font-size: 24px; font-weight: 800; line-height: 1.35; overflow-wrap: anywhere; }
 .b-client .chips { display: flex; flex-wrap: wrap; gap: 6px; margin-block-start: 8px; }
 .b-client .chips span { background: #fff; border: 1px solid #e0e0e4; border-radius: 999px; padding: 2px 12px; font-size: 13px; font-weight: 600; }
@@ -184,6 +187,7 @@ export function pdfStyles(): string {
 .b-photos { display: flex; gap: 16px; }
 .b-photos figure { flex: 1; height: ${PHOTO_PAIR_HEIGHT_PX}px; display: flex; flex-direction: column; gap: 6px; }
 .b-photos img, .b-photos .ph { flex: 1; min-height: 0; width: 100%; object-fit: cover; border-radius: 12px; background: #f2f2f4; }
+.b-photos.one figure { flex: none; width: 50%; margin-inline: auto; }
 .b-photos figcaption { text-align: center; font-weight: 700; }
 .b-contact { display: flex; flex-direction: column; align-items: center; text-align: center; gap: 8px; padding: 26px 24px 22px;
   border-radius: 18px; background: var(--tint1); border: 1px solid #e6e6e9; margin-block-start: 8px; }

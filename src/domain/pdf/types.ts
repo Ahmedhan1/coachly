@@ -203,7 +203,14 @@ export type PdfBlock =
       /** Last row of its day (draws the closing edge of the table). */
       last: boolean;
     }
-  | { type: 'clientCard'; name: string; chips: string[]; tiles: StatItem[] }
+  | {
+      type: 'clientCard';
+      name: string;
+      chips: string[];
+      tiles: StatItem[];
+      /** The client's own photo (taken by the trainer or uploaded from the client's phone), or null. */
+      photo: PdfImageRef | null;
+    }
   | { type: 'mealItem'; text: string; detail: string }
   | {
       type: 'mealCard';
@@ -228,7 +235,12 @@ export type PdfBlock =
       head: [string, string, string, string];
       rows: { label: string; first: string; latest: string; change: string; unit: string }[];
     }
-  | { type: 'photoPair'; before: { image: PdfImageRef; caption: string }; after: { image: PdfImageRef; caption: string } }
+  | {
+      type: 'photoPair';
+      before: { image: PdfImageRef; caption: string };
+      /** null when only one check-in has photos: the one photo is shown alone. */
+      after: { image: PdfImageRef; caption: string } | null;
+    }
   | { type: 'contact'; title: string; lines: string[]; closing: string };
 
 export type PdfBlockType = PdfBlock['type'];

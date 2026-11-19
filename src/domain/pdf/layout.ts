@@ -38,6 +38,8 @@ export const RECIPE_IMAGE_PX = 132;
 export const SUPPLEMENT_IMAGE_PX = 80;
 export const CHART_HEIGHT_PX = 230;
 export const PHOTO_PAIR_HEIGHT_PX = 340;
+/** Side of the client's round photo in the client card. */
+export const CLIENT_PHOTO_PX = 96;
 export const CLOSING_LOGO_PX = 120;
 
 export const FONT = { body: 14, small: 12, sub: 17, title: 21, name: 16 } as const;
@@ -69,7 +71,8 @@ export function estimateBlockHeight(block: PdfBlock): number {
       break;
     case 'clientCard': {
       const tiles = Math.ceil(block.tiles.length / 4) * 78;
-      h = textHeight(block.name, 24, W - 32) + (block.chips.length > 0 ? 40 : 0) + tiles + 40;
+      const head = textHeight(block.name, 24, W - 32 - (block.photo ? CLIENT_PHOTO_PX + 16 : 0)) + (block.chips.length > 0 ? 40 : 0);
+      h = Math.max(head, block.photo ? CLIENT_PHOTO_PX : 0) + tiles + 40;
       break;
     }
     case 'keyValues': {

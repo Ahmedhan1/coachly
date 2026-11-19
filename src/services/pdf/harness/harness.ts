@@ -59,6 +59,8 @@ async function fixtureImages(): Promise<Map<string, Blob>> {
   m.set(FIXTURE_IMAGE_IDS.cover, await canvas(3024, 4032, photo(290), 'image/jpeg'));
   m.set(FIXTURE_IMAGE_IDS.before, await canvas(3024, 4032, photo(20), 'image/jpeg'));
   m.set(FIXTURE_IMAGE_IDS.after, await canvas(3024, 4032, photo(200), 'image/jpeg'));
+  // iPhone portrait camera size, like a photo the client uploads from their phone.
+  m.set(FIXTURE_IMAGE_IDS.client, await canvas(3024, 4032, photo(330), 'image/jpeg'));
   m.set(FIXTURE_IMAGE_IDS.recipe, await canvas(1600, 1200, photo(40), 'image/jpeg'));
   m.set(FIXTURE_IMAGE_IDS.supplement, await canvas(800, 800, photo(250), 'image/png'));
   return m;

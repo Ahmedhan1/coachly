@@ -103,9 +103,9 @@ export function blockHtml(b: PdfBlock, urlOf: UrlOf, color: string, ctx: BlockCo
       return `<h3 class="blk b-sub"><span class="tx">${esc(b.text)}</span>${b.meta ? `<span class="meta">${bdi(b.meta)}</span>` : ''}</h3>`;
     case 'clientCard':
       return (
-        `<div class="blk card b-client"><div class="hd"><div class="nm">${bdi(b.name)}</div>` +
+        `<div class="blk card b-client"><div class="hd">${b.photo ? img(urlOf(b.photo), 'av', b.name) : ''}<div class="who"><div class="nm">${bdi(b.name)}</div>` +
         (b.chips.length > 0 ? `<div class="chips">${b.chips.map((c) => `<span>${bdi(c)}</span>`).join('')}</div>` : '') +
-        `</div>${b.tiles.length > 0 ? `<div class="tiles">${b.tiles.map(statTile).join('')}</div>` : ''}</div>`
+        `</div></div>${b.tiles.length > 0 ? `<div class="tiles">${b.tiles.map(statTile).join('')}</div>` : ''}</div>`
       );
     case 'keyValues':
       return `<div class="blk card b-kv">${b.rows.map((r) => `<div class="kv"><span class="k">${esc(r.label)}</span><span class="v">${bdi(r.value)}</span></div>`).join('')}</div>`;
@@ -182,8 +182,8 @@ export function blockHtml(b: PdfBlock, urlOf: UrlOf, color: string, ctx: BlockCo
       return `<div class="blk card b-chart"><div class="ttl">${esc(b.title)} <span>(${esc(b.unit)})</span></div>${chartSvg(b.points, color)}</div>`;
     case 'photoPair':
       return (
-        `<div class="blk card b-photos">` +
-        [b.before, b.after].map((p) => `<figure>${img(urlOf(p.image), 'ph')}<figcaption>${bdi(p.caption)}</figcaption></figure>`).join('') +
+        `<div class="blk card b-photos${b.after ? '' : ' one'}">` +
+        (b.after ? [b.before, b.after] : [b.before]).map((p) => `<figure>${img(urlOf(p.image), 'ph')}<figcaption>${bdi(p.caption)}</figcaption></figure>`).join('') +
         `</div>`
       );
     case 'contact': {
