@@ -260,7 +260,7 @@ try {
     await safari.setInputFiles('input[name=photo]', files.slice(2));
     assert.equal(await thumbCount(), 3);
     await safari.waitForFunction(() => [...document.querySelectorAll('#p-checkin .thumb img')].filter((i) => i.complete && i.naturalWidth > 0).length === 3);
-    await safari.locator('#p-checkin .card').screenshot({ path: join(shotDir, 'viewer-checkin-photos.png') });
+    await safari.locator('#p-checkin form.card').screenshot({ path: join(shotDir, 'viewer-checkin-photos.png') });
     await safari.click('#p-checkin .btn');
     await safari.waitForFunction(() => document.querySelector('#p-checkin .status')?.textContent?.includes('وصلت'), null, { timeout: 15_000 });
     assert.equal(await thumbCount(), 0, 'photos clear after sending');
@@ -298,6 +298,7 @@ try {
     const withPhoto = { ...lib.SAMPLE_DOCUMENT, brand: { ...lib.SAMPLE_DOCUMENT.brand, photo: lib.SAMPLE_DOCUMENT.brand.logo } };
     envelope = await lib.sealWithKey(key, new TextEncoder().encode(JSON.stringify(withPhoto)));
     await page.goto(`${ORIGIN}/c/${shareId}#k=${b64url(key)}`);
+    await page.reload();
     await page.waitForSelector('body[data-ready="1"]', { timeout: 10_000 });
     assert.equal(await page.locator('#brand img.trainer-photo').count(), 1, 'trainer photo in the header');
     await page.click('#t-p-checkin');
