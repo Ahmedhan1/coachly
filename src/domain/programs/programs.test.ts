@@ -77,11 +77,78 @@ describe('built-in templates', () => {
     expect(new Set(allIds).size).toBe(allIds.length);
   });
 
-  it('covers push/pull/legs, upper/lower and full body with supersets', () => {
-    expect(BUILTIN_TEMPLATES.map((t) => t.id)).toEqual(['ppl', 'upper_lower', 'full_body']);
+  it('covers push/pull/legs, upper/lower and full body with supersets, then the library', () => {
+    expect(BUILTIN_TEMPLATES.map((t) => t.id)).toEqual([
+      'ppl',
+      'upper_lower',
+      'full_body',
+      'beginner_ab',
+      'strength_ab',
+      'bro_split',
+      'glutes_focus',
+      'home_dumbbells',
+      'bodyweight',
+      'fat_loss_circuit',
+      'older_adults',
+      'kettlebell',
+    ]);
     const ppl = instantiateTemplate(BUILTIN_TEMPLATES[0]!, { name: 'x', dayName: (k) => k, newId: ids() });
     expect(ppl.days.map((d) => d.name)).toEqual(['push', 'pull', 'legs']);
     expect([...supersetTags(ppl.days[0]!.items).values()]).toEqual(['A1', 'A2']);
+  });
+});
+
+describe('template library prescriptions', () => {
+  const byId = (id: string) => BUILTIN_TEMPLATES.find((t) => t.id === id)!;
+  const items = (id: string) => byId(id).days.flatMap((d) => d.items);
+
+  it('every day is a workable session: 4-6 exercises, 2-5 sets, sane rests', () => {
+    for (const tpl of BUILTIN_TEMPLATES) {
+      for (const d of tpl.days) {
+        expect(d.items.length, `${tpl.id}/${d.key}`).toBeGreaterThanOrEqual(4);
+        expect(d.items.length, `${tpl.id}/${d.key}`).toBeLessThanOrEqual(6);
+        for (const i of d.items) {
+          expect(i.sets).toBeGreaterThanOrEqual(2);
+          expect(i.sets).toBeLessThanOrEqual(5);
+          expect(i.restSec).toBeGreaterThanOrEqual(30);
+          expect(i.restSec).toBeLessThanOrEqual(240);
+        }
+      }
+    }
+  });
+
+  it('day keys are unique inside a template', () => {
+    for (const tpl of BUILTIN_TEMPLATES) {
+      const keys = tpl.days.map((d) => d.key);
+      expect(new Set(keys).size, tpl.id).toBe(keys.length);
+    }
+  });
+
+  it('strength work is heavy with long rests; older adults stay moderate', () => {
+    const main = items('strength_ab').filter((i) => i.rpe !== undefined);
+    expect(main.length).toBeGreaterThanOrEqual(5);
+    for (const i of main) {
+      expect(Number(i.reps)).toBeLessThanOrEqual(6);
+      expect(i.restSec).toBeGreaterThanOrEqual(150);
+    }
+    for (const i of items('older_adults')) {
+      expect(i.sets).toBe(2);
+      expect(i.rpe ?? 6).toBeLessThanOrEqual(7);
+    }
+  });
+
+  it('home and bodyweight templates need no gym machines or barbells', () => {
+    const ids = [...items('home_dumbbells'), ...items('bodyweight'), ...items('kettlebell')].map((i) => i.exerciseId);
+    for (const id of ids) expect(['machine', 'cable', 'barbell'], id).not.toContain(catalog.get(id)?.equipment);
+  });
+
+  it('the glute template trains glutes on two days', () => {
+    const gluteDays = byId('glutes_focus').days.filter((d) => d.items.some((i) => catalog.get(i.exerciseId)?.primaryMuscles.includes('glutes')));
+    expect(gluteDays.length).toBe(2);
+  });
+
+  it('fat-loss circuit pairs every move into a superset', () => {
+    for (const i of items('fat_loss_circuit')) expect(i.superset).toBeDefined();
   });
 });
 
