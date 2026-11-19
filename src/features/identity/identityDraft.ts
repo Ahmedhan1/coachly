@@ -2,12 +2,15 @@ import { useCallback, useEffect, useState } from 'react';
 import { IDENTITY_SETUP_KEY, useServices } from '@/app/services';
 import { DEFAULT_BRAND } from '@/domain/branding';
 import type { TrainerSettings } from '@/domain/models';
+import { dropCopies, queueImageCopy } from '@/features/files/cloudCopies';
 
 export const CURRENCIES = ['EGP', 'SAR', 'AED', 'KWD', 'QAR', 'USD', 'EUR'] as const;
 
 export interface IdentityDraft {
   name: string;
   logoImageId: string | null;
+  /** The trainer's own photo (optional). */
+  photoImageId: string | null;
   color: string;
   currency: string;
   weight: TrainerSettings['units']['weight'];
@@ -22,6 +25,7 @@ export function draftFrom(settings: TrainerSettings, firstRun: boolean): Identit
   return {
     name: settings.name,
     logoImageId: settings.logoImageId,
+    photoImageId: settings.photoImageId ?? null,
     color: color.toUpperCase(),
     currency: settings.currency,
     weight: settings.units.weight,
@@ -31,7 +35,8 @@ export function draftFrom(settings: TrainerSettings, firstRun: boolean): Identit
 
 /** Loads the draft from settings and saves it back (plus the "setup done" flag). */
 export function useIdentityDraft(firstRun: boolean) {
-  const { data, meta } = useServices();
+  const services = useServices();
+  const { data, meta } = services;
   const [draft, setDraft] = useState<IdentityDraft | null>(null);
 
   useEffect(() => {
@@ -46,16 +51,24 @@ export function useIdentityDraft(firstRun: boolean) {
 
   const save = useCallback(
     async (value: IdentityDraft) => {
+      const before = (await data.repos.settings.get()).photoImageId ?? null;
       await data.repos.settings.update({
         name: value.name.trim(),
         logoImageId: value.logoImageId as TrainerSettings['logoImageId'],
+        photoImageId: value.photoImageId as TrainerSettings['logoImageId'],
         primaryColor: value.color,
         currency: value.currency,
         units: { weight: value.weight, length: value.length },
       });
       await meta.set(IDENTITY_SETUP_KEY, Date.now());
+      // Encrypted cloud copy of the trainer's photo (one per account).
+      if (value.photoImageId !== before) {
+        if (value.photoImageId) await queueImageCopy(services, 'trainer_photo', null, value.photoImageId);
+        else await dropCopies(services, null, ['trainer_photo']);
+        if (before) await data.repos.images.delete(before).catch(() => undefined);
+      }
     },
-    [data, meta],
+    [data, meta, services],
   );
 
   return { draft, update, save };

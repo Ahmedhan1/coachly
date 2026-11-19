@@ -27,12 +27,23 @@ export async function purgeExpired(db: AppDatabase, now: Date): Promise<PurgeRep
   const cutoff = purgeCutoffMs(now);
   return db.transaction('rw', db.tables, async () => {
     let rows = 0;
+    const purged = new Set<string>();
     for (const name of ENTITY_TABLES) {
       const table = db.table<{ id: string; deletedAt: number | null }, string>(name);
       // `deletedAt` index (v2) holds only soft-deleted rows, so live history is never read here.
       const ids = (await table.where('deletedAt').below(cutoff).primaryKeys()) as string[];
       if (ids.length > 0) await table.bulkDelete(ids);
       rows += ids.length;
+      for (const id of ids) purged.add(String(id));
+    }
+    // Cloud copies of what is gone for good (a client's photo, a payment's receipt): drop the local link to the
+    // picture so it can be purged below, and queue the remote delete (or forget it if it never went up).
+    if (purged.size > 0) {
+      const copies = await db.cloudFiles.filter((r) => r.ref !== null && purged.has(r.ref)).toArray();
+      for (const r of copies) {
+        if (r.remoteId === null) await db.cloudFiles.delete(r.id);
+        else await db.cloudFiles.put({ ...r, state: 'deleting', imageId: null, bytes: null, attempts: 0, nextAttemptAt: now.getTime() });
+      }
     }
     const deletions = await db.deletions.where('at').below(cutoff).delete();
 

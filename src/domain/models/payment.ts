@@ -1,6 +1,6 @@
 import { z } from 'zod';
 import { currencySchema, entityMetaShape, isoDateSchema, moneyMinorSchema, shortTextSchema } from './common';
-import { clientIdSchema, paymentIdSchema } from './ids';
+import { clientIdSchema, imageIdSchema, paymentIdSchema } from './ids';
 
 export const paymentMethodSchema = z.enum(['cash', 'instapay', 'wallet', 'bank', 'other']);
 export const paymentStatusSchema = z.enum(['paid', 'due']);
@@ -17,6 +17,8 @@ export const paymentSchema = z
     dueOn: isoDateSchema.nullable(),
     method: paymentMethodSchema,
     note: shortTextSchema,
+    /** Photo of the receipt (InstaPay / wallet screenshot); optional. */
+    invoiceImageId: imageIdSchema.nullable().optional(),
     ...entityMetaShape,
   })
   .refine((p) => (p.status === 'paid' ? p.paidOn !== null : p.dueOn !== null), {

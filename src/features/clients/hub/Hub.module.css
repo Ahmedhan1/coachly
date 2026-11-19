@@ -2,7 +2,8 @@
 
 .tabs {
   position: sticky;
-  inset-block-start: 0;
+  /* Under the compact top bar (PageHeader), which is showing by the time the tabs reach the top. */
+  inset-block-start: calc(var(--safe-top) + var(--navbar-h));
   z-index: 5;
   display: flex;
   gap: 6px;
@@ -10,6 +11,8 @@
   padding: var(--sp-2) var(--gutter);
   margin-block-start: var(--sp-3);
   background: var(--bg);
+  -webkit-backdrop-filter: var(--material-blur);
+  backdrop-filter: var(--material-blur);
   scrollbar-width: none;
   overscroll-behavior-inline: contain;
 }
@@ -359,4 +362,10 @@
 
 .chooser {
   margin-inline: calc(var(--gutter) * -1);
+}
+
+@supports ((-webkit-backdrop-filter: blur(1px)) or (backdrop-filter: blur(1px))) {
+  .tabs {
+    background: var(--material-bg);
+  }
 }

@@ -17,7 +17,8 @@
     "vapid:keys": "node scripts/vapid-keys.mjs"
   },
   "dependencies": {
-    "@noble/ed25519": "3.2.0"
+    "@noble/ed25519": "3.2.0",
+    "aws4fetch": "1.0.20"
   },
   "devDependencies": {
     "@cloudflare/vitest-plugin": "1.8.5",

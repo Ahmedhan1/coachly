@@ -22,6 +22,8 @@ export const trainerSettingsSchema = z.object({
   id: z.literal(TRAINER_SETTINGS_ID),
   name: shortTextSchema,
   logoImageId: imageIdSchema.nullable(),
+  /** The trainer's own profile photo (optional; older settings have none). */
+  photoImageId: imageIdSchema.nullable().optional(),
   primaryColor: hexColorSchema,
   secondaryColor: hexColorSchema,
   /** Font id from the app's font list; 'system' uses the device font. */
