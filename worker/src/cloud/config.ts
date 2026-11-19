@@ -1,5 +1,7 @@
 import type { Env } from '../env';
-import type { CloudConfig } from '../ports';
+import { FILE_MAX_BYTES } from '../../../shared/files';
+import { MemoryObjectStore, S3ObjectStore, type ObjectStore } from '../files/objectStore';
+import type { CloudConfig, FilesDeps } from '../ports';
 
 const MiB = 1024 * 1024;
 const GiB = 1024 * MiB;
@@ -40,3 +42,27 @@ export function cloudConfigFromEnv(env: Env, overrides: Partial<CloudConfig> = {
     ...overrides,
   };
 }
+
+/**
+ * Cloud files store from the FILES_* settings. Without all five settings the files API is off (503), and the
+ * rest of the Worker works as before.
+ */
+export function filesDepsFromEnv(env: Env, store?: ObjectStore | null): FilesDeps {
+  const settings = {
+    endpoint: env.FILES_ENDPOINT?.trim() ?? '',
+    region: env.FILES_REGION?.trim() ?? '',
+    bucket: env.FILES_BUCKET?.trim() ?? '',
+    accessKeyId: env.FILES_ACCESS_KEY_ID?.trim() ?? '',
+    secretAccessKey: env.FILES_SECRET_ACCESS_KEY?.trim() ?? '',
+  };
+  const configured = Object.values(settings).every((v) => v !== '');
+  return {
+    store: store !== undefined ? store : configured ? new S3ObjectStore(settings) : null,
+    maxBytes: FILE_MAX_BYTES,
+    clientMaxBytes: 4 * MiB,
+    accountMaxBytes: positiveInt(env.FILES_ACCOUNT_MAX_BYTES, GiB),
+    clientPendingMax: 20,
+  };
+}
+
+export { MemoryObjectStore };

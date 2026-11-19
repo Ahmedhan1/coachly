@@ -9,6 +9,7 @@ import type { Deps } from '../ports';
 import { RULES } from '../rateLimit';
 import { constantTimeEqual } from '../serverCrypto';
 import { overPagesQuota } from './quota';
+import { deleteShareFiles } from '../files/routes';
 
 export const SHARE_ID = /^[A-Za-z0-9_-]{22,64}$/;
 const HASH_B64 = /^[A-Za-z0-9_-]{43}$/;
@@ -127,6 +128,8 @@ async function revokeShare(deps: Deps, lid: string, shareId: string): Promise<Re
     db.prepare('DELETE FROM checkins WHERE share_id = ?').bind(shareId),
     adjustUsage(db, -freed),
   ]);
+  // Files the client uploaded through this page (photo, uploads) go with it; best effort.
+  await deleteShareFiles(deps, shareId).catch(() => undefined);
   return json({ ok: true });
 }
 
