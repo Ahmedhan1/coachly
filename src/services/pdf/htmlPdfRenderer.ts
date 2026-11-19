@@ -12,6 +12,7 @@ import { err, ok, type Result } from '@/domain/nutrition/result';
 import type { ImageDownscaler } from '@/services/storage/types';
 import { safeFileName } from '@/services/share/shareService';
 import { DEFAULT_FONT_BASE_URL, loadPdfFonts } from './fonts';
+import { paintPictures, SNAPSHOT_CLASS, snapshotStyles } from './composite';
 import { collectImageRefs, PdfCanvasDownscaler, ResolvedImages, type PdfImageSource } from './images';
 import { blockHtml, fontStack, pageHtml } from './pageHtml';
 import { pdfStyles } from './pageStyles';
@@ -28,8 +29,8 @@ export interface HtmlPdfRendererOptions {
   /** Longest side for embedded pictures before rendering (spec: ~1200 px). */
   maxImageSide?: number;
   /**
-   * Extra snapshot passes before the kept one. WebKit (every browser on iPhone) paints <img> inside the SVG
-   * snapshot only from the second pass on, so the first one comes out with white boxes. Default: 2 on WebKit,
+   * Extra snapshot passes before the kept one (WebKit settles web fonts in the SVG snapshot from the second pass
+   * on). Pictures no longer depend on this: they are painted by canvas (composite.ts). Default: 2 on WebKit,
    * 0 elsewhere (see snapshotWarmupPasses).
    */
   warmupPasses?: number;
@@ -55,7 +56,7 @@ function ensureStyles(): void {
   if (document.getElementById(STYLE_ID)) return;
   const style = document.createElement('style');
   style.id = STYLE_ID;
-  style.textContent = pdfStyles();
+  style.textContent = pdfStyles() + snapshotStyles();
   document.head.appendChild(style);
 }
 
@@ -175,21 +176,37 @@ export class HtmlPdfRenderer implements PdfRenderer {
         host.appendChild(node);
         await imagesReady(node);
         await this.o.onPageNode?.(node, i);
+        // Text, cards and fills only: pictures are hidden here and painted by canvas (composite.ts), because
+        // WebKit leaves <img> inside html-to-image's SVG snapshot blank on iPhone.
         const snap = {
           width: PAGE_WIDTH_PX,
           height: PAGE_HEIGHT_PX,
           pixelRatio: ratio,
-          backgroundColor: '#ffffff',
           fontEmbedCSS: fonts.embedCss,
           skipAutoScale: true,
           cacheBust: false,
         };
+        node.classList.add(SNAPSHOT_CLASS);
         for (let w = 0; w < warmups; w++) {
           const c = await toCanvas(node, snap);
           c.width = 0;
           c.height = 0;
         }
-        const canvas = await toCanvas(node, snap);
+        const shot = await toCanvas(node, snap);
+        node.classList.remove(SNAPSHOT_CLASS);
+        const canvas = document.createElement('canvas');
+        canvas.width = shot.width;
+        canvas.height = shot.height;
+        const ctx2d = canvas.getContext('2d');
+        if (!ctx2d) throw new Error('canvas 2d unavailable');
+        const scale = canvas.width / PAGE_WIDTH_PX;
+        ctx2d.fillStyle = '#ffffff';
+        ctx2d.fillRect(0, 0, canvas.width, canvas.height);
+        paintPictures(ctx2d, node, scale, 'under');
+        ctx2d.drawImage(shot, 0, 0);
+        shot.width = 0;
+        shot.height = 0;
+        paintPictures(ctx2d, node, scale, 'over');
         const jpeg = await canvasToJpeg(canvas, quality);
         if (previewWidth > 0) {
           const preview = await previewOf(canvas, previewWidth);

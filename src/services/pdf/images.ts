@@ -74,12 +74,13 @@ export class ResolvedImages {
       if (options.signal?.aborted) break;
       const blob = await source.load(ref);
       if (blob) {
+        let out: Blob = blob;
         try {
-          const small = await downscaler.downscale(blob, options.maxSide ?? DEFAULT_MAX_IMAGE_SIDE);
-          r.urls.set(imageRefKey(ref), URL.createObjectURL(small.blob));
+          out = (await downscaler.downscale(blob, options.maxSide ?? DEFAULT_MAX_IMAGE_SIDE)).blob;
         } catch {
-          // undecodable image: leave the frame empty
+          // The canvas could not shrink it (seen on iPhone): use the original; the page <img> still decodes it.
         }
+        r.urls.set(imageRefKey(ref), URL.createObjectURL(out));
       }
       options.onEach?.(++done, refs.length);
     }
@@ -116,8 +117,9 @@ export class PdfCanvasDownscaler implements ImageDownscaler {
     const { canvas } = drawn;
     try {
       const longest = Math.max(drawn.sourceWidth, drawn.sourceHeight);
-      // Small JPEG/PNG go in untouched; everything else (WebP pack photos included) is re-encoded.
-      if (longest <= maxSide && (input.type === 'image/jpeg' || png)) {
+      // Small JPEG/PNG/WebP go in untouched: the page <img> decodes them natively and composite.ts draws that
+      // <img>, so a canvas re-encode (which has come out blank on iPhone) is only done to shrink big pictures.
+      if (longest <= maxSide && (input.type === 'image/jpeg' || png || input.type === 'image/webp')) {
         return { blob: input, width: drawn.sourceWidth, height: drawn.sourceHeight };
       }
       if (!png) fillBehind(drawn, '#ffffff');
