@@ -16,11 +16,11 @@ export function schemaAction(backupVersion: number, currentVersion: number): Res
 
 const MB = 1024 * 1024;
 
-/** LIMITS.md: 500 trainers fit in R2 only if the average cloud backup stays at or under ~18 MB. */
+/** docs/LIMITS.md: 500 trainers fit in R2 only if the average cloud backup stays at or under ~18 MB. */
 export const DEFAULT_CLOUD_BUDGET_BYTES = 18 * MB;
-/** LIMITS.md: per-trainer cap. */
+/** docs/LIMITS.md: per-trainer cap. */
 export const CLOUD_HARD_CAP_BYTES = 100 * MB;
-/** LIMITS.md: cloud photo thumbnails are ~400 px, ~30 KB each. */
+/** docs/LIMITS.md: cloud photo thumbnails are ~400 px, ~30 KB each. */
 export const THUMBNAIL_MAX_SIDE = 400;
 export const THUMBNAIL_ESTIMATED_BYTES = 30 * 1024;
 

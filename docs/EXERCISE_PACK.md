@@ -13,7 +13,7 @@ licensing risk described in `LICENSES.md`; the trainer can replace any photo wit
 | `img/<id>-<n>.webp` | Photos, max 480 px on the long side, WebP quality 60. Usually 2 per exercise (start / end position). |
 
 Each manifest entry has: `id` (dataset id, stable), `en`, `ar` (default Arabic name from
-`data-src/exercise-names.ar.json` — machine transliteration, needs review by a trainer), `primary` /
+`assets-src/exercises/exercise-names.ar.json` — machine transliteration, needs review by a trainer), `primary` /
 `secondary` (app muscle-group ids), `equipment`, `level`, `category`, `force`, `mechanic`, `images` (file names
 relative to `image.base`). The header also carries `image` settings and `imageBytes` (total size of all
 photos, for the "download all" button).
@@ -29,7 +29,7 @@ Wave 5 (2026-11-18, `--manifest-only`, no image changes): **1082 exercises** (87
 `exercises.json` 524 KB. Every exercise carries `jointStress` and `homeFriendly`. A sample photo goes from
 850×567 JPEG, 61 KB to 480×320 WebP, 10 KB.
 
-## Visual audit and hand fixes (`data-src/exercise-fixes.json`)
+## Visual audit and hand fixes (`assets-src/exercises/exercise-fixes.json`)
 
 All 873 photo exercises were checked on contact sheets (40 per sheet, both photos, id + muscles + equipment) plus an
 automatic pass (corrupt / blank / tiny / over 40 KB / byte-identical photos across exercises). Result: no corrupt,
@@ -53,7 +53,7 @@ Pulldown. The upstream dataset has nothing else that matches the remaining extra
 ## Everkinetic drawings and the photo credit
 
 Extras can carry their own image files: `ownImages: ["pt_X-0.webp", "pt_X-1.webp"]` plus `imageCredit` in
-`data-src/exercise-extras.json` (the build keeps these files in `img/` and lists them; `ownImages` wins over
+`assets-src/exercises/exercise-extras.json` (the build keeps these files in `img/` and lists them; `ownImages` wins over
 `imagesFrom`). Four extras use Everkinetic drawings (CC BY-SA 4.0, list and sources in `LICENSES.md`): Barbell Reverse
 Lunge, Band Biceps Curl, Glute Bridge Hold, Lying Leg Raise. Made with `python3 -I scripts/everkinetic-to-pack.py
 <everkinetic clone> public/exercise-pack/img 0128=pt_Barbell_Reverse_Lunge …` (480×320 white canvas, WebP, 6–10 KB).
@@ -108,19 +108,19 @@ node scripts/build-exercise-pack.mjs --offline  # rebuild from the local cache o
 node scripts/build-exercise-pack.mjs --manifest-only  # rewrite exercises.json only (names, cues, English)
 ```
 
-`--manifest-only` rebuilds `exercises.json` from the `data-src/` files and keeps the image list, image settings
+`--manifest-only` rebuilds `exercises.json` from the `assets-src/exercises/` files and keeps the image list, image settings
 and `imageBytes` of the existing manifest. It never downloads, encodes or deletes images, so image paths and
 sizes stay exactly the same. Use it after editing names or cues.
 
 English data (shown when the app language is English): `en` is the dataset name cleaned by
-`cleanEnglishName()` (src/domain/exercises/pack.ts), overridden by `data-src/exercise-names.en.json`;
-`cuesEn` comes from `data-src/exercise-cues.en.json` (same count as the Arabic cues). Flags: `--names-en`,
+`cleanEnglishName()` (src/domain/exercises/pack.ts), overridden by `assets-src/exercises/exercise-names.en.json`;
+`cuesEn` comes from `assets-src/exercises/exercise-cues.en.json` (same count as the Arabic cues). Flags: `--names-en`,
 `--cues-en`.
 
 Options: `--size 480 --quality 60 --format webp|jpeg --concurrency 8 --retries 3 --limit N --budget-mb 40`.
 
 - **Download:** `https://raw.githubusercontent.com/yuhonas/free-exercise-db/main/exercises/<id>/<n>.jpg` into
-  `data-src/free-exercise-db/images/` (git-ignored by `data-src/.gitignore`, ~101 MB). 8 requests in flight,
+  `assets-src/exercises/free-exercise-db/images/` (git-ignored by `assets-src/exercises/.gitignore`, ~101 MB). 8 requests in flight,
   3 retries with exponential backoff, HTTP 404 is not retried, files are written atomically (`.part` +
   rename), files already cached are skipped — re-running after an interruption resumes. A full download took
   about 70 s here.

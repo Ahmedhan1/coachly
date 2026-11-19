@@ -68,4 +68,4 @@ UPLOAD_KEY=<مفتاح الرفع> python3 deploy/app/upload.py
 - `deploy/app/upload.py` uploads `index.html`, `sw.js` and the manifest **last**, so a phone checking for an update
   mid-deploy never gets a new service worker whose files are missing. Old hashed assets are never deleted.
 - A new version does not take over an open app by itself: the trainer sees «فيه نسخة جديدة» and taps update,
-  or it activates on the next cold start (`src/app/swUpdate.ts`).
+  or it activates on the next cold start (`src/app/pwa/swUpdate.ts`).

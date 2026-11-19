@@ -1,4 +1,4 @@
-// English for src/i18n/features/training.ts (exercise library, muscle map, programs, session mode).
+// English for src/i18n/ar/training.ts (exercise library, muscle map, programs, session mode).
 import type { EnArea } from './types';
 
 export const training: EnArea<'training'> = {

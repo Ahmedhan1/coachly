@@ -29,10 +29,10 @@ foreign and amateur to the buyer.
 
 - `transliterateExerciseName(english)` in `src/i18n/fitness-terms.ts` → `{ arabic, unknownTokens }`.
   Multi-word phrases match first; numbers, hyphens, slashes and parentheses are handled.
-- `node scripts/transliterate-exercises.mjs` → regenerates `data-src/exercise-names.ar.json` and
-  `data-src/exercise-names.coverage.json` (unknown tokens by frequency). Aim for 0 unknown tokens; add missing
+- `node scripts/transliterate-exercises.mjs` → regenerates `assets-src/exercises/exercise-names.ar.json` and
+  `assets-src/exercises/exercise-names.coverage.json` (unknown tokens by frequency). Aim for 0 unknown tokens; add missing
   words to the dictionary, never post-edit the generated JSON by hand.
-- `npm run check:words` → scans `src/i18n/**` (not tests), `src/**/*.ar.json`, `data-src/**/*.ar.json` and
+- `npm run check:words` → scans `src/i18n/**` (not tests), `src/**/*.ar.json`, `assets-src/exercises/**/*.ar.json` and
   `public/**/*.json`; prints `file:line` and exits 1 on any forbidden word. Must pass before any phase is done.
 
 ## Checklist before saying "done"

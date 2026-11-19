@@ -9,7 +9,7 @@
   color: var(--text-2);
 }
 
-/* 48pt, --surface, radius 14, no border in light; 1px --line-strong in dark (DESIGN.md §5). */
+/* 48pt, --surface, radius 14, no border in light; 1px --line-strong in dark (docs/DESIGN.md §5). */
 .input {
   min-block-size: var(--field-h);
   padding-inline: var(--sp-4);

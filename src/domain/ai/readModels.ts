@@ -1,5 +1,5 @@
 import { daysBetween, subscriptionAttention, type Client, type MealPlan, type Payment, type Program, type ProgressEntry, type Recipe } from '../models';
-import { mealItemText } from '../meals/mealItemText';
+import { mealItemText } from '../meals/foods/mealItemText';
 import type { Task } from './tasks';
 
 /**

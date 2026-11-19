@@ -1,4 +1,4 @@
-// English for src/i18n/features/settings.ts (backup, notifications, client page, formulas, integrations).
+// English for src/i18n/ar/settings.ts (backup, notifications, client page, formulas, integrations).
 import type { EnArea } from './types';
 
 export const settings: EnArea<'settings'> = {

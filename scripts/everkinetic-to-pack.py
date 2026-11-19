@@ -2,7 +2,7 @@
 
 Usage: python3 -I scripts/everkinetic-to-pack.py <everkinetic clone> public/exercise-pack/img 0128=pt_Barbell_Reverse_Lunge ...
 Each Everkinetic id gives <pack id>-0.webp (relaxation) and -1.webp (tension): trimmed, centred on a white 480x320
-(3:2, like the pack photos) canvas, WebP quality 70 (~6-10 KB). Then list them in data-src/exercise-extras.json as
+(3:2, like the pack photos) canvas, WebP quality 70 (~6-10 KB). Then list them in assets-src/exercises/exercise-extras.json as
 `ownImages` with `imageCredit` and run `node scripts/build-exercise-pack.mjs --manifest-only`. See docs/EXERCISE_PACK.md.
 """
 import sys,os

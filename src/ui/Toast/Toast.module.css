@@ -11,7 +11,7 @@
   pointer-events: none;
 }
 
-/* Inverted, 52pt, radius 14 (DESIGN.md §5). */
+/* Inverted, 52pt, radius 14 (docs/DESIGN.md §5). */
 .toast {
   display: flex;
   align-items: center;
