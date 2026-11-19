@@ -14,7 +14,7 @@
   grid-template-columns: 1fr auto 1fr;
   align-items: center;
   min-block-size: 52px;
-  margin-inline: -8px;
+  margin-inline: calc(var(--sp-2) * -1);
 }
 
 .bar > :last-child {
@@ -258,7 +258,7 @@
 .previewTime {
   display: flex;
   align-items: baseline;
-  gap: 6px;
+  gap: var(--sp-1-5);
   margin-block-start: var(--sp-2);
   font: var(--t-num-xl);
 }
@@ -296,7 +296,7 @@
   display: inline-flex;
   align-items: center;
   block-size: 28px;
-  padding-inline: 10px;
+  padding-inline: var(--sp-2);
   border-radius: var(--r-full);
   background: var(--brand-tint);
   color: var(--brand-ink);

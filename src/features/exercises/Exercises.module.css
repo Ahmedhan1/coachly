@@ -50,7 +50,7 @@
   place-items: center;
   min-inline-size: 20px;
   block-size: 20px;
-  padding-inline: 5px;
+  padding-inline: var(--sp-1);
   border-radius: var(--r-full);
   background: var(--brand);
   color: var(--brand-on);
@@ -64,7 +64,7 @@
   scrollbar-width: none;
   margin-inline: calc(-1 * var(--gutter));
   padding-inline: var(--gutter);
-  padding-block: 4px;
+  padding-block: var(--sp-1);
 }
 
 .chips::-webkit-scrollbar {
@@ -83,9 +83,9 @@
   position: relative;
   display: inline-flex;
   align-items: center;
-  gap: 4px;
+  gap: var(--sp-1);
   min-block-size: 36px;
-  padding-inline: 14px 10px;
+  padding-inline: var(--sp-3) var(--sp-2);
   border-radius: var(--r-full);
   background: var(--brand-tint);
   color: var(--brand-ink);

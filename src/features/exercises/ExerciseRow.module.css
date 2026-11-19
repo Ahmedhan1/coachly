@@ -27,7 +27,7 @@
   min-inline-size: 0;
   display: flex;
   flex-direction: column;
-  gap: 6px;
+  gap: var(--sp-1-5);
 }
 
 .name {
@@ -51,7 +51,7 @@
   display: inline-flex;
   align-items: center;
   block-size: 24px;
-  padding-inline: 10px;
+  padding-inline: var(--sp-2);
   border-radius: var(--r-full);
   background: var(--surface-2);
   color: var(--text);

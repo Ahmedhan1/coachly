@@ -1,7 +1,7 @@
 .field {
   display: flex;
   flex-direction: column;
-  gap: 2px;
+  gap: var(--sp-0);
 }
 
 .head {
@@ -21,7 +21,7 @@
 }
 
 .unit {
-  margin-inline-start: 4px;
+  margin-inline-start: var(--sp-1);
   font: var(--t-caption);
   color: var(--text-2);
 }

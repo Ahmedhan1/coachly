@@ -96,7 +96,7 @@
   display: grid;
   place-items: center;
   align-content: center;
-  gap: 4px;
+  gap: var(--sp-1);
   inline-size: 96px;
   block-size: 96px;
   border-radius: var(--r-md);

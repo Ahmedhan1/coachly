@@ -82,7 +82,7 @@
 }
 
 .meta {
-  margin-block-start: 4px;
+  margin-block-start: var(--sp-1);
   font: var(--t-sub);
   color: var(--text-2);
 }
@@ -112,7 +112,7 @@
 }
 
 .pkgSub {
-  margin-block-start: 4px;
+  margin-block-start: var(--sp-1);
   font: var(--t-sub);
   color: var(--text-2);
 }
@@ -120,7 +120,7 @@
 .chips {
   display: flex;
   flex-wrap: wrap;
-  gap: 6px;
+  gap: var(--sp-1-5);
   margin-block-start: var(--sp-3);
 }
 
@@ -132,7 +132,7 @@
 .goalLabel {
   display: flex;
   align-items: center;
-  gap: 6px;
+  gap: var(--sp-1-5);
   font: var(--t-label);
   color: var(--text-2);
 }
@@ -143,7 +143,7 @@
 }
 
 .goalText {
-  margin-block-start: 6px;
+  margin-block-start: var(--sp-1-5);
   font: var(--t-headline);
   text-wrap: balance;
 }
@@ -170,12 +170,12 @@
 }
 
 .facts dd {
-  margin: 4px 0 0;
+  margin: var(--sp-1) 0 0;
   font: var(--t-num-md);
 }
 
 .facts dd span {
-  margin-inline-start: 3px;
+  margin-inline-start: var(--sp-0);
   font: var(--t-caption);
   color: var(--text-2);
 }
@@ -260,7 +260,7 @@
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 3px;
+  gap: var(--sp-0);
   flex: none;
   inline-size: 64px;
   min-block-size: 52px;
@@ -315,7 +315,7 @@
   flex: none;
   inline-size: 22px;
   block-size: 22px;
-  margin-block-start: 2px;
+  margin-block-start: var(--sp-0);
   accent-color: var(--brand);
 }
 

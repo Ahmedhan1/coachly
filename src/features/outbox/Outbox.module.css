@@ -104,7 +104,7 @@
 }
 
 .how {
-  margin: 0 var(--gutter, 16px) var(--sp-4);
+  margin: 0 var(--gutter) var(--sp-4);
   color: var(--text-2);
   font: var(--t-sub);
 }

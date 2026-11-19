@@ -124,7 +124,7 @@
 }
 
 .mChip {
-  padding: 2px var(--sp-2);
+  padding: var(--sp-0) var(--sp-2);
   border-radius: var(--r-xs);
   background: var(--surface-2);
   color: var(--text-2);
@@ -220,7 +220,7 @@
   display: flex;
   flex: 1;
   flex-direction: column;
-  gap: 2px;
+  gap: var(--sp-0);
   min-inline-size: 0;
 }
 
@@ -242,7 +242,7 @@
 .sets {
   display: flex;
   align-items: baseline;
-  gap: 4px;
+  gap: var(--sp-1);
   margin-block-start: var(--sp-1);
   font: var(--t-num);
 }
@@ -264,7 +264,7 @@
 }
 
 .chip {
-  padding: 1px var(--sp-2);
+  padding: var(--sp-0) var(--sp-2);
   border-radius: var(--r-xs);
   background: var(--surface-2);
   color: var(--text-2);
@@ -388,7 +388,7 @@
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 3px;
+  gap: var(--sp-0);
   inline-size: 64px;
   min-block-size: 52px;
   border: 0;

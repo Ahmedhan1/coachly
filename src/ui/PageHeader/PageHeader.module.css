@@ -1,6 +1,6 @@
 .header {
   padding-block: calc(var(--safe-top) + var(--sp-2)) var(--sp-1);
-  padding-inline: var(--gutter) 8px;
+  padding-inline: var(--gutter) var(--sp-2);
 }
 
 .top,
@@ -13,7 +13,7 @@
 }
 
 .bar {
-  margin-inline-start: -8px;
+  margin-inline-start: calc(var(--sp-2) * -1);
 }
 
 .back {
@@ -59,7 +59,7 @@
   align-items: center;
   gap: var(--sp-2);
   block-size: calc(var(--safe-top) + var(--navbar-h));
-  padding: var(--safe-top) calc(var(--safe-right) + 8px) 0 calc(var(--safe-left) + 8px);
+  padding: var(--safe-top) calc(var(--safe-right) + var(--sp-2)) 0 calc(var(--safe-left) + var(--sp-2));
   background: var(--bg);
   -webkit-backdrop-filter: var(--material-blur);
   backdrop-filter: var(--material-blur);

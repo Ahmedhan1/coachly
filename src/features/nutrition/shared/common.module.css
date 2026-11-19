@@ -166,7 +166,7 @@
 .chips {
   display: flex;
   flex-wrap: wrap;
-  gap: 6px;
+  gap: var(--sp-1-5);
 }
 
 .chip {
@@ -174,7 +174,7 @@
   display: inline-flex;
   align-items: center;
   min-block-size: 32px;
-  padding-inline: 14px;
+  padding-inline: var(--sp-3);
   border-radius: var(--r-full);
   background: var(--surface);
   color: var(--text-2);

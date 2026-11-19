@@ -14,8 +14,8 @@
 
 .track {
   display: flex;
-  gap: 2px;
-  padding: 3px;
+  gap: var(--sp-0);
+  padding: var(--sp-0);
   border-radius: var(--r-md);
   background: var(--field-bg, var(--surface));
 }

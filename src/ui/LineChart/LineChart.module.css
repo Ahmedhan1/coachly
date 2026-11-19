@@ -48,8 +48,8 @@
   inset-inline-end: 0;
   display: flex;
   align-items: baseline;
-  gap: 6px;
-  padding: 4px 10px;
+  gap: var(--sp-1-5);
+  padding: var(--sp-1) var(--sp-2);
   border-radius: var(--r-sm);
   background: var(--text);
   color: var(--bg);

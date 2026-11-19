@@ -19,9 +19,9 @@
   position: relative;
   display: inline-flex;
   align-items: center;
-  gap: 6px;
+  gap: var(--sp-1-5);
   min-block-size: 36px;
-  padding-inline: 14px;
+  padding-inline: var(--sp-3);
   border-radius: var(--r-full);
   background: var(--surface-2);
   color: var(--text);

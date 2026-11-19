@@ -46,7 +46,7 @@
 .days {
   display: grid;
   grid-template-columns: repeat(7, minmax(0, 1fr));
-  gap: 2px;
+  gap: var(--sp-0);
   margin: var(--sp-2) 0 0;
   padding: 0;
   list-style: none;
@@ -56,10 +56,10 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 2px;
+  gap: var(--sp-0);
   inline-size: 100%;
   min-block-size: 72px;
-  padding-block: 6px;
+  padding-block: var(--sp-1-5);
   border-radius: var(--r-md);
   color: var(--text);
 }
@@ -82,7 +82,7 @@
   place-items: center;
   min-inline-size: 20px;
   block-size: 20px;
-  padding-inline: 5px;
+  padding-inline: var(--sp-1);
   border-radius: var(--r-full);
   background: var(--surface-2);
   font: var(--t-num-xs);
@@ -173,7 +173,7 @@
 }
 
 .time small {
-  margin-block-start: 3px;
+  margin-block-start: var(--sp-0);
   font: var(--t-caption);
   color: var(--text-2);
 }
@@ -214,7 +214,7 @@
 .attendance {
   display: grid;
   grid-template-columns: 1fr 1fr 1.35fr;
-  gap: 6px;
+  gap: var(--sp-1-5);
   padding-inline: calc(var(--sp-4) + 56px + var(--sp-3)) var(--sp-4);
 }
 
@@ -222,9 +222,9 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  gap: 4px;
+  gap: var(--sp-1);
   min-block-size: var(--tap);
-  padding-inline: 6px;
+  padding-inline: var(--sp-1-5);
   border-radius: var(--r-full);
   background: var(--surface-2);
   color: var(--text-2);
@@ -494,7 +494,7 @@
 .dayChips {
   display: grid;
   grid-template-columns: repeat(7, minmax(0, 1fr));
-  gap: 4px;
+  gap: var(--sp-1);
 }
 
 .dayChip {
@@ -545,7 +545,7 @@
 }
 
 .conflictHint {
-  margin-block-start: 2px;
+  margin-block-start: var(--sp-0);
   opacity: 0.9;
 }
 

@@ -22,7 +22,7 @@
 .rowHead {
   display: flex;
   flex-direction: column;
-  gap: 2px;
+  gap: var(--sp-0);
   min-inline-size: 0;
 }
 
@@ -79,7 +79,7 @@
   display: inline-flex;
   align-items: center;
   min-block-size: 36px;
-  padding-inline: 12px;
+  padding-inline: var(--sp-3);
   border: 1px solid var(--line);
   border-radius: var(--r-full);
   background: var(--bg);
@@ -102,7 +102,7 @@
 .tag {
   display: inline-flex;
   align-items: center;
-  padding: 2px 8px;
+  padding: var(--sp-0) var(--sp-2);
   border-radius: var(--r-full);
   background: var(--surface-2);
   color: var(--text-2);
@@ -150,7 +150,7 @@
 .bars > div {
   display: flex;
   flex-direction: column;
-  gap: 4px;
+  gap: var(--sp-1);
   min-inline-size: 0;
 }
 
@@ -169,14 +169,14 @@
 .mealBar {
   display: flex;
   flex-direction: column;
-  gap: 4px;
+  gap: var(--sp-1);
   margin-block-end: var(--sp-2);
 }
 
 .cycleDays {
   display: grid;
   grid-template-columns: repeat(7, minmax(0, 1fr));
-  gap: 4px;
+  gap: var(--sp-1);
 }
 
 .cycleDay {
@@ -184,9 +184,9 @@
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 2px;
+  gap: var(--sp-0);
   min-block-size: 56px;
-  padding: 4px 0;
+  padding: var(--sp-1) 0;
   border: 1px solid var(--line);
   border-radius: var(--r-md);
   background: var(--bg);
@@ -261,9 +261,9 @@
 .removable {
   display: inline-flex;
   align-items: center;
-  gap: 4px;
+  gap: var(--sp-1);
   min-block-size: 36px;
-  padding-inline: 12px 6px;
+  padding-inline: var(--sp-3) var(--sp-1-5);
   border: 1px solid var(--line);
   border-radius: var(--r-full);
   background: var(--bg);
@@ -316,8 +316,8 @@
 }
 
 .pillTag {
-  margin-inline-start: 6px;
-  padding: 1px 6px;
+  margin-inline-start: var(--sp-1-5);
+  padding: var(--sp-0) var(--sp-1-5);
   border-radius: var(--r-full);
   background: var(--surface-2);
   color: var(--text-2);
@@ -327,7 +327,7 @@
 .phaseList {
   display: flex;
   flex-direction: column;
-  gap: 4px;
+  gap: var(--sp-1);
   margin: 0;
   padding: 0;
   list-style: none;

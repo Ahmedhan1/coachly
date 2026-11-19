@@ -45,8 +45,10 @@
   --t-num-hero: 800 52px/1 var(--font-num);
   --t-num-timer: 700 88px/1 var(--font-num);
 
-  /* Space (4pt base) */
+  /* Space (4pt base, plus 2px and 6px for tight gaps). Every padding, margin and gap uses these. */
+  --sp-0: 2px;
   --sp-1: 4px;
+  --sp-1-5: 6px;
   --sp-2: 8px;
   --sp-3: 12px;
   --sp-4: 16px;

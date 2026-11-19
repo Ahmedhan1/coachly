@@ -58,7 +58,7 @@
   position: absolute;
   inset-block-end: 3px;
   inset-inline: 3px;
-  padding: 1px 4px;
+  padding: var(--sp-0) var(--sp-1);
   border-radius: var(--r-xs);
   background: var(--surface);
   color: var(--text-2);
@@ -73,7 +73,7 @@
   position: absolute;
   inset-inline-end: 4px;
   inset-block-end: 4px;
-  padding: 2px;
+  padding: var(--sp-0);
   border-radius: var(--r-xs);
   background: var(--surface);
 }
@@ -83,7 +83,7 @@
   inset-inline-start: 4px;
   inset-block-start: 4px;
   min-inline-size: 22px;
-  padding-inline: 5px;
+  padding-inline: var(--sp-1);
   border-radius: var(--r-xs);
   background: var(--text);
   color: var(--bg);
@@ -108,7 +108,7 @@
   display: flex;
   align-items: center;
   gap: var(--sp-1);
-  padding: 2px;
+  padding: var(--sp-0);
   border-radius: var(--r-md);
   background: var(--surface-2);
 }
@@ -139,7 +139,7 @@
   flex: 1;
   align-items: baseline;
   justify-content: center;
-  gap: 2px;
+  gap: var(--sp-0);
   min-inline-size: 0;
 }
 
@@ -163,7 +163,7 @@
 }
 
 .stepperBig .stepperRow {
-  padding: 4px;
+  padding: var(--sp-1);
 }
 
 .stepperBig .stepBtn {
@@ -258,7 +258,7 @@
   gap: var(--sp-2);
   margin-inline: calc(var(--gutter) * -1);
   padding-inline: var(--gutter);
-  padding-block: 4px;
+  padding-block: var(--sp-1);
   overflow-x: auto;
   scrollbar-width: none;
 }
@@ -366,8 +366,8 @@
 /* ---------- client fit (picker) ---------- */
 .fitBadge {
   align-self: flex-start;
-  margin-block-start: 4px;
-  padding: 2px var(--sp-2);
+  margin-block-start: var(--sp-1);
+  padding: var(--sp-0) var(--sp-2);
   border-radius: var(--r-xs);
   background: var(--warn-tint);
   color: var(--text);

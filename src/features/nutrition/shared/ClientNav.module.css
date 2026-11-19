@@ -1,8 +1,8 @@
 .nav {
   display: flex;
-  gap: 2px;
+  gap: var(--sp-0);
   margin: var(--sp-4) var(--gutter) 0;
-  padding: 3px;
+  padding: var(--sp-0);
   border-radius: var(--r-md);
   background: var(--surface);
 }
@@ -13,7 +13,7 @@
   display: grid;
   place-items: center;
   min-block-size: 38px;
-  padding-inline: 4px;
+  padding-inline: var(--sp-1);
   border-radius: 11px;
   color: var(--text-2);
   font: var(--t-control);

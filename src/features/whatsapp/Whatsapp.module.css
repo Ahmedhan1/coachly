@@ -140,7 +140,7 @@
 .pickText {
   display: flex;
   flex-direction: column;
-  gap: 2px;
+  gap: var(--sp-0);
   min-inline-size: 0;
 }
 

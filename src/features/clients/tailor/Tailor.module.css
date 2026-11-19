@@ -143,7 +143,7 @@
 }
 
 .fact {
-  padding: 4px var(--sp-2);
+  padding: var(--sp-1) var(--sp-2);
   border-radius: var(--r-xs);
   background: var(--surface-2);
   font: var(--t-caption);
@@ -174,7 +174,7 @@
   display: flex;
   flex-direction: column;
   align-items: flex-start;
-  gap: 2px;
+  gap: var(--sp-0);
   inline-size: 100%;
   min-block-size: 44px;
   padding: var(--sp-2) var(--sp-3);

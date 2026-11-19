@@ -7,7 +7,7 @@
 /* Three steps of the one brand hue + neutral ink, separated by 2px surface gaps. */
 .bar {
   display: flex;
-  gap: 2px;
+  gap: var(--sp-0);
   block-size: 12px;
   border-radius: var(--r-full);
   overflow: hidden;
@@ -43,14 +43,14 @@
 .legendCompact dt {
   display: flex;
   align-items: center;
-  gap: 6px;
+  gap: var(--sp-1-5);
   font: var(--t-caption);
   color: var(--text-2);
 }
 
 .legend dd,
 .legendCompact dd {
-  margin: 2px 0 0;
+  margin: var(--sp-0) 0 0;
 }
 
 .legend dd :global(.num) {
@@ -62,7 +62,7 @@
 }
 
 .unit {
-  margin-inline-start: 3px;
+  margin-inline-start: var(--sp-0);
   font: var(--t-caption);
   color: var(--text-2);
 }
