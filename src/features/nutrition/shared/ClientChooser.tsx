@@ -1,9 +1,10 @@
+import { ClientAvatar } from '@/features/clients/ClientAvatar';
 import { useState } from 'react';
 import { useRepos } from '@/app/services';
 import { useLive } from '@/app/useLive';
 import { searchItems } from '@/data';
 import { t } from '@/i18n';
-import { Avatar, EmptyState, ListRow, ListSection, SearchField } from '@/ui';
+import { EmptyState, ListRow, ListSection, SearchField } from '@/ui';
 
 /** A searchable client list whose rows open `/clients/:id/<path>`. */
 export function ClientChooser({ path, title, emptyBody }: { path: string; title: string; emptyBody: string }) {
@@ -22,7 +23,7 @@ export function ClientChooser({ path, title, emptyBody }: { path: string; title:
       )}
       <ListSection title={title} count={shown.length}>
         {shown.map((c) => (
-          <ListRow key={c.id} leading={<Avatar name={c.name} />} title={c.name} to={`/clients/${c.id}/${path}`} />
+          <ListRow key={c.id} leading={<ClientAvatar client={c} />} title={c.name} to={`/clients/${c.id}/${path}`} />
         ))}
       </ListSection>
     </>

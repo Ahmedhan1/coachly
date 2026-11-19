@@ -5,7 +5,7 @@ import { mergeItemNotes } from '../programs/tailor';
 export type ShareDocumentV1 = {
   v: 1;
   updatedAt: number;
-  brand: { name: string; color: string; logo?: string };
+  brand: { name: string; color: string; logo?: string; photo?: string };
   client: { firstName: string };
   programTitle?: string;
   days: Array<{
@@ -79,6 +79,8 @@ export interface ShareSources {
   color: string;
   /** Small logo as a data URL (≤ 100 000 chars), or null. */
   logo?: string | null;
+  /** The trainer's photo as a small data URL (≤ 60 000 chars), or null. */
+  trainerPhoto?: string | null;
   client: Pick<Client, 'name'>;
   program: Program | null;
   /** Arabic name and (for built-in pack exercises) the photo file name inside /exercise-pack/img/. */
@@ -195,6 +197,7 @@ export function buildShareDocument(s: ShareSources): ShareDocumentV1 {
   };
   if (s.program) doc.programTitle = cut(s.program.name, 80);
   if (s.logo && LOGO.test(s.logo) && s.logo.length <= 100_000) doc.brand.logo = s.logo;
+  if (s.trainerPhoto && LOGO.test(s.trainerPhoto) && s.trainerPhoto.length <= 60_000) doc.brand.photo = s.trainerPhoto;
   return s.extras ? { ...doc, ...cleanExtras(s.extras) } : doc;
 }
 

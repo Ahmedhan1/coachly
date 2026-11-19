@@ -1,5 +1,6 @@
 import { useEffect, useId, useMemo, useState } from 'react';
 import { useServices } from '@/app/services';
+import { useStoredImageUrl } from '@/features/files/useStoredImageUrl';
 import { applyBrand } from '@/app/useBrandTheme';
 import { auditBrand, BRAND_PRESETS, deriveBrand, normalizeHex } from '@/domain/branding';
 import { t, type TKey } from '@/i18n';
@@ -28,26 +29,7 @@ export function NameSection({ draft, update, autoFocus }: SectionProps & { autoF
   );
 }
 
-/** Object URL for a stored image; revoked when the id changes or the component unmounts. */
-function useImageUrl(id: string | null): string | null {
-  const { data } = useServices();
-  const [loaded, setLoaded] = useState<{ id: string; url: string } | null>(null);
-  useEffect(() => {
-    if (!id) return;
-    let objectUrl: string | null = null;
-    let cancelled = false;
-    void data.repos.images.getBlob(id).then((blob) => {
-      if (cancelled || !blob) return;
-      objectUrl = URL.createObjectURL(blob);
-      setLoaded({ id, url: objectUrl });
-    });
-    return () => {
-      cancelled = true;
-      if (objectUrl) URL.revokeObjectURL(objectUrl);
-    };
-  }, [data, id]);
-  return loaded && loaded.id === id ? loaded.url : null;
-}
+const useImageUrl = useStoredImageUrl;
 
 const LOGO_MAX_SIDE = 512;
 
@@ -256,6 +238,62 @@ export function UnitsSection({ draft, update }: SectionProps) {
           { value: 'in', label: t('identity.units.in') },
         ]}
       />
+    </div>
+  );
+}
+
+const PHOTO_MAX_SIDE = 800;
+
+/** The trainer's own photo: round, shown to clients on their page next to the logo. */
+export function TrainerPhotoSection({ draft, update }: SectionProps) {
+  const { images, data } = useServices();
+  const inputId = useId();
+  const url = useImageUrl(draft.photoImageId);
+  const [state, setState] = useState<'idle' | 'busy' | 'error'>('idle');
+
+  const pick = async (file: File | undefined) => {
+    if (!file) return;
+    setState('busy');
+    try {
+      const saved = await data.repos.images.save(await images.downscale(file, PHOTO_MAX_SIDE));
+      update({ photoImageId: saved.id });
+      setState('idle');
+    } catch {
+      setState('error');
+    }
+  };
+
+  return (
+    <div className={styles.logo}>
+      <div className={`${styles.logoFrame} ${styles.round}`}>
+        {url ? <img src={url} alt={t('files.trainerPhoto.alt')} className={styles.photoImg} /> : <Icon name="user" />}
+      </div>
+      <div className={styles.logoActions}>
+        <label htmlFor={inputId} className={styles.fileButton}>
+          <Icon name="camera" />
+          {state === 'busy' ? t('identity.logo.processing') : draft.photoImageId ? t('files.trainerPhoto.change') : t('files.trainerPhoto.pick')}
+        </label>
+        <input
+          id={inputId}
+          type="file"
+          accept="image/*"
+          className="visually-hidden"
+          onChange={(e) => {
+            void pick(e.target.files?.[0]);
+            e.target.value = '';
+          }}
+        />
+        {draft.photoImageId && (
+          <Button variant="danger" size="small" onClick={() => update({ photoImageId: null })}>
+            {t('files.trainerPhoto.remove')}
+          </Button>
+        )}
+        {state === 'error' && (
+          <p className={styles.error} role="alert">
+            {t('identity.logo.error')}
+          </p>
+        )}
+      </div>
     </div>
   );
 }

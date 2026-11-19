@@ -93,3 +93,22 @@ describe('CloudFileRepository', () => {
     expect(await repos.cloudFiles.list()).toEqual([]);
   });
 });
+
+describe('purge and cloud copies', () => {
+  it('a client deleted for good loses its cloud photo too, and the picture is purged', async () => {
+    const { purgeExpired } = await import('./purge');
+    const { repos, db, clock } = createTestData();
+    const img = await repos.images.save({ blob: new Blob(['x'], { type: 'image/jpeg' }), width: 1, height: 1 });
+    const client = await repos.clients.create({
+      name: 'نورهان', phone: '', gender: null, birthDate: null, goal: 'fat_loss', goalNote: '', injuries: [],
+      measurements: {}, package: null, startDate: null, endDate: null, remainingSessions: 0, notes: '', photoId: img.id,
+    } as never);
+    const copy = await repos.cloudFiles.put('client_photo', client.id, { imageId: img.id, mime: 'image/jpeg' });
+    await repos.cloudFiles.markSynced(copy.id, 'remote-1', copy.updatedAt);
+    await repos.clients.softDelete(client.id);
+    clock.advance(400 * 86_400_000);
+    const report = await purgeExpired(db, new Date(clock()));
+    expect(report.images).toBe(1);
+    expect(await repos.cloudFiles.get(copy.id)).toMatchObject({ state: 'deleting', remoteId: 'remote-1', imageId: null });
+  });
+});

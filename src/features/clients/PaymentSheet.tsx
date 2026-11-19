@@ -1,5 +1,7 @@
 import { useState, type FormEvent } from 'react';
-import { useRepos } from '@/app/services';
+import { useServices } from '@/app/services';
+import { dropCopies, queueImageCopy } from '@/features/files/cloudCopies';
+import { ReceiptField } from '@/features/files/ReceiptField';
 import { useUiStore } from '@/app/uiStore';
 import { toIsoDate, type Client, type IsoDate, type Payment, type PaymentMethod } from '@/domain/models';
 import { t } from '@/i18n';
@@ -32,7 +34,8 @@ function partialRemainder(payment: Payment | null, status: 'paid' | 'due', paidM
 
 /** Record a payment: amount, كاش / إنستاباي / فودافون كاش / تحويل, paid or pending, and the date. */
 export function PaymentSheet({ client, payment, currency, onClose, onDelete, receiving = false }: PaymentSheetProps) {
-  const repos = useRepos();
+  const services = useServices();
+  const repos = services.data.repos;
   const showToast = useUiStore((s) => s.showToast);
   const today = toIsoDate(new Date());
   const cur = payment?.currency ?? client.package?.currency ?? currency;
@@ -42,6 +45,7 @@ export function PaymentSheet({ client, payment, currency, onClose, onDelete, rec
   const [date, setDate] = useState<IsoDate>((receiving ? today : payment?.status === 'due' ? payment.dueOn : payment?.paidOn) ?? today);
   const [note, setNote] = useState(payment?.note ?? '');
   const [error, setError] = useState<string | null>(null);
+  const [receipt, setReceipt] = useState<string | null>(payment?.invoiceImageId ?? null);
   const typed = parseMoneyInput(amount);
   const partialPreview = typed === null ? 0 : partialRemainder(payment, status, typed);
 
@@ -60,11 +64,13 @@ export function PaymentSheet({ client, payment, currency, onClose, onDelete, rec
       paidOn: status === 'paid' ? date : null,
       dueOn: status === 'due' ? date : (payment?.dueOn ?? null),
       note: note.trim(),
+      invoiceImageId: receipt as Payment['invoiceImageId'],
     };
     const remainder = partialRemainder(payment, status, minor);
+    let savedId: string;
     try {
-      if (payment) await repos.payments.update(payment.id, fields);
-      else await repos.payments.create({ clientId: client.id, ...fields });
+      if (payment) savedId = (await repos.payments.update(payment.id, fields)).id;
+      else savedId = (await repos.payments.create({ clientId: client.id, ...fields })).id;
       if (payment && remainder > 0) {
         await repos.payments.create({
           clientId: client.id,
@@ -80,6 +86,13 @@ export function PaymentSheet({ client, payment, currency, onClose, onDelete, rec
     } catch {
       setError(t('schedule.pay.saveFailed'));
       return;
+    }
+    // Receipt photo: encrypted cloud copy named by the payment id; the replaced picture is deleted.
+    const before = payment?.invoiceImageId ?? null;
+    if (receipt !== before) {
+      if (receipt) await queueImageCopy(services, 'invoice', savedId, receipt);
+      else await dropCopies(services, savedId, ['invoice']);
+      if (before) await repos.images.delete(before).catch(() => undefined);
     }
     showToast({
       message: remainder > 0 ? t('schedule.pay.savedPartial', { paid: formatMoney(minor, cur), rest: formatMoney(remainder, cur) }) : t('schedule.pay.saved'),
@@ -136,6 +149,7 @@ export function PaymentSheet({ client, payment, currency, onClose, onDelete, rec
           ltr
         />
         <TextField label={`${t('schedule.pay.note')} (${t('common.optional')})`} value={note} onChange={(e) => setNote(e.target.value)} autoComplete="off" />
+        <ReceiptField value={receipt} onChange={setReceipt} />
         {payment && (
           <Button variant="danger" icon="trash" onClick={() => onDelete(payment)}>
             {t('schedule.pay.delete')}

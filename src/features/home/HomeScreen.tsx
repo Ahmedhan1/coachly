@@ -1,3 +1,4 @@
+import { ClientAvatar } from '@/features/clients/ClientAvatar';
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useGo } from '@/app/nav';
@@ -10,7 +11,7 @@ import { whatsappUrl } from '@/features/clients/contact';
 import { OutboxCard } from '@/features/outbox/OutboxCard';
 import { ActiveSessionBanner } from '@/features/session/ActiveSessionBanner';
 import { t } from '@/i18n';
-import { Avatar, Badge, Button, Icon, IconButton, ListRow, ListSection, Money, Num, PageHeader, SectionLink, Tx, cx } from '@/ui';
+import { Badge, Button, Icon, IconButton, ListRow, ListSection, Money, Num, PageHeader, SectionLink, Tx, cx } from '@/ui';
 import { formatLongDate, timeParts } from '@/ui/format';
 import type { AgendaItem, NextSession } from './homeModel';
 import { useHomeData, type HomeData } from './useHomeData';
@@ -268,7 +269,7 @@ function FollowUp({ home }: { home: HomeData }) {
               <ListRow
                 to={clientUrl(client.id, top?.kind === 'overdue_payment' ? 'payments' : top?.kind === 'no_session_week' ? 'sessions' : 'progress')}
                 className={styles.followLink}
-                leading={<Avatar name={client.name} />}
+                leading={<ClientAvatar client={client} />}
                 title={client.name}
                 subtitle={reasons.map((r, i) => (
                   <span key={r.kind}>

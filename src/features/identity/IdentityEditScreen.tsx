@@ -5,7 +5,7 @@ import { t, type TKey } from '@/i18n';
 import { Button, PageHeader } from '@/ui';
 import { useIdentityDraft } from './identityDraft';
 import { IconLinkSheet, useIconHint } from './IconHint';
-import { ColorSection, LogoSection, NameSection, UnitsSection } from './IdentitySections';
+import { ColorSection, LogoSection, NameSection, TrainerPhotoSection, UnitsSection } from './IdentitySections';
 import styles from './Identity.module.css';
 
 const SECTIONS = [
@@ -54,6 +54,13 @@ export function IdentityEditScreen() {
             )}
           </section>
         ))}
+        <section className={`${styles.editSection} ${styles.editSave}`} aria-labelledby="identity-photo">
+          <h2 id="identity-photo" className={styles.editTitle}>
+            {t('files.trainerPhoto.title')}
+          </h2>
+          <p className={styles.editLead}>{t('files.trainerPhoto.lead')}</p>
+          <TrainerPhotoSection draft={draft} update={update} />
+        </section>
         <div className={styles.editSave}>
           <Button
             size="large"

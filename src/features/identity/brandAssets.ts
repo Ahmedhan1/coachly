@@ -158,3 +158,33 @@ export async function clientPageLogo(services: Pick<AppServices, 'data'>): Promi
   }
 }
 
+
+/** The trainer's photo for the client page (small JPEG data URL ≤ 60 000 chars), or null. */
+export async function clientPageTrainerPhoto(services: Pick<AppServices, 'data'>): Promise<string | null> {
+  const s = await services.data.repos.settings.get();
+  const blob = s.photoImageId ? await services.data.repos.images.getBlob(s.photoImageId) : undefined;
+  const bmp = blob ? await bitmapOf(blob) : null;
+  if (!bmp) return null;
+  try {
+    for (const max of [160, 120, 96]) {
+      const side = Math.min(1, max / Math.max(bmp.width, bmp.height));
+      const w = Math.max(1, Math.round(bmp.width * side));
+      const h = Math.max(1, Math.round(bmp.height * side));
+      const canvas = document.createElement('canvas');
+      canvas.width = w;
+      canvas.height = h;
+      const ctx = canvas.getContext('2d');
+      if (!ctx) return null;
+      ctx.fillStyle = '#ffffff';
+      ctx.fillRect(0, 0, w, h);
+      ctx.drawImage(bmp.source, 0, 0, w, h);
+      const url = canvas.toDataURL('image/jpeg', 0.8);
+      canvas.width = 0;
+      canvas.height = 0;
+      if (url.startsWith('data:image/jpeg;base64,') && url.length <= 60_000) return url;
+    }
+    return null;
+  } finally {
+    bmp.close();
+  }
+}
