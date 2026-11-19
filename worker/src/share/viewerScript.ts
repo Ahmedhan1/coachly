@@ -933,7 +933,7 @@ function myPhotoCard(raw) {
   var row = el('div', 'my-photo-row');
   var face = el('div', 'my-photo-face');
   var input = el('input'); input.type = 'file'; input.accept = 'image/*'; input.name = 'my-photo';
-  var pick = el('label', 'add-photo');
+  var pick = el('label', 'pick-photo');
   pick.appendChild(input);
   pick.appendChild(el('span', '', T.myPhotoPick));
   row.appendChild(face);
@@ -1002,7 +1002,6 @@ function energyPicker() {
 function checkinSection(raw, page) {
   var s = el('section', 'panel');
   s.id = 'p-checkin';
-  s.appendChild(myPhotoCard(raw));
   var card = el('form', 'card');
   card.noValidate = true;
   card.appendChild(el('h3', '', T.checkinTitle));
@@ -1127,6 +1126,7 @@ function checkinSection(raw, page) {
       .then(function () { btn.disabled = false; });
   });
   s.appendChild(card);
+  s.appendChild(myPhotoCard(raw));
   return s;
 }
 
