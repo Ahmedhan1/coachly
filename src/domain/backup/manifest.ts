@@ -23,7 +23,7 @@ export type BackupKind = 'full' | 'photos';
 const ARCHIVE_ID = /^[A-Za-z0-9_-]{1,64}$/;
 export const MANIFEST_PATH = 'manifest.json';
 
-/** Which photo bytes the archive carries. Cloud copies may carry thumbnails or no photos (LIMITS.md policy). */
+/** Which photo bytes the archive carries. Cloud copies may carry thumbnails or no photos (docs/LIMITS.md policy). */
 export type ImageVariant = 'full' | 'thumbnail' | 'none';
 export const IMAGE_VARIANTS: readonly ImageVariant[] = ['full', 'thumbnail', 'none'];
 

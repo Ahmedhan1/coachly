@@ -1,4 +1,4 @@
-// English for src/i18n/features/assistant.ts (AI assistant: chat, confirmation cards, tasks, settings).
+// English for src/i18n/ar/assistant.ts (AI assistant: chat, confirmation cards, tasks, settings).
 import type { EnArea } from './types';
 
 export const assistant: EnArea<'assistant'> = {

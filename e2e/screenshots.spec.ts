@@ -1,7 +1,7 @@
 import { expect, test, type Page } from '@playwright/test';
 import { DEMO_CODE, openAddClient } from './helpers';
 
-const OUT = 'docs/screenshots/phase2b';
+const OUT = 'docs/screenshots/core';
 const DEVICES = [
   { name: 'iphone-se', viewport: { width: 375, height: 667 } },
   { name: 'iphone-pro-max', viewport: { width: 430, height: 932 } },

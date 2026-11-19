@@ -1,6 +1,6 @@
 import { useState, type FormEvent } from 'react';
 import { useServices } from '@/app/services';
-import { useGo } from '@/app/nav';
+import { useGo } from '@/app/shell/nav';
 import { useUiStore } from '@/app/uiStore';
 import { useLive } from '@/app/useLive';
 import { bookingConflicts, type BookingRepeat } from '@/domain/attendance';

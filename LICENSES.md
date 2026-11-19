@@ -203,7 +203,7 @@ Other agents are adding dependencies in `worker/` and the root **right now**. At
    package.json **and** LICENSE file).
 3. Re-check: `react-body-highlighter` with React 19 (Phase 5), drei helpers that fetch remote assets (Phase 6),
    Z-Anatomy NC objects excluded (Phase 6), font OFL.txt files shipped (done in Phase 2b), Rate Limiting binding plan
-   availability (Phase 3, see LIMITS.md).
+   availability (Phase 3, see docs/LIMITS.md).
 
 ## Nutrition data, wave 4 (cookbook + English names)
 
@@ -215,7 +215,7 @@ Other agents are adding dependencies in `worker/` and the root **right now**. At
 
 ### Exercise pack — wave 5 additions (2026-11-18)
 
-- **108 new built-in exercises** (`data-src/exercise-extras.json`, ids `pt_*`): names, muscles, Arabic and English
+- **108 new built-in exercises** (`assets-src/exercises/exercise-extras.json`, ids `pt_*`): names, muscles, Arabic and English
   cues are our own work. They ship with **no new photos** — no new image source was added. Without a photo the app
   shows our own muscle picture (rendered from our 3D model), labelled «العضلات المستهدفة».
 - **17 existing extras now reuse free-exercise-db photos** (`imagesFrom`) of the same movement, after a visual check;

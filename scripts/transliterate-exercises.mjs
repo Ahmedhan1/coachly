@@ -2,7 +2,7 @@
 // Runs every free-exercise-db exercise name through the Arabic fitness dictionary.
 // Usage: node scripts/transliterate-exercises.mjs [input.json] [outDir]
 // Writes <outDir>/exercise-names.ar.json and <outDir>/exercise-names.coverage.json.
-// Names: hand-curated data-src/exercise-names.overrides.ar.json first ("source": "curated"), then the
+// Names: hand-curated assets-src/exercises/exercise-names.overrides.ar.json first ("source": "curated"), then the
 // Egyptian word-order rule naturalExerciseName ("source": "auto"). "popular" marks the الأشهر set.
 // Requires Node >= 22.18 (imports the TypeScript dictionary directly; Node strips the types).
 import { readFileSync, writeFileSync } from 'node:fs';
@@ -17,9 +17,9 @@ import {
 } from '../src/i18n/fitness-terms.ts';
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), '..');
-const input = resolve(process.argv[2] ?? join(root, 'data-src/free-exercise-db/exercises.json'));
-const outDir = resolve(process.argv[3] ?? join(root, 'data-src'));
-const overridesFile = resolve(process.argv[4] ?? join(root, 'data-src/exercise-names.overrides.ar.json'));
+const input = resolve(process.argv[2] ?? join(root, 'assets-src/exercises/free-exercise-db/exercises.json'));
+const outDir = resolve(process.argv[3] ?? join(root, 'assets-src/exercises'));
+const overridesFile = resolve(process.argv[4] ?? join(root, 'assets-src/exercises/exercise-names.overrides.ar.json'));
 
 /** @type {{ names: Record<string, string>, popular: string[] }} */
 const overrides = JSON.parse(readFileSync(overridesFile, 'utf8'));

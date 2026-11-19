@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from 'react';
-import { installPromptState, promptInstall, subscribeInstallPrompt } from '@/app/installPrompt';
+import { installPromptState, promptInstall, subscribeInstallPrompt } from '@/app/pwa/installPrompt';
 import { t, type TKey } from '@/i18n';
 import { Button, Icon } from '@/ui';
 import {

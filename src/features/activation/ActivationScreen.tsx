@@ -5,7 +5,7 @@ import { formatActivationCodeInput, isCompleteActivationCode } from '@/services/
 import type { ActivationError, ActivationState, LockReason } from '@/services/activation/types';
 import { Button, Icon, TextArea, TextField } from '@/ui';
 import { OFFLINE_CODE_PREFIX } from '../../../shared/license';
-import { checkForAppUpdate, setReloadSafe } from '@/app/appUpdate';
+import { checkForAppUpdate, setReloadSafe } from '@/app/pwa/appUpdate';
 import { DeviceIdCard } from './DeviceIdCard';
 import styles from './ActivationScreen.module.css';
 

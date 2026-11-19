@@ -44,7 +44,7 @@ export default defineConfig({
     react(),
     licenseKeyWarning(),
     VitePWA({
-      // A new version waits until the trainer taps "update" (src/app/swUpdate.ts) or closes the app: the open
+      // A new version waits until the trainer taps "update" (src/app/pwa/swUpdate.ts) or closes the app: the open
       // page never mixes old code with a new precache. Registration is done by the app itself.
       registerType: 'prompt',
       injectRegister: false,

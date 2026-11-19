@@ -1,6 +1,6 @@
 // Per-license cap on client-page storage (pages + pending check-ins). Without it one license could hold
 // 200 pages x 5 MiB plus 200 x 20 pending check-ins x 3 MiB (~13 GB): the whole free R2 bucket, after which
-// the global guard refuses every trainer's growing backup. LIMITS.md, "R2 storage".
+// the global guard refuses every trainer's growing backup. docs/LIMITS.md, "R2 storage".
 
 /** Bytes this license currently holds in R2 for client pages and their pending check-ins (two indexed sums). */
 export async function pagesBytes(db: D1Database, lid: string): Promise<number> {

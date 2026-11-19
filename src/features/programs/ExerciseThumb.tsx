@@ -20,7 +20,7 @@ function packImage(exercise: CatalogExercise | undefined): string | null {
 }
 
 /**
- * Exercise photo slot (DESIGN.md §5): the pack photo with the muscle map in a corner badge. Falls back to
+ * Exercise photo slot (docs/DESIGN.md §5): the pack photo with the muscle map in a corner badge. Falls back to
  * the muscle map alone when there is no photo (offline and not cached, 404, trainer-only exercise).
  */
 export function ExerciseThumb({ exercise, size = 'md', tag, className }: ExerciseThumbProps) {
