@@ -58,7 +58,7 @@
   block-size: 24px;
   border-radius: var(--r-full);
   background: var(--surface-2);
-  font: 700 13px/1 var(--font-num);
+  font: var(--t-num-xs);
 }
 
 .pill[aria-current='true'] {
@@ -395,7 +395,7 @@
   border-radius: var(--r-md);
   background: var(--surface);
   color: var(--text);
-  font: 500 11.5px/1 var(--font-ui);
+  font: var(--t-micro);
 }
 
 .stack:disabled {

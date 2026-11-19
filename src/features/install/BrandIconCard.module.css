@@ -40,7 +40,7 @@
 }
 
 .title {
-  font: 700 17px/1.35 var(--font-display);
+  font: var(--t-heading);
 }
 
 .lead {
@@ -57,7 +57,7 @@
   border-radius: var(--r-full);
   background: var(--brand);
   color: var(--brand-on);
-  font: 700 17px/1 var(--font-display);
+  font: var(--t-heading);
   cursor: pointer;
 }
 
@@ -117,7 +117,7 @@
 }
 
 .okTitle {
-  font: 700 16px/1.35 var(--font-display);
+  font: var(--t-heading);
 }
 
 .error {

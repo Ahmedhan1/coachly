@@ -55,7 +55,7 @@
   border-radius: var(--r-full);
   background: var(--surface-2);
   color: var(--text);
-  font: 600 12.5px/1 var(--font-ui);
+  font: var(--t-label);
 }
 
 .brand {

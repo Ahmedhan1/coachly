@@ -32,7 +32,7 @@
 
 .stripRange {
   flex: 1;
-  font: 600 15px/1.3 var(--font-ui);
+  font: var(--t-callout);
   text-align: center;
 }
 
@@ -69,12 +69,12 @@
 }
 
 .dayName {
-  font: 500 12px/1.3 var(--font-ui);
+  font: var(--t-caption);
   color: var(--text-2);
 }
 
 .dayNum {
-  font: 800 19px/1.2 var(--font-num);
+  font: var(--t-num);
 }
 
 .dayCount {
@@ -85,7 +85,7 @@
   padding-inline: 5px;
   border-radius: var(--r-full);
   background: var(--surface-2);
-  font: 700 12px/1 var(--font-num);
+  font: var(--t-num-xs);
 }
 
 .dayCount i {
@@ -169,12 +169,12 @@
   align-items: flex-start;
   flex: none;
   inline-size: 56px;
-  font: 700 19px/1 var(--font-num);
+  font: var(--t-num);
 }
 
 .time small {
   margin-block-start: 3px;
-  font: 400 12px/1.4 var(--font-ui);
+  font: var(--t-caption);
   color: var(--text-2);
 }
 
@@ -228,7 +228,7 @@
   border-radius: var(--r-full);
   background: var(--surface-2);
   color: var(--text-2);
-  font: 500 14px/1.1 var(--font-ui);
+  font: var(--t-control);
   white-space: nowrap;
 }
 
@@ -302,7 +302,7 @@
 }
 
 .weekDate b {
-  font: 700 16px/1.3 var(--font-display);
+  font: var(--t-heading);
 }
 
 .weekDate small {
@@ -322,7 +322,7 @@
 
 .weekCount {
   flex: none;
-  font: 800 22px/1 var(--font-num);
+  font: var(--t-num-md);
 }
 
 .weekCountZero {
@@ -358,7 +358,7 @@
   border-radius: var(--r-sm);
   background: var(--brand);
   color: var(--brand-on);
-  font: 600 15px/1 var(--font-ui);
+  font: var(--t-button);
 }
 
 .save::after {
@@ -502,7 +502,7 @@
   border-radius: var(--r-full);
   background: var(--surface);
   color: var(--text-2);
-  font: 500 12.5px/1 var(--font-ui);
+  font: var(--t-caption);
 }
 
 .dayChipOn {
@@ -541,7 +541,7 @@
 }
 
 .conflictTitle {
-  font: 700 15px/1.4 var(--font-ui);
+  font: var(--t-callout);
 }
 
 .conflictHint {
@@ -599,6 +599,6 @@
   border-radius: var(--r-md);
   background: var(--surface-2);
   color: var(--text);
-  font: 600 16px/1.2 var(--font-ui);
+  font: var(--t-button);
   text-decoration: none;
 }

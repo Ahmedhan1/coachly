@@ -11,7 +11,7 @@
   border-radius: var(--r-sm);
   background: var(--brand);
   color: var(--brand-on);
-  font: 600 15px/1 var(--font-ui);
+  font: var(--t-button);
 }
 
 .save::after {
@@ -124,7 +124,7 @@
 
 .cardTitle {
   margin: 0;
-  font: 700 17px/1.3 var(--font-display);
+  font: var(--t-heading);
 }
 
 .cardBody {
@@ -184,7 +184,7 @@
 }
 
 .noteName {
-  font: 600 15px/1.3 var(--font-ui);
+  font: var(--t-callout);
   color: var(--text);
 }
 

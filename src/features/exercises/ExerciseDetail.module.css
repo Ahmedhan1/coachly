@@ -67,7 +67,7 @@
 }
 
 .name {
-  font: 800 26px/1.25 var(--font-display);
+  font: var(--t-large-title);
   overflow-wrap: anywhere;
 }
 
@@ -92,7 +92,7 @@
   padding-inline: 12px;
   border-radius: var(--r-full);
   background: var(--surface);
-  font: 600 13px/1 var(--font-ui);
+  font: var(--t-label);
 }
 
 .tagBrand {
@@ -213,7 +213,7 @@
   border-radius: var(--r-full);
   background: var(--brand);
   color: #fff;
-  font: 700 13px/1 var(--font-ui);
+  font: var(--t-label);
 }
 
 .legend {

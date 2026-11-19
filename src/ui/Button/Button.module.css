@@ -8,7 +8,7 @@
   min-inline-size: var(--tap);
   padding-inline: var(--sp-5);
   border-radius: var(--r-md);
-  font: 600 16px/1.2 var(--font-ui);
+  font: var(--t-button);
   text-align: center;
 }
 
@@ -28,7 +28,7 @@
 
 .large {
   min-block-size: 52px;
-  font-size: 17px;
+  font: var(--t-button-lg);
 }
 
 /* 36pt visual, 44pt hit area (docs/DESIGN.md §1.5) */
@@ -37,7 +37,7 @@
   min-inline-size: 0;
   padding-inline: var(--sp-3);
   border-radius: var(--r-sm);
-  font-size: 14px;
+  font: var(--t-button-sm);
 }
 
 .small::after {

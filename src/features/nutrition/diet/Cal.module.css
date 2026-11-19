@@ -84,7 +84,7 @@
   border-radius: var(--r-full);
   background: var(--bg);
   color: var(--text-2);
-  font: 500 14px/1 var(--font-ui);
+  font: var(--t-control);
 }
 
 .chip[aria-pressed='true'] {
@@ -191,7 +191,7 @@
   border-radius: var(--r-md);
   background: var(--bg);
   color: var(--text-2);
-  font: 600 12px/1.2 var(--font-ui);
+  font: var(--t-label);
 }
 
 .cycleDay[data-type='training'] {
@@ -207,7 +207,7 @@
 }
 
 .cycleDay small {
-  font: 500 11px/1 var(--font-ui);
+  font: var(--t-micro);
   opacity: 0.85;
 }
 
@@ -268,7 +268,7 @@
   border-radius: var(--r-full);
   background: var(--bg);
   color: var(--text);
-  font: 500 14px/1 var(--font-ui);
+  font: var(--t-control);
 }
 
 .removable svg {
@@ -321,7 +321,7 @@
   border-radius: var(--r-full);
   background: var(--surface-2);
   color: var(--text-2);
-  font: 500 11px/1.4 var(--font-ui);
+  font: var(--t-micro);
 }
 
 .phaseList {

@@ -17,7 +17,7 @@
 
 .tick {
   fill: var(--text-2);
-  font: 600 11px/1 var(--font-num);
+  font: var(--t-num-xs);
   font-variant-numeric: tabular-nums;
 }
 
@@ -58,5 +58,5 @@
 }
 
 .readout :global(.num) {
-  font: 700 15px/1 var(--font-num);
+  font: var(--t-num-sm);
 }

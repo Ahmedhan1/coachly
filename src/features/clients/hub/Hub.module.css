@@ -28,7 +28,7 @@
   border-radius: var(--r-full);
   background: var(--surface);
   color: var(--text-2);
-  font: 600 15px/1 var(--font-ui);
+  font: var(--t-button);
   white-space: nowrap;
 }
 
@@ -43,7 +43,7 @@
 
 /* ---------- facts (overview) ---------- */
 .factValue {
-  font: 700 17px/1.3 var(--font-num);
+  font: var(--t-num);
 }
 
 .quick {
@@ -65,7 +65,7 @@
   border-radius: var(--r-md);
   background: var(--surface);
   color: var(--text);
-  font: 500 13px/1.2 var(--font-ui);
+  font: var(--t-label);
   text-align: center;
 }
 
@@ -112,7 +112,7 @@
 }
 
 .dayName {
-  font: 600 17px/1.3 var(--font-ui);
+  font: var(--t-heading);
 }
 
 .daySub {
@@ -200,7 +200,7 @@
 
 .stats dd {
   margin: 4px 0 0;
-  font: 800 22px/1.2 var(--font-num);
+  font: var(--t-num-md);
 }
 
 .stats dd small {
@@ -224,7 +224,7 @@
   display: flex;
   justify-content: space-between;
   gap: var(--sp-2);
-  font: 600 15px/1.4 var(--font-ui);
+  font: var(--t-callout);
 }
 
 .entrySets {
@@ -238,7 +238,7 @@
   padding: 2px 8px;
   border-radius: var(--r-full);
   background: var(--surface-2);
-  font: 600 14px/1.6 var(--font-num);
+  font: var(--t-code);
 }
 
 .bestChip {
@@ -255,7 +255,7 @@
 }
 
 .kcal {
-  font: 800 34px/1.1 var(--font-num);
+  font: var(--t-num-xl);
 }
 
 .kcal small {
@@ -278,7 +278,7 @@
 
 .macros dd {
   margin: 2px 0 0;
-  font: 700 17px/1.3 var(--font-num);
+  font: var(--t-num);
 }
 
 .macros dd small {
@@ -292,7 +292,7 @@
 }
 
 .emptyTitle {
-  font: 700 17px/1.3 var(--font-display);
+  font: var(--t-heading);
 }
 
 .emptyBody {

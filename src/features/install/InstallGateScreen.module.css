@@ -21,7 +21,7 @@
   border-radius: var(--r-md);
   background: var(--brand);
   color: var(--brand-on);
-  font: 800 26px/1 var(--font-display);
+  font: var(--t-large-title);
 }
 
 .title {
@@ -59,7 +59,7 @@
   border-radius: var(--r-sm);
   background: var(--text);
   color: var(--bg);
-  font: 800 16px/1 var(--font-num);
+  font: var(--t-num-sm);
 }
 
 .stepText {
@@ -71,7 +71,7 @@
 }
 
 .stepTitle {
-  font: 700 17px/1.35 var(--font-display);
+  font: var(--t-heading);
 }
 
 .stepBody {
@@ -111,5 +111,5 @@
 }
 
 .calloutTitle {
-  font: 700 17px/1.35 var(--font-display);
+  font: var(--t-heading);
 }

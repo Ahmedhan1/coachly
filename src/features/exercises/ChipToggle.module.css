@@ -5,7 +5,7 @@
 }
 
 .label {
-  font: 700 15px/1.3 var(--font-display);
+  font: var(--t-heading);
   color: var(--text);
 }
 
@@ -25,7 +25,7 @@
   border-radius: var(--r-full);
   background: var(--surface-2);
   color: var(--text);
-  font: 500 14px/1 var(--font-ui);
+  font: var(--t-control);
   white-space: nowrap;
 }
 

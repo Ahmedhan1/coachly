@@ -21,7 +21,7 @@
 }
 
 .value {
-  font: 800 34px/1 var(--font-num);
+  font: var(--t-num-xl);
 }
 
 .caption {

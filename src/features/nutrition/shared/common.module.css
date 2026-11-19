@@ -132,7 +132,7 @@
   min-block-size: var(--tap);
   padding-inline: var(--sp-2);
   color: var(--brand-ink);
-  font: 600 16px/1 var(--font-ui);
+  font: var(--t-button);
 }
 
 .sheetSave:disabled {
@@ -178,7 +178,7 @@
   border-radius: var(--r-full);
   background: var(--surface);
   color: var(--text-2);
-  font: 500 14px/1 var(--font-ui);
+  font: var(--t-control);
 }
 
 .chip::after {

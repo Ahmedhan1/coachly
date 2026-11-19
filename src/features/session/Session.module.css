@@ -227,7 +227,7 @@
   border-radius: var(--r-sm);
   background: var(--surface);
   color: var(--text-3);
-  font: 600 13px/1 var(--font-num);
+  font: var(--t-num-xs);
 }
 
 .setChipDone {
@@ -260,7 +260,7 @@
 }
 
 .restClock {
-  font: 700 88px/1 var(--font-num);
+  font: var(--t-num-timer);
   letter-spacing: -0.02em;
 }
 
@@ -355,5 +355,5 @@
   border-radius: var(--r-sm);
   background: var(--warn-tint);
   color: var(--text);
-  font: 600 15px/1.4 var(--font-ui);
+  font: var(--t-callout);
 }

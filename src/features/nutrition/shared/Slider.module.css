@@ -17,7 +17,7 @@
 }
 
 .value :global(.num) {
-  font: 800 20px/1 var(--font-num);
+  font: var(--t-num);
 }
 
 .unit {
@@ -38,6 +38,6 @@
 .ends {
   display: flex;
   justify-content: space-between;
-  font: 500 11px/1 var(--font-num);
+  font: var(--t-num-xs);
   color: var(--text-3);
 }

@@ -37,7 +37,7 @@
   justify-content: center;
   gap: 3px;
   color: var(--text-3);
-  font: 500 11px/1.1 var(--font-ui);
+  font: var(--t-micro);
 }
 
 .active {

@@ -92,7 +92,7 @@
 }
 
 .compactTitle {
-  font: 600 17px/1.2 var(--font-ui);
+  font: var(--t-heading);
   text-align: center;
   white-space: nowrap;
   overflow: hidden;

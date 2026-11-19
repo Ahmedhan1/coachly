@@ -45,7 +45,7 @@
   min-block-size: var(--tap);
   padding-inline: var(--sp-3);
   color: var(--bg);
-  font: 700 15px/1 var(--font-ui);
+  font: var(--t-button);
   text-decoration: underline;
   text-underline-offset: 4px;
 }

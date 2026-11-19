@@ -20,7 +20,7 @@
   gap: 2px;
   background: var(--danger);
   color: var(--on-danger);
-  font: 600 12.5px/1.2 var(--font-ui);
+  font: var(--t-label);
 }
 
 .content {

@@ -15,7 +15,7 @@
   border-radius: var(--r-md);
   background: var(--brand);
   color: var(--brand-on);
-  font: 800 26px/1 var(--font-display);
+  font: var(--t-large-title);
 }
 
 .title {
@@ -39,7 +39,7 @@
 }
 
 .lockedTitle {
-  font: 700 16px/1.4 var(--font-display);
+  font: var(--t-heading);
 }
 
 .form {
@@ -53,7 +53,7 @@
 }
 
 .codeField input {
-  font: 700 22px/1 var(--font-num);
+  font: var(--t-num-md);
   letter-spacing: 0.08em;
   text-align: center;
 }
@@ -78,7 +78,6 @@
   flex: 1;
   font: var(--t-label);
   color: var(--text-2);
-  font-family: var(--font-ui);
 }
 
 .copied {
@@ -89,7 +88,7 @@
 .deviceId {
   display: block;
   margin-block: var(--sp-2);
-  font: 600 15px/1.5 var(--font-num);
+  font: var(--t-code);
   overflow-wrap: anywhere;
   user-select: all;
   -webkit-user-select: all;
@@ -104,7 +103,7 @@
 .detail,
 .build {
   margin: 0;
-  font-size: var(--t-caption);
+  font: var(--t-caption);
   color: var(--text-3);
   text-align: center;
   font-variant-numeric: tabular-nums;

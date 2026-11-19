@@ -8,7 +8,7 @@
   border-radius: var(--r-full);
   background: var(--text);
   color: var(--bg);
-  font: 800 16px/1 var(--font-display);
+  font: var(--t-heading);
 }
 
 /* ---------- Hero: next session, fully in brand ---------- */
@@ -24,7 +24,7 @@
   display: flex;
   align-items: center;
   gap: 6px;
-  font: 600 13px/1.2 var(--font-ui);
+  font: var(--t-label);
 }
 
 .heroTop i {
@@ -39,11 +39,11 @@
   align-items: baseline;
   gap: 8px;
   margin-block-start: var(--sp-3);
-  font: 800 52px/1 var(--font-display);
+  font: var(--t-num-hero);
 }
 
 .heroTime small {
-  font: 700 20px/1 var(--font-display);
+  font: var(--t-title);
 }
 
 .heroWho {
@@ -54,7 +54,7 @@
   background: none;
   color: inherit;
   text-align: start;
-  font: 700 22px/1.3 var(--font-display);
+  font: var(--t-title);
   overflow-wrap: anywhere;
   cursor: pointer;
 }
@@ -96,7 +96,7 @@
 }
 
 .noNextTitle {
-  font: 700 20px/1.3 var(--font-display);
+  font: var(--t-title);
 }
 
 .noNextBody {
@@ -115,12 +115,12 @@
   flex-direction: column;
   align-items: flex-start;
   inline-size: 56px;
-  font: 700 19px/1 var(--font-num);
+  font: var(--t-num);
 }
 
 .time small {
   margin-block-start: 3px;
-  font: 400 12px/1.4 var(--font-ui);
+  font: var(--t-caption);
   color: var(--text-2);
 }
 
@@ -165,7 +165,7 @@
 }
 
 .money :global(.num) {
-  font: 600 14px/1 var(--font-num);
+  font: var(--t-num-sm);
   color: var(--text);
 }
 
@@ -181,15 +181,15 @@
 }
 
 .expLeft b {
-  font: 800 24px/1 var(--font-num);
+  font: var(--t-num-md);
 }
 
 .expLeft b:not(:has(.num)) {
-  font: 700 15px/1.6 var(--font-display);
+  font: var(--t-heading);
 }
 
 .expLeft small {
-  font: 400 11.5px/1.3 var(--font-ui);
+  font: var(--t-micro);
   color: var(--text-2);
 }
 
@@ -248,7 +248,7 @@
 }
 
 .demoTitle {
-  font: 700 15px/1.4 var(--font-display);
+  font: var(--t-heading);
 }
 
 .demoBody {
