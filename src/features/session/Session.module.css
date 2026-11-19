@@ -13,8 +13,16 @@
   align-items: center;
   gap: var(--sp-3);
   padding: calc(var(--safe-top) + var(--sp-2)) var(--gutter) var(--sp-2);
-  border-block-end: var(--hairline) solid var(--line);
+  border-block-end: var(--hairline) solid var(--material-line);
   background: var(--bg);
+  -webkit-backdrop-filter: var(--material-blur);
+  backdrop-filter: var(--material-blur);
+}
+
+@supports ((-webkit-backdrop-filter: blur(1px)) or (backdrop-filter: blur(1px))) {
+  .top {
+    background: var(--material-bg);
+  }
 }
 
 .topText {

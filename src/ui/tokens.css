@@ -54,6 +54,8 @@
   --tap: 44px;
   --row-h: 60px;
   --tabbar-h: 56px;
+  /* Compact top bar shown when a large title scrolls away (PageHeader); sticky strips sit under it. */
+  --navbar-h: 44px;
   --field-h: 48px;
   --icon: 24px;
   --content-max: 640px;
@@ -110,6 +112,12 @@
   --field-border: 0;
 
   --shadow-sheet: 0 -8px 40px rgb(0 0 0 / 0.18);
+
+  /* iOS "material": translucent bars that blur what scrolls under them (tab bar, bottom action bars).
+     Resolved per scheme because --bg changes; solid --bg where backdrop-filter is missing (base.css). */
+  --material-bg: color-mix(in srgb, var(--bg) 80%, transparent);
+  --material-blur: saturate(180%) blur(20px);
+  --material-line: color-mix(in srgb, var(--text) 10%, transparent);
   --shadow-raise: none;
 }
 
