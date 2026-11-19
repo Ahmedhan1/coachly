@@ -38,9 +38,8 @@ export interface StarterRecipe {
   photo?: string;
 }
 
-/** Version of the shipped food table and recipe book. Bumping it makes existing installs merge in what is new. */
-export const STARTER_FOOD_VERSION: number = ingredientsJson.version;
-export const STARTER_RECIPE_VERSION: number = recipesJson.version;
+// Data versions live in ./versions.ts (checked on every launch without loading this module); a test keeps them
+// equal to the `version` fields of the JSON files. Import this module only with `await import(...)` from app code.
 
 /** The starter ingredient table (per 100 g, approximate — see README.md next to this file). */
 export function starterIngredients(): IngredientEntry[] {
