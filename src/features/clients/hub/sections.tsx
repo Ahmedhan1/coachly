@@ -128,11 +128,24 @@ export function InjuriesSection({ client }: { client: Client }) {
   );
 }
 
-export function PaymentsSection({ payments, today, owed, currency, onAdd, onOpen }: { payments: Payment[]; today: string; owed: number; currency: string; onAdd: () => void; onOpen: (p: Payment) => void }) {
+/** "باقي عليه 700 · اتدفع 300 من 1,000": the balance and, with a priced package, how it was worked out. */
+function paymentsFooter(owed: number, packagePaid: PackagePaid | null, currency: string): string | undefined {
+  const balance = owed > 0 ? t('schedule.pay.balance', { amount: formatMoney(owed, currency) }) : null;
+  if (!packagePaid) return balance ?? undefined;
+  const progress =
+    packagePaid.paidMinor >= packagePaid.priceMinor
+      ? t('schedule.pay.paidInFull')
+      : t('schedule.pay.paidOfPrice', { paid: formatMoney(packagePaid.paidMinor, currency), price: formatMoney(packagePaid.priceMinor, currency) });
+  return balance ? `${balance} · ${progress}` : progress;
+}
+
+type PackagePaid = { paidMinor: number; priceMinor: number };
+
+export function PaymentsSection({ payments, today, owed, packagePaid = null, currency, onAdd, onOpen }: { payments: Payment[]; today: string; owed: number; packagePaid?: PackagePaid | null; currency: string; onAdd: () => void; onOpen: (p: Payment) => void }) {
   return (
     <ListSection
       title={t('clientDetail.payments')}
-      footer={owed > 0 ? t('schedule.pay.balance', { amount: formatMoney(owed, currency) }) : undefined}
+      footer={paymentsFooter(owed, packagePaid, currency)}
       action={
         <Button size="small" variant="plain" icon="plus" onClick={onAdd}>
           {t('clientDetail.addPayment')}

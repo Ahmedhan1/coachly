@@ -209,6 +209,8 @@ export const schedule: EnArea<'schedule'> = {
     partialHint: 'Partial payment: the remaining {amount} stays due.',
     savedPartial: '{paid} recorded, {rest} still due',
     balance: '{amount} still due',
+    paidOfPrice: '{paid} of {price} paid',
+    paidInFull: 'Package paid in full',
     methods: {
       cash: 'Cash',
       instapay: 'InstaPay',

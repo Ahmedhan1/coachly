@@ -207,6 +207,8 @@ export const schedule = {
     partialHint: 'دفعة جزئية: الباقي {amount} هيفضل مستحق عليه.',
     savedPartial: 'اتسجل {paid}، وباقي عليه {rest}',
     balance: 'باقي عليه {amount}',
+    paidOfPrice: 'اتدفع {paid} من {price}',
+    paidInFull: 'الباقة مدفوعة بالكامل',
     methods: {
       cash: 'كاش',
       instapay: 'إنستاباي',
