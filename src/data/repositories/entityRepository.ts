@@ -73,6 +73,20 @@ export class EntityRepository<T extends StoredEntity> {
     return entity;
   }
 
+  /**
+   * Creates many rows in a single IndexedDB write (all validated first; nothing is written if one is invalid).
+   * For bulk inserts such as the starter recipe book: one transaction instead of one per row, so the trainer's
+   * own writes are never queued behind hundreds of small ones.
+   */
+  async createMany(inputs: readonly NewEntity<T>[]): Promise<T[]> {
+    const now = this.ctx.clock();
+    const entities = inputs.map((input) =>
+      this.schema.parse({ ...input, id: this.ctx.newId(), createdAt: now, updatedAt: now, deletedAt: null, demo: input.demo ?? false }),
+    );
+    await this.table.bulkAdd(entities);
+    return entities;
+  }
+
   async update(id: string, patch: EntityPatch<T>): Promise<T> {
     return this.ctx.db.transaction('rw', this.table, async () => {
       const existing = await this.require(id);

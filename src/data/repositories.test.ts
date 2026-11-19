@@ -24,6 +24,22 @@ describe('EntityRepository via clients', () => {
     expect(await db.clients.count()).toBe(0);
   });
 
+  it('createMany writes all rows in one go, in order, with ids and timestamps', async () => {
+    const { repos, clock } = createTestData();
+    const rows = await repos.clients.createMany([newClient('سارة'), newClient('منى')]);
+    expect(rows.map((r) => [r.id, r.name, r.createdAt, r.deletedAt])).toEqual([
+      ['id1', 'سارة', clock(), null],
+      ['id2', 'منى', clock(), null],
+    ]);
+    expect((await repos.clients.list()).map((r) => r.name).sort()).toEqual(['سارة', 'منى']);
+  });
+
+  it('createMany writes nothing when any row is invalid', async () => {
+    const { repos, db } = createTestData();
+    await expect(repos.clients.createMany([newClient('سارة'), newClient('  ')])).rejects.toBeInstanceOf(ZodError);
+    expect(await db.clients.count()).toBe(0);
+  });
+
   it('updates, bumping updatedAt and keeping createdAt', async () => {
     const { repos, clock } = createTestData();
     const c = await repos.clients.create(newClient('سارة'));
