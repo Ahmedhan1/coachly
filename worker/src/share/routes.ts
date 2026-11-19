@@ -137,7 +137,7 @@ function etagOf(row: ShareRow): string {
 /** GET /api/share/:shareId (public) — the encrypted page content. */
 async function readShare(request: Request, deps: Deps, clientKey: string, shareId: string): Promise<Response> {
   const now = deps.now();
-  // Memory only: two D1 writes per page view would be the largest D1 write cost at 500 trainers (LIMITS.md).
+  // Memory only: two D1 writes per page view would be the largest D1 write cost at 500 trainers (docs/LIMITS.md).
   // A read needs the unguessable 128-bit page id, R2 reads are cheap (10 M Class B / month), and 304s cost none.
   if (!(await deps.localLimiter.hit(RULES.shareReadIp, clientKey, now))) return json({ error: 'rate_limited' }, 429);
   if (!(await deps.localLimiter.hit(RULES.shareReadPage, shareId, now))) return json({ error: 'rate_limited' }, 429);

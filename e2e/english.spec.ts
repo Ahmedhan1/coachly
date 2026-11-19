@@ -1,6 +1,6 @@
 import { existsSync } from 'node:fs';
 import { expect, test, type Page } from '@playwright/test';
-import { nutrition as arNutrition } from '../src/i18n/features/nutrition';
+import { nutrition as arNutrition } from '../src/i18n/ar/nutrition';
 import { openApp } from './helpers';
 
 /**

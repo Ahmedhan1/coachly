@@ -1,6 +1,6 @@
 /*
- * Design tokens — direction B «الحديد» (Iron), the owner's choice (DESIGN.md §5).
- * Ported from design/direction-b/tokens.css; token NAMES follow DESIGN.md §3.
+ * Design tokens — direction B «الحديد» (Iron), the owner's choice (docs/DESIGN.md §5).
+ * Ported from design/direction-b/tokens.css; token NAMES follow docs/DESIGN.md §3.
  * This is the ONLY place visual values live.
  *
  * Brand: the trainer picks one color; src/domain/branding derives every brand token for light and dark
@@ -64,7 +64,7 @@
   --safe-left: env(safe-area-inset-left, 0px);
   --safe-right: env(safe-area-inset-right, 0px);
 
-  /* Motion — only sheets, toasts and swipe move (DESIGN.md §6) */
+  /* Motion — only sheets, toasts and swipe move (docs/DESIGN.md §6) */
   --dur-1: 120ms;
   --dur-2: 200ms;
   --dur-3: 300ms;

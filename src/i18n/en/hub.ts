@@ -1,4 +1,4 @@
-// English for src/i18n/features/hub.ts (client hub, Home follow-ups, global search, connected session flow).
+// English for src/i18n/ar/hub.ts (client hub, Home follow-ups, global search, connected session flow).
 import type { EnArea } from './types';
 
 export const hub: EnArea<'hub'> = {

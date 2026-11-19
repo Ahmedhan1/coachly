@@ -31,7 +31,7 @@ function deepShade(brand: string): string {
   return '#000000';
 }
 
-/** Text-safe variants of the trainer's color for white paper (same rules as the app, DESIGN.md §2). */
+/** Text-safe variants of the trainer's color for white paper (same rules as the app, docs/DESIGN.md §2). */
 export function pdfColors(primary: string): Pick<PdfTheme, 'primaryColor' | 'onPrimary' | 'primaryInk' | 'primaryTint' | 'primaryDeep'> {
   const hex = normalizeHex(primary) ?? FALLBACK_PRIMARY;
   const t = deriveBrand(hex, PAPER).light;

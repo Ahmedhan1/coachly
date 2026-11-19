@@ -31,7 +31,7 @@ describe('check-forbidden-words', () => {
   it('passes on clean input', () => {
     const root = makeRoot({
       'src/i18n/ar.ts': "export const ar = { glutes: 'جلوتس', curl: 'بايسبس كيرل' };\n",
-      'data-src/exercise-names.ar.json': JSON.stringify([{ ar: 'بار سكوات' }], null, 2),
+      'assets-src/exercises/exercise-names.ar.json': JSON.stringify([{ ar: 'بار سكوات' }], null, 2),
     });
     const result = run(root);
     expect(result.status).toBe(0);
@@ -50,7 +50,7 @@ describe('check-forbidden-words', () => {
 
   it('fails on a planted forbidden word in exercise data JSON', () => {
     const root = makeRoot({
-      'data-src/exercise-names.ar.json': JSON.stringify([{ ar: 'سكوات' }, { ar: `تمرين ${planted}` }], null, 2),
+      'assets-src/exercises/exercise-names.ar.json': JSON.stringify([{ ar: 'سكوات' }, { ar: `تمرين ${planted}` }], null, 2),
     });
     const result = run(root);
     expect(result.status).toBe(1);

@@ -39,7 +39,7 @@ for something you did not run.
 11. **Forbidden words in the translation file and the exercise data** — `npm run check:words`.
 12. **Licenses** — every dependency in root and `worker/` is listed in `LICENSES.md`; no GPL/AGPL in shipped
     code (run the license scan script once it exists; until then, read each new package's license).
-13. **Limits sanity** — `LIMITS.md` re-verified against the Cloudflare docs on release day if the release
+13. **Limits sanity** — `docs/LIMITS.md` re-verified against the Cloudflare docs on release day if the release
     touches the Worker, D1, R2 or cron.
 14. **Secrets** — no private key, `.dev.vars`, `*.pem`/`*.key` or `ADMIN_PASSWORD` in the repo or in `dist/`
     (`git ls-files` and a grep of the built bundle for key material).
