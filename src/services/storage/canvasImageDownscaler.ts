@@ -1,3 +1,4 @@
+import { drawImageToCanvas, fillBehind } from './drawImage';
 import { fitWithin } from './targetSize';
 import { DEFAULT_JPEG_QUALITY, DEFAULT_MAX_IMAGE_SIDE, type DownscaledImage, type ImageDownscaler } from './types';
 
@@ -21,23 +22,18 @@ export function hasTransparency(rgba: Uint8ClampedArray, step = 4): boolean {
 }
 
 /**
- * Browser implementation: decode with createImageBitmap (respects EXIF orientation), draw onto a canvas at the
- * fitted size, export JPEG (PNG when the picture has transparency, e.g. a logo). Needs a real browser;
- * covered by e2e/manual QA.
+ * Browser implementation: decode (createImageBitmap, falling back to <img> when Safari draws nothing, see
+ * drawImage.ts), draw onto a canvas at the fitted size, export JPEG (PNG when the picture has transparency,
+ * e.g. a logo). Needs a real browser; covered by e2e/manual QA.
  */
 export class CanvasImageDownscaler implements ImageDownscaler {
   constructor(private readonly quality = DEFAULT_JPEG_QUALITY) {}
 
   async downscale(input: Blob, maxSide = DEFAULT_MAX_IMAGE_SIDE): Promise<DownscaledImage> {
-    const bitmap = await createImageBitmap(input, { imageOrientation: 'from-image' });
+    const drawn = await drawImageToCanvas(input, (w, h) => fitWithin(w, h, maxSide));
+    const { canvas, context } = drawn;
     try {
-      const size = fitWithin(bitmap.width, bitmap.height, maxSide);
-      const canvas = document.createElement('canvas');
-      canvas.width = size.width;
-      canvas.height = size.height;
-      const context = canvas.getContext('2d');
-      if (!context) throw new Error('canvas 2d unavailable');
-      context.drawImage(bitmap, 0, 0, size.width, size.height);
+      const size = { width: canvas.width, height: canvas.height };
       let alpha = false;
       if (MAY_HAVE_ALPHA.has(input.type)) {
         try {
@@ -46,16 +42,18 @@ export class CanvasImageDownscaler implements ImageDownscaler {
           alpha = true;
         }
       }
+      if (!alpha) fillBehind(drawn, '#ffffff');
       const type = alpha ? 'image/png' : 'image/jpeg';
       const encoded = await new Promise<Blob>((resolve, reject) =>
         canvas.toBlob((b) => (b ? resolve(b) : reject(new Error('encode failed'))), type, alpha ? undefined : this.quality),
       );
-      const fits = size.width === bitmap.width && size.height === bitmap.height;
+      const fits = size.width === drawn.sourceWidth && size.height === drawn.sourceHeight;
       // EXIF-rotated originals must be re-encoded so they display upright everywhere.
       const blob = fits && input.type === 'image/jpeg' ? encoded : pickStoredBlob(input, encoded, fits);
       return { blob, ...size };
     } finally {
-      bitmap.close();
+      canvas.width = 0;
+      canvas.height = 0;
     }
   }
 }

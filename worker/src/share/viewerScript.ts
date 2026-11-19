@@ -87,6 +87,9 @@ var AR = {
   tooBig: 'الصور كبيرة. جرّب صور أقل.',
   failed: 'ما اتبعتش. اتأكد من النت وجرّب تاني.',
   photoFailed: 'مش قادرين نقرا الصورة دي.',
+  addPhoto: '+ أضف صورة',
+  removePhoto: 'شيل الصورة',
+  photoCount: function (n) { return n + ' من 3 صور'; },
   privateNote: 'الصفحة دي خاصة بيك. ما تبعتش اللينك لحد.',
   days: ['الأحد', 'الاتنين', 'التلات', 'الأربع', 'الخميس', 'الجمعة', 'السبت'],
   am: 'ص',
@@ -198,6 +201,9 @@ var EN = {
   tooBig: 'The photos are too large. Try fewer photos.',
   failed: 'Not sent. Check your internet and try again.',
   photoFailed: 'We could not read this photo.',
+  addPhoto: '+ Add a photo',
+  removePhoto: 'Remove photo',
+  photoCount: function (n) { return n + ' of 3 photos'; },
   privateNote: 'This page is private to you. Do not share the link.',
   days: ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'],
   am: 'am',
@@ -828,29 +834,71 @@ function toNumber(text) {
   if (t === '') return undefined;
   return /^\d{1,3}(\.\d{1,2})?$/.test(t) ? Number(t) : NaN;
 }
-function loadBitmap(file) {
-  if (window.createImageBitmap) return createImageBitmap(file).catch(function () { return loadImage(file); });
-  return loadImage(file);
-}
 function loadImage(file) {
   return new Promise(function (resolve, reject) {
     var url = URL.createObjectURL(file);
     var img = new Image();
-    img.onload = function () { resolve(img); };
-    img.onerror = function () { reject(new Error('img')); };
+    img.onload = function () {
+      var done = function () { resolve({ src: img, w: img.naturalWidth, h: img.naturalHeight, close: function () { URL.revokeObjectURL(url); } }); };
+      if (img.decode) img.decode().then(done, done); else done();
+    };
+    img.onerror = function () { URL.revokeObjectURL(url); reject(new Error('img')); };
     img.src = url;
   });
 }
-/** Downscales to <= 1200 px on the long side and re-encodes as JPEG (drops EXIF, including GPS). */
-function downscale(file) {
-  return loadBitmap(file).then(function (img) {
-    var w = img.width, h = img.height, scale = Math.min(1, 1200 / Math.max(w, h));
-    var canvas = document.createElement('canvas');
-    canvas.width = Math.max(1, Math.round(w * scale));
-    canvas.height = Math.max(1, Math.round(h * scale));
-    canvas.getContext('2d').drawImage(img, 0, 0, canvas.width, canvas.height);
-    return canvas.toDataURL('image/jpeg', 0.8);
+function loadBitmap(file) {
+  if (!window.createImageBitmap) return Promise.resolve(null);
+  return createImageBitmap(file).then(function (b) {
+    return { src: b, w: b.width, h: b.height, close: function () { if (b.close) b.close(); } };
+  }, function () { return null; });
+}
+/** Draws onto a canvas of at most 1200 px on the long side; null when nothing was painted. */
+function paint(pic) {
+  if (!pic.w || !pic.h) return null;
+  var scale = Math.min(1, 1200 / Math.max(pic.w, pic.h));
+  var canvas = document.createElement('canvas');
+  canvas.width = Math.max(1, Math.round(pic.w * scale));
+  canvas.height = Math.max(1, Math.round(pic.h * scale));
+  var ctx = canvas.getContext('2d');
+  if (!ctx) return null;
+  ctx.drawImage(pic.src, 0, 0, canvas.width, canvas.height);
+  try {
+    var px = ctx.getImageData(0, 0, canvas.width, canvas.height).data, any = false;
+    for (var i = 3; i < px.length; i += 28) if (px[i] !== 0) { any = true; break; }
+    if (!any) { canvas.width = 0; canvas.height = 0; return null; }
+  } catch (e) { /* cannot read back: keep the draw */ }
+  ctx.globalCompositeOperation = 'destination-over';
+  ctx.fillStyle = '#ffffff';
+  ctx.fillRect(0, 0, canvas.width, canvas.height);
+  return canvas;
+}
+function drawWith(load, file) {
+  return load(file).then(function (pic) {
+    if (!pic) return null;
+    try { return paint(pic); } finally { pic.close(); }
   });
+}
+/**
+ * Downscales to <= 1200 px on the long side and re-encodes as JPEG (drops EXIF, including GPS). iPhone Safari
+ * can return a bitmap that draws nothing; then the photo is decoded again through an <img>.
+ */
+function downscale(file) {
+  return drawWith(loadBitmap, file)
+    .then(function (canvas) { return canvas || drawWith(loadImage, file); })
+    .then(function (canvas) {
+      if (!canvas) throw new Error('photo');
+      var url = canvas.toDataURL('image/jpeg', 0.8);
+      canvas.width = 0; canvas.height = 0;
+      if (url.indexOf('data:image/jpeg;base64,') !== 0) throw new Error('photo');
+      return url;
+    });
+}
+/** One photo at a time: three full-size iPhone photos decoded at once can run Safari out of memory. */
+function downscaleAll(files) {
+  var out = [];
+  return files.reduce(function (p, f) {
+    return p.then(function () { return downscale(f).then(function (u) { out.push(u); }); });
+  }, Promise.resolve()).then(function () { return out; });
 }
 
 var RANGES = { weight: [20, 400], waist: [30, 300], neck: [20, 100], hip: [30, 300], chest: [30, 300], arm: [10, 150], thigh: [20, 200], sleep: [0, 24], adherence: [0, 100] };
@@ -907,22 +955,50 @@ function checkinSection(raw, page) {
   week.appendChild(row3);
   card.appendChild(week);
   var notes = el('textarea'); notes.name = 'notes'; notes.maxLength = 1000; notes.rows = 3;
+  // Photos are collected across picks (front, side, back are often taken one at a time with the camera),
+  // up to 3; each thumbnail has its own remove button.
+  var chosen = [];
   var photo = el('input'); photo.name = 'photo'; photo.type = 'file'; photo.accept = 'image/*'; photo.multiple = true;
   var thumbs = el('div', 'thumbs');
-  var urls = [];
-  photo.addEventListener('change', function () {
-    urls.forEach(function (u) { URL.revokeObjectURL(u); });
-    urls = [];
+  var addBtn = el('label', 'add-photo');
+  var addText = el('span', '', T.addPhoto);
+  addBtn.appendChild(photo);
+  addBtn.appendChild(addText);
+  var photoBox = el('div', 'field');
+  photoBox.appendChild(el('span', 'label', T.photo));
+  photoBox.appendChild(thumbs);
+  photoBox.appendChild(addBtn);
+  var drawThumbs = function () {
     thumbs.textContent = '';
-    Array.prototype.slice.call(photo.files || [], 0, 3).forEach(function (f) {
-      var u = URL.createObjectURL(f);
-      urls.push(u);
-      var i = el('img'); i.alt = ''; i.src = u;
-      thumbs.appendChild(i);
+    chosen.forEach(function (p, idx) {
+      var t = el('div', 'thumb');
+      var i = el('img'); i.alt = ''; i.src = p.url;
+      var x = el('button', 'thumb-x', '×'); x.type = 'button'; x.setAttribute('aria-label', T.removePhoto);
+      x.addEventListener('click', function () {
+        URL.revokeObjectURL(p.url);
+        chosen.splice(idx, 1);
+        drawThumbs();
+      });
+      t.appendChild(i);
+      t.appendChild(x);
+      thumbs.appendChild(t);
     });
+    addBtn.hidden = chosen.length >= 3;
+    thumbs.setAttribute('aria-label', T.photoCount(chosen.length));
+  };
+  var clearPhotos = function () {
+    chosen.forEach(function (p) { URL.revokeObjectURL(p.url); });
+    chosen = [];
+    drawThumbs();
+  };
+  photo.addEventListener('change', function () {
+    Array.prototype.slice.call(photo.files || []).forEach(function (f) {
+      if (chosen.length < 3) chosen.push({ file: f, url: URL.createObjectURL(f) });
+    });
+    photo.value = ''; // so picking the same photo again still fires "change"
+    drawThumbs();
   });
-  card.appendChild(field(T.photo, photo));
-  card.appendChild(thumbs);
+  card.appendChild(photoBox);
   card.appendChild(field(T.checkinNotes, notes));
   if (currentPicks(page).length) card.appendChild(el('p', 'sub picks-note', T.picksSent));
   var status = el('p', 'status'); status.setAttribute('role', 'status');
@@ -945,14 +1021,14 @@ function checkinSection(raw, page) {
     var picked = card.querySelector('input[name=energy]:checked');
     if (picked) { doc.energy = Number(picked.value); anyNumber = true; }
     var n = notes.value.trim();
-    var files = Array.prototype.slice.call(photo.files || [], 0, 3);
+    var files = chosen.map(function (p) { return p.file; });
     if (!anyNumber && !n && !files.length) { say(T.empty, 'err'); return; }
     if (n) doc.notes = n.slice(0, 1000);
     var picks = currentPicks(page);
     if (picks.length) doc.mealPicks = picks;
     btn.disabled = true;
     say(T.sending);
-    Promise.all(files.map(function (f) { return downscale(f); }))
+    downscaleAll(files)
       .then(function (list) {
         if (list[0]) doc.photo = list[0];
         if (list.length > 1) doc.photos = list.slice(1);
@@ -965,7 +1041,7 @@ function checkinSection(raw, page) {
         });
       })
       .then(function (res) {
-        if (res.status === 201) { card.reset(); thumbs.textContent = ''; say(T.sent, 'ok'); }
+        if (res.status === 201) { card.reset(); clearPhotos(); say(T.sent, 'ok'); }
         else if (res.status === 429) say(T.tooMany, 'err');
         else if (res.status === 413) say(T.tooBig, 'err');
         else say(T.failed, 'err');
