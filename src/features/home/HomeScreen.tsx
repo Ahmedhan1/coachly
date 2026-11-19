@@ -1,7 +1,7 @@
 import { ClientAvatar } from '@/features/clients/ClientAvatar';
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useGo } from '@/app/nav';
+import { useGo } from '@/app/shell/nav';
 import { useServices } from '@/app/services';
 import type { FollowUpReason } from '@/domain/clientHub';
 import { bookUrl, clientUrl, sessionUrl } from '@/features/clients/hub/links';

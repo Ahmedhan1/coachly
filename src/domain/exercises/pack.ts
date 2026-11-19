@@ -155,7 +155,7 @@ export interface PackExercise {
   cuesEn?: string[];
   /** 1-based rank in the hand-picked «الأشهر» (most common) set; absent for the rest. */
   popular?: number;
-  /** True for the app's own built-in additions (data-src/exercise-extras.json), not from the dataset. */
+  /** True for the app's own built-in additions (assets-src/exercises/exercise-extras.json), not from the dataset. */
   extra?: boolean;
   /** Joint load (knee / shoulder / lower back). Present on every built-in exercise. */
   jointStress?: JointStress;
@@ -166,7 +166,7 @@ export interface PackExercise {
 }
 
 /**
- * A built-in exercise the dataset lacks (data-src/exercise-extras.json). `imagesFrom` names a dataset
+ * A built-in exercise the dataset lacks (assets-src/exercises/exercise-extras.json). `imagesFrom` names a dataset
  * exercise whose photos truly show the same movement; without it the app draws the muscle map.
  */
 export interface ExtraExercise extends Omit<PackExercise, 'images' | 'popular' | 'extra' | 'cuesEn' | 'jointStress'> {
@@ -182,7 +182,7 @@ export interface ExtraExercise extends Omit<PackExercise, 'images' | 'popular' |
 }
 
 /**
- * A hand-reviewed correction of one exercise (data-src/exercise-fixes.json), applied after the dataset
+ * A hand-reviewed correction of one exercise (assets-src/exercises/exercise-fixes.json), applied after the dataset
  * mapping and the extras. Found by the visual audit of the photos; `reason` says why.
  */
 export interface ExerciseFix {
@@ -296,7 +296,7 @@ const capitalise = (word: string): string =>
  * "A (B)" ("With Bands" becomes a "Band" prefix), "Jogging, Treadmill" into "Treadmill Jogging", leading
  * grips into a suffix ("Lat Pulldown (Wide Grip)"), plurals into the singular, and moves the equipment to
  * the front ("Front Dumbbell Raise" → "Dumbbell Front Raise"). Hand-written names in
- * data-src/exercise-names.en.json win over this.
+ * assets-src/exercises/exercise-names.en.json win over this.
  */
 export function cleanEnglishName(raw: string): string {
   let name = raw.replace(/\s+/g, ' ').trim();
@@ -357,7 +357,7 @@ export function buildPackExercise(
 
 export interface BuildExercisePackInput {
   sources: readonly DatasetExercise[];
-  /** Exercise id → default Arabic name (data-src/exercise-names.ar.json). */
+  /** Exercise id → default Arabic name (assets-src/exercises/exercise-names.ar.json). */
   arabicNames: ReadonlyMap<string, string>;
   /** Exercise id → image file names that really exist in the pack. */
   imagesById: ReadonlyMap<string, readonly string[]>;
@@ -366,14 +366,14 @@ export interface BuildExercisePackInput {
   imageBytes?: number;
   /** Exercise ids of the «الأشهر» set, most common first. */
   popular?: readonly string[];
-  /** Exercise id → Arabic coaching cues for dataset exercises (data-src/exercise-cues.ar.json). */
+  /** Exercise id → Arabic coaching cues for dataset exercises (assets-src/exercises/exercise-cues.ar.json). */
   cues?: ReadonlyMap<string, readonly string[]>;
   extras?: readonly ExtraExercise[];
-  /** Exercise id → hand-written English name (data-src/exercise-names.en.json); wins over the cleaned name. */
+  /** Exercise id → hand-written English name (assets-src/exercises/exercise-names.en.json); wins over the cleaned name. */
   englishNames?: ReadonlyMap<string, string>;
-  /** Exercise id → short English cues (data-src/exercise-cues.en.json), dataset and extras alike. */
+  /** Exercise id → short English cues (assets-src/exercises/exercise-cues.en.json), dataset and extras alike. */
   cuesEn?: ReadonlyMap<string, readonly string[]>;
-  /** Exercise id → hand-reviewed correction (data-src/exercise-fixes.json). */
+  /** Exercise id → hand-reviewed correction (assets-src/exercises/exercise-fixes.json). */
   fixes?: ReadonlyMap<string, ExerciseFix>;
   /** When given, every exercise gets `jointStress` and `homeFriendly` (hand-set values win). */
   jointRules?: JointRules;

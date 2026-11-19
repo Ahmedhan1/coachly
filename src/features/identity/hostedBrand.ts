@@ -1,5 +1,5 @@
 import type { AppServices } from '@/app/services';
-import { readBrandCache } from '@/app/BootSplash';
+import { readBrandCache } from '@/app/pwa/BootSplash';
 import type { BrandHosting, BrandIconSet } from '@/services/brand/brandHosting';
 import { brandParam, brandPath, startupMedia } from '../../../shared/brandIcon';
 import { buildBrandCache, refreshBrandAssets } from './brandAssets';

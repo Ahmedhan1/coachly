@@ -29,7 +29,7 @@ condition or risk to manage · **RED** = do not ship.
 | dexie-react-hooks | 4.4.0 | Apache-2.0 | installed | OK |
 | react | 19.3.1 | MIT | installed | OK |
 | react-dom | 19.3.1 | MIT | installed | OK |
-| react-router-dom | 7.18.5 | MIT | installed (LICENSE.md) | OK |
+| react-router-dom | 7.18.6 | MIT | installed (LICENSE.md) | OK |
 | zod | 4.6.7 | MIT | installed | OK |
 | zustand | 5.1.0 | MIT | installed | OK |
 | @eslint/js | 10.0.1 | MIT | installed | OK (dev only) |
@@ -44,11 +44,12 @@ condition or risk to manage · **RED** = do not ship.
 | fake-indexeddb | 6.2.8 | Apache-2.0 | installed | OK (dev only) |
 | globals | 17.14.0 | MIT | installed | OK (dev only) |
 | jsdom | 31.0.1 | MIT | installed (LICENSE.txt) | OK (dev only) |
-| typescript | 6.0.3 | Apache-2.0 | installed (LICENSE.txt) | OK (dev only) |
+| typescript | 6.0.3 | Apache-2.0 | installed (LICENSE.txt) | OK (dev only; the API typescript-eslint loads) |
+| typescript-native (npm alias of typescript) | 7.0.2 | Apache-2.0 | npm view | OK (dev only; native compiler used by `typecheck`/`build`) |
 | typescript-eslint | 8.73.0 | MIT | installed | OK (dev only) |
 | vite | 8.3.8 | MIT | installed (LICENSE.md) | OK (dev only; its bundled-deps notice is in the file) |
 | vite-plugin-pwa | 2.0.0 | MIT | installed | OK (dev only; Workbox runtime code it injects is MIT) |
-| vitest | 5.1.0 | MIT | installed (LICENSE.md) | OK (dev only) |
+| vitest | 5.1.1 | MIT | installed (LICENSE.md) | OK (dev only) |
 
 ### Transitive scan of root `node_modules` (2026-11-16)
 
@@ -71,11 +72,11 @@ Apache-2.0.
 | Package | Version | License | Verified | Verdict |
 | --- | --- | --- | --- | --- |
 | @noble/ed25519 | 3.2.0 | MIT | installed | OK |
-| @cloudflare/vitest-plugin | 1.8.3 | MIT | installed | OK (dev only) |
-| @cloudflare/workers-types | 5.20261117.1 | MIT OR Apache-2.0 | installed | OK (dev only) |
-| typescript | 6.0.3 | Apache-2.0 | installed | OK (dev only) |
-| vitest | 5.1.0 | MIT | installed | OK (dev only) |
-| wrangler | 4.163.0 | MIT OR Apache-2.0 | installed | OK (dev only) |
+| @cloudflare/vitest-plugin | 1.8.5 | MIT | installed | OK (dev only) |
+| @cloudflare/workers-types | 5.20261119.1 | MIT OR Apache-2.0 | installed | OK (dev only) |
+| typescript | 7.0.2 | Apache-2.0 | installed | OK (dev only) |
+| vitest | 5.1.1 | MIT | installed | OK (dev only) |
+| wrangler | 4.165.0 | MIT OR Apache-2.0 | installed | OK (dev only) |
 
 Transitive scan of `worker/node_modules`: MIT 49, Apache-2.0 7, MIT OR Apache-2.0 4, ISC 1, 0BSD 1, CC0-1.0 1,
 and **2 LGPL packages**:
@@ -203,7 +204,7 @@ Other agents are adding dependencies in `worker/` and the root **right now**. At
    package.json **and** LICENSE file).
 3. Re-check: `react-body-highlighter` with React 19 (Phase 5), drei helpers that fetch remote assets (Phase 6),
    Z-Anatomy NC objects excluded (Phase 6), font OFL.txt files shipped (done in Phase 2b), Rate Limiting binding plan
-   availability (Phase 3, see LIMITS.md).
+   availability (Phase 3, see docs/LIMITS.md).
 
 ## Nutrition data, wave 4 (cookbook + English names)
 
@@ -215,7 +216,7 @@ Other agents are adding dependencies in `worker/` and the root **right now**. At
 
 ### Exercise pack — wave 5 additions (2026-11-18)
 
-- **108 new built-in exercises** (`data-src/exercise-extras.json`, ids `pt_*`): names, muscles, Arabic and English
+- **108 new built-in exercises** (`assets-src/exercises/exercise-extras.json`, ids `pt_*`): names, muscles, Arabic and English
   cues are our own work. They ship with **no new photos** — no new image source was added. Without a photo the app
   shows our own muscle picture (rendered from our 3D model), labelled «العضلات المستهدفة».
 - **17 existing extras now reuse free-exercise-db photos** (`imagesFrom`) of the same movement, after a visual check;

@@ -1,4 +1,4 @@
-// English for src/i18n/features/schedule.ts (schedule, packages, payments, income, WhatsApp templates).
+// English for src/i18n/ar/schedule.ts (schedule, packages, payments, income, WhatsApp templates).
 // WhatsApp template bodies use the English placeholder names {name} {when} {package} {amount}; the domain
 // treats them as aliases of the Arabic ones ({الاسم} {الموعد} {الباقة} {المبلغ}).
 import type { EnArea } from './types';
@@ -209,6 +209,8 @@ export const schedule: EnArea<'schedule'> = {
     partialHint: 'Partial payment: the remaining {amount} stays due.',
     savedPartial: '{paid} recorded, {rest} still due',
     balance: '{amount} still due',
+    paidOfPrice: '{paid} of {price} paid',
+    paidInFull: 'Package paid in full',
     methods: {
       cash: 'Cash',
       instapay: 'InstaPay',

@@ -1,4 +1,4 @@
-// English for src/i18n/features/nutrition.ts (calculator, meal plans, diet planner, cookbook, foods, supplements, progress).
+// English for src/i18n/ar/nutrition.ts (calculator, meal plans, diet planner, cookbook, foods, supplements, progress).
 import type { EnArea } from './types';
 
 export const nutrition: EnArea<'nutrition'> = {

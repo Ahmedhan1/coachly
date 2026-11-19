@@ -36,7 +36,16 @@ function buildId(): string {
 
 export default defineConfig({
   define: { 'import.meta.env.VITE_BUILD_ID': JSON.stringify(buildId()) },
-  resolve: { alias: { '@': fileURLToPath(new URL('./src', import.meta.url)) } },
+  resolve: {
+    alias: [
+      { find: '@', replacement: fileURLToPath(new URL('./src', import.meta.url)) },
+      // jsPDF's optional deps (only for doc.html() / SVG, never used): keep them out of the bundle and precache.
+      ...['html2canvas', 'dompurify', 'canvg'].map((dep) => ({
+        find: new RegExp(`^${dep}$`),
+        replacement: fileURLToPath(new URL('./src/services/pdf/jspdfUnusedDeps.ts', import.meta.url)),
+      })),
+    ],
+  },
   // Same headers as production (deploy/app), so e2e and manual checks run under the real CSP. Not on the dev
   // server: Vite's HMR client needs inline scripts.
   preview: { headers: { ...APP_SECURITY_HEADERS } },
@@ -44,7 +53,7 @@ export default defineConfig({
     react(),
     licenseKeyWarning(),
     VitePWA({
-      // A new version waits until the trainer taps "update" (src/app/swUpdate.ts) or closes the app: the open
+      // A new version waits until the trainer taps "update" (src/app/pwa/swUpdate.ts) or closes the app: the open
       // page never mixes old code with a new precache. Registration is done by the app itself.
       registerType: 'prompt',
       injectRegister: false,

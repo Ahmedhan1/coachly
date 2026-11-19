@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useServices } from '@/app/services';
-import { checkForAppUpdate } from '@/app/appUpdate';
+import { checkForAppUpdate } from '@/app/pwa/appUpdate';
 import { useUiStore } from '@/app/uiStore';
 import { useLive } from '@/app/useLive';
 import { toIsoDate } from '@/domain/models';

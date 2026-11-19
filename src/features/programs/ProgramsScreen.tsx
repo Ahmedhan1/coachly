@@ -1,7 +1,7 @@
 import { useMemo, useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useRepos, useServices } from '@/app/services';
-import { useGo } from '@/app/nav';
+import { useGo } from '@/app/shell/nav';
 import { useUiStore } from '@/app/uiStore';
 import { useLive } from '@/app/useLive';
 import type { Client, ClientId, Program } from '@/domain/models';

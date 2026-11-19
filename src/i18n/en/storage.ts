@@ -1,4 +1,4 @@
-// English for src/i18n/features/storage.ts (device backup, backup card, storage screen, photo archives).
+// English for src/i18n/ar/storage.ts (device backup, backup card, storage screen, photo archives).
 import type { EnArea } from './types';
 
 export const storage: EnArea<'storage'> = {

@@ -1,14 +1,17 @@
 import type { ExerciseId, ProgramDay, ProgramItem } from '../models';
 import { normalizeSupersets } from './supersets';
+import { LIBRARY_TEMPLATES, type LibraryTemplateId } from './templateLibrary';
 import type { LocalIdFactory, ProgramBody } from './types';
 
 /**
- * Built-in program templates (SPEC: Push/Pull/Legs, Upper/Lower, Full Body). Pure data: exercise ids are
+ * Built-in program templates (SPEC: Push/Pull/Legs, Upper/Lower, Full Body, then the library in
+ * templateLibrary.ts: beginner, strength, 5-day split, glutes, home, bodyweight, fat loss, older adults,
+ * kettlebell). Pure data: exercise ids are
  * ids of the bundled pack (public/exercise-pack/exercises.json; a test checks they exist). Names are NOT
  * here — the UI looks them up as i18n keys by `id` and day `key`, so the trainer sees the dictionary
  * transliterations (بوش، بول، ليجز…).
  */
-export type BuiltinTemplateId = 'ppl' | 'upper_lower' | 'full_body';
+export type BuiltinTemplateId = 'ppl' | 'upper_lower' | 'full_body' | LibraryTemplateId;
 
 export interface TemplateItem {
   exerciseId: string;
@@ -118,6 +121,7 @@ export const BUILTIN_TEMPLATES: readonly BuiltinTemplate[] = [
       },
     ],
   },
+  ...LIBRARY_TEMPLATES,
 ];
 
 export function builtinTemplate(id: BuiltinTemplateId): BuiltinTemplate {

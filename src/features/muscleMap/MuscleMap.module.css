@@ -13,7 +13,7 @@
   background: var(--surface);
 }
 
-/* Dark stage even in light mode is fine for the model (DESIGN.md §5). */
+/* Dark stage even in light mode is fine for the model (docs/DESIGN.md §5). */
 .stage {
   position: relative;
   /* Fits under the header with the view buttons above the tab bar on a 667pt phone. */

@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 // Builds the offline exercise pack: public/exercise-pack/exercises.json + public/exercise-pack/img/*.
 //
-// 1. Downloads the free-exercise-db photos (raw.githubusercontent.com) into data-src/free-exercise-db/images/
+// 1. Downloads the free-exercise-db photos (raw.githubusercontent.com) into assets-src/exercises/free-exercise-db/images/
 //    (git-ignored) with a concurrency limit, retries and resume (files already cached are skipped).
 // 2. Resizes each photo to at most --size px on the long side and encodes WebP (JPEG with --format jpeg)
 //    using ImageMagick (`magick`/`convert`) or, if missing, ffmpeg. No npm dependency.
@@ -33,15 +33,15 @@ export const REMOTE_BASE = 'https://raw.githubusercontent.com/yuhonas/free-exerc
 export const SOURCE_LABEL = 'yuhonas/free-exercise-db';
 
 export const DEFAULTS = Object.freeze({
-  source: 'data-src/free-exercise-db/exercises.json',
-  names: 'data-src/exercise-names.ar.json',
-  overrides: 'data-src/exercise-names.overrides.ar.json',
-  extras: 'data-src/exercise-extras.json',
-  fixes: 'data-src/exercise-fixes.json',
-  cues: 'data-src/exercise-cues.ar.json',
-  namesEn: 'data-src/exercise-names.en.json',
-  cuesEn: 'data-src/exercise-cues.en.json',
-  cache: 'data-src/free-exercise-db/images',
+  source: 'assets-src/exercises/free-exercise-db/exercises.json',
+  names: 'assets-src/exercises/exercise-names.ar.json',
+  overrides: 'assets-src/exercises/exercise-names.overrides.ar.json',
+  extras: 'assets-src/exercises/exercise-extras.json',
+  fixes: 'assets-src/exercises/exercise-fixes.json',
+  cues: 'assets-src/exercises/exercise-cues.ar.json',
+  namesEn: 'assets-src/exercises/exercise-names.en.json',
+  cuesEn: 'assets-src/exercises/exercise-cues.en.json',
+  cache: 'assets-src/exercises/free-exercise-db/images',
   out: 'public/exercise-pack',
   size: 480,
   quality: 60,
@@ -332,14 +332,14 @@ export async function buildPack(opts, log = console.log) {
 }
 
 /**
- * `--manifest-only`: rewrites exercises.json from the data-src files (names, cues, English) and keeps the
+ * `--manifest-only`: rewrites exercises.json from the assets-src/exercises files (names, cues, English) and keeps the
  * image list, settings and byte count of the existing manifest. Never touches, downloads or deletes images.
  */
 function rebuildManifestOnly({ sources, arabicNames, shared, manifestFile, imgDir }, log) {
   if (!existsSync(manifestFile)) throw new Error(`--manifest-only needs an existing ${manifestFile}`);
   const previous = JSON.parse(readFileSync(manifestFile, 'utf8'));
   const image = { format: previous.image.format, maxSize: previous.image.maxSize, quality: previous.image.quality };
-  // Every encoded photo that exists on disk (fixes in data-src/exercise-fixes.json then pick which to keep),
+  // Every encoded photo that exists on disk (fixes in assets-src/exercises/exercise-fixes.json then pick which to keep),
   // so a fix can be undone without re-encoding.
   const imagesById = new Map();
   for (const p of planImages(sources, image.format)) {

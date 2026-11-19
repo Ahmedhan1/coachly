@@ -16,9 +16,9 @@ describe('clientOverview', () => {
       client: { package: { totalSessions: 12 }, remainingSessions: 4 },
       sessions: [s('a', -50, 'attended'), s('b', -26, 'attended'), s('n', 30), s('m', 50), s('x', 10, 'cancelled')],
       payments: [
-        { status: 'due', amountMinor: 30_000, dueOn: '2026-11-10' },
-        { status: 'due', amountMinor: 5_000, dueOn: '2026-11-25' },
-        { status: 'paid', amountMinor: 99_000, dueOn: null },
+        { status: 'due', amountMinor: 30_000, dueOn: '2026-11-10', paidOn: null },
+        { status: 'due', amountMinor: 5_000, dueOn: '2026-11-25', paidOn: null },
+        { status: 'paid', amountMinor: 99_000, dueOn: null, paidOn: '2026-11-01' },
       ],
       lastCheckIn: '2026-11-07',
       now: NOW,
@@ -31,6 +31,21 @@ describe('clientOverview', () => {
     expect(o.owedMinor).toBe(35_000);
     expect(o.overdueMinor).toBe(30_000);
     expect(o.checkInDaysAgo).toBe(10);
+  });
+  it('a priced package owes its price minus what was paid in the period (1,000 package, 300 paid, 150 due → 700)', () => {
+    const o = clientOverview({
+      client: { package: { totalSessions: 30, priceMinor: 100_000 }, remainingSessions: 29, startDate: '2026-11-19' },
+      sessions: [],
+      payments: [
+        { status: 'due', amountMinor: 15_000, dueOn: '2026-11-19', paidOn: null },
+        { status: 'paid', amountMinor: 30_000, dueOn: null, paidOn: '2026-11-19' },
+      ],
+      lastCheckIn: null,
+      now: NOW,
+      today: '2026-11-19',
+    });
+    expect(o.owedMinor).toBe(70_000);
+    expect(o.packagePaid).toEqual({ paidMinor: 30_000, priceMinor: 100_000 });
   });
   it('has no package numbers and no check-in when there are none', () => {
     const o = clientOverview({ client: { package: null, remainingSessions: 0 }, sessions: [], payments: [], lastCheckIn: null, now: NOW, today: '2026-11-17' });

@@ -223,6 +223,13 @@ describe('read models', () => {
     expect(JSON.stringify(detail)).not.toContain('0101');
   });
 
+  it('tells the assistant the real balance: package price minus what was paid in the period', () => {
+    const priced = client('c3', 'محمد هاني', { package: { name: '', totalSessions: 30, priceMinor: 100_000, currency: 'EGP' }, startDate: '2026-11-19', endDate: '2026-12-19', remainingSessions: 29 });
+    const paidRow: Payment = { ...due('p9', 'c3', 30_000, '2026-11-19'), status: 'paid', paidOn: '2026-11-19', dueOn: null };
+    const detail = clientDetailView(priced, { programs: [], mealPlans: [], payments: [paidRow, due('p8', 'c3', 15_000, '2026-11-19')], progress: [] }, '2026-11-19', { firstNamesOnly: false });
+    expect(detail.balanceDue).toBe(700);
+  });
+
   it('lists who is late paying, most late first, in major units', () => {
     const v = overdueView([a, b], [due('p1', 'c2', 50000, '2026-11-15'), due('p2', 'c1', 10000, '2026-11-01'), due('p3', 'c1', 5000, '2026-11-12')], '2026-11-17', { firstNamesOnly: false });
     expect(v.unpaid).toEqual([
