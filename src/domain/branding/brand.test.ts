@@ -51,7 +51,7 @@ describe('deriveBrand', () => {
     expect(theme.light.brandOn).toBe(ON_DARK);
     expect(theme.dark.brand).toBe('#F25C1F');
     expect(theme.dark.brandOn).toBe(ON_DARK);
-    // tint-strong matches the reference algorithm and design/direction-b/tokens.css
+    // tint-strong matches the reference algorithm and the Direction B token defaults
     expect(theme.light.brandTintStrong).toBe('#EED0C1');
     expect(theme.dark.brandTintStrong).toBe('#4C2211');
   });

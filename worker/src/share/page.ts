@@ -1,6 +1,6 @@
 // The client page served at GET /c/:shareId: one self-contained Arabic RTL HTML document, inline CSS/JS with a
 // per-response nonce, no third-party requests. The key is read from location.hash and never reaches the server.
-// Styling follows design direction B (design/direction-b/tokens.css) with system fonts (no font downloads).
+// Styling follows design direction B (src/ui/tokens.css) with system fonts (no font downloads).
 // The 3D muscle model is deferred on this page (see docs/CLOUD.md).
 import { escapeHtml } from '../admin/html';
 import { VIEWER_SCRIPT } from './viewerScript';

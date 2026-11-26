@@ -117,8 +117,7 @@ and **2 LGPL packages**:
 | Alexandria | OFL-1.1 | upstream `google/fonts/ofl/alexandria/OFL.txt` fetched 2026-11-16 ("Copyright 2022 The Alexandria Project Authors", no Reserved Font Name) | OK. **Bundled** (display + numbers, direction B) |
 
 **Bundled in the app (Phase 2b, 2026-11-16):** `public/fonts/alexandria-{arabic,latin}.woff2` and
-`public/fonts/readex-pro-{arabic,latin}.woff2` — unmodified Google Fonts woff2 subset files (copied from
-`design/fonts/`, renamed only), declared in `src/ui/fonts.css` with `font-display: swap` and Arabic/Latin
+`public/fonts/readex-pro-{arabic,latin}.woff2` — unmodified Google Fonts woff2 subset files (renamed only), declared in `src/ui/fonts.css` with `font-display: swap` and Arabic/Latin
 `unicode-range`, precached by the service worker. License texts shipped next to them:
 `public/fonts/OFL-Alexandria.txt`, `public/fonts/OFL-ReadexPro.txt` (official upstream files).
 

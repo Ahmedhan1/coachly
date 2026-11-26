@@ -1,22 +1,8 @@
 # DESIGN.md — PT Coach visual system
 
-> **Status: OWNER CHOSE DIRECTION B «الحديد» (Iron) on 2026-11-16.** The app adopts `design/direction-b/tokens.css`; direction A is kept for reference only. Two directions are proposed: **A «الدفتر» (The Ledger)** and
-> **B «الحديد» (Iron)**. The owner picks one from `design/compare.html` / `design/screenshots/compare.png`.
-> Until then, Phase 2 builds components against the shared token *names* below; the chosen direction's
-> `design/direction-*/tokens.css` becomes `src/ui/tokens.css`. Nothing else should need to change.
-
-Files:
-
-| Path | What |
-| --- | --- |
-| `design/direction-a/`, `design/direction-b/` | `tokens.css` (swappable), `ui.css` (component reference), 3 static screens |
-| `design/fonts/` | Locally bundled woff2 (Arabic + Latin subsets, OFL-1.1) + `fonts.css` |
-| `design/icons.svg` | Hand-drawn stroke icon sprite + exercise pictograms (photo-slot stand-ins) |
-| `design/build.mjs` | Injects the sprite, generated front/back muscle maps and the mock status bar into each screen |
-| `design/brand-derive.mjs` | Reference algorithm: one brand hex → all brand tokens (port to `src/domain` with tests) |
-| `design/capture.mjs` | Playwright screenshots (SE 375×667, Pro Max 430×932, light/dark, @2x) |
-
-Regenerate: `node design/build.mjs && node design/capture.mjs`.
+> **Status:** Direction B «الحديد» (Iron), chosen 2026-11-16, is what ships. Its values live in `src/ui/tokens.css`
+> (the only place visual values live); components are in `src/ui`. The original mockups of directions A and B were
+> removed on 2026-11-26 and remain in git history (`git show 708815f:design/`).
 
 ---
 
@@ -101,68 +87,6 @@ Dark mode: `@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]
 
 ---
 
-## 4. Direction A — «الدفتر» The Ledger
-
-**Rationale (عربي):** زي دفتر المدرب الشخصي بس متنظّم: خلفية لون الورق، خطوط رفيعة بتفصل بدل الكروت،
-وعناوين بخط نسخ فيه روح وشخصية. لون الهوية بيظهر في حاجات قليلة ومهمة: الحصة الجاية والزرار الأساسي
-والتبويب الحالي. البحث وزرار الإضافة تحت عند الصباع. هادي ومحترم ومريح للعين، والأرقام مرصوصة زي جدول حسابات.
-
-### Color
-| Token | Light | Dark |
-| --- | --- | --- |
-| `--bg` | `#F4F1EA` warm paper | `#141311` |
-| `--surface` | `#FBFAF7` | `#1C1B18` |
-| `--surface-2` | `#EDE9E0` | `#252320` |
-| `--line` / `--line-strong` | `#E0DBD0` / `#CFC9BC` | `#2F2D29` / `#3D3A35` |
-| `--text` / `-2` / `-3` | `#1B1A17` / `#5E5A52` / `#6A655C` | `#EDEAE3` / `#ABA69C` / `#948F85` |
-| `--ok` `--warn` `--danger` | `#2A7343` `#8C5200` `#B3261E` | `#6BBF85` `#E0A64A` `#F08A80` |
-| brand default | `#1F6B53` (ink same) | fill `#236E56`, ink `#6FA592` |
-
-Brand usage is **sparse**: next-session row tint + dot, active tab, primary button, links, superset rail.
-
-### Type
-- Headings: **Noto Naskh Arabic 700** — `--t-display` 34/1.25 (30 on ≤380px wide), `--t-title` 24/1.3, section titles 21.
-- UI + numbers: **IBM Plex Sans Arabic** 400/500/600/700 — body 16/1.55, headline 17/600, sub 14, caption 12.5.
-- Numbers: Plex, tabular, medium weight, 17px in lists, 28px for the one big package number. Never bigger.
-
-### Space, shape, elevation
-- Gutter 20px; rows 56px min (timeline 64). 4pt scale.
-- Radii: 4 (tags) · 6 (photo slots, small buttons) · 10 (buttons, fields) · 14 (sheet). Lists are full-bleed with hairlines, **not cards**.
-- Hairlines 0.5px. Elevation only on sheets (`--shadow-sheet`) and a 1px lift on the search field; none in dark mode.
-
-### Components
-- **Tab bar**: 5 tabs (الرئيسية، العملاء، المواعيد، التمارين، المزيد), 50pt + safe area, solid `--surface`, hairline top; icons 25px stroke 1.6, active = `--brand-ink` + stroke 2.
-- **Command bar** (Home and list screens): pinned above the tab bar — search field "دوّر على عميل أو تمرين" + square brand "+" (quick add sheet: عميل، حصة، برنامج). Thumb-reachable, iOS-Safari-like.
-- **List row**: title 17/600, sub 14 `--text-2`, trailing value/chevron; separators inset from the start.
-- **Timeline row**: time column (start) `5:00` + `م` under it, a 1px rail with status dot, done rows muted, next row on `--brand-tint` with brand dot + halo.
-- **Swipe**: leading (from the right in RTL) and trailing actions 76px wide each; brand action = `--brand`, neutral = `#6F6A61`, destructive = `--danger`.
-- **Buttons**: primary 50pt brand fill; secondary hairline outline on `--surface`; plain = brand-ink text; small 34pt visual / 44pt hit.
-- **Action bar** (pushed screens): `--surface` + hairline, primary flex-1, secondaries with icon+label; on ≤400px wide secondaries become 50pt icon-only (label kept in `aria-label`).
-- **Fields**: 44pt, `--surface`, hairline `--line-strong`, radius 10, label above in caption.
-- **Tags/chips**: 24px high, radius 4, `--surface-2`; brand/warn/danger variants on tints.
-- **Ledger spec grid** (program): 5 equal columns سيتات/عدات/راحة/تمبو/RPE, hairline cells, caption label over a 16px tabular value.
-- **Sheet**: radius 14 top, grabber 36×5, `--scrim` behind.
-- **Empty state**: one Naskh line saying what to do + one primary button; no illustration ("لسه ما ضفتش عملاء. ابدأ بأول عميل").
-- **Toast/undo**: inverted (`--text` bg), 48pt, "تراجع" underlined, 5s, above the action bar.
-
-### Iconography
-**Updated 2026-11-19 (owner):** filled, rounded icons everywhere — Material Symbols Rounded, fill 1, weight 400
-(Apache-2.0), path data in `src/ui/icons/paths.ts`, rendered by `<Icon>` in `currentColor`. Every section title has
-one in a brand-tinted tile, rows have a leading icon, actions have an icon before the label, section footers start
-with an info icon. The only outline icon is the empty favourite star (to show the off state).
-`design/icons.svg` (the old stroke set) is kept for the design mockups only.
-
-### Photo / 3D treatment
-Photo slots: 60×60 square, radius 6, hairline frame, neutral `--photo` fill; real photos are shown
-unfiltered. Next to each photo a 26×60 back/front body silhouette with target muscles in brand.
-Day header shows front+back at 40×92. 3D viewer: model on `--bg`, muscles `--muscle-off`, target in `--brand`.
-
-### PDF look
-Paper-colored background, Naskh headings, Plex body, hairline-ruled exercise tables exactly like the
-ledger spec grid, brand used only for the trainer's name rule and target muscles. Feels like a printed program.
-
----
-
 ## 5. Direction B — «الحديد» Iron
 
 **Rationale (عربي):** روح صالة الجيم: خط عناوين عريض وتقيل، وأرقام كبيرة بس لما يكون ليها معنى زي ميعاد
@@ -240,8 +164,8 @@ cards with large photos and the muscle badge, sets×reps in big numerals — rea
 
 ## 8. Fonts and licensing
 
-All four families are SIL OFL 1.1 (Google Fonts), bundled as woff2 subsets in `design/fonts/` — they work
-offline and must be listed in `LICENSES.md` when Phase 2 copies them into `public/`. The trainer's
+The app's font families are SIL OFL 1.1 (Google Fonts), bundled as woff2 subsets in `public/fonts/` and listed in
+`LICENSES.md`; they work offline. The trainer's
 font-picker (SPEC: Cairo/Tajawal/Plex) changes `--font-ui` only; `--font-display` stays with the direction.
 
 ## 9. Known gaps (to resolve after the choice)
