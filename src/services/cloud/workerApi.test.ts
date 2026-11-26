@@ -35,10 +35,10 @@ describe('WorkerApi', () => {
     expect(await api.bytes({ method: 'GET', path: '/api/x' })).toEqual({ ok: false, error: 'timeout' });
   });
 
-  it('never calls the network offline or without a license', async () => {
+  it('never calls the network offline or signed out', async () => {
     const fetchFn = vi.fn<FetchFn>();
     expect(await new WorkerApi({ baseUrl: 'https://w.test', tokens, fetchFn, network: { isOnline: () => false, onOnline: () => () => undefined } }).send({ method: 'GET', path: '/' })).toEqual({ ok: false, error: 'offline' });
-    expect(await new WorkerApi({ baseUrl: 'https://w.test', tokens: { getToken: async () => null }, fetchFn }).send({ method: 'GET', path: '/' })).toEqual({ ok: false, error: 'not_activated' });
+    expect(await new WorkerApi({ baseUrl: 'https://w.test', tokens: { getToken: async () => null }, fetchFn }).send({ method: 'GET', path: '/' })).toEqual({ ok: false, error: 'not_signed_in' });
     expect(fetchFn).not.toHaveBeenCalled();
   });
 });

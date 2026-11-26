@@ -38,7 +38,7 @@ export const browserTimers: Timers = {
   clearTimeout: (h) => globalThis.clearTimeout(h as ReturnType<typeof setTimeout>),
 };
 
-export type SchedulerError = CloudError | ExportError | 'not_activated' | 'needs_password' | 'too_large' | 'unexpected';
+export type SchedulerError = CloudError | ExportError | 'not_signed_in' | 'needs_password' | 'too_large' | 'unexpected';
 
 export type SchedulerPhase = 'idle' | 'scheduled' | 'waiting_online' | 'running' | 'retry_wait' | 'stopped';
 
@@ -220,7 +220,7 @@ export class BackupScheduler {
     if (!this.deps.network.isOnline()) return err('offline');
     this.set({ phase: 'running', nextAttemptAt: null });
     const token = await this.deps.tokens.getToken();
-    if (!token) return err('not_activated');
+    if (!token) return err('not_signed_in');
     const password = await this.deps.passwords.getPassword();
     if (!password) return err('needs_password');
 
@@ -289,7 +289,7 @@ export class BackupScheduler {
       this.schedule(canRetryLower ? 0 : delay, 'retry_wait');
       return;
     }
-    // Needs the trainer (password, activation) or cannot shrink further: wait for the next change.
+    // Needs the trainer (password, sign-in) or cannot shrink further: wait for the next change.
     this.set({ lastError: error, phase: 'idle', nextAttemptAt: null, attempt: 0 });
   }
 }

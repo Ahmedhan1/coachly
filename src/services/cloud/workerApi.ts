@@ -16,7 +16,7 @@ export interface WorkerRequest {
   json?: unknown;
   bytes?: Uint8Array;
   headers?: Record<string, string>;
-  /** Public endpoints skip the license token. */
+  /** Public endpoints skip the session token. */
   auth?: boolean;
 }
 
@@ -41,11 +41,11 @@ export class WorkerApi {
     return `${this.base}${path}`;
   }
 
-  async send(req: WorkerRequest): Promise<Result<Response, CloudError | 'not_activated'>> {
+  async send(req: WorkerRequest): Promise<Result<Response, CloudError | 'not_signed_in'>> {
     return this.exchange(req, async (res) => ok(res));
   }
 
-  async json<T>(req: WorkerRequest): Promise<Result<T, CloudError | 'not_activated'>> {
+  async json<T>(req: WorkerRequest): Promise<Result<T, CloudError | 'not_signed_in'>> {
     return this.exchange(req, async (res) => {
       const text = await res.text();
       try {
@@ -56,7 +56,7 @@ export class WorkerApi {
     });
   }
 
-  async bytes(req: WorkerRequest): Promise<Result<Uint8Array, CloudError | 'not_activated'>> {
+  async bytes(req: WorkerRequest): Promise<Result<Uint8Array, CloudError | 'not_signed_in'>> {
     return this.exchange(req, async (res) => ok(new Uint8Array(await res.arrayBuffer())));
   }
 
@@ -67,13 +67,13 @@ export class WorkerApi {
   private async exchange<T>(
     req: WorkerRequest,
     read: (res: Response) => Promise<Result<T, CloudError>>,
-  ): Promise<Result<T, CloudError | 'not_activated'>> {
+  ): Promise<Result<T, CloudError | 'not_signed_in'>> {
     if (!this.configured) return err('network');
     if (this.o.network && !this.o.network.isOnline()) return err('offline');
     const headers: Record<string, string> = { ...req.headers };
     if (req.auth !== false) {
       const token = await this.o.tokens.getToken();
-      if (!token) return err('not_activated');
+      if (!token) return err('not_signed_in');
       headers.Authorization = `Bearer ${token}`;
     }
     let body: BodyInit | undefined;

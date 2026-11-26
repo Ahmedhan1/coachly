@@ -24,7 +24,6 @@ condition or risk to manage · **RED** = do not ship.
 
 | Package | Version | License | Verified | Verdict |
 | --- | --- | --- | --- | --- |
-| @noble/ed25519 | 3.2.0 | MIT | installed (LICENSE: "The MIT License (MIT)") | OK |
 | dexie | 4.4.7 | Apache-2.0 | installed (LICENSE: Apache License) | OK — keep NOTICE/attribution in "About" |
 | dexie-react-hooks | 4.4.0 | Apache-2.0 | installed | OK |
 | react | 19.3.1 | MIT | installed | OK |
@@ -64,7 +63,7 @@ BSD-3-Clause 7, MPL-2.0 3, CC-BY-4.0 1, (MIT OR CC0-1.0) 1. **No GPL, AGPL, LGPL
 | glob, minimatch, lru-cache, minipass, … | BlueOak-1.0.0 | OK — permissive |
 | type-fest 0.16.0 | MIT OR CC0-1.0 | OK |
 
-The production dependency tree (`npm ls --omit=dev`) is only: @noble/ed25519, dexie, dexie-react-hooks, react,
+The production dependency tree (`npm ls --omit=dev`) is only: dexie, dexie-react-hooks, react,
 react-dom (+ scheduler), react-router-dom (+ react-router, cookie, set-cookie-parser), zod, zustand — all MIT /
 Apache-2.0.
 
@@ -72,12 +71,21 @@ Apache-2.0.
 
 | Package | Version | License | Verified | Verdict |
 | --- | --- | --- | --- | --- |
-| @noble/ed25519 | 3.2.0 | MIT | installed | OK |
+| better-auth | 1.7.28 | MIT | installed 2026-11-26 (LICENSE: "The MIT License (MIT)") | OK — trainer accounts. Telemetry switched off in `worker/src/auth/auth.ts` |
+| aws4fetch | 1.0.20 | MIT | installed | OK |
 | @cloudflare/vitest-plugin | 1.8.5 | MIT | installed | OK (dev only) |
 | @cloudflare/workers-types | 5.20261119.1 | MIT OR Apache-2.0 | installed | OK (dev only) |
 | typescript | 7.0.2 | Apache-2.0 | installed | OK (dev only) |
 | vitest | 5.1.1 | MIT | installed | OK (dev only) |
 | wrangler | 4.165.0 | MIT OR Apache-2.0 | installed | OK (dev only) |
+
+better-auth's production tree (added 2026-11-26, each read from `worker/node_modules/<pkg>/package.json` and its
+LICENSE file): @better-auth/core, @better-auth/kysely-adapter (and the other unused adapters it ships),
+@better-auth/utils, @better-auth/telemetry (not enabled), @better-fetch/fetch, better-call, kysely 0.29.9,
+jose 6.2.18, defu, nanostores, rou3, zod 4.6.6, @standard-schema/spec — **all MIT**. Whole non-dev tree of
+`worker/package-lock.json` on 2026-11-26: MIT 50, Apache-2.0 2, ISC 1, BSD-3-Clause 1, and lightningcss (MPL-2.0),
+which is dev-only (vitest → vite). No GPL/AGPL. `@noble/ed25519` was removed from app and Worker with the
+license system.
 
 Transitive scan of `worker/node_modules`: MIT 49, Apache-2.0 7, MIT OR Apache-2.0 4, ISC 1, 0BSD 1, CC0-1.0 1,
 and **2 LGPL packages**:

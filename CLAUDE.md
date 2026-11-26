@@ -1,13 +1,13 @@
 # PT Coach App — project rules
 
-Commercial offline-first PWA sold once (lifetime) to private personal trainers in Egypt. One trainer, one
+Commercial offline-first PWA for private personal trainers in Egypt; each trainer's account is approved by the owner. One trainer, one
 iPhone, non-technical, one-handed use between sessions. Full spec: `docs/SPEC.md` (Arabic). Read it before
 working on a feature.
 
 ## Hard constraints
 
 - **Zero cost.** No paid library or service. No Xcode / Expo / App Store. Cloudflare free tier only.
-- **Golden rule.** After activation the app never needs the network. Every Cloudflare call sits behind an
+- **Golden rule.** After the first sign-in the app never needs the network. Every Cloudflare call sits behind an
   interface in `src/services`, has a short timeout, fails silently, and queues a retry. Test with and
   without network.
 - **Target.** Safari on iOS 16.4+, installed to the home screen (standalone PWA).
@@ -21,9 +21,11 @@ working on a feature.
 - **The app never suggests supplement doses.**
 - **Licenses.** Check every dependency's license before adding and record it in `LICENSES.md`. No GPL/AGPL.
   Never copy code from wger. Pin exact versions (`npm i -E`).
-- **Privacy.** Nothing leaves the device unencrypted. The server sees only: license id, device id, push
-  subscription, notification time, generic text without names.
-- **Secrets.** The Ed25519 private signing key never enters the repo or the site bundle.
+- **Privacy.** Nothing leaves the device unencrypted. The server sees only: the trainer's account (name, email,
+  password hash or Google id, approval status), session tokens, push subscription, notification time, generic
+  text without client names.
+- **Secrets.** `BETTER_AUTH_SECRET`, `ADMIN_PASSWORD` and `GOOGLE_CLIENT_SECRET` are Worker secrets: never in the
+  repo or the site bundle.
 
 ## Layers (dependencies point downward only)
 
@@ -34,26 +36,33 @@ working on a feature.
 4. `src/services` — calendar, files, 3D, PDF, backup, integrations; each behind an interface with a fake for tests.
 
 `worker/` is a separate Cloudflare Worker project with its own `package.json` and tests.
-`shared/` holds code used by both app and worker (license format). `tools/` holds offline owner tools.
+`shared/` holds code used by both app and worker (byte helpers, envelopes, headers). `tools/` holds offline owner tools.
 
 Small files, clear names, no `any`. TypeScript strict with `noUncheckedIndexedAccess`.
 
-## License contract (shared by app, worker, tools) — implemented in `shared/license.ts`
+## Account contract (app ↔ worker) — server in `worker/src/auth`, app in `src/services/auth`, rules in `src/domain/account`
 
-- **Short activation code**: 12 chars from alphabet `ABCDEFGHJKMNPQRSTVWXYZ23456789`, shown as `XXXX-XXXX-XXXX`.
-- **License token**: `b64url(utf8(JSON payload)) + "." + b64url(ed25519 signature over the payload bytes)`.
-- **Payload** (all times are unix seconds):
-  `{ v: 1, lid: string, dev: string, name: string, iat: number, actBy: number, exp: number | null, feat: string[] }`
-  - `dev` = first 32 hex chars of SHA-256(deviceId). `deviceId` is a random UUID created at install.
-  - `exp: null` = lifetime. `actBy` = last moment the code may be activated.
-- **Offline long code** (fallback when Cloudflare is down): `"PT1." + license token`, typed/pasted by the trainer.
-- **Clock rollback**: app stores the latest time it has seen; if the clock goes back more than 24h, a
-  time-limited license locks (lifetime licenses are unaffected).
-- **Worker API** (JSON):
-  - `POST /api/activate` `{ code, deviceId }` → `200 { license, dataKey }` | `4xx { error: 'invalid' | 'used' | 'expired' | 'rate_limited' }`
-  - `GET /api/license/status` with header `Authorization: Bearer <license token>` → `{ revoked: boolean }`
-  - `/admin/*` — owner-only code dashboard, protected by `ADMIN_PASSWORD` secret.
-  - Signing key: Worker secret `LICENSE_PRIVATE_KEY` (hex). Public key is embedded in the app.
+Licenses and activation codes were removed on 2026-11-26. Trainers have accounts (better-auth on the Worker,
+tables in D1, `worker/migrations/0005_accounts.sql`).
+
+- **Sign-in methods**: email + password (min 8 chars, no emails are ever sent) and Google (only when
+  `GOOGLE_CLIENT_ID` + `GOOGLE_CLIENT_SECRET` are set). Phone/WhatsApp OTP is not built: every provider costs
+  money (zero-cost rule).
+- **Approval**: every new account is `pending`; the owner approves, disables or re-enables it, and sets new
+  passwords, in `/admin` (protected by `ADMIN_PASSWORD`). Only `approved` accounts may use cloud endpoints.
+- **Session**: the app keeps the session token in Dexie meta (`auth.token`, device-local, never in a backup) and
+  sends `Authorization: Bearer <token>`. Never cookies (the Worker is another site). Sessions last a year and
+  refresh daily while used.
+- **Offline**: the last known account (`auth.account`) lives on the device; the app opens offline. A background
+  `GET /api/account` updates the status; 401 = session ended → sign in again (data stays).
+- **Google**: top-level `GET /auth/google?return=<app origin>` on the Worker → Google → `/api/auth/callback/google`
+  → `/auth/handoff` turns the first-party cookie into a 3-minute one-time token and redirects to
+  `<app>/#auth=<token>` (or `#auth_error=…`); the app trades it at `POST /api/auth/one-time-token/verify`.
+- **Worker API**: `/api/auth/*` (better-auth, allow-listed paths only), `GET /api/account` →
+  `{ account: { id, name, email, status } }`, `GET /api/auth-config` → `{ google }`. Cloud endpoints answer
+  401 `invalid`, 403 `pending` / `disabled`.
+- **Guest**: "continue as guest" exists only in `npm run dev` and the e2e build (`guestAllowedIn`); never in
+  production.
 
 ## Commands
 

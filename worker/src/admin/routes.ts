@@ -1,28 +1,17 @@
+import { base64UrlEncode } from '../../../shared/bytes';
+import type { AccountRecord } from '../auth/accounts';
+import { MIN_PASSWORD_LENGTH } from '../auth/auth';
 import { MAX_FORM_BODY_BYTES, readLimitedText } from '../http';
-import type { Deps, LicenseRecord } from '../ports';
-import { dropLicensePush } from '../push/cleanup';
+import type { Deps } from '../ports';
+import { dropAccountPush } from '../push/cleanup';
 import { RULES } from '../rateLimit';
-import {
-  ADMIN_SCRIPT,
-  codeIssuedPage,
-  confirmPage,
-  dashboardPage,
-  issuedGonePage,
-  loginPage,
-  messagePage,
-  statusBucket,
-  DURATION_OPTIONS,
-  STATUS_FILTERS,
-} from './html';
-import { createIssuedCookie, readIssuedCookie, type IssuedCode } from './issued';
+import { ADMIN_SCRIPT, confirmPage, dashboardPage, loginPage, messagePage, passwordSetPage, STATUS_FILTERS, type AccountAction } from './html';
 import { clearSessionCookie, createSessionCookie, hasValidSession, SESSION_COOKIE } from './session';
 
-const DAY = 86_400;
 /** Read cap for the dashboard list; search and paging run over these rows. */
 const LIST_LIMIT = 2000;
 const PAGE_SIZE = 25;
-const MAX_NAME_LENGTH = 100;
-const DEFAULT_WINDOW_DAYS = 14;
+const MAX_QUERY_LENGTH = 100;
 
 export interface AdminHooks {
   /** Optional housekeeping on dashboard load (deletes old rate-limit windows). */
@@ -59,60 +48,6 @@ async function readForm(request: Request): Promise<URLSearchParams | null> {
   return text === null ? null : new URLSearchParams(text);
 }
 
-function parseWindowDays(value: string | null): number | null {
-  const days = Number(value ?? DEFAULT_WINDOW_DAYS);
-  return Number.isInteger(days) && days >= 1 && days <= 365 ? days : null;
-}
-
-function parseDuration(value: string | null): { ok: true; days: number | null } | { ok: false } {
-  const option = DURATION_OPTIONS.find((o) => o.value === value);
-  if (option === undefined) return { ok: false };
-  return { ok: true, days: option.value === 'lifetime' ? null : Number(option.value) };
-}
-
-async function issueCode(
-  deps: Deps,
-  input: {
-    name: string;
-    durationDays: number | null;
-    windowDays: number;
-    expiresAt: number | null;
-    feat: string[];
-    /** Set by "move to new device": the license being replaced, whose account the new one joins. */
-    replaces?: LicenseRecord;
-  },
-): Promise<{ code: string; record: LicenseRecord }> {
-  const now = deps.now();
-  for (let attempt = 0; ; attempt++) {
-    const code = deps.newCode();
-    const lid = deps.newId();
-    const record: LicenseRecord = {
-      lid,
-      codeHash: await deps.crypto.hashCode(code),
-      customerName: input.name,
-      durationDays: input.durationDays,
-      actBy: now + input.windowDays * DAY,
-      status: 'issued',
-      deviceFp: null,
-      createdAt: now,
-      activatedAt: null,
-      expiresAt: input.expiresAt,
-      revokedAt: null,
-      replacedBy: null,
-      feat: input.feat,
-      previousLid: input.replaces?.lid ?? null,
-      rootLid: input.replaces?.rootLid ?? lid,
-    };
-    try {
-      await deps.store.insert(record);
-      await deps.store.audit('code_issued', record.lid, now);
-      return { code, record };
-    } catch (error) {
-      if (attempt >= 2) throw error; // a duplicate code hash is astronomically unlikely; retry a couple of times
-    }
-  }
-}
-
 async function handleLogin(request: Request, deps: Deps, clientKey: string): Promise<Response> {
   const now = deps.now();
   const allowed =
@@ -121,105 +56,83 @@ async function handleLogin(request: Request, deps: Deps, clientKey: string): Pro
   const form = await readForm(request);
   const password = form?.get('password') ?? '';
   if (!(await deps.crypto.passwordMatches(password))) {
-    await deps.store.audit('login_failed', null, now);
+    await deps.audit.audit('login_failed', null, now);
     return html(loginPage('كلمة السر غلط.'), 401);
   }
-  await deps.store.audit('login_ok', null, now);
+  await deps.audit.audit('login_ok', null, now);
   return redirect('/admin', { 'Set-Cookie': await createSessionCookie(deps.crypto, now) });
 }
 
-async function handleGenerate(request: Request, deps: Deps): Promise<Response> {
-  const form = await readForm(request);
-  const name = (form?.get('name') ?? '').trim();
-  const duration = parseDuration(form?.get('duration') ?? null);
-  const windowDays = parseWindowDays(form?.get('window') ?? null);
-  if (name === '' || name.length > MAX_NAME_LENGTH || !duration.ok || windowDays === null) {
-    return html(messagePage('بيانات ناقصة', 'اكتب اسم العميل، واختار المدة، ومهلة التفعيل من 1 لـ 365 يوم.'), 400);
-  }
-  const { code, record } = await issueCode(deps, {
-    name,
-    durationDays: duration.days,
-    windowDays,
-    expiresAt: null,
-    feat: ['core'],
-  });
-  return showIssuedOnce(deps, { code, name, actBy: record.actBy, durationDays: record.durationDays, moved: false });
+/** Readable random password for "new password": 12 base64url chars (72 bits). */
+function suggestPassword(): string {
+  return base64UrlEncode(crypto.getRandomValues(new Uint8Array(9)));
 }
 
-/** Post/Redirect/Get: a refresh of the result page shows the same code again instead of issuing another. */
-async function showIssuedOnce(deps: Deps, issued: IssuedCode): Promise<Response> {
-  return redirect('/admin/issued', { 'Set-Cookie': await createIssuedCookie(deps.crypto, issued, deps.now()) });
-}
-
-async function handleLicenseAction(request: Request, deps: Deps, action: 'move' | 'revoke'): Promise<Response> {
-  const form = await readForm(request);
-  const lid = form?.get('lid') ?? '';
-  const record = lid === '' ? null : await deps.store.findById(lid);
-  if (record === null) return html(messagePage('مش موجود', 'الترخيص ده مش موجود.'), 404);
-  if (record.status !== 'issued' && record.status !== 'active') {
-    return html(messagePage('خلاص', 'الترخيص ده متلغي أو متنقل قبل كده.'), 409);
-  }
-  if (form?.get('confirmed') !== 'yes') return html(confirmPage(action, record));
-
-  const now = deps.now();
-  if (action === 'revoke') {
-    await deps.store.end(record.lid, 'revoked', now, null);
-    await dropLicensePush(deps.cloud.db, record.lid);
-    await deps.store.audit('revoked', record.lid, now);
-    return redirect('/admin?done=revoked');
-  }
-
-  const windowDays = parseWindowDays(form.get('window'));
-  if (windowDays === null) return html(messagePage('بيانات ناقصة', 'مهلة التفعيل لازم تكون من 1 لـ 365 يوم.'), 400);
-  // Keep the customer's remaining time: an active time-limited license carries its expiry over.
-  const carriedExpiry = record.status === 'active' ? record.expiresAt : null;
-  const { code, record: next } = await issueCode(deps, {
-    name: record.customerName,
-    durationDays: record.durationDays,
-    windowDays,
-    expiresAt: carriedExpiry,
-    feat: record.feat,
-    replaces: record,
-  });
-  if (!(await deps.store.end(record.lid, 'replaced', now, next.lid))) {
-    await deps.store.end(next.lid, 'revoked', now, null);
-    return html(messagePage('خلاص', 'الترخيص ده اتغيّر في نفس اللحظة. افتح اللوحة تاني.'), 409);
-  }
-  // Cloud data stays under the account id (rootLid) and so follows the trainer; only the old device's push
-  // subscription is tied to the old license, and it goes.
-  await dropLicensePush(deps.cloud.db, record.lid);
-  await deps.store.audit('moved', record.lid, now);
-  return showIssuedOnce(deps, { code, name: record.customerName, actBy: next.actBy, durationDays: next.durationDays, moved: true });
-}
-
-const NOTICES: Record<string, string> = { revoked: 'الترخيص اتلغى.' };
+const NOTICES: Record<string, string> = {
+  approve: 'الحساب اتوافق عليه. المدرب يقدر يستخدم التطبيق دلوقتي.',
+  enable: 'الحساب اشتغل تاني.',
+  disable: 'الحساب اتوقف.',
+};
 const EXPIRED_NOTICE = 'الجلسة خلصت (بتخلص بعد 12 ساعة). ادخل تاني بكلمة السر، وبعدها كرر آخر خطوة لو ما كملتش.';
+
+async function handleAccountAction(request: Request, deps: Deps, action: AccountAction): Promise<Response> {
+  const form = await readForm(request);
+  const id = form?.get('id') ?? '';
+  const record = id === '' ? null : await deps.accounts.find(id);
+  if (record === null) return html(messagePage('مش موجود', 'الحساب ده مش موجود.'), 404);
+  const now = deps.now();
+
+  if (action === 'approve' || action === 'enable') {
+    if (record.status === 'approved') return redirect('/admin');
+    await deps.accounts.setStatus(record.id, 'approved');
+    await deps.audit.audit(action === 'approve' ? 'approved' : 'enabled', record.id, now);
+    return redirect(`/admin?done=${action}`);
+  }
+
+  if (form?.get('confirmed') !== 'yes') return html(confirmPage(action, record, suggestPassword()));
+
+  if (action === 'disable') {
+    // Sessions stay: the app then learns "disabled" (and locks) instead of just "signed out".
+    await deps.accounts.setStatus(record.id, 'disabled');
+    await dropAccountPush(deps.cloud.db, record.id);
+    await deps.audit.audit('disabled', record.id, now);
+    return redirect('/admin?done=disable');
+  }
+
+  const password = form.get('password') ?? '';
+  if (password.length < MIN_PASSWORD_LENGTH || password.length > 128) {
+    return html(messagePage('كلمة السر قصيرة', `كلمة السر لازم تكون ${MIN_PASSWORD_LENGTH} حروف على الأقل.`), 400);
+  }
+  await deps.accounts.setPassword(record.id, password);
+  await deps.accounts.endSessions(record.id);
+  await deps.audit.audit('password_set', record.id, now);
+  return html(passwordSetPage({ record, password, appUrl: deps.config.appOrigins[0] ?? null }));
+}
+
+function matches(r: AccountRecord, needle: string, status: string): boolean {
+  const text = `${r.name} ${r.email}`.toLocaleLowerCase('ar');
+  return (needle === '' || text.includes(needle)) && (status === '' || r.status === status);
+}
 
 function hasCookie(request: Request, name: string): boolean {
   return (request.headers.get('Cookie') ?? '').split(';').some((part) => part.trim().startsWith(`${name}=`));
 }
 
-async function dashboard(url: URL, deps: Deps, now: number): Promise<Response> {
-  const all = await deps.store.list(LIST_LIMIT);
-  const q = (url.searchParams.get('q') ?? '').trim().slice(0, MAX_NAME_LENGTH);
+async function dashboard(url: URL, deps: Deps): Promise<Response> {
+  const all = await deps.accounts.list(LIST_LIMIT);
+  const q = (url.searchParams.get('q') ?? '').trim().slice(0, MAX_QUERY_LENGTH);
   const statusParam = url.searchParams.get('status') ?? '';
   const status = STATUS_FILTERS.some((o) => o.value === statusParam) ? statusParam : '';
   const needle = q.toLocaleLowerCase('ar');
-  const matches = all.filter(
-    (r) =>
-      (needle === '' || r.customerName.toLocaleLowerCase('ar').includes(needle)) &&
-      (status === '' || statusBucket(r, now) === status),
-  );
-  const pages = Math.max(1, Math.ceil(matches.length / PAGE_SIZE));
+  const found = all.filter((r) => matches(r, needle, status));
+  const pages = Math.max(1, Math.ceil(found.length / PAGE_SIZE));
   const requested = Number(url.searchParams.get('page') ?? '1');
   const pageNumber = Number.isInteger(requested) ? Math.min(Math.max(requested, 1), pages) : 1;
-  const records = matches.slice((pageNumber - 1) * PAGE_SIZE, pageNumber * PAGE_SIZE);
+  const records = found.slice((pageNumber - 1) * PAGE_SIZE, pageNumber * PAGE_SIZE);
   const notice = NOTICES[url.searchParams.get('done') ?? ''] ?? null;
+  const pending = all.filter((r) => r.status === 'pending').length;
   return html(
-    dashboardPage(
-      { records, total: matches.length, all: all.length, page: pageNumber, pages, q, status, notice, capped: all.length >= LIST_LIMIT },
-      now,
-    ),
+    dashboardPage({ records, total: found.length, all: all.length, pending, page: pageNumber, pages, q, status, notice, capped: all.length >= LIST_LIMIT }),
   );
 }
 
@@ -239,7 +152,7 @@ export async function handleAdmin(request: Request, deps: Deps, clientKey: strin
 
   const authed = await hasValidSession(request, deps.crypto, now);
   // Anonymous visitors only ever get the login page or a redirect: count them in memory, so a crawler or a
-  // flood cannot spend the D1 daily write budget that licenses and backups depend on. Login has its own
+  // flood cannot spend the D1 daily write budget that accounts and backups depend on. Login has its own
   // durable limit above.
   const limiter = authed ? deps.limiter : deps.localLimiter;
   if (!(await limiter.hit(RULES.admin, clientKey, now))) return html(messagePage('استنى شوية', 'طلبات كتير.'), 429);
@@ -254,16 +167,9 @@ export async function handleAdmin(request: Request, deps: Deps, clientKey: strin
 
   if (method === 'GET' && path === '/admin') {
     await hooks.prune?.(now);
-    return dashboard(url, deps, now);
+    return dashboard(url, deps);
   }
-  if (method === 'GET' && path === '/admin/issued') {
-    const issued = await readIssuedCookie(request, deps.crypto, now);
-    return issued === null
-      ? html(issuedGonePage(), 410)
-      : html(codeIssuedPage({ ...issued, appUrl: deps.config.appOrigins[0] ?? null }));
-  }
-  if (method === 'POST' && path === '/admin/codes') return handleGenerate(request, deps);
-  if (method === 'POST' && path === '/admin/licenses/revoke') return handleLicenseAction(request, deps, 'revoke');
-  if (method === 'POST' && path === '/admin/licenses/move') return handleLicenseAction(request, deps, 'move');
+  const action = /^\/admin\/accounts\/(approve|disable|enable|password)$/.exec(path)?.[1] as AccountAction | undefined;
+  if (method === 'POST' && action !== undefined) return handleAccountAction(request, deps, action);
   return html(messagePage('مش موجود', 'الصفحة دي مش موجودة.'), 404);
 }

@@ -1,5 +1,5 @@
 import { parseSessionDays, setSessionDays, type SessionDays } from '@/domain/clientHub';
-import type { MetaStore } from '@/services/license/metaStore';
+import type { MetaStore } from '@/services/meta/metaStore';
 
 /** Meta key (inside backups): the program day the trainer attached to a booked session. */
 export const SESSION_DAYS_KEY = 'schedule.sessionDays';

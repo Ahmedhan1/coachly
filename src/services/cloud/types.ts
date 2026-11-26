@@ -6,10 +6,10 @@ import type { Result } from '@/domain/nutrition/result';
  * - offline: the browser reports no network (request not attempted)
  * - timeout: no answer within the short timeout
  * - network: fetch failed (DNS, TLS, connection reset, CORS)
- * - unauthorized: license token rejected or revoked (401/403)
+ * - unauthorized: session rejected, account pending or disabled (401/403)
  * - not_found: no cloud backup stored yet (GET)
  * - storage_unavailable: the Worker has no cloud storage (R2) enabled yet (503); the local file is the copy
- * - storage_full: the server refused because of the per-license or global storage cap
+ * - storage_full: the server refused because of the per-account or global storage cap
  * - too_large: body over the request size limit (413)
  * - rate_limited: too many uploads today (429)
  * - server: any other non-2xx answer
@@ -33,7 +33,7 @@ export interface CloudBackupInfo {
 }
 
 /**
- * Worker contract: `PUT/GET/HEAD /api/backup`, header `Authorization: Bearer <license token>`,
+ * Worker contract: `PUT/GET/HEAD /api/backup`, header `Authorization: Bearer <session token>`,
  * body = PTP1 password envelope of the backup zip (opaque to the server).
  */
 export interface CloudBackupClient {
@@ -49,7 +49,7 @@ export interface NetworkStatus {
   onOnline(listener: () => void): () => void;
 }
 
-/** Source of the license token for `Authorization: Bearer`. null = not activated. */
+/** Source of the session token for `Authorization: Bearer`. null = not signed in. */
 export interface TokenProvider {
   getToken(): Promise<string | null>;
 }

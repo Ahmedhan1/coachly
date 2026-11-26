@@ -1,20 +1,11 @@
-import { formatShortCode } from '../../../shared/license';
-import type { LicenseRecord } from '../ports';
+import type { AccountRecord } from '../auth/accounts';
+import type { AccountStatus } from '../auth/auth';
 
-export const DURATION_OPTIONS: ReadonlyArray<{ value: string; label: string }> = [
-  { value: 'lifetime', label: 'مدى الحياة' },
-  { value: '30', label: 'شهر' },
-  { value: '90', label: '3 شهور' },
-  { value: '180', label: '6 شهور' },
-  { value: '365', label: 'سنة' },
-  { value: '730', label: 'سنتين' },
-];
-
-export const STATUS_FILTERS: ReadonlyArray<{ value: string; label: string }> = [
+export const STATUS_FILTERS: ReadonlyArray<{ value: '' | AccountStatus; label: string }> = [
   { value: '', label: 'الكل' },
-  { value: 'waiting', label: 'لسه ما اتفعلش' },
-  { value: 'active', label: 'شغّال' },
-  { value: 'ended', label: 'ملغي أو منتهي أو متنقل' },
+  { value: 'pending', label: 'مستني موافقتك' },
+  { value: 'approved', label: 'شغّال' },
+  { value: 'disabled', label: 'موقوف' },
 ];
 
 export function escapeHtml(text: string): string {
@@ -35,34 +26,12 @@ export function formatDate(seconds: number | null): string {
   return seconds === null ? '—' : dateFormat.format(new Date(seconds * 1000)).replace(',', '');
 }
 
-export function durationLabel(days: number | null): string {
-  if (days === null) return 'مدى الحياة';
-  return DURATION_OPTIONS.find((o) => o.value === String(days))?.label ?? `${days} يوم`;
+export function statusLabel(status: AccountStatus): string {
+  return STATUS_FILTERS.find((o) => o.value === status)?.label ?? status;
 }
 
-export function statusLabel(r: LicenseRecord, now: number): string {
-  switch (r.status) {
-    case 'issued':
-      return now > r.actBy ? 'مهلة التفعيل خلصت' : 'لسه ما اتفعلش';
-    case 'active':
-      return r.expiresAt !== null && now >= r.expiresAt ? 'انتهت مدته' : 'شغّال';
-    case 'revoked':
-      return 'ملغي';
-    case 'replaced':
-      return 'اتنقل لجهاز جديد';
-  }
-}
-
-/** Which filter bucket a record falls in (matches STATUS_FILTERS values). */
-export function statusBucket(r: LicenseRecord, now: number): 'waiting' | 'active' | 'ended' {
-  if (r.status === 'issued') return now > r.actBy ? 'ended' : 'waiting';
-  if (r.status === 'active') return r.expiresAt !== null && now >= r.expiresAt ? 'ended' : 'active';
-  return 'ended';
-}
-
-function statusTone(r: LicenseRecord, now: number): string {
-  const bucket = statusBucket(r, now);
-  return bucket === 'active' ? 'ok' : bucket === 'waiting' ? 'wait' : 'off';
+function statusTone(status: AccountStatus): string {
+  return status === 'approved' ? 'ok' : status === 'pending' ? 'wait' : 'off';
 }
 
 const STYLE = `
@@ -125,8 +94,8 @@ if(navigator.clipboard&&window.isSecureContext){navigator.clipboard.writeText(te
 
 export function loginPage(error: string | null, notice: string | null = null): string {
   return page(
-    'دخول لوحة الأكواد',
-    `<h1>لوحة الأكواد</h1>
+    'دخول لوحة الحسابات',
+    `<h1>لوحة الحسابات</h1>
 ${notice === null ? '' : `<div class="card notice"><strong>${escapeHtml(notice)}</strong></div>`}
 <div class="card"><form method="post" action="/admin/login">
 <label>كلمة السر<input type="password" name="password" autocomplete="current-password" required autofocus></label>
@@ -135,55 +104,61 @@ ${error === null ? '' : `<p class="error">${escapeHtml(error)}</p>`}
   );
 }
 
-function actionForm(action: 'move' | 'revoke', lid: string, label: string, danger: boolean): string {
-  return `<form method="post" action="/admin/licenses/${action}">
-<input type="hidden" name="lid" value="${escapeHtml(lid)}">
-<button type="submit" class="${danger ? 'danger' : 'quiet'}">${escapeHtml(label)}</button></form>`;
+export function messagePage(title: string, text: string): string {
+  return page(title, `<h1>${escapeHtml(title)}</h1><div class="card"><p>${escapeHtml(text)}</p><p><a href="/admin">رجوع للوحة</a></p></div>`);
 }
 
-/** Short, stable label for the device a license is bound to (first 8 hex of the device fingerprint). */
-export function deviceLabel(fp: string | null): string {
-  return fp === null ? '—' : fp.slice(0, 8);
+export type AccountAction = 'approve' | 'disable' | 'enable' | 'password';
+
+const ACTION_LABELS: Record<AccountAction, string> = {
+  approve: 'موافقة',
+  enable: 'تشغيل تاني',
+  disable: 'إيقاف',
+  password: 'كلمة سر جديدة',
+};
+
+function actionForm(action: AccountAction, id: string): string {
+  const cls = action === 'disable' ? 'danger' : action === 'password' ? 'quiet' : '';
+  return `<form method="post" action="/admin/accounts/${action}">
+<input type="hidden" name="id" value="${escapeHtml(id)}">
+<button type="submit"${cls === '' ? '' : ` class="${cls}"`}>${escapeHtml(ACTION_LABELS[action])}</button></form>`;
 }
 
-function row(r: LicenseRecord, now: number): string {
-  const open = r.status === 'issued' || r.status === 'active';
-  const actions = open
-    ? actionForm('move', r.lid, 'نقل لجهاز جديد', false) + actionForm('revoke', r.lid, 'إلغاء', true)
-    : '<span class="muted">—</span>';
+export function actionsFor(status: AccountStatus): AccountAction[] {
+  switch (status) {
+    case 'pending':
+      return ['approve', 'disable', 'password'];
+    case 'approved':
+      return ['disable', 'password'];
+    case 'disabled':
+      return ['enable', 'password'];
+  }
+}
+
+function row(r: AccountRecord): string {
   const cell = (label: string, value: string, cls = '') =>
     `<td data-label="${label}"${cls === '' ? '' : ` class="${cls}"`}>${value}</td>`;
-  return `<tr>${cell('الاسم', escapeHtml(r.customerName), 'name')}
-${cell('الحالة', `<span class="pill ${statusTone(r, now)}">${escapeHtml(statusLabel(r, now))}</span>`)}
-${cell('المدة', escapeHtml(durationLabel(r.durationDays)))}
-${cell('اتعمل', `<span class="ltr">${formatDate(r.createdAt)}</span>`)}
-${cell('آخر موعد للتفعيل', r.status === 'issued' ? `<span class="ltr">${formatDate(r.actBy)}</span>` : '—')}
-${cell('اتفعّل', `<span class="ltr">${formatDate(r.activatedAt)}</span>`)}
-${cell('الجهاز', `<span class="ltr mono">${escapeHtml(deviceLabel(r.deviceFp))}</span>`)}
-${cell('ينتهي', `<span class="ltr">${formatDate(r.expiresAt)}</span>`)}
-<td class="acts">${actions}</td></tr>`;
-}
-
-export function generateForm(): string {
-  const options = DURATION_OPTIONS.map((o) => `<option value="${o.value}">${escapeHtml(o.label)}</option>`).join('');
-  return `<div class="card"><h2>كود جديد</h2><form method="post" action="/admin/codes">
-<label>اسم العميل<input name="name" maxlength="100" required autocomplete="off"></label>
-<label>مدة الترخيص<select name="duration">${options}</select></label>
-<label>مهلة التفعيل (بالأيام)<input name="window" type="number" inputmode="numeric" min="1" max="365" value="14" required></label>
-<button type="submit">طلّع الكود</button></form></div>`;
+  return `<tr>${cell('الاسم', escapeHtml(r.name === '' ? '—' : r.name), 'name')}
+${cell('الإيميل', `<span class="ltr">${escapeHtml(r.email)}</span>`)}
+${cell('الحالة', `<span class="pill ${statusTone(r.status)}">${escapeHtml(statusLabel(r.status))}</span>`)}
+${cell('اتسجل', `<span class="ltr">${formatDate(r.createdAt)}</span>`)}
+<td class="acts">${actionsFor(r.status)
+    .map((a) => actionForm(a, r.id))
+    .join('')}</td></tr>`;
 }
 
 export interface DashboardView {
-  records: readonly LicenseRecord[];
+  records: readonly AccountRecord[];
   total: number;
   /** Count before filtering. */
   all: number;
+  pending: number;
   page: number;
   pages: number;
   q: string;
   status: string;
   notice: string | null;
-  /** The list hit the server's read cap: the oldest licenses are not shown. */
+  /** The list hit the server's read cap: the oldest accounts are not shown. */
   capped: boolean;
 }
 
@@ -203,109 +178,80 @@ function pager(view: DashboardView): string {
   return `<nav class="pager" aria-label="الصفحات">${prev}<span>صفحة <span class="ltr">${view.page} / ${view.pages}</span></span>${next}</nav>`;
 }
 
-export function dashboardPage(view: DashboardView, now: number): string {
-  const rows = view.records.map((r) => row(r, now)).join('');
+export function dashboardPage(view: DashboardView): string {
+  const rows = view.records.map(row).join('');
   const statusOptions = STATUS_FILTERS.map(
     (o) => `<option value="${o.value}"${o.value === view.status ? ' selected' : ''}>${escapeHtml(o.label)}</option>`,
   ).join('');
   const filtered = view.q !== '' || view.status !== '';
-  const empty = filtered ? 'مفيش نتايج للبحث ده.' : 'لسه مفيش أكواد. اكتب اسم العميل فوق واضغط «طلّع الكود».';
+  const empty = filtered ? 'مفيش نتايج للبحث ده.' : 'لسه مفيش حد عمل حساب. ابعت لينك التطبيق للمدرب، ولما يسجل هيظهر هنا.';
+  const waiting =
+    view.pending === 0
+      ? ''
+      : `<div class="card notice"><strong>فيه <span class="ltr">${view.pending}</span> حساب مستني موافقتك.</strong> <a href="/admin?status=pending">اعرضهم</a></div>`;
   return page(
-    'لوحة الأكواد',
-    `<div class="top"><h1>لوحة الأكواد</h1><form method="post" action="/admin/logout"><button class="link" type="submit">خروج</button></form></div>
+    'لوحة الحسابات',
+    `<div class="top"><h1>لوحة الحسابات</h1><form method="post" action="/admin/logout"><button class="link" type="submit">خروج</button></form></div>
 ${view.notice === null ? '' : `<div class="card notice"><strong>${escapeHtml(view.notice)}</strong></div>`}
-${generateForm()}
-<div class="card"><h2>العملاء (${filtered ? `<span class="ltr">${view.total}</span> من <span class="ltr">${view.all}</span>` : `<span class="ltr">${view.all}</span>`})</h2>
+${waiting}
+<div class="card"><h2>المدربين (${filtered ? `<span class="ltr">${view.total}</span> من <span class="ltr">${view.all}</span>` : `<span class="ltr">${view.all}</span>`})</h2>
+<p class="muted">المدرب بيعمل حسابه من التطبيق (إيميل وكلمة سر، أو جوجل). الحساب الجديد بيفضل مستني لحد ما تدوس «موافقة».</p>
 <form class="filters" method="get" action="/admin" role="search">
-<label>بحث بالاسم<input type="search" name="q" value="${escapeHtml(view.q)}" autocomplete="off"></label>
+<label>بحث بالاسم أو الإيميل<input type="search" name="q" value="${escapeHtml(view.q)}" autocomplete="off"></label>
 <label>الحالة<select name="status">${statusOptions}</select></label>
 <button type="submit" class="quiet">بحث</button>${filtered ? '<a href="/admin">مسح</a>' : ''}</form>
 <table>
-<thead><tr><th>الاسم</th><th>الحالة</th><th>المدة</th><th>اتعمل</th><th>آخر موعد للتفعيل</th><th>اتفعّل</th><th>الجهاز</th><th>ينتهي</th><th></th></tr></thead>
-<tbody>${rows === '' ? `<tr><td colspan="9" class="muted">${empty}</td></tr>` : rows}</tbody></table>
+<thead><tr><th>الاسم</th><th>الإيميل</th><th>الحالة</th><th>اتسجل</th><th></th></tr></thead>
+<tbody>${rows === '' ? `<tr><td colspan="5" class="muted">${empty}</td></tr>` : rows}</tbody></table>
 ${pager(view)}
-${view.capped ? '<p class="muted">القائمة بتعرض أحدث الأكواد بس. استخدم البحث عشان توصل للأقدم.</p>' : ''}
+${view.capped ? '<p class="muted">القائمة بتعرض أحدث الحسابات بس. استخدم البحث عشان توصل للأقدم.</p>' : ''}
 </div>`,
   );
 }
 
-/** Ready-to-send WhatsApp text: app link, code and the 3 install steps for iPhone and Android. */
-export function welcomeMessage(input: { name: string; code: string; actBy: number; appUrl: string | null }): string {
-  const lines = [
-    `أهلاً ${input.name}،`,
-    ...(input.appUrl === null ? [] : ['لينك التطبيق:', input.appUrl]),
-    'كود التفعيل:',
-    formatShortCode(input.code),
-    '',
-    'التثبيت في 3 خطوات:',
-    '1. افتح اللينك: على الآيفون من Safari، وعلى أندرويد من Chrome.',
-    '2. ثبّته على الشاشة الرئيسية: الآيفون: زرار المشاركة ثم «إضافة إلى الشاشة الرئيسية». أندرويد: زرار التثبيت أو قايمة ⋮ ثم «تثبيت التطبيق».',
-    `3. افتح التطبيق من الأيقونة واكتب الكود (قبل ${formatDate(input.actBy).slice(0, 10)}).`,
-  ];
-  return lines.join('\n');
+/** Second step before disable / new password, so one mis-tap on the phone does not lock a trainer out. */
+export function confirmPage(action: 'disable' | 'password', record: AccountRecord, suggestedPassword: string): string {
+  const who = `<strong>${escapeHtml(record.name === '' ? record.email : record.name)}</strong> (<span class="ltr">${escapeHtml(record.email)}</span>)`;
+  const body =
+    action === 'disable'
+      ? `<p>متأكد إنك عايز توقف حساب ${who}؟ التطبيق عنده هيقفل أول ما يلاقي نت، والنسخة الاحتياطية والتذكيرات هتقف.</p>`
+      : `<p>كلمة سر جديدة لـ ${who}. كل الأجهزة اللي داخلة بالحساب هتخرج، والمدرب يدخل بالكلمة الجديدة.</p>
+<label>كلمة السر الجديدة (8 حروف على الأقل)<input name="password" class="ltr mono" minlength="8" maxlength="128" value="${escapeHtml(suggestedPassword)}" required autocomplete="off"></label>`;
+  return page(
+    'تأكيد',
+    `<h1>تأكيد</h1><div class="card">
+<form method="post" action="/admin/accounts/${action}">
+<input type="hidden" name="id" value="${escapeHtml(record.id)}"><input type="hidden" name="confirmed" value="yes">
+${body}
+<button type="submit" class="${action === 'disable' ? 'danger' : ''}">${action === 'disable' ? 'أيوه، وقّف' : 'غيّر كلمة السر'}</button></form>
+<p><a href="/admin">لأ، رجوع</a></p></div>`,
+  );
 }
 
-export function codeIssuedPage(input: {
-  code: string;
-  name: string;
-  actBy: number;
-  durationDays: number | null;
-  moved: boolean;
-  appUrl: string | null;
-}): string {
-  const message = welcomeMessage(input);
+/** Shown once after a new password is set, with a ready WhatsApp text. The password is not stored in plain text. */
+export function passwordSetPage(input: { record: AccountRecord; password: string; appUrl: string | null }): string {
+  const lines = [
+    `أهلاً ${input.record.name}،`,
+    'كلمة السر الجديدة لحسابك في التطبيق:',
+    input.password,
+    `الإيميل: ${input.record.email}`,
+    ...(input.appUrl === null ? [] : ['لينك التطبيق:', input.appUrl]),
+    'ادخل بيها، وتقدر تغيّرها بعد كده.',
+  ];
+  const message = lines.join('\n');
   const wa = `https://wa.me/?text=${encodeURIComponent(message)}`;
   return page(
-    'الكود الجديد',
-    `<h1>${input.moved ? 'كود النقل لجهاز جديد' : 'الكود الجديد'}</h1>
-<div class="card"><p>العميل: <strong>${escapeHtml(input.name)}</strong> — المدة: ${escapeHtml(durationLabel(input.durationDays))}</p>
-<p><span id="code" class="code">${escapeHtml(formatShortCode(input.code))}</span></p>
-<div class="actions"><button type="button" data-copy="code">نسخ الكود</button><span class="copied" id="code-copied" role="status"></span></div>
-<p>لازم يتفعّل قبل: <strong class="ltr">${formatDate(input.actBy)}</strong> (بتوقيت القاهرة)</p>
-<p class="error">الكود ده بيظهر هنا بس لمدة نص ساعة، ومش متخزن عندنا غير بصمته. ابعته دلوقتي.</p>
-${input.moved ? '<p class="muted">الجهاز القديم اتلغى. أول ما التطبيق القديم يلاقي نت هيقفل.</p>' : ''}
-</div>
+    'كلمة السر الجديدة',
+    `<h1>كلمة السر الجديدة</h1>
+<div class="card"><p>الحساب: <strong>${escapeHtml(input.record.name)}</strong> (<span class="ltr">${escapeHtml(input.record.email)}</span>)</p>
+<p><span id="pw" class="code">${escapeHtml(input.password)}</span></p>
+<div class="actions"><button type="button" data-copy="pw">نسخ</button><span class="copied" id="pw-copied" role="status"></span></div>
+<p class="error">كلمة السر دي بتظهر هنا مرة واحدة بس. ابعتها دلوقتي.</p></div>
 <div class="card"><h2>رسالة جاهزة للمدرب</h2>
-${input.appUrl === null ? '<p class="error">لينك التطبيق مش متظبط في السيرفر (APP_ORIGIN)، فالرسالة من غير لينك.</p>' : ''}
 <textarea id="msg" readonly dir="rtl">${escapeHtml(message)}</textarea>
 <div class="actions"><a class="btn wa" href="${escapeHtml(wa)}" target="_blank" rel="noopener">ابعت على واتساب</a>
-<button type="button" class="quiet" data-copy="msg">نسخ الرسالة</button><span class="copied" id="msg-copied" role="status"></span></div>
-</div>
+<button type="button" class="quiet" data-copy="msg">نسخ الرسالة</button><span class="copied" id="msg-copied" role="status"></span></div></div>
 <p><a href="/admin">رجوع للوحة</a></p>`,
   );
 }
 
-export function issuedGonePage(): string {
-  return page(
-    'الكود مش ظاهر',
-    `<h1>الكود مش ظاهر</h1><div class="card"><p>الكود بيظهر نص ساعة بس بعد ما يطلع، وبعدها بيختفي لأننا مش بنخزّنه.</p>
-<p>لو ضاع منك: من اللوحة اضغط «نقل لجهاز جديد» على نفس العميل، هيطلع له كود جديد والقديم يتلغى.</p>
-<p><a href="/admin">رجوع للوحة</a></p></div>`,
-  );
-}
-
-export function messagePage(title: string, text: string): string {
-  return page(title, `<h1>${escapeHtml(title)}</h1><div class="card"><p>${escapeHtml(text)}</p><p><a href="/admin">رجوع للوحة</a></p></div>`);
-}
-
-/** Second step before revoke / move, so one mis-tap on the phone does not cancel a customer. */
-export function confirmPage(action: 'move' | 'revoke', record: LicenseRecord): string {
-  const name = escapeHtml(record.customerName);
-  const text =
-    action === 'revoke'
-      ? `متأكد إنك عايز تلغي ترخيص <strong>${name}</strong>؟ التطبيق عنده هيقفل أول ما يلاقي نت.`
-      : `هيتلغى الجهاز الحالي لـ <strong>${name}</strong> ويطلع كود جديد بنفس المدة (ولو الترخيص كان شغّال، بنفس تاريخ الانتهاء).`;
-  const windowField =
-    action === 'move'
-      ? '<label>مهلة التفعيل للكود الجديد (بالأيام)<input name="window" type="number" inputmode="numeric" min="1" max="365" value="14" required></label>'
-      : '';
-  return page(
-    'تأكيد',
-    `<h1>تأكيد</h1><div class="card"><p>${text}</p>
-<form method="post" action="/admin/licenses/${action}">
-<input type="hidden" name="lid" value="${escapeHtml(record.lid)}"><input type="hidden" name="confirmed" value="yes">
-${windowField}
-<button type="submit" class="${action === 'revoke' ? 'danger' : ''}">${action === 'revoke' ? 'أيوه، ألغي' : 'أيوه، انقل'}</button></form>
-<p><a href="/admin">لأ، رجوع</a></p></div>`,
-  );
-}

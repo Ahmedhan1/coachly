@@ -1,17 +1,18 @@
 import { createContext, useContext, type ReactNode } from 'react';
 import type { DataLayer } from '@/data';
-import type { ActivationService } from '@/services/activation/types';
+import type { AuthService } from '@/services/auth/types';
 import type { BackupServices } from '@/services/backup';
 import type { ClientPageService } from '@/services/clientPage/clientPageService';
 import type { PushService } from '@/services/push/pushService';
 import type { FileSyncService } from '@/services/files/fileSyncService';
-import type { MetaStore } from '@/services/license/metaStore';
+import type { MetaStore } from '@/services/meta/metaStore';
 import type { ImageDownscaler, StorageService } from '@/services/storage';
 
 export interface AppServices {
   data: DataLayer;
   storage: StorageService;
-  activation: ActivationService;
+  /** Trainer account (sign-in, owner approval). Works offline after the first sign-in. */
+  auth: AuthService;
   /** App flags (e.g. identity setup done) in the same database as the data. */
   meta: MetaStore;
   images: ImageDownscaler;

@@ -6,7 +6,7 @@ BASE = sys.argv[1] if len(sys.argv) > 1 else 'https://pt-coach.nexus-ahmed.worke
 KEY = os.environ['UPLOAD_KEY']
 DIST = os.path.join(os.path.dirname(__file__), '..', '..', 'dist')
 
-# Release guard: a build without the license server URL can never activate a code. Refuse to ship it,
+# Release guard: a build without the account server URL can never sign anyone in. Refuse to ship it.
 
 def _bundle_text():
     out = []

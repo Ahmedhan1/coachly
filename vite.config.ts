@@ -1,30 +1,11 @@
 import { execSync } from 'node:child_process';
-import { readFileSync } from 'node:fs';
 import { fileURLToPath, URL } from 'node:url';
 import react from '@vitejs/plugin-react';
-import { defineConfig, type Plugin } from 'vite';
+import { defineConfig } from 'vite';
 import { VitePWA } from 'vite-plugin-pwa';
 import { APP_SECURITY_HEADERS } from './shared/appHeaders';
 
-/** Fails loudly (but does not stop the build) while the license public key is still the placeholder. */
-function licenseKeyWarning(): Plugin {
-  return {
-    name: 'pt-coach-license-key-warning',
-    buildStart() {
-      const file = fileURLToPath(new URL('./src/services/license/publicKey.ts', import.meta.url));
-      const source = readFileSync(file, 'utf8');
-      if (source.includes("'REPLACE_WITH_PUBLIC_KEY_HEX'")) {
-        const line = '!'.repeat(78);
-        console.warn(
-          `\n${line}\n  LICENSE PUBLIC KEY IS NOT SET (src/services/license/publicKey.ts).\n` +
-            `  This build cannot verify any real activation code. See docs/ACTIVATION.md step 1.\n${line}\n`,
-        );
-      }
-    },
-  };
-}
-
-/** Short build stamp shown on the activation and About screens, so a screenshot tells which build a phone runs. */
+/** Short build stamp shown on the sign-in and About screens, so a screenshot tells which build a phone runs. */
 function buildId(): string {
   const day = new Date().toISOString().slice(0, 10);
   try {
@@ -51,7 +32,6 @@ export default defineConfig({
   preview: { headers: { ...APP_SECURITY_HEADERS } },
   plugins: [
     react(),
-    licenseKeyWarning(),
     VitePWA({
       // A new version waits until the trainer taps "update" (src/app/pwa/swUpdate.ts) or closes the app: the open
       // page never mixes old code with a new precache. Registration is done by the app itself.

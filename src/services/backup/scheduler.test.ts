@@ -165,13 +165,13 @@ describe('BackupScheduler', () => {
     expect(r.ok && r.value.variant).toBe('none');
   });
 
-  it('missing password or license: no upload, no retry loop', async () => {
+  it('missing password or account: no upload, no retry loop', async () => {
     const a = setup({ passwords: memoryPasswordProvider(null) });
     expect(await a.scheduler.runNow()).toEqual({ ok: false, error: 'needs_password' });
     await a.settle();
     expect(a.t.pending()).toBe(0);
     const b = setup({ tokens: staticTokenProvider(null) });
-    expect(await b.scheduler.runNow()).toEqual({ ok: false, error: 'not_activated' });
+    expect(await b.scheduler.runNow()).toEqual({ ok: false, error: 'not_signed_in' });
     expect(b.client.calls).toHaveLength(0);
   });
 

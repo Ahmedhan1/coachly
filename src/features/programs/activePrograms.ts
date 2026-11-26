@@ -2,7 +2,7 @@ import { useServices } from '@/app/services';
 import { useLive } from '@/app/useLive';
 import { parseActivePrograms, setActiveProgram, splitClientPrograms, type ActivePrograms } from '@/domain/clientHub';
 import type { Program } from '@/domain/models';
-import type { MetaStore } from '@/services/license/metaStore';
+import type { MetaStore } from '@/services/meta/metaStore';
 
 /** Meta key (inside backups): the program the trainer marked active per client. */
 export const ACTIVE_PROGRAMS_KEY = 'programs.activeByClient';

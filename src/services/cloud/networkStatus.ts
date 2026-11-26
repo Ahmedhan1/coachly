@@ -33,14 +33,15 @@ export class FakeNetworkStatus implements NetworkStatus {
   }
 }
 
-/** Minimal key/value reader, e.g. the license MetaStore. */
+/** Minimal key/value reader, e.g. the MetaStore. */
 export interface KeyValueReader {
   get(key: string): Promise<unknown>;
 }
 
-export const LICENSE_TOKEN_META_KEY = 'license.token';
+/** Same key as AUTH_META_KEYS.token (src/services/auth): the account session token. */
+export const SESSION_TOKEN_META_KEY = 'auth.token';
 
-export function metaTokenProvider(store: KeyValueReader, key: string = LICENSE_TOKEN_META_KEY): TokenProvider {
+export function metaTokenProvider(store: KeyValueReader, key: string = SESSION_TOKEN_META_KEY): TokenProvider {
   return {
     getToken: async () => {
       try {

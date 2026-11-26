@@ -2,17 +2,17 @@ import { env } from 'cloudflare:workers';
 import { depsFromEnv, type DepsOverrides } from '../src/deps';
 import { handleRequest } from '../src/app';
 import type { Deps } from '../src/ports';
-import { decodeLicenseToken } from '../../shared/license';
-import { TEST_ADMIN_PASSWORD } from './fixtures';
+import { TEST_ADMIN_PASSWORD, TEST_APP_ORIGIN } from './fixtures';
 
 export const BASE = 'https://license.example';
+export const TEST_PASSWORD = 'correct horse battery';
 export const DAY = 86_400;
 
-let ipCounter = 0;
-/** A fresh client IP per test keeps rate-limit buckets independent. */
+let ipCounter = Math.floor(Math.random() * 0xffffff);
+/** A fresh (valid IPv4) client IP per call keeps rate-limit buckets independent, ours and better-auth's. */
 export function freshIp(): string {
-  ipCounter += 1;
-  return `203.0.113.${ipCounter % 250}-${Date.now()}-${ipCounter}`;
+  ipCounter = (ipCounter + 1) % 0xffffff;
+  return `10.${(ipCounter >> 16) & 255}.${(ipCounter >> 8) & 255}.${ipCounter & 255}`;
 }
 
 export interface Harness {
@@ -21,13 +21,17 @@ export interface Harness {
   ip: string;
   send(path: string, init?: RequestInit & { ip?: string }): Promise<Response>;
   login(): Promise<string>;
-  issueCode(input?: { name?: string; duration?: string; window?: string }): Promise<string>;
-  activate(code: string, deviceId: string, ip?: string): Promise<Response>;
   form(path: string, cookie: string, fields: Record<string, string>): Promise<Response>;
-  /** Issues and activates a fresh license on a fresh device; returns the Bearer token. */
-  license(name?: string): Promise<string>;
-  /** Revokes the license that `token` belongs to, through the admin dashboard. */
-  revoke(token: string): Promise<void>;
+  /** Signs up through better-auth (as the app does); returns the session token and user id. Not approved. */
+  signUp(input?: { name?: string; email?: string; password?: string; ip?: string }): Promise<{ token: string; userId: string; email: string }>;
+  /** Signs up a fresh account and approves it in /admin; returns the Bearer session token. */
+  account(name?: string): Promise<string>;
+  /** User id behind a session token (GET /api/account). */
+  accountId(token: string): Promise<string>;
+  /** Runs an /admin account action (approve | disable | enable) for the account behind `token`. */
+  adminAction(token: string, action: 'approve' | 'disable' | 'enable'): Promise<void>;
+  /** Disables the account that `token` belongs to, through the admin dashboard. */
+  disable(token: string): Promise<void>;
   /** Sends with `Authorization: Bearer <token>`. */
   authed(path: string, token: string, init?: RequestInit & { ip?: string }): Promise<Response>;
 }
@@ -71,45 +75,47 @@ export async function harness(overrides: Omit<DepsOverrides, 'now'> = {}): Promi
     return cachedCookie;
   };
 
-  const issueCode: Harness['issueCode'] = async (input = {}) => {
-    const cookie = await login();
-    const res = await form('/admin/codes', cookie, {
-      name: input.name ?? 'كابتن تجربة',
-      duration: input.duration ?? 'lifetime',
-      window: input.window ?? '14',
-    });
-    return extractCode(await (await followIssued(send, res, cookie)).text());
-  };
-
-  const activate: Harness['activate'] = (code, deviceId, otherIp) =>
-    send('/api/activate', {
+  const signUp: Harness['signUp'] = async (input = {}) => {
+    const email = input.email ?? `trainer-${crypto.randomUUID()}@example.com`;
+    const res = await send('/api/auth/sign-up/email', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ code, deviceId }),
-      ...(otherIp === undefined ? {} : { ip: otherIp }),
+      headers: { 'Content-Type': 'application/json', Origin: TEST_APP_ORIGIN },
+      body: JSON.stringify({ name: input.name ?? 'كابتن تجربة', email, password: input.password ?? TEST_PASSWORD }),
+      ip: input.ip ?? freshIp(),
     });
-
-  const license: Harness['license'] = async (name) => {
-    const code = await issueCode(name === undefined ? {} : { name });
-    const res = await activate(code, crypto.randomUUID(), freshIp());
-    const body = (await res.json()) as { license?: string };
-    if (typeof body.license !== 'string') throw new Error(`activation failed: ${res.status}`);
-    return body.license;
+    const body = (await res.json()) as { token?: string; user?: { id?: string } };
+    if (typeof body.token !== 'string' || typeof body.user?.id !== 'string') throw new Error(`sign-up failed: ${res.status}`);
+    return { token: body.token, userId: body.user.id, email };
   };
 
-  const revoke: Harness['revoke'] = async (token) => {
-    const lid = decodeLicenseToken(token)?.payload.lid ?? '';
-    const res = await form('/admin/licenses/revoke', await login(), { lid, confirmed: 'yes' });
-    if (res.status !== 303) throw new Error(`revoke failed: ${res.status}`);
+  const accountId: Harness['accountId'] = async (token) => {
+    const res = await authed('/api/account', token, { ip: freshIp() });
+    const body = (await res.json()) as { account?: { id?: string } };
+    if (typeof body.account?.id !== 'string') throw new Error(`no account: ${res.status}`);
+    return body.account.id;
   };
 
-  const authed: Harness['authed'] = (path, token, init = {}) => {
+  const adminAction: Harness['adminAction'] = async (token, action) => {
+    const id = await accountId(token);
+    const res = await form(`/admin/accounts/${action}`, await login(), { id, confirmed: 'yes' });
+    if (res.status !== 303) throw new Error(`${action} failed: ${res.status}`);
+  };
+
+  const account: Harness['account'] = async (name) => {
+    const { token } = await signUp(name === undefined ? {} : { name });
+    await adminAction(token, 'approve');
+    return token;
+  };
+
+  const disable: Harness['disable'] = (token) => adminAction(token, 'disable');
+
+  function authed(path: string, token: string, init: RequestInit & { ip?: string } = {}): Promise<Response> {
     const headers = new Headers(init.headers);
     headers.set('Authorization', `Bearer ${token}`);
     return send(path, { ...init, headers });
-  };
+  }
 
-  return { deps, clock, ip, send, login, issueCode, activate, form, license, revoke, authed };
+  return { deps, clock, ip, send, login, form, signUp, account, accountId, adminAction, disable, authed };
 }
 
 /** A body that starts with the given 4-byte magic, then `size - 4` filler bytes. */
@@ -122,24 +128,6 @@ export function envelopeBytes(magic: 'PTP1' | 'PTK1', size: number, fill = 7): U
 export async function storedBytes(): Promise<number> {
   const row = await env.DB.prepare('SELECT bytes FROM storage_usage WHERE id = 1').first<{ bytes: number }>();
   return row?.bytes ?? 0;
-}
-
-/** Follows the dashboard's Post/Redirect/Get after a code is issued: GET /admin/issued with the one-time cookie. */
-export async function followIssued(
-  send: (path: string, init?: RequestInit) => Promise<Response>,
-  res: Response,
-  sessionCookie: string,
-): Promise<Response> {
-  const location = res.headers.get('Location');
-  const issued = (res.headers.get('Set-Cookie') ?? '').split(';')[0] ?? '';
-  if (res.status !== 303 || location !== '/admin/issued' || issued === '') throw new Error(`no issued redirect: ${res.status}`);
-  return send(location, { headers: { Cookie: `${sessionCookie}; ${issued}` } });
-}
-
-export function extractCode(html: string): string {
-  const match = /class="code">([A-Z0-9]{4}-[A-Z0-9]{4}-[A-Z0-9]{4})</.exec(html);
-  if (match?.[1] === undefined) throw new Error('no code in page');
-  return match[1];
 }
 
 export async function readJson(res: Response): Promise<Record<string, unknown>> {

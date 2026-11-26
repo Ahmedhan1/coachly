@@ -17,8 +17,8 @@ src/                 the app
   data/              Dexie schema, migrations, repositories, seeds
   services/          calendar, files, 3D, PDF, backup, cloud — each behind an interface with a fake
   i18n/              ar.ts (+ ar/ per feature), en/, fitness-terms.ts
-shared/              code shared by app and worker (license, envelope, brand icon, headers)
-worker/              Cloudflare Worker (activation, push, backup, client page, admin) with its own tests
+shared/              code shared by app and worker (byte helpers, envelope, brand icon, headers)
+worker/              Cloudflare Worker (accounts via better-auth, push, backup, client page, admin) with its own tests
 deploy/app/          Worker that serves the installed app's files from D1
 e2e/                 Playwright scenarios
 public/              static files shipped with the app (exercise pack, food photos, fonts, 3D model)
@@ -26,7 +26,6 @@ assets-src/          raw sources, not shipped as-is
   exercises/         exercise dataset, Arabic/English names and cues, extras and fixes
   model3d/           Blender export scripts and the public model repo template
 scripts/             build and check scripts (exercise pack, forbidden words)
-tools/               offline owner tools (key generation, offline activation codes)
 design/              design directions, fonts, promo video tooling
 docs/                SPEC, PLAN, DESIGN, LIMITS, MANUAL_QA, deployment and feature notes
 ```

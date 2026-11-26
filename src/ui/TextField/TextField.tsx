@@ -54,7 +54,7 @@ export interface TextAreaProps extends TextareaHTMLAttributes<HTMLTextAreaElemen
   ltr?: boolean;
 }
 
-/** Multi-line variant (e.g. the pasted offline activation code). */
+/** Multi-line variant (e.g. notes, long pasted text). */
 export function TextArea({ label, hint, error, ltr, className, id, ...rest }: TextAreaProps) {
   const autoId = useId();
   const inputId = id ?? autoId;

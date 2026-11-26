@@ -1,6 +1,6 @@
 // Cloud backup (feature 13). The body is an opaque PTP1 envelope (encrypted on the iPhone with the trainer's
 // password); the Worker checks the 4-byte magic and the size, never the content. Everything here is indexed by
-// the account id (`who.account`, the root license of a move chain), so a backup follows the trainer to a new
+// the account id (`who.account`, the user id), so a backup follows the trainer to a new
 // device. The `lid` parameters below are that account id.
 import { authenticate } from '../cloud/auth';
 import { checkedStream, declaredLength } from '../cloud/stream';

@@ -102,7 +102,7 @@ describe('HttpCloudBackupClient', () => {
     expect(errorFromResponse(404, null)).toBe('not_found');
   });
 
-  it('reads the license token from meta', async () => {
+  it('reads the session token from meta', async () => {
     expect(await metaTokenProvider({ get: async () => 'abc' }).getToken()).toBe('abc');
     expect(await metaTokenProvider({ get: async () => undefined }).getToken()).toBeNull();
     expect(await metaTokenProvider({ get: async () => Promise.reject(new Error('x')) }).getToken()).toBeNull();

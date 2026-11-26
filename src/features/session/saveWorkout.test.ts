@@ -3,7 +3,7 @@ import { createTestData } from '@/data/testing';
 import type { ClientId } from '@/domain/models';
 import { createSession } from '@/domain/programs';
 import { fixedOffsetClock } from '@/domain/schedule';
-import { memoryMetaStore } from '@/services/license/metaStore';
+import { memoryMetaStore } from '@/services/meta/metaStore';
 import { createScheduleWriter } from '@/features/schedule/scheduleWriter';
 import { saveWorkout } from './saveWorkout';
 

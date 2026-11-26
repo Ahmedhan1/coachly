@@ -21,7 +21,7 @@ import {
  */
 
 /** Meta keys that belong to this device/install and never travel inside a backup. */
-export const DEVICE_LOCAL_META_PREFIXES: readonly string[] = ['license.', 'backup.'];
+export const DEVICE_LOCAL_META_PREFIXES: readonly string[] = ['auth.', 'backup.'];
 
 export function isDeviceLocalMetaKey(key: string): boolean {
   return DEVICE_LOCAL_META_PREFIXES.some((p) => key.startsWith(p));

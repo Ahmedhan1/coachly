@@ -143,6 +143,14 @@ and exercise images from **Pages static assets**, not R2 (free and unlimited); o
 
 ### CPU 10 ms per invocation
 
+**Accounts (2026-11-26), measured in workerd (vitest pool, this machine):** better-auth's default scrypt (pure JS)
+takes ~80 ms per hash, 8× the Free plan budget, so sign-up/sign-in would fail with "exceeded CPU". The Worker uses
+Web Crypto PBKDF2-SHA-256 instead (`worker/src/auth/password.ts`): ~1.5 ms per 10,000 iterations, 30,000 iterations
+≈ 4.5 ms. A whole sign-in request measured ~15 ms wall time locally, most of it local D1 I/O (which does not count
+as CPU); the better-auth instance is built once per isolate. **Check the real CPU time of `/api/auth/sign-in/email`
+in the Cloudflare dashboard after the first deploy** (docs/MANUAL_QA.md); if it is over budget, lower
+`PASSWORD_ITERATIONS` (old hashes keep working: the cost is stored in each hash).
+
 Not measured yet — measured for real in Phase 3 (Ed25519 signing on activation) and Phase 9 (Web Push:
 ECDH P-256 + HKDF + AES-GCM payload encryption + ES256 VAPID JWT per message). Design that does not depend on
 the measurement: the cron run sends at most **N pushes per run** (start with N = 20, tune after measuring) and
@@ -199,8 +207,9 @@ not guarantee it.
   (`pagesLicenseMaxBytes`); above it publishing answers `507 storage_full` and a client check-in answers
   `429 too_many_pending`. Without it one license could hold ~13 GB (200 pages × 5 MiB + 200 × 20 × 3 MiB) and
   push the whole bucket over the global guard for every trainer.
-- Known, accepted: the global activation limit (300/h) and global login limit (30/h) can be exhausted on
-  purpose by a few IPs (temporary lock-out, not a breach; the offline long code still activates). Revoked
+- Known, accepted: the global sign-in/sign-up limit (600/h) and the global admin login limit (30/h) can be
+  exhausted on purpose by a few IPs (temporary lock-out, not a breach; an app that is already signed in keeps
+  working offline). Revoked
   `shares` rows are kept forever so an id is never reused (tiny rows).
 
 ## 3b. On-device storage (not Cloudflare)

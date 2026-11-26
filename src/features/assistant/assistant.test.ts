@@ -4,7 +4,7 @@ import { AppDatabase, createDataLayer } from '@/data';
 import { fakeIdbOptions, manualClock } from '@/data/testing';
 import { planAction, validateToolCall, type ProposedAction, type ReadCall } from '@/domain/ai';
 import { fixedOffsetClock } from '@/domain/schedule';
-import { memoryMetaStore } from '@/services/license/metaStore';
+import { memoryMetaStore } from '@/services/meta/metaStore';
 import { readAiSettings, readTasks, AI_SETTINGS_KEY } from './aiSettings';
 import { buildPlanContext, runReadTool } from './assistantData';
 import { executeProposal } from './executor';

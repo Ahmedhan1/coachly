@@ -2,7 +2,7 @@ import type { CloudDeps } from '../ports';
 import { adjustUsage, storedBytes } from '../cloud/usage';
 
 export interface BackupRow {
-  /** Account id (root license id, see LicenseRecord.rootLid). */
+  /** Account id (the user id). */
   lid: string;
   /** Lid used in this row's R2 keys when it differs from `lid` (backups written before migration 0003). */
   key_lid: string | null;
@@ -28,7 +28,7 @@ export interface UploadRow {
 
 export const BACKUP_MAGIC = 'PTP1';
 
-/** Two slots per license; D1 says which one is the latest. R2 has no rename/copy, so we flip a pointer instead. */
+/** Two slots per account; D1 says which one is the latest. R2 has no rename/copy, so we flip a pointer instead. */
 export function backupKey(lid: string, slot: 0 | 1): string {
   return `backups/${encodeURIComponent(lid)}/${slot}`;
 }
@@ -51,7 +51,7 @@ export function getUpload(db: D1Database, uploadId: string, lid: string): Promis
   return db.prepare('SELECT * FROM backup_uploads WHERE upload_id = ? AND lid = ?').bind(uploadId, lid).first<UploadRow>();
 }
 
-/** Aborts this account's unfinished multipart upload, if any (one at a time per license). */
+/** Aborts this account's unfinished multipart upload, if any (one at a time per account). */
 export async function abortPendingUpload(cloud: CloudDeps, lid: string): Promise<void> {
   const pending = await cloud.db.prepare('SELECT * FROM backup_uploads WHERE lid = ?').bind(lid).first<UploadRow>();
   if (pending === null) return;

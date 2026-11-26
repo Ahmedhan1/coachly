@@ -1,5 +1,5 @@
 import { expect, test, type Page } from '@playwright/test';
-import { DEMO_CODE, openAddClient } from './helpers';
+import { GUEST_BUTTON, openAddClient } from './helpers';
 
 const OUT = 'docs/screenshots/core';
 const DEVICES = [
@@ -30,10 +30,9 @@ for (const device of DEVICES) {
         await shot(page, `install-gate-${tag}`);
 
         await page.goto('/?standalone=1');
-        await expect(page.getByTestId('device-id')).not.toHaveText('…');
-        await page.getByLabel('كود التفعيل').fill(DEMO_CODE);
-        await shot(page, `activation-${tag}`);
-        await page.getByRole('button', { name: 'تفعيل', exact: true }).click();
+        await expect(page.getByRole('heading', { level: 1, name: 'أهلاً بيك' })).toBeVisible();
+        await shot(page, `sign-in-${tag}`);
+        await page.getByRole('button', { name: GUEST_BUTTON }).click();
 
         await expect(page.getByText('خطوة 1 من 4')).toBeVisible();
         await page.getByLabel('اسمك زي ما تحب العملاء يشوفوه').fill('كابتن كريم');

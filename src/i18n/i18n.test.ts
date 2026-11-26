@@ -4,7 +4,7 @@ import { ar, t, tParts } from './index';
 describe('t()', () => {
   it('looks up nested keys', () => {
     expect(t('tabs.home')).toBe('الرئيسية');
-    expect(t('activation.errors.used')).toBe(ar.activation.errors.used);
+    expect(t('auth.errors.email_taken')).toBe(ar.auth.errors.email_taken);
   });
   it('interpolates params with Western digits', () => {
     expect(t('clients.remaining', { n: 12 })).toBe('باقي 12 حصة');

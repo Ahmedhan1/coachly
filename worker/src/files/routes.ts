@@ -1,7 +1,7 @@
 // Cloud files API (photos, thumbnails, invoices, PDFs). Bodies are PTK1 envelopes encrypted on the device; the
 // Worker checks the magic and the size, stores the bytes in the object store (iDrive e2) and indexes them in D1.
 //
-// Trainer (Authorization: Bearer <license token>):
+// Trainer (Authorization: Bearer <session token>):
 //   GET    /api/files[?kind=&ref=&source=&since=]  list (newest change last, up to 500)
 //   POST   /api/files?kind=<kind>[&ref=<ref>]        create        → 201 { file }
 //   GET    /api/files/:id                            download (octet-stream)
@@ -10,7 +10,7 @@
 // Client page (X-Checkin-Token, the same write token as check-ins):
 //   POST   /api/share/:shareId/files?kind=client_photo|client_upload → 201 { id }
 //          A new client_photo replaces the client's previous one from that page.
-import { base64UrlDecode, base64UrlEncode } from '../../../shared/license';
+import { base64UrlDecode, base64UrlEncode } from '../../../shared/bytes';
 import {
   FILE_ID,
   FILE_MAGIC,

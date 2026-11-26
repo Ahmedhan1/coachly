@@ -1,6 +1,6 @@
 import { handleAdmin, type AdminHooks } from './admin/routes';
 import { AI_RELAY_PATH, handleAiRelay } from './ai/relay';
-import { handleActivate, handleStatus } from './api';
+import { routeAuthApi, routeAuthPages } from './auth/routes';
 import { routeBackup } from './backup/routes';
 import { clientIp, corsHeaders, json, withHeaders } from './http';
 import type { Deps } from './ports';
@@ -16,6 +16,8 @@ export async function handleRequest(request: Request, deps: Deps, hooks: AdminHo
   const clientKey = await deps.crypto.hashClient(clientIp(request));
 
   if (url.pathname === '/admin' || url.pathname.startsWith('/admin/')) return handleAdmin(request, deps, clientKey, hooks);
+  const authPage = await routeAuthPages(request, url, deps, clientKey);
+  if (authPage !== null) return authPage;
 
   const viewer = /^\/c\/([^/]+)$/.exec(url.pathname);
   if (viewer !== null && request.method === 'GET' && !deps.cloud.bucket) return json({ error: 'storage_unavailable' }, 503);
@@ -47,8 +49,8 @@ export async function handleRequest(request: Request, deps: Deps, hooks: AdminHo
 }
 
 async function routeApi(request: Request, path: string, deps: Deps, clientKey: string): Promise<Response> {
-  if (request.method === 'POST' && path === '/api/activate') return handleActivate(request, deps, clientKey);
-  if (request.method === 'GET' && path === '/api/license/status') return handleStatus(request, deps, clientKey);
+  const auth = await routeAuthApi(request, path, deps, clientKey);
+  if (auth !== null) return auth;
   if (request.method === 'POST' && path === AI_RELAY_PATH) return handleAiRelay(request, deps, clientKey);
   // Cloud files live in the external object store (not R2), so they do not depend on the R2 binding.
   if (path === '/api/files' || path.startsWith('/api/files/')) return (await routeFiles(request, path, deps, clientKey)) ?? notFound(deps, clientKey);

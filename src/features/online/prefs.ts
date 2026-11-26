@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import type { MetaStore } from '@/services/license/metaStore';
+import type { MetaStore } from '@/services/meta/metaStore';
 import type { ClientShare } from '@/services/clientPage/clientPageService';
 
 /** Device-local (`backup.` prefix → never inside a backup): the push subscription belongs to this phone. */

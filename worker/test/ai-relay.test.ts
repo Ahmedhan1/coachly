@@ -24,7 +24,7 @@ async function relay(h: Harness, token: string | null, upstream: Upstream, init:
 }
 
 describe('POST /api/ai/relay', () => {
-  it('is registered and needs a license token (never calls Groq without one)', async () => {
+  it('is registered and needs an account session (never calls Groq without one)', async () => {
     const h = await harness();
     const res = await h.send('/api/ai/relay', { method: 'POST', headers: { 'X-Groq-Key': KEY }, body: '{}' });
     expect(res.status).toBe(401);
@@ -36,7 +36,7 @@ describe('POST /api/ai/relay', () => {
 
   it('forwards only known fields with the trainer key and returns Groq answer as is', async () => {
     const h = await harness();
-    const token = await h.license();
+    const token = await h.account();
     const seen: Seen[] = [];
     const res = await relay(h, token, fakeUpstream(seen));
     expect(res.status).toBe(200);
@@ -50,7 +50,7 @@ describe('POST /api/ai/relay', () => {
 
   it('passes Groq errors and retry-after through', async () => {
     const h = await harness();
-    const token = await h.license();
+    const token = await h.account();
     const res = await relay(h, token, fakeUpstream([], () => Response.json({ error: { message: 'Rate limit', code: 'rate_limit_exceeded' } }, { status: 429, headers: { 'retry-after': '12' } })));
     expect(res.status).toBe(429);
     expect(res.headers.get('Retry-After')).toBe('12');
@@ -59,7 +59,7 @@ describe('POST /api/ai/relay', () => {
 
   it('refuses a missing or odd Groq key, a bad body and a body over 64 KB', async () => {
     const h = await harness();
-    const token = await h.license();
+    const token = await h.account();
     const seen: Seen[] = [];
     expect(await readJson(await relay(h, token, fakeUpstream(seen), { key: null }))).toEqual({ error: 'bad_key' });
     expect(await readJson(await relay(h, token, fakeUpstream(seen), { key: 'sk-ant-xyz' }))).toEqual({ error: 'bad_key' });
@@ -72,7 +72,7 @@ describe('POST /api/ai/relay', () => {
 
   it('answers 502 upstream when Groq cannot be reached', async () => {
     const h = await harness();
-    const token = await h.license();
+    const token = await h.account();
     const res = await relay(h, token, async () => {
       throw new TypeError('network');
     });
@@ -80,9 +80,9 @@ describe('POST /api/ai/relay', () => {
     expect(await readJson(res)).toEqual({ error: 'upstream' });
   });
 
-  it('rate limits per license (per minute, in memory)', async () => {
+  it('rate limits per account (per minute, in memory)', async () => {
     const h = await harness();
-    const token = await h.license();
+    const token = await h.account();
     const seen: Seen[] = [];
     let last: Response | null = null;
     for (let i = 0; i <= AI_RULES.minute.limit; i++) last = await relay(h, token, fakeUpstream(seen), { ip: freshIp() });
@@ -92,10 +92,10 @@ describe('POST /api/ai/relay', () => {
     expect(seen).toHaveLength(AI_RULES.minute.limit);
   });
 
-  it('refuses a revoked license', async () => {
+  it('refuses a disabled account', async () => {
     const h = await harness();
-    const token = await h.license();
-    await h.revoke(token);
+    const token = await h.account();
+    await h.disable(token);
     expect((await relay(h, token, fakeUpstream([]))).status).toBe(403);
   });
 

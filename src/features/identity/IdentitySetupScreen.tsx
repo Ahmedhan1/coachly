@@ -18,7 +18,7 @@ const STEPS: readonly Step[] = [
   { key: 'units', Body: UnitsSection },
 ];
 
-/** First run after activation (SPEC screen 1): 4 short steps, every one skippable, all editable later. */
+/** First run after sign-in (SPEC screen 1): 4 short steps, every one skippable, all editable later. */
 export function IdentitySetupScreen({ onDone }: { onDone: () => void }) {
   const { draft, update, save } = useIdentityDraft(true);
   const hint = useIconHint(onDone);

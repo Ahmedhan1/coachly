@@ -5,10 +5,10 @@ import type { Deps, RateRule } from '../ports';
 /**
  * POST /api/ai/relay — fallback for the in-app assistant when Safari cannot reach Groq directly.
  *
- * - Needs a valid license token (`Authorization: Bearer`), like every cloud endpoint.
+ * - Needs an approved account session (`Authorization: Bearer`), like every cloud endpoint.
  * - The trainer's own Groq key arrives in `X-Groq-Key` and is only forwarded: never logged, stored or echoed.
  * - Body ≤ 64 KB, only known chat-completion fields are forwarded (no streaming).
- * - Rate limited per license: a per-minute cap in memory (no D1 write) plus a daily cap via authenticate().
+ * - Rate limited per account: a per-minute cap in memory (no D1 write) plus a daily cap via authenticate().
  * - Answers with Groq's own status and body, so the app reads them exactly like a direct call.
  * Relay-own refusals use a string error ({ error: 'rate_limited' }); Groq's errors are objects.
  */
@@ -20,9 +20,9 @@ const MAX_RESPONSE_BYTES = 512 * 1024;
 const UPSTREAM_TIMEOUT_MS = 30_000;
 
 export const AI_RULES = {
-  /** Per license, per isolate (memory only). Groq's free tier itself allows about 30 requests a minute. */
+  /** Per account, per isolate (memory only). Groq's free tier itself allows about 30 requests a minute. */
   minute: { name: 'ai-relay-min', limit: 30, windowSeconds: 60 },
-  /** Per license, durable (memory pre-filter + D1). */
+  /** Per account, durable (memory pre-filter + D1). */
   day: { name: 'ai-relay-day', limit: 2000, windowSeconds: 86_400 },
 } as const satisfies Record<string, RateRule>;
 
@@ -37,7 +37,7 @@ export async function handleAiRelay(request: Request, deps: Deps, clientKey: str
   if (!auth.ok) return auth.response;
 
   const now = deps.now();
-  if (!(await deps.localLimiter.hit(AI_RULES.minute, auth.who.lid, now))) {
+  if (!(await deps.localLimiter.hit(AI_RULES.minute, auth.who.userId, now))) {
     return json({ error: 'rate_limited' }, 429, { 'Retry-After': String(AI_RULES.minute.windowSeconds - (now % AI_RULES.minute.windowSeconds)) });
   }
 

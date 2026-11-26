@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { SENT_LOG_MAX_ENTRIES } from '@/domain/outbox';
-import { memoryMetaStore } from '@/services/license/metaStore';
+import { memoryMetaStore } from '@/services/meta/metaStore';
 import { markSent, readSent } from './useOutbox';
 
 const NOW = new Date('2026-11-17T10:00:00Z');

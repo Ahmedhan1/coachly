@@ -1,18 +1,19 @@
-# Cloudflare Worker for PT Coach: activation codes, cloud backup, Web Push, client page. Free tier only:
-# Workers + D1 + R2 + one Cron Trigger. Owner guides (Arabic): ../docs/ACTIVATION.md, ../docs/CLOUD.md
+# Cloudflare Worker for PT Coach: trainer accounts (better-auth), cloud backup, Web Push, client page. Free tier
+# only: Workers + D1 + R2 + one Cron Trigger. Owner guides (Arabic): ../docs/ACCOUNTS.md, ../docs/CLOUD.md
 name = "pt-coach-license"
 main = "src/index.ts"
 compatibility_date = "2026-08-01"
-
-# shared/license.ts lives outside this folder; make it use this package's copy of @noble/ed25519.
-[alias]
-"@noble/ed25519" = "./node_modules/@noble/ed25519/index.js"
+# better-auth uses node:async_hooks (AsyncLocalStorage). Free; part of the Workers runtime.
+compatibility_flags = ["nodejs_compat"]
 
 [vars]
 # Address of the installed app (Cloudflare Pages). Several origins may be separated by commas.
 APP_ORIGIN = "https://pt-coach.nexus-ahmed.workers.dev"
-# Public key printed by tools/keygen.mjs (hex). Not secret. Must match LICENSE_PRIVATE_KEY.
-LICENSE_PUBLIC_KEY = "f7b05d930a69c89ddaec69450fbf3e2d03934f222507e3a2d03256def880e301"
+# This Worker's own public address (better-auth builds Google's callback URL from it).
+BETTER_AUTH_URL = "https://pt-coach-license.nexus-ahmed.workers.dev"
+# Google sign-in: the OAuth client id from Google Cloud Console (not secret). Empty = Google button hidden/off.
+# Authorised redirect URI there: <BETTER_AUTH_URL>/api/auth/callback/google
+GOOGLE_CLIENT_ID = ""
 # Cloud backup cap per trainer, bytes (100 MiB). docs/LIMITS.md explains the R2 budget.
 BACKUP_MAX_BYTES = "104857600"
 # Above this total (9 GiB of the 10 GB free R2), uploads that would grow storage get `storage_full`.
@@ -26,9 +27,10 @@ FILES_BUCKET = "onlincoaching"
 FILES_ACCOUNT_MAX_BYTES = "1073741824"
 
 # Secrets (never in this file) - set with `npx wrangler secret put NAME`:
-#   LICENSE_PRIVATE_KEY  Ed25519 private key (hex, 64 chars) from tools/keygen.mjs
-#   ADMIN_PASSWORD       password for /admin
-#   DATA_KEY             key that unlocks the app's data pack (returned on activation)
+#   BETTER_AUTH_SECRET   random text, at least 32 characters (e.g. `openssl rand -base64 32`). Changing it signs
+#                        every trainer out of the cloud (the app keeps working offline).
+#   ADMIN_PASSWORD       password for /admin (at least 12 characters)
+#   GOOGLE_CLIENT_SECRET Google OAuth client secret (Google sign-in is off until it and GOOGLE_CLIENT_ID exist)
 #   VAPID_PRIVATE_KEY    Web Push private key from `npm run vapid:keys` (push is off until all three VAPID_* exist)
 #   VAPID_PUBLIC_KEY     Web Push public key from `npm run vapid:keys`
 #   VAPID_SUBJECT        contact for push services, e.g. mailto:you@example.com

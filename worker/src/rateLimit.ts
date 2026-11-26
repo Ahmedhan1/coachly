@@ -1,16 +1,18 @@
 import type { RateLimiter, RateRule } from './ports';
 
 export const RULES = {
-  activate: { name: 'activate', limit: 10, windowSeconds: 600 },
-  activateGlobal: { name: 'activate-all', limit: 300, windowSeconds: 3600 },
-  status: { name: 'status', limit: 120, windowSeconds: 3600 },
+  /** Account writes (sign-in, sign-up, Google start/handoff, one-time token): per IP and for everyone. */
+  authWrite: { name: 'auth-write', limit: 20, windowSeconds: 600 },
+  authWriteGlobal: { name: 'auth-write-all', limit: 600, windowSeconds: 3600 },
+  /** Session reads (get-session, /api/account): per IP. */
+  authRead: { name: 'auth-read', limit: 240, windowSeconds: 3600 },
   login: { name: 'login', limit: 5, windowSeconds: 900 },
   loginGlobal: { name: 'login-all', limit: 30, windowSeconds: 3600 },
   admin: { name: 'admin', limit: 300, windowSeconds: 3600 },
   preflight: { name: 'preflight', limit: 120, windowSeconds: 600 },
   other: { name: 'other', limit: 60, windowSeconds: 600 },
 
-  // ---- phase 9 (per license / device unless noted) ----
+  // ---- phase 9 (per account / device unless noted) ----
   /** Per IP, memory only: caps signature checks before any D1 write is spent. */
   cloudIp: { name: 'cloud-ip', limit: 600, windowSeconds: 600 },
   backupWrite: { name: 'backup-write', limit: 24, windowSeconds: 86_400 },
@@ -27,7 +29,7 @@ export const RULES = {
   checkinIpHour: { name: 'checkin-ip-h', limit: 6, windowSeconds: 3600 },
   checkinIpDay: { name: 'checkin-ip-d', limit: 20, windowSeconds: 86_400 },
   checkinPage: { name: 'checkin-page', limit: 10, windowSeconds: 86_400 },
-  /** Cloud files: per license. */
+  /** Cloud files: per account. */
   filesWrite: { name: 'files-write', limit: 400, windowSeconds: 86_400 },
   filesRead: { name: 'files-read', limit: 2000, windowSeconds: 86_400 },
   /** Client-page uploads (public, write token): per IP and per page. */

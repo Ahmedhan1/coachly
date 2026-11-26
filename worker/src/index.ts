@@ -1,15 +1,9 @@
-import { precomputeSigningTables } from '../../shared/license';
 import { handleRequest } from './app';
 import { depsFromEnv } from './deps';
 import type { Env } from './env';
 import { json } from './http';
 import { runPushCron } from './push/cron';
 import { MemoryRateLimiter } from './rateLimit';
-
-// Build the Ed25519 base-point table at startup (global scope, outside the per-request CPU budget).
-// Measured in Node 22 (`npm run bench`): 25-55 ms once here; then the first signature ~3-4 ms and warm ones
-// ~1 ms, versus ~40 ms for the first signature without it. Warm verify (status endpoint) ~2-3 ms.
-precomputeSigningTables();
 
 const memoryLimiter = new MemoryRateLimiter();
 

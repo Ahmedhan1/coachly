@@ -1,7 +1,7 @@
 // Security / production hardening found in the 2026-11 audit. Each block pins one fix.
 import { env } from 'cloudflare:workers';
 import { describe, expect, it } from 'vitest';
-import { base64UrlEncode, decodeLicenseToken } from '../../shared/license';
+import { base64UrlEncode } from '../../shared/bytes';
 import { readLimitedText } from '../src/http';
 import { runPushCron } from '../src/push/cron';
 import { envelopeBytes, freshIp, harness, readJson, type Harness, BASE } from './helpers';
@@ -81,12 +81,9 @@ describe('response headers and errors', () => {
 
   it('an unexpected exception becomes a generic JSON 500 with CORS, never a stack trace', async () => {
     const h = await harness();
-    h.deps.store.findByCodeHash = () => Promise.reject(new Error('D1_ERROR: secret table detail'));
-    const res = await h.send('/api/activate', {
-      method: 'POST',
-      headers: { Origin: TEST_APP_ORIGIN, 'Content-Type': 'application/json' },
-      body: JSON.stringify({ code: 'ABCD-EFGH-JKMN', deviceId: crypto.randomUUID() }),
-    });
+    // A stub of its own: the real account system is shared by every test in this isolate.
+    h.deps.accounts = { ...h.deps.accounts, session: () => Promise.reject(new Error('D1_ERROR: secret table detail')) };
+    const res = await h.send('/api/backup', { method: 'GET', headers: { Origin: TEST_APP_ORIGIN, Authorization: 'Bearer x' } });
     expect(res.status).toBe(500);
     expect(res.headers.get('Access-Control-Allow-Origin')).toBe(TEST_APP_ORIGIN);
     const text = await res.text();
@@ -98,7 +95,7 @@ describe('response headers and errors', () => {
 describe('D1 write budget (100,000 rows / day on Free)', () => {
   it('a public client-page read spends no D1 write on rate limiting', async () => {
     const h = await harness();
-    const token = await h.license();
+    const token = await h.account();
     const shareId = newId();
     expect((await putPage(h, token, shareId, 64, await sha256B64(new Uint8Array(32)))).status).toBe(200);
     const before = await rateRows('share-read');
@@ -116,7 +113,7 @@ describe('D1 write budget (100,000 rows / day on Free)', () => {
 
   it('re-sending an unchanged push schedule rewrites nothing (retry state kept); changes still apply', async () => {
     const h = await harness();
-    const token = await h.license();
+    const token = await h.account();
     const now = h.clock.now;
     const sub = { subscription: { endpoint: `https://web.push.apple.com/${newId()}`, keys: { p256dh: UA_PUBLIC, auth: UA_AUTH } } };
     expect((await h.authed('/api/push/subscribe', token, { method: 'POST', body: JSON.stringify(sub) })).status).toBe(200);
@@ -174,22 +171,20 @@ describe('push cron backlog', () => {
   });
 });
 
-describe('license token binding', () => {
-  it('refuses a validly signed token whose device does not match the activated device', async () => {
+describe('session tokens', () => {
+  it('a cookie alone never authorises a cloud call, and a made-up bearer token is refused', async () => {
     const h = await harness();
-    const token = await h.license();
-    const payload = decodeLicenseToken(token)?.payload;
-    if (payload === undefined) throw new Error('no payload');
-    const forged = await h.deps.crypto.signLicense({ ...payload, dev: 'f'.repeat(32) });
+    const token = await h.account();
     expect((await h.authed('/api/backup', token, { method: 'HEAD' })).status).toBe(404);
-    expect((await h.authed('/api/backup', forged, { method: 'HEAD' })).status).toBe(401);
+    expect((await h.send('/api/backup', { method: 'HEAD', headers: { Cookie: `__Secure-better-auth.session_token=${token}` } })).status).toBe(401);
+    expect((await h.authed('/api/backup', `${token}x`, { method: 'HEAD' })).status).toBe(401);
   });
 });
 
-describe('client-page storage per license', () => {
-  it('caps pages + pending check-ins per license so one trainer cannot fill the shared R2', async () => {
-    const h = await harness({ cloudConfig: { pagesLicenseMaxBytes: 1000 } });
-    const token = await h.license();
+describe('client-page storage per account', () => {
+  it('caps pages + pending check-ins per account so one trainer cannot fill the shared R2', async () => {
+    const h = await harness({ cloudConfig: { pagesAccountMaxBytes: 1000 } });
+    const token = await h.account();
     const writeToken = crypto.getRandomValues(new Uint8Array(32));
     const hash = await sha256B64(writeToken);
     const first = newId();

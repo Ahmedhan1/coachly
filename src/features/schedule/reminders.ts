@@ -1,4 +1,4 @@
-import type { MetaStore } from '@/services/license/metaStore';
+import type { MetaStore } from '@/services/meta/metaStore';
 import { REMINDERS_PROMPT_KEY } from './prefs';
 
 /**

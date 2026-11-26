@@ -1,6 +1,6 @@
 import { readFileSync } from 'node:fs';
 import { expect, test, type Page } from '@playwright/test';
-import { DEMO_CODE } from './helpers';
+import { GUEST_BUTTON } from './helpers';
 
 // The trainer's logo on the home-screen icon. The app Worker endpoints (/api/brand, /b/<id>/...) are not
 // served by `vite preview`, so they are mocked here; their own validation is unit-tested in shared/brandIcon.
@@ -74,8 +74,7 @@ test.describe('installed app', () => {
   test('first launch from a branded icon brings the logo in, and later launches show it instantly', async ({ page }) => {
     await mockBrandServer(page);
     await page.goto(`/?brand=${ID}&standalone=1`);
-    await page.getByLabel('كود التفعيل').fill(DEMO_CODE);
-    await page.getByRole('button', { name: 'تفعيل', exact: true }).click();
+    await page.getByRole('button', { name: GUEST_BUTTON }).click();
     await expect(page.getByRole('heading', { level: 1, name: 'اسمك إيه؟' })).toBeVisible();
     await page.getByRole('textbox').first().fill('كابتن اختبار');
     await page.getByRole('button', { name: 'التالي' }).click();
@@ -96,8 +95,7 @@ test.describe('installed app', () => {
     await context.grantPermissions(['clipboard-read', 'clipboard-write']);
     const uploads = await mockBrandServer(page);
     await page.goto(`/?brand=${ID}&standalone=1`);
-    await page.getByLabel('كود التفعيل').fill(DEMO_CODE);
-    await page.getByRole('button', { name: 'تفعيل', exact: true }).click();
+    await page.getByRole('button', { name: GUEST_BUTTON }).click();
     await page.getByRole('button', { name: 'بعدين' }).click();
     await expect(page.getByRole('navigation', { name: 'التنقل الرئيسي' })).toBeVisible();
     await page.goto('/more/settings/identity?standalone=1');

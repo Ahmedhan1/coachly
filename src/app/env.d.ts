@@ -2,11 +2,9 @@
 /// <reference types="vite-plugin-pwa/vanillajs" />
 
 interface ImportMetaEnv {
-  /** "1" in the e2e build: enables the ?standalone=1 install-gate bypass and the fake activation service. */
+  /** "1" in the e2e build: enables the ?standalone=1 install-gate bypass, the guest button and ?worker=. */
   readonly VITE_E2E?: string;
-  /** "1" in `npm run dev` only: use the fake activation service (any well-formed short code). */
-  readonly VITE_FAKE_ACTIVATION?: string;
-  /** License Worker base URL, e.g. https://pt-coach-license.<account>.workers.dev */
+  /** Account/cloud Worker base URL, e.g. https://pt-coach-license.<account>.workers.dev (or http://localhost:8787). */
   readonly VITE_WORKER_URL?: string;
   readonly VITE_APP_VERSION?: string;
   /** Set by vite.config.ts at build time: build date + git commit. */

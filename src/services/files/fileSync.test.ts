@@ -1,9 +1,9 @@
 import { describe, expect, it } from 'vitest';
 import { createTestData } from '@/data/testing';
-import { memoryMetaStore } from '@/services/license/metaStore';
+import { memoryMetaStore } from '@/services/meta/metaStore';
 import { FakeImageDownscaler } from '@/services/storage/fakeImageDownscaler';
 import { generateRawKey, openWithKey, sealWithKey } from '../../../shared/envelope';
-import { base64UrlEncode } from '../../../shared/license';
+import { base64UrlEncode } from '../../../shared/bytes';
 import { packFile, unpackFile } from '@/domain/files';
 import { FakeCloudFilesClient } from './fakeCloudFilesClient';
 import { FILES_KEY_META, FileSyncService } from './fileSyncService';

@@ -1,0 +1,169 @@
+.page {
+  max-inline-size: 480px;
+  margin-inline: auto;
+  padding:
+    calc(var(--safe-top) + var(--sp-7)) calc(var(--gutter) + var(--safe-right))
+    calc(var(--safe-bottom) + var(--sp-7)) calc(var(--gutter) + var(--safe-left));
+}
+
+.mark {
+  display: grid;
+  place-items: center;
+  inline-size: 56px;
+  block-size: 56px;
+  margin-block-end: var(--sp-4);
+  border-radius: var(--r-md);
+  background: var(--brand);
+  color: var(--brand-on);
+  font: var(--t-large-title);
+}
+
+.title {
+  font: var(--t-display);
+}
+
+.lead {
+  margin-block: var(--sp-2) var(--sp-6);
+  color: var(--text-2);
+}
+
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-3);
+  margin-block-start: var(--sp-5);
+}
+
+.passwordRow {
+  position: relative;
+}
+
+/*
+ * The eye button sits at the row's inline end (left in Arabic, right in English). The password input itself is
+ * always LTR, so its own logical sides do not follow the page: reserve the space on the side the button is on.
+ */
+.passwordRow input {
+  padding-inline-end: 52px;
+}
+
+:global([dir='rtl']) .passwordRow input {
+  padding-inline-start: 52px;
+  padding-inline-end: var(--sp-4);
+}
+
+.reveal {
+  position: absolute;
+  inset-inline-end: var(--sp-1);
+  inset-block-start: 30px;
+  display: grid;
+  place-items: center;
+  inline-size: 44px;
+  block-size: 44px;
+  border: 0;
+  border-radius: var(--r-control);
+  background: transparent;
+  color: var(--text-2);
+}
+
+.error {
+  margin: 0;
+  padding: var(--sp-3) var(--sp-4);
+  border-radius: var(--r-md);
+  background: var(--danger-tint);
+  color: var(--danger);
+  font: var(--t-sub);
+}
+
+.note {
+  margin: 0;
+  font: var(--t-caption);
+  color: var(--text-2);
+  text-align: center;
+}
+
+.or {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-3);
+  margin-block: var(--sp-5) var(--sp-3);
+  font: var(--t-caption);
+  color: var(--text-3);
+}
+
+.or::before,
+.or::after {
+  content: '';
+  flex: 1;
+  border-block-start: 1px solid var(--line-strong);
+}
+
+.googleMark {
+  display: inline-grid;
+  place-items: center;
+  inline-size: 24px;
+  block-size: 24px;
+  border-radius: 50%;
+  background: var(--surface);
+  color: var(--brand);
+  font: var(--t-label);
+}
+
+.guest {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-1);
+  margin-block-start: var(--sp-6);
+  padding-block-start: var(--sp-4);
+  border-block-start: 1px dashed var(--line-strong);
+}
+
+.who {
+  margin-block-end: var(--sp-2);
+  font: var(--t-sub);
+  color: var(--text-2);
+}
+
+.gateIcon,
+.gateIconOff {
+  display: grid;
+  place-items: center;
+  inline-size: 56px;
+  block-size: 56px;
+  margin-block-end: var(--sp-4);
+  border-radius: var(--r-md);
+  background: var(--brand);
+  color: var(--brand-on);
+  font-size: 28px;
+}
+
+.gateIconOff {
+  background: var(--danger-tint);
+  color: var(--danger);
+}
+
+.build {
+  margin: var(--sp-6) 0 0;
+  font: var(--t-caption);
+  color: var(--text-3);
+  text-align: center;
+  font-variant-numeric: tabular-nums;
+}
+
+.langRow {
+  display: flex;
+  justify-content: flex-end;
+  margin-block-end: var(--sp-2);
+}
+
+.langToggle {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--sp-2);
+  min-block-size: 44px;
+  padding-inline: var(--sp-3);
+  border: 1px solid var(--line-strong);
+  border-radius: var(--r-control);
+  background: transparent;
+  color: var(--text-2);
+  font: var(--t-sub);
+}

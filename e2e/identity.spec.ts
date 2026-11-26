@@ -1,10 +1,10 @@
 import { expect, test } from '@playwright/test';
-import { activateWithFakeCode } from './helpers';
+import { enterAsGuest } from './helpers';
 
 const rootVar = (name: string) => `getComputedStyle(document.documentElement).getPropertyValue('${name}').trim().toUpperCase()`;
 
 test('first-run identity setup: name, brand color with live preview, currency; editable later in settings', async ({ page }) => {
-  await activateWithFakeCode(page);
+  await enterAsGuest(page);
   await expect(page.getByText('خطوة 1 من 4')).toBeVisible();
   await expect(page.getByRole('heading', { level: 1, name: 'اسمك إيه؟' })).toBeVisible();
   await page.getByLabel('اسمك زي ما تحب العملاء يشوفوه').fill('كابتن تامر');
@@ -54,7 +54,7 @@ test('first-run identity setup: name, brand color with live preview, currency; e
 });
 
 test('identity setup can be skipped entirely', async ({ page }) => {
-  await activateWithFakeCode(page);
+  await enterAsGuest(page);
   await page.getByRole('button', { name: 'بعدين' }).click();
   await expect(page.getByRole('heading', { level: 1, name: 'النهارده' })).toBeVisible();
   expect(await page.evaluate(rootVar('--brand'))).toBe('#F25C1F');

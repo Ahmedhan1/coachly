@@ -225,7 +225,7 @@ D1 migration `worker/migrations/0002_cloud.sql` adds `storage_usage`, `backups`,
   query plan, share revoke → 404, check-in token and rate limits, viewer headers.
 - `npm run test:viewer` — Chromium: the viewer page decrypts a document sealed by `shared/envelope.ts`; its
   check-in opens with `shared/envelope.ts`; no CSP violations; screenshots light/dark.
-- `npm run test:e2e` — the bundled Worker in `wrangler dev` (local D1/R2): activation → 3 MB backup round trip →
+- `npm run test:e2e` — the bundled Worker in `wrangler dev` (local D1/R2): sign-up + owner approval → 3 MB backup round trip →
   publish → Chromium opens `/c/…` from the Worker → check-in → trainer decrypts → revoke.
 - `npm run bench:push` — CPU per push in Node.
 

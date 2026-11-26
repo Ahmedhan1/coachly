@@ -1,7 +1,7 @@
 import { createScheduledController } from 'cloudflare:test';
 import { env } from 'cloudflare:workers';
 import { beforeEach, describe, expect, it } from 'vitest';
-import { base64UrlDecode } from '../../shared/license';
+import { base64UrlDecode } from '../../shared/bytes';
 import worker from '../src/index';
 import { DUE_QUERY, runPushCron } from '../src/push/cron';
 import { ecdhParams, importEcPrivateKey } from '../src/push/webpush';
@@ -83,10 +83,10 @@ describe('push endpoints', () => {
     expect((await h.send('/api/push/vapid')).status).toBe(503);
   });
 
-  it('requires a valid, non-revoked license on subscribe, schedule and delete', async () => {
+  it('requires an approved account on subscribe, schedule and delete', async () => {
     const h = await harness();
-    const token = await h.license();
-    await h.revoke(token);
+    const token = await h.account();
+    await h.disable(token);
     const calls: Array<[string, string]> = [
       ['POST', '/api/push/subscribe'],
       ['PUT', '/api/push/schedule'],
@@ -96,13 +96,13 @@ describe('push endpoints', () => {
       expect((await h.send(path, { method, body: '{}' })).status).toBe(401);
       const res = await h.authed(path, token, { method, body: '{}' });
       expect(res.status).toBe(403);
-      expect(await readJson(res)).toEqual({ error: 'revoked' });
+      expect(await readJson(res)).toEqual({ error: 'disabled' });
     }
   });
 
   it('accepts only real push-service endpoints and well-formed keys', async () => {
     const h = await harness();
-    const token = await h.license();
+    const token = await h.account();
     for (const endpoint of ['https://evil.example/push', 'http://web.push.apple.com/x', 'https://web.push.apple.com:8443/x', 'not a url']) {
       expect((await subscribe(h, token, endpoint)).status, endpoint).toBe(400);
     }
@@ -113,7 +113,7 @@ describe('push endpoints', () => {
 
   it('validates the schedule and replaces it as a whole for that device', async () => {
     const h = await harness();
-    const token = await h.license();
+    const token = await h.account();
     const now = h.clock.now;
     expect(await readJson(await schedule(h, token, [{ id: 'a', at: now + 60, title: 'تذكير', body: 'عندك حصة' }]))).toEqual({ error: 'no_subscription' });
     await subscribe(h, token, 'https://web.push.apple.com/device-a');
@@ -152,7 +152,7 @@ describe('push cron', () => {
   it('sends due items in batches, oldest first, with VAPID + aes128gcm, and deletes what it sent', async () => {
     const push = fakePushService();
     const h = await harness({ pushFetch: push.fetcher, cloudConfig: { pushBatchSize: 25 } });
-    const token = await h.license();
+    const token = await h.account();
     await subscribe(h, token, 'https://web.push.apple.com/device-1');
     const now = h.clock.now;
     const items = Array.from({ length: 30 }, (_, i) => ({ id: `n${i}`, at: now + i, title: 'تذكير', body: `حصة رقم ${i}` }));
@@ -179,7 +179,7 @@ describe('push cron', () => {
     const push = fakePushService((url) => (url.endsWith('/gone') ? 410 : url.endsWith('/missing') ? 404 : 201));
     const h = await harness({ pushFetch: push.fetcher });
     const now = h.clock.now;
-    const tokens = [await h.license(), await h.license(), await h.license()];
+    const tokens = [await h.account(), await h.account(), await h.account()];
     const endpoints = ['https://web.push.apple.com/gone', 'https://web.push.apple.com/missing', 'https://web.push.apple.com/fine'];
     for (const [i, token] of tokens.entries()) {
       await subscribe(h, token, endpoints[i] ?? '');
@@ -197,7 +197,7 @@ describe('push cron', () => {
   it('retries 429/5xx a few times, then gives up; drops stale reminders without sending', async () => {
     const push = fakePushService(() => 503);
     const h = await harness({ pushFetch: push.fetcher });
-    const token = await h.license();
+    const token = await h.account();
     const now = h.clock.now;
     await subscribe(h, token, 'https://fcm.googleapis.com/fcm/send/abc');
     await schedule(h, token, [
@@ -218,7 +218,7 @@ describe('push cron', () => {
   it('does nothing without VAPID keys', async () => {
     const push = fakePushService();
     const h = await harness({ pushFetch: push.fetcher, vapid: { keys: async () => null } });
-    const token = await h.license();
+    const token = await h.account();
     await subscribe(h, token, 'https://web.push.apple.com/x');
     await schedule(h, token, [{ id: 'a', at: h.clock.now, title: 't', body: '' }]);
     expect(await runPushCron(h.deps.cloud, h.clock.now + 1)).toEqual({ sent: 0, gone: 0, retry: 0, failed: 0, stale: 0 });

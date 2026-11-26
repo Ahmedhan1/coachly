@@ -1,10 +1,10 @@
-import { base64UrlDecode } from '../../../shared/license';
+import { base64UrlDecode } from '../../../shared/bytes';
 import { err, ok, type Result } from '@/domain/nutrition/result';
 import type { PushItem } from '@/domain/notifications';
 import type { CloudError } from '@/services/cloud/types';
 import type { WorkerApi } from '@/services/cloud/workerApi';
 
-export type PushError = CloudError | 'not_activated' | 'unsupported' | 'denied' | 'not_configured' | 'subscribe_failed';
+export type PushError = CloudError | 'not_signed_in' | 'unsupported' | 'denied' | 'not_configured' | 'subscribe_failed';
 
 /** Web Push through the Worker (docs/CLOUD.md §2). Works only for the home-screen app on iOS 16.4+. */
 export interface PushService {

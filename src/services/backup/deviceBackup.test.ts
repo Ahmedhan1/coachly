@@ -99,12 +99,12 @@ describe('device backup file', () => {
     expect(await dumpDatabase(target)).toEqual(await dumpDatabase(source));
   });
 
-  it('never carries device-local secrets (license.*, backup.* incl. passwords) and a restore keeps this device’s', async () => {
+  it('never carries device-local secrets (auth.*, backup.* incl. passwords) and a restore keeps this device’s', async () => {
     const f = testDbFactory();
     const source = f.open();
     await seedDatabase(source);
     await source.meta.bulkPut([
-      { key: 'license.dataKey', value: 'SECRET-DATAKEY' },
+      { key: 'auth.account', value: 'SECRET-ACCOUNT' },
       { key: 'backup.cloudPassword', value: 'SECRET-CLOUDPW' },
       { key: FILE_PASSWORD_KEY, value: 'SECRET-FILEPW' },
       { key: 'backup.status', value: { lastLocalAt: 1 } },
@@ -114,7 +114,7 @@ describe('device backup file', () => {
     const { unzipSync } = await import('fflate');
     const files = unzipSync(new Uint8Array(await zip.value.blob.arrayBuffer()));
     const all = Object.values(files).map((b) => new TextDecoder().decode(b)).join('\n');
-    for (const secret of ['SECRET-DATAKEY', 'SECRET-CLOUDPW', 'SECRET-FILEPW', 'backup.status', 'device-a-token']) expect(all.includes(secret)).toBe(false);
+    for (const secret of ['SECRET-ACCOUNT', 'SECRET-CLOUDPW', 'SECRET-FILEPW', 'backup.status', 'device-a-token']) expect(all.includes(secret)).toBe(false);
 
     const target = f.open();
     await target.meta.put({ key: FILE_PASSWORD_KEY, value: 'mine' });

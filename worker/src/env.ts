@@ -2,14 +2,16 @@ export interface Env {
   DB: D1Database;
   /** R2 bucket: cloud backups, client pages and check-ins (all ciphertext). */
   BACKUPS: R2Bucket;
-  /** Secret: Ed25519 private key, 64 hex chars. */
-  LICENSE_PRIVATE_KEY: string;
-  /** Var: Ed25519 public key, 64 hex chars. */
-  LICENSE_PUBLIC_KEY: string;
+  /** Secret: better-auth secret (random, at least 32 characters). Also derives the Worker's HMAC keys. */
+  BETTER_AUTH_SECRET: string;
+  /** Var: this Worker's public address, e.g. https://pt-coach-license.<account>.workers.dev */
+  BETTER_AUTH_URL: string;
+  /** Var: Google OAuth client id. Google sign-in is off until both GOOGLE_* are set. */
+  GOOGLE_CLIENT_ID?: string;
+  /** Secret: Google OAuth client secret. */
+  GOOGLE_CLIENT_SECRET?: string;
   /** Secret: password for /admin. */
   ADMIN_PASSWORD: string;
-  /** Secret: key for the app's data pack, returned on activation. */
-  DATA_KEY: string;
   /** Var: allowed app origin(s), comma separated. The first one serves /exercise-pack/img/ to the client page. */
   APP_ORIGIN: string;
   /** Secret: VAPID private key (base64url, 32 bytes) from `npm run vapid:keys`. */

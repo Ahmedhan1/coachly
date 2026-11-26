@@ -28,15 +28,15 @@ describe('backup export → import', () => {
 
     const target = f.open();
     await seedDatabase(target, { start: 5, images: 1 }); // different existing data, must be replaced
-    await target.meta.put({ key: 'license.token', value: 'device-b-token' });
+    await target.meta.put({ key: 'auth.token', value: 'device-b-token' });
     const before = await dumpDatabase(source);
 
     const r = await importArchive(target, archive.blob);
     expect(r.ok).toBe(true);
     if (r.ok) expect(r.value).toMatchObject({ migratedFrom: null, imageVariant: 'full', counts: { clients: 2, images: 3 } });
     expect(await dumpDatabase(target)).toEqual(before);
-    // this device's license stays; the source device's token never travelled
-    expect((await target.meta.get('license.token'))?.value).toBe('device-b-token');
+    // this device's account stays; the source device's token never travelled
+    expect((await target.meta.get('auth.token'))?.value).toBe('device-b-token');
     const zipText = new TextDecoder().decode(new Uint8Array(await archive.blob.arrayBuffer()));
     expect(zipText.includes('device-a-token')).toBe(false);
   });

@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import type { MetaStore } from '@/services/license/metaStore';
+import type { MetaStore } from '@/services/meta/metaStore';
 
 /** PDF look the trainer controls (logo placement/size, font, backgrounds, footer, contacts, disclaimer). */
 export const PDF_BRANDING_KEY = 'pdf.branding';

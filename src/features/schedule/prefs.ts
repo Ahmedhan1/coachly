@@ -2,7 +2,7 @@ import { z } from 'zod';
 import { useServices } from '@/app/services';
 import { useLive } from '@/app/useLive';
 import type { AttendanceStatus } from '@/domain/schedule';
-import type { MetaStore } from '@/services/license/metaStore';
+import type { MetaStore } from '@/services/meta/metaStore';
 
 /**
  * Schedule preferences and small schedule state, kept in the meta table (travels inside backups).

@@ -1,7 +1,7 @@
 import { env } from 'cloudflare:workers';
 import { describe, expect, it } from 'vitest';
 import { generateRawKey, openWithKey, sealWithKey } from '../../shared/envelope';
-import { base64UrlEncode, decodeLicenseToken } from '../../shared/license';
+import { base64UrlEncode } from '../../shared/bytes';
 import { findForbiddenTerms } from '../../src/i18n/fitness-terms';
 import { parseCheckinDocument, parseShareDocument } from '../src/share/document';
 import { checkinKey, shareKey } from '../src/share/routes';
@@ -46,10 +46,10 @@ async function postCheckin(h: Harness, shareId: string, key: Uint8Array, ip: str
 }
 
 describe('share auth', () => {
-  it('requires a valid, non-revoked license on every owner endpoint, and refuses other licenses', async () => {
+  it('requires an approved account on every owner endpoint, and refuses other accounts', async () => {
     const h = await harness();
-    const owner = await h.license();
-    const other = await h.license();
+    const owner = await h.account();
+    const other = await h.account();
     const shareId = newShareId();
     const key = generateRawKey();
     expect((await publish(h, owner, shareId, key)).status).toBe(200);
@@ -70,10 +70,10 @@ describe('share auth', () => {
       const res = await h.authed(path, other, init);
       expect([res.status, await readJson(res)], `${method} ${path}`).toEqual([403, { error: 'forbidden' }]);
     }
-    await h.revoke(other);
+    await h.disable(other);
     for (const [method, path] of calls) {
       const res = await h.authed(path, other, { method });
-      expect([res.status, await readJson(res)], `${method} ${path}`).toEqual([403, { error: 'revoked' }]);
+      expect([res.status, await readJson(res)], `${method} ${path}`).toEqual([403, { error: 'disabled' }]);
     }
   });
 });
@@ -81,7 +81,7 @@ describe('share auth', () => {
 describe('client page content', () => {
   it('publishes, serves the envelope publicly (decryptable with the link key), and supports ETag', async () => {
     const h = await harness();
-    const token = await h.license();
+    const token = await h.account();
     const shareId = newShareId();
     const key = generateRawKey();
     const res = await publish(h, token, shareId, key);
@@ -99,7 +99,7 @@ describe('client page content', () => {
 
   it('refuses a missing check-in key, a non-PTK1 body and bodies over 5 MB', async () => {
     const h = await harness();
-    const token = await h.license();
+    const token = await h.account();
     const shareId = newShareId();
     const noKey = await h.authed(`/api/share/${shareId}`, token, { method: 'PUT', body: envelopeBytes('PTK1', 64), headers: { 'Content-Length': '64' } });
     expect(noKey.status).toBe(400);
@@ -111,8 +111,8 @@ describe('client page content', () => {
 
   it('revoke: the page answers 404, blobs and check-ins are deleted, and the id cannot be reused', async () => {
     const h = await harness();
-    const token = await h.license();
-    const lid = decodeLicenseToken(token)?.payload.lid ?? '';
+    const token = await h.account();
+    const lid = await h.accountId(token);
     const shareId = newShareId();
     const key = generateRawKey();
     const before = await storedBytes();
@@ -131,14 +131,14 @@ describe('client page content', () => {
 
   it('answers storage_full when a new page would pass the global guard', async () => {
     const h = await harness({ cloudConfig: { storageGuardBytes: (await storedBytes()) + 100 } });
-    const token = await h.license();
+    const token = await h.account();
     const res = await publish(h, token, newShareId(), generateRawKey(), envelopeBytes('PTK1', 200));
     expect([res.status, await readJson(res)]).toEqual([507, { error: 'storage_full' }]);
   });
 
   it('rate-limits public reads per page id', async () => {
     const h = await harness();
-    const token = await h.license();
+    const token = await h.account();
     const shareId = newShareId();
     await publish(h, token, shareId, generateRawKey());
     let last = 0;
@@ -150,7 +150,7 @@ describe('client page content', () => {
 describe('check-ins', () => {
   it('accepts an encrypted check-in with the write token; the owner lists, downloads and deletes it', async () => {
     const h = await harness();
-    const token = await h.license();
+    const token = await h.account();
     const shareId = newShareId();
     const key = generateRawKey();
     await publish(h, token, shareId, key);
@@ -177,7 +177,7 @@ describe('check-ins', () => {
 
   it('refuses non-PTK1 bodies and bodies over 3 MB', async () => {
     const h = await harness();
-    const token = await h.license();
+    const token = await h.account();
     const shareId = newShareId();
     const key = generateRawKey();
     await publish(h, token, shareId, key);
@@ -187,7 +187,7 @@ describe('check-ins', () => {
 
   it('caps pending check-ins per page', async () => {
     const h = await harness({ cloudConfig: { maxPendingCheckins: 3 } });
-    const token = await h.license();
+    const token = await h.account();
     const shareId = newShareId();
     const key = generateRawKey();
     await publish(h, token, shareId, key);
@@ -199,7 +199,7 @@ describe('check-ins', () => {
 
   it('rate-limits check-ins strictly per IP (6 / hour) and per page (10 / day)', async () => {
     const h = await harness();
-    const token = await h.license();
+    const token = await h.account();
     const shareId = newShareId();
     const key = generateRawKey();
     await publish(h, token, shareId, key);

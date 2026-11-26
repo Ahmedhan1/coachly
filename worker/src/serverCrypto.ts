@@ -1,11 +1,13 @@
-import { base64UrlEncode, bytesToHex, hexToBytes, KEY_LENGTH, signLicense, verifyLicenseToken } from '../../shared/license';
+import { base64UrlEncode, bytesToHex } from '../../shared/bytes';
 import type { ServerCrypto } from './ports';
 
 export interface Secrets {
-  privateKeyHex: string;
-  publicKeyHex: string;
+  /** BETTER_AUTH_SECRET: also the root of the Worker's own HMAC keys (one secret less for the owner). */
+  authSecret: string;
   adminPassword: string;
 }
+
+export const MIN_AUTH_SECRET_LENGTH = 32;
 
 const encoder = new TextEncoder();
 
@@ -23,7 +25,7 @@ async function sha256(bytes: Uint8Array): Promise<Uint8Array<ArrayBuffer>> {
   return new Uint8Array(await crypto.subtle.digest('SHA-256', new Uint8Array(bytes)));
 }
 
-/** Separate HMAC key per purpose, derived from the signing key (one secret less for the owner to manage). */
+/** Separate HMAC key per purpose, derived from the auth secret. */
 async function hmacKey(purpose: string, ...material: Uint8Array[]): Promise<CryptoKey> {
   const raw = await sha256(concat(encoder.encode(`pt-coach/${purpose}/v1`), ...material));
   return crypto.subtle.importKey('raw', raw, { name: 'HMAC', hash: 'SHA-256' }, false, ['sign']);
@@ -44,24 +46,19 @@ export function constantTimeEqual(a: Uint8Array, b: Uint8Array): boolean {
 export class ConfigError extends Error {}
 
 export async function createServerCrypto(secrets: Secrets): Promise<ServerCrypto> {
-  const privateKey = hexToBytes(secrets.privateKeyHex.trim());
-  const publicKey = hexToBytes(secrets.publicKeyHex.trim());
-  if (privateKey === null || privateKey.length !== KEY_LENGTH) throw new ConfigError('LICENSE_PRIVATE_KEY must be 64 hex chars');
-  if (publicKey === null || publicKey.length !== KEY_LENGTH) throw new ConfigError('LICENSE_PUBLIC_KEY must be 64 hex chars');
+  const secret = secrets.authSecret.trim();
+  if (secret.length < MIN_AUTH_SECRET_LENGTH) throw new ConfigError(`BETTER_AUTH_SECRET must be at least ${MIN_AUTH_SECRET_LENGTH} characters`);
   if (secrets.adminPassword.length < 12) throw new ConfigError('ADMIN_PASSWORD must be at least 12 characters');
 
+  const material = encoder.encode(secret);
   const passwordDigest = await sha256(encoder.encode(secrets.adminPassword));
-  const [codeKey, clientKey, sessionKey] = await Promise.all([
-    hmacKey('code-hash', privateKey),
-    hmacKey('client-hash', privateKey),
-    // Changing ADMIN_PASSWORD logs every session out.
-    hmacKey('admin-session', privateKey, passwordDigest),
+  const [clientKey, sessionKey] = await Promise.all([
+    hmacKey('client-hash', material),
+    // Changing ADMIN_PASSWORD logs every admin session out.
+    hmacKey('admin-session', material, passwordDigest),
   ]);
 
   return {
-    signLicense: (payload) => signLicense(payload, privateKey),
-    verifyLicense: (token) => verifyLicenseToken(token, publicKey),
-    hashCode: (code) => hmacHex(codeKey, code),
     hashClient: async (ip) => (await hmacHex(clientKey, ip)).slice(0, 32),
     sessionMac: async (data) =>
       base64UrlEncode(new Uint8Array(await crypto.subtle.sign('HMAC', sessionKey, new Uint8Array(encoder.encode(data))))),

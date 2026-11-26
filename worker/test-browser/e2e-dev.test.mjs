@@ -21,10 +21,9 @@ const PORT = 8799;
 const BASE = `http://127.0.0.1:${PORT}`;
 const ADMIN = 'e2e-admin-password';
 const VARS = {
-  LICENSE_PRIVATE_KEY: '9d61b19deffd5a60ba844af492ec2cc44449c5697b326919703bac031cae7f60',
-  LICENSE_PUBLIC_KEY: 'd75a980182b10ab7d54bfed3c964073a0ee172f3daa62325af021a68f707511a',
+  BETTER_AUTH_SECRET: 'e2e-only-better-auth-secret-0123456789abcdef',
+  BETTER_AUTH_URL: BASE,
   ADMIN_PASSWORD: ADMIN,
-  DATA_KEY: 'e2e-data-key',
   APP_ORIGIN: 'https://app.example',
   VAPID_PRIVATE_KEY: 'RVN97ZGt23rXHSVkQ4ncT_uNTDMwCQxBOEK52YqCUCk',
   VAPID_PUBLIC_KEY: 'BEn8vbGWpoCUuvmo-UnEMflbaJL3UkagEmqVC7q3HqYPPuUZ6p8gn5gBcqF7Kcjy-fGTjBBg-EgB0ntr63-QXbs',
@@ -68,7 +67,15 @@ try {
   await waitReady();
   ok('wrangler dev serves the bundled Worker');
 
-  // Owner issues a code, the app activates it.
+  // A trainer signs up (pending), the owner approves the account in /admin.
+  const signUp = await fetch(`${BASE}/api/auth/sign-up/email`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', Origin: 'https://app.example' },
+    body: JSON.stringify({ name: 'e2e', email: `e2e-${crypto.randomUUID()}@example.com`, password: 'e2e-password-1' }),
+  });
+  const { token: sessionToken, user } = await signUp.json();
+  assert.ok(sessionToken && user?.id, `sign-up failed: ${signUp.status}`);
+  const auth = { Authorization: `Bearer ${sessionToken}` };
   const login = await fetch(`${BASE}/admin/login`, {
     method: 'POST',
     redirect: 'manual',
@@ -76,21 +83,14 @@ try {
     body: `password=${ADMIN}`,
   });
   const cookie = (login.headers.get('set-cookie') ?? '').split(';')[0];
-  const issued = await (
-    await fetch(`${BASE}/admin/codes`, {
-      method: 'POST',
-      headers: { Cookie: cookie, Origin: BASE, 'Content-Type': 'application/x-www-form-urlencoded' },
-      body: 'name=e2e&duration=lifetime&window=14',
-    })
-  ).text();
-  const code = /class="code">([A-Z0-9-]{14})</.exec(issued)?.[1];
-  assert.ok(code, 'no code issued');
-  const { license } = await (
-    await fetch(`${BASE}/api/activate`, { method: 'POST', body: JSON.stringify({ code, deviceId: crypto.randomUUID() }) })
-  ).json();
-  assert.ok(license);
-  const auth = { Authorization: `Bearer ${license}` };
-  ok('license issued and activated');
+  const approve = await fetch(`${BASE}/admin/accounts/approve`, {
+    method: 'POST',
+    redirect: 'manual',
+    headers: { Cookie: cookie, Origin: BASE, 'Content-Type': 'application/x-www-form-urlencoded' },
+    body: `id=${encodeURIComponent(user.id)}`,
+  });
+  assert.equal(approve.status, 303);
+  ok('account signed up and approved');
 
   // Backup: a real 3 MB PTP1 envelope over HTTP, streamed into local R2, and back.
   const backupPlain = new Uint8Array(randomBytes(3 * 1024 * 1024 - 64));

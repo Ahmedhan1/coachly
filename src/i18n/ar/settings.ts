@@ -69,15 +69,15 @@ export const settings = {
     cloudErrors: {
       offline: 'مفيش نت. هنرفع لما النت يرجع.',
       storage_full: 'المساحة السحابية خلصت. الملف المحلي هو نسختك دلوقتي.',
-      unauthorized: 'الترخيص مش مقبول على السيرفر.',
+      unauthorized: 'السيرفر ما قبلش الحساب. اتأكد إنك داخل وإن الحساب متوافق عليه.',
       needs_password: 'محتاجين كلمة سر للنسخة السحابية.',
-      not_activated: 'التطبيق مش متفعّل.',
+      not_signed_in: 'انت مش داخل بحساب.',
       generic: 'الرفع ما نجحش. هنحاول تاني لوحدنا.',
     },
     restoreCloud: 'استرجاع من السحابة',
     restoreCloudHint: 'على موبايل جديد: اكتب كلمة سر النسخة السحابية.',
     restoreCloudConfirm: 'هيمسح كل البيانات الحالية ويحط النسخة السحابية مكانها.',
-    restoreCloudNone: 'مفيش نسخة سحابية للترخيص ده.',
+    restoreCloudNone: 'مفيش نسخة سحابية للحساب ده.',
     restoreCloudInfo: 'النسخة السحابية: {size} · {date}',
     storageUsed: 'المساحة المستخدمة على الموبايل: {size}',
     storageLink: 'المساحة والصور',
@@ -187,11 +187,15 @@ export const settings = {
     about: 'عن التطبيق',
     aboutHint: 'الرخص ومصدر المجسم',
   },
-  license: {
-    activeLifetime: 'مفعّل باسم {name}',
-    activeUntil: 'مفعّل باسم {name}، لحد {date}',
-    lifetime: 'ترخيص مدى الحياة. شغال من غير نت.',
-    until: 'ترخيص محدد المدة. شغال من غير نت لحد التاريخ ده.',
+  account: {
+    signedInAs: '{name}',
+    approved: 'الحساب شغّال. التطبيق بيشتغل من غير نت.',
+    guest: 'وضع الضيف (نسخة التطوير بس). مفيش نسخة سحابية ولا تذكيرات.',
+    signOut: 'خروج من الحساب',
+    signOutHint: 'بياناتك بتفضل على الآيفون',
+    signOutTitle: 'تخرج من الحساب؟',
+    signOutBody: 'هتخرج من الحساب على الجهاز ده. بياناتك هتفضل على الآيفون، ولما تدخل تاني بنفس الحساب تكمّل عادي.',
+    signOutConfirm: 'خروج',
     checkUpdate: 'دوّر على تحديث للتطبيق',
     checkUpdateHint: 'النسخة الأحدث بتشتغل لما تفتح التطبيق تاني.',
     checking: 'بندوّر على تحديث…',
@@ -260,7 +264,7 @@ export const settings = {
     available: 'فيه نسخة جديدة من التطبيق.',
     apply: 'حدّث دلوقتي',
   },
-  /** Language switch (Settings + activation screen). Option labels are each language's own name. */
+  /** Language switch (Settings + sign-in screen). Option labels are each language's own name. */
   language: {
     title: 'اللغة / Language',
     hint: 'لغة التطبيق',
