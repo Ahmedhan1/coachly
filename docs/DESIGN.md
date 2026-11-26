@@ -132,8 +132,12 @@ caption 12.5/400, buttons 16/500. Numbers tabular (`.num`) at 600–700: hero ti
 - Everything else follows §10: one implementation per control in `src/ui`.
 
 ### PDF look
-White pages, Rubik (or Cairo, the trainer's choice in PDF settings), a brand-colored band on the cover with the
-trainer logo, exercise cards with large photos and the muscle badge, sets×reps in big numerals.
+Pebble on paper (`src/services/pdf/pageStyles.ts`): Rubik (or Cairo, the trainer's choice in PDF settings), a warm
+off-white page, white rounded cards with a faint warm shadow, section titles with a round brand number (no filled
+bands), light table headers without zebra rows, superset rows washed in the brand tint, pill chips, a rounded brand
+card on the cover and a rounded contact card at its foot. Over a trainer background image, titles and loose text sit
+on white pills. Only treatment changed in Nov 2026: every size the paginator uses (`src/domain/pdf/layout`) is the same,
+so page breaks are unchanged.
 
 ---
 
