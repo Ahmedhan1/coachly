@@ -1,7 +1,7 @@
-# Demo video (vertical 1080×1920, ~36 s)
+# Demo video (vertical 1080×1920, ~61 s, with music)
 
-Fast motion demo of the real app (Pebble design): sign-in, home, clients, gym team, approval, a trainer's clients,
-settings. Output: `docs/video/pt-coach-demo.mp4`.
+Fast demo of the real app (Pebble design) on a tilted 3D phone: sign-in, home, clients, training programs, the
+exercise library, the 3D muscle model, gym team, approval, a trainer's clients, settings. Output: `docs/video/pt-coach-demo.mp4`.
 
 1. Serve an e2e build of the app on port 4410:
 
@@ -20,10 +20,12 @@ settings. Output: `docs/video/pt-coach-demo.mp4`.
    node tools/demo-video/record.mjs /tmp/demo
    ```
 
-3. Compose (phone frame, captions, intro/outro cards, eased camera zoom toward taps, cuts off-camera parts):
+3. Compose (3D phone built with CSS and rendered by Chromium, footage perspective-mapped onto its screen, captions,
+   intro/outro cards, music from `music.mjs`; no camera zoom; cuts off-camera parts):
 
    ```bash
    node tools/demo-video/compose.mjs /tmp/demo docs/video/pt-coach-demo.mp4
    ```
 
-No music. Everything shown is the app itself; the demo trainer and gym names are made up.
+The music is synthesized by `music.mjs` and the phone is drawn in CSS, so there is no third-party asset to license.
+Everything shown is the app itself; the demo trainer and gym names are made up.

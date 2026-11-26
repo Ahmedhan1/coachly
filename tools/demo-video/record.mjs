@@ -149,6 +149,28 @@ async function tap(locator, { zoom = true, hold = 650 } = {}) {
   await pause(hold);
 }
 
+/** A tap at screen coordinates (e.g. on the 3D canvas). */
+async function tapAt(x, y, hold = 650) {
+  events.push({ type: 'tap', t: at(), x, y, zoom: false });
+  await page.mouse.move(x, y, { steps: 6 });
+  await pause(120);
+  await page.mouse.click(x, y);
+  await pause(hold);
+}
+
+/** A finger drag (spins the 3D model). */
+async function drag(x1, y1, x2, y2, ms = 900) {
+  await page.mouse.move(x1, y1, { steps: 4 });
+  await page.mouse.down();
+  const steps = Math.round(ms / 25);
+  for (let i = 1; i <= steps; i++) {
+    await page.mouse.move(x1 + ((x2 - x1) * i) / steps, y1 + ((y2 - y1) * i) / steps);
+    await pause(18);
+  }
+  await page.mouse.up();
+  await pause(250);
+}
+
 async function typeInto(locator, text) {
   await tap(locator, { zoom: false, hold: 150 });
   await locator.pressSequentially(text, { delay: 45 });
@@ -200,12 +222,52 @@ try {
   await glide(-640);
   await pause(300);
 
-  // 5. Schedule.
-  await tap(page.getByRole('link', { name: 'رجوع للعملاء' }), { zoom: false, hold: 700 });
-  scene('مواعيد الأسبوع');
-  await tap(page.getByRole('link', { name: 'المواعيد', exact: true }), { hold: 1500 });
+  // 5. Training programs: a ready template becomes an editable program.
+  await tap(page.getByRole('link', { name: 'رجوع للعملاء' }), { hold: 600 });
+  scene('برامج تمرين جاهزة، تعدّلها زي ما تحب');
+  await tap(page.getByRole('link', { name: 'الرئيسية', exact: true }), { hold: 500 });
+  await tap(page.getByRole('button', { name: 'المزيد والإعدادات' }), { hold: 700 });
+  await tap(page.getByRole('link', { name: /بناء البرامج/ }), { hold: 900 });
+  await tap(page.getByText('بوش / بول / ليجز').first(), { hold: 1300 });
+  await glide(520);
+  await pause(600);
+  await glide(-520);
+  await tap(page.getByRole('navigation', { name: /أيام|الأيام/ }).getByRole('button', { name: /بول/ }).or(page.getByRole('button', { name: /^2\s*بول$/ })).first(), { hold: 1200 });
 
-  // 6. Gym: Team screen, invite link.
+  // 6. Exercise library with photos.
+  scene('أكتر من 1000 تمرين بالصور والنصايح');
+  await tap(page.getByRole('link', { name: 'رجوع للبرامج' }).first(), { hold: 600 });
+  await tap(page.getByRole('link', { name: 'التمارين', exact: true }), { hold: 1000 });
+  await glide(900, 26);
+  await pause(400);
+  await glide(-900, 20);
+  await tap(page.getByText('بنش برس بالبار').first(), { hold: 1100 });
+  await glide(520);
+  await pause(900);
+
+  // 7. 3D muscle model: tap a muscle, spin it, switch views.
+  scene('مجسم عضلات 3D، تلفّه بصباعك');
+  await tap(page.getByRole('link', { name: 'الرئيسية', exact: true }), { hold: 500 });
+  await tap(page.getByRole('button', { name: 'المزيد والإعدادات' }), { hold: 700 });
+  await tap(page.getByRole('link', { name: /خريطة العضلات/ }), { hold: 900 });
+  await tap(page.getByRole('radio', { name: /3D/ }).or(page.getByRole('button', { name: /مجسم 3D/ })).or(page.getByText('مجسم 3D')).first(), { hold: 300 });
+  cut.start('model loads');
+  await page.locator('canvas').first().waitFor();
+  await pause(3500);
+  cut.end();
+  const stage = await page.locator('canvas').first().boundingBox();
+  if (!stage) throw new Error('no 3D stage');
+  const sx = (f) => stage.x + stage.width * f;
+  const sy = (f) => stage.y + stage.height * f;
+  await pause(400);
+  await tapAt(sx(0.44), sy(0.27), 1300);
+  await drag(sx(0.3), sy(0.6), sx(0.85), sy(0.6), 1100);
+  await drag(sx(0.85), sy(0.6), sx(0.3), sy(0.6), 900);
+  await tap(page.getByRole('button', { name: 'ورا', exact: true }), { hold: 1200 });
+  await tapAt(sx(0.5), sy(0.55), 1200);
+  await tap(page.getByRole('button', { name: /^قد/ }), { hold: 900 });
+
+  // 8. Gym: Team screen, invite link.
   scene('الجيم بيضيف مدربينه بلينك');
   await tap(page.getByRole('link', { name: 'الرئيسية', exact: true }), { zoom: false, hold: 700 });
   await tap(page.getByRole('button', { name: 'المزيد والإعدادات' }), { hold: 900 });
