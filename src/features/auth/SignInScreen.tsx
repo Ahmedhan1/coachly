@@ -5,7 +5,7 @@ import { TEAM_META_KEYS } from '@/services/team/teamService';
 import { checkForAppUpdate, setReloadSafe } from '@/app/pwa/appUpdate';
 import { MIN_PASSWORD_LENGTH, validateSignIn, validateSignUp, type AuthError, type AuthState } from '@/domain/account';
 import { t } from '@/i18n';
-import { Button, Icon, SegmentedControl, TextField } from '@/ui';
+import { Button, GoogleLogo, Icon, SegmentedControl, TextField } from '@/ui';
 import { LanguageToggle } from './LanguageToggle';
 import styles from './AuthScreen.module.css';
 
@@ -190,10 +190,7 @@ export function SignInScreen({ initialError = null, onSignedIn }: SignInScreenPr
       {google && (
         <>
           <p className={styles.or}>{t('auth.or')}</p>
-          <Button variant="secondary" size="large" block disabled={busy} onClick={startGoogle} data-testid="google-sign-in">
-            <span className={styles.googleMark} aria-hidden="true">
-              G
-            </span>
+          <Button variant="outline" size="large" block leading={<GoogleLogo />} disabled={busy} onClick={startGoogle} data-testid="google-sign-in">
             {t('auth.google')}
           </Button>
         </>

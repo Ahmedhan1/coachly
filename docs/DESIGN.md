@@ -137,6 +137,10 @@ caption 12.5/400, buttons 16/500. Numbers tabular (`.num`) at 600–700: hero ti
   must clear it uses `--tabbar-space`.
 - **Hero (next session)**: brand block, radius 28, time 52px, on-brand "ابدأ الحصة" pill + round WhatsApp button.
 - **Buttons / chips / segments / fields**: pills (`--r-control`); selected segment and pressed chip = `--text` fill.
+- **No ghost buttons** (owner, 2026-11-26): a button on its own always looks like a button. `plain` is a brand-tint
+  pill with brand ink; text-only actions live inside lists (`ListRow`). The one exception is `danger`, the red text
+  action for destructive choices (e.g. «شيل من الفريق»). "Continue with Google" is the `outline` variant (white
+  pill, hairline border) with Google's own multi-colour G (`GoogleLogo`), never tinted by the trainer's brand.
 - **Section title icons**: brand-tint circles.
 - **Sheet**: radius 34, grabber 40×5, faint warm shadow.
 - Everything else follows §10: one implementation per control in `src/ui`.

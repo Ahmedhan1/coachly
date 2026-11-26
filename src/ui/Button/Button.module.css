@@ -66,10 +66,33 @@
   color: var(--brand);
 }
 
+/*
+ * No ghost buttons (docs/DESIGN.md §5): a secondary action on its own is still a filled pill, here a brand tint
+ * with brand ink (≥ 4.5:1 in both modes). Text-only actions belong inside lists (ListRow), not as Buttons.
+ */
 .plain {
-  background: transparent;
+  background: var(--brand-tint);
   color: var(--brand-ink);
+}
+
+.small.plain {
   padding-inline: var(--sp-3);
+}
+
+/* Sign in with a third party (Google): white pill with a hairline border and that provider's own logo. */
+.outline {
+  background: var(--surface);
+  color: var(--text);
+  box-shadow:
+    inset 0 0 0 1px var(--line-strong),
+    var(--shadow-card);
+}
+
+.leading {
+  display: inline-grid;
+  place-items: center;
+  inline-size: 22px;
+  block-size: 22px;
 }
 
 .danger {
