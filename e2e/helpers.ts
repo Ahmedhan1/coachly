@@ -78,3 +78,31 @@ export async function saveDeviceBackup(page: Page, password: string | null): Pro
   await expect(page.getByText('النسخة اتحفظت برة التطبيق')).toBeVisible();
   return file;
 }
+
+/**
+ * Waits until the running session the app keeps in IndexedDB (meta 'session.active') has `doneSets` sets marked
+ * done. The app saves after every tap, but asynchronously: a reload in the same few milliseconds would simulate
+ * the phone dying mid-write, not the app being reopened, so tests that reload wait for the save first.
+ */
+export async function waitForSavedSession(page: Page, doneSets: number): Promise<void> {
+  await expect
+    .poll(
+      () =>
+        page.evaluate(async () => {
+          const db: IDBDatabase = await new Promise((res, rej) => {
+            const r = indexedDB.open('pt-coach');
+            r.onsuccess = () => res(r.result);
+            r.onerror = () => rej(r.error);
+          });
+          const row: { value?: { exercises?: { sets: { done: boolean }[] }[] } } | undefined = await new Promise((res) => {
+            const r = db.transaction('meta').objectStore('meta').get('session.active');
+            r.onsuccess = () => res(r.result as never);
+            r.onerror = () => res(undefined);
+          });
+          db.close();
+          return (row?.value?.exercises ?? []).flatMap((e) => e.sets).filter((s) => s.done).length;
+        }),
+      { timeout: 5_000 },
+    )
+    .toBe(doneSets);
+}
