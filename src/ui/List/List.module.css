@@ -1,21 +1,24 @@
+/* Editorial section: generous space above, the title over a full-width hairline rule, content below. */
 .section {
-  margin-block-start: var(--sp-7);
+  margin-block-start: var(--sp-8);
   padding-inline: var(--gutter);
 }
 
 .header {
   display: flex;
-  align-items: center;
+  align-items: flex-end;
   justify-content: space-between;
   gap: var(--sp-2);
   min-block-size: var(--tap);
-  margin-block-end: var(--sp-2);
+  margin-block-end: var(--sp-3);
+  padding-block-end: var(--sp-2);
+  border-block-end: var(--hairline) solid var(--line-strong);
 }
 
 .title {
   display: flex;
   align-items: center;
-  gap: var(--sp-2);
+  gap: var(--sp-1);
   font: var(--t-title);
 }
 
@@ -46,11 +49,9 @@
   block-size: var(--icon-sm);
 }
 
+/* Editorial index: rows set straight on the page, divided by hairlines, aligned with the heading text. */
 .tile {
-  border-radius: var(--r-lg);
-  overflow: hidden;
-  background: var(--surface);
-  box-shadow: var(--shadow-card);
+  border-block-end: var(--hairline) solid var(--line);
 }
 
 .tile > * + * {

@@ -95,6 +95,16 @@ Dark mode: `@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]
 شريط التبويبات عايم فوق المحتوى زي كبسولة، وزرار الإضافة دايرة بلون الهوية في النص. لون الهوية بيظهر بجرأة على
 الحصة الجاية والزرار الأساسي وزرار الإضافة.
 
+### Editorial layer (2026-11-26, owner: "editorial, keep the font and colours")
+Pebble's palette, Rubik and the trainer's brand colour stay; the layout became type-led:
+- **Masthead** (`PageHeader`): the subtitle is a small brand-ink kicker (`--t-eyebrow`) *above* a 40px title.
+- **Sections** (`ListSection`, `common.sectionTitle`): a 22px title over a full-width hairline rule (`--line-strong`),
+  40px of space between sections. Title icons are quiet inline glyphs in brand ink, not tinted tiles.
+- **Indexes vs objects**: lists are rows set on the page divided by hairlines (no box); things the trainer acts on
+  (next-session hero, package, follow-ups, session) stay rounded cards with a faint lift.
+- **Display numerals**: `--t-num-hero` 76px for the one number a screen is about; `--t-num-lg` 52, `--t-num-xl` 40.
+- Neutral chips and badges use `--tint-ink` (translucent ink) so they read on the page and inside cards.
+
 ### Color
 | Token | Light | Dark |
 | --- | --- | --- |

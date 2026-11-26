@@ -102,11 +102,8 @@
 
 .list {
   margin-inline: var(--gutter);
-  border-radius: var(--r-lg);
-  overflow: hidden;
-  background: var(--surface);
+  border-block-start: var(--hairline) solid var(--line);
   contain: layout paint;
-  box-shadow: var(--shadow-card);
 }
 
 .loading {

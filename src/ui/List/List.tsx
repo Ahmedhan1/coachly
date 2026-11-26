@@ -21,7 +21,7 @@ export interface ListSectionProps {
   label?: string;
 }
 
-/** Section: title + rows grouped in a rounded, lifted tile on --bg. */
+/** Editorial section: a ruled title, then rows set on the page divided by hairlines (an index, not a box). */
 export function ListSection({ title, icon, count, footer, children, action, bare, className, label }: ListSectionProps) {
   return (
     <section className={cx(styles.section, className)} aria-label={title ? undefined : label}>

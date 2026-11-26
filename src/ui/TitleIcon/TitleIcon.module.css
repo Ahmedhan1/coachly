@@ -1,17 +1,16 @@
+/* Editorial: a quiet inline glyph in brand ink before the title, not a tinted tile. Sized in em with the title. */
 .tile {
   display: inline-grid;
   flex: none;
   place-items: center;
-  inline-size: 1.6em;
-  block-size: 1.6em;
-  margin-inline-end: var(--sp-2);
-  border-radius: var(--r-sm);
-  background: var(--brand-tint);
+  inline-size: 1.05em;
+  block-size: 1.05em;
+  margin-inline-end: var(--sp-1-5);
   color: var(--brand-ink);
   vertical-align: middle;
 }
 
 .tile svg {
-  inline-size: 0.95em;
-  block-size: 0.95em;
+  inline-size: 1em;
+  block-size: 1em;
 }

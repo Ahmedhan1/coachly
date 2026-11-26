@@ -17,6 +17,7 @@
 .panel {
   /* Fields inside a white sheet sit on --surface-2 so they stay visible. */
   --field-bg: var(--surface-2);
+  --row-bg: var(--surface);
   position: relative;
   display: flex;
   flex-direction: column;

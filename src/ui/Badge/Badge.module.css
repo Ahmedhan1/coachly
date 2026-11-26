@@ -19,7 +19,7 @@
 }
 
 .neutral {
-  background: var(--surface-2);
+  background: var(--tint-ink);
   color: var(--text-2);
 }
 
