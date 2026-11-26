@@ -188,10 +188,17 @@ function Boot() {
     };
   }, [services, route]);
 
-  // The daily purge of old soft-deleted rows waits until the first screen has painted and the main thread is idle.
+  // Maintenance waits until the first screen has painted and the main thread is idle: the daily purge of old
+  // soft-deleted rows, then the one-time rewrite of images stored as Blobs into bytes (WebKit loses Blobs).
   useEffect(() => {
     if (boot.phase !== 'ready') return;
-    return afterFirstPaint(() => void services.data.runDailyPurge(new Date()).catch(() => undefined));
+    return afterFirstPaint(() => {
+      void services.data
+        .runDailyPurge(new Date())
+        .catch(() => undefined)
+        .then(() => services.data.repos.images.migrateBlobsToBytes())
+        .catch(() => undefined);
+    });
   }, [boot.phase, services]);
 
   useEffect(() => {

@@ -80,6 +80,23 @@ test.describe('installed app', () => {
     await page.getByRole('button', { name: 'التالي' }).click();
     await expect(page.getByRole('heading', { level: 1, name: 'اللوجو بتاعك' })).toBeVisible();
     await expect(page.getByRole('img', { name: 'اللوجو' })).toBeVisible();
+    // Stored as raw bytes, never as a Blob: WebKit loses Blobs in IndexedDB (picked photos point at temp files
+    // iOS deletes; private sessions refuse them), which emptied logos and photos in PDFs on iPhone.
+    const rows = await page.evaluate(async () => {
+      const db: IDBDatabase = await new Promise((res, rej) => {
+        const r = indexedDB.open('pt-coach');
+        r.onsuccess = () => res(r.result);
+        r.onerror = () => rej(r.error);
+      });
+      const all: { data?: unknown; blob?: unknown }[] = await new Promise((res) => {
+        const r = db.transaction('images').objectStore('images').getAll();
+        r.onsuccess = () => res(r.result as never);
+      });
+      db.close();
+      return all.map((row) => ({ bytes: row.data instanceof ArrayBuffer, blob: row.blob !== undefined }));
+    });
+    expect(rows.length).toBeGreaterThan(0);
+    expect(rows.every((r) => r.bytes && !r.blob)).toBe(true);
 
     // Next launch: the splash with the logo is on screen before the app bundle has run.
     await page.addInitScript(() => {

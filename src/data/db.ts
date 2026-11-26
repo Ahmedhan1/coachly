@@ -20,8 +20,37 @@ import { StorageProblems, storageProblemMiddleware } from './storageProblems';
 
 export const DB_NAME = 'pt-coach';
 
+/** An image as the app uses it: metadata plus a Blob (built in memory from the stored bytes). */
 export interface ImageRecord extends ImageMeta {
   blob: Blob;
+}
+
+/**
+ * What the images table holds: metadata plus the raw bytes (`data`). Blobs inside IndexedDB are fragile on
+ * WebKit (every iPhone browser): a picked photo is stored as a pointer to a temp file that iOS deletes later
+ * ("WebKitBlobResource error 1"), and private/ephemeral sessions refuse Blobs outright. ArrayBuffers are stored
+ * inline and always work. Rows written before 2026-11-27 still hold `blob` until `migrateBlobsToBytes` runs.
+ */
+export interface ImageRow extends ImageMeta {
+  data?: ArrayBuffer;
+  blob?: Blob;
+}
+
+/** Just the metadata of an image row or record (no bytes, no Blob). */
+export function metaOf(row: ImageMeta): ImageMeta {
+  return { id: row.id, mime: row.mime, width: row.width, height: row.height, bytes: row.bytes, createdAt: row.createdAt, demo: row.demo };
+}
+
+/** The row to store for `record`: bytes copied out of its Blob (async, so call it before a transaction). */
+export async function toImageRow(record: ImageRecord): Promise<ImageRow> {
+  return { ...metaOf(record), data: await record.blob.arrayBuffer() };
+}
+
+/** The in-memory record for a stored row (new rows: a Blob over the bytes; legacy rows: their Blob). */
+export function fromImageRow(row: ImageRow | undefined): ImageRecord | undefined {
+  if (!row) return undefined;
+  if (row.data) return { ...metaOf(row), blob: new Blob([row.data], { type: row.mime }) };
+  return row.blob ? { ...metaOf(row), blob: row.blob } : undefined;
 }
 
 /**
@@ -81,7 +110,7 @@ export class AppDatabase extends Dexie {
   supplements!: Table<Supplement, string>;
   progress!: Table<ProgressEntry, string>;
   pdfTemplates!: Table<PdfTemplate, string>;
-  images!: Table<ImageRecord, string>;
+  images!: Table<ImageRow, string>;
   deletions!: Table<DeletionRecord, number>;
   cloudFiles!: Table<CloudFileRecord, string>;
   /** Full disk, refused writes and other-tab upgrades; the app shell turns them into toasts. */

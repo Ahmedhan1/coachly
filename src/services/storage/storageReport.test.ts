@@ -67,7 +67,8 @@ describe('StorageCleanupService', () => {
     expect(res.shrunk).toBe(1);
     const after = (await db.images.get(id))!;
     expect(after.bytes).toBeLessThan(before.bytes);
-    expect(after.bytes).toBe(after.blob.size);
+    expect(after.data?.byteLength).toBe(after.bytes);
+    expect(after.blob).toBeUndefined();
     expect((await db.images.get(png.id))!.bytes).toBe(5000);
     expect(ORPHAN_GRACE_MS).toBeGreaterThan(0);
   });
