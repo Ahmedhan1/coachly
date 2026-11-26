@@ -119,7 +119,7 @@ let filming = true;
 const camera = (async () => {
   while (filming) {
     try {
-      const { data } = await cdp.send('Page.captureScreenshot', { format: 'jpeg', quality: 90, optimizeForSpeed: true });
+      const { data } = await cdp.send('Page.captureScreenshot', { format: 'jpeg', quality: 90, optimizeForSpeed: true, clip: { x: 0, y: 0, width: VIEW.width, height: VIEW.height, scale: 2 } });
       const file = join(framesDir, `f${String(frames.length).padStart(5, '0')}.jpg`);
       writeFileSync(file, Buffer.from(data, 'base64'));
       frames.push({ file, ms: Date.now() });
