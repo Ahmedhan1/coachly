@@ -1,8 +1,9 @@
 import type { Accounts } from './auth/accounts';
+import type { TeamStore } from './team/store';
 import type { ObjectStore } from './files/objectStore';
 import type { VapidKeys } from './push/vapid';
 
-export type AuditAction = 'login_ok' | 'login_failed' | 'approved' | 'disabled' | 'enabled' | 'password_set';
+export type AuditAction = 'login_ok' | 'login_failed' | 'approved' | 'disabled' | 'enabled' | 'password_set' | 'plan_set';
 
 /** Owner actions. Entries carry an account id at most: never names, emails or device ids. */
 export interface AuditLog {
@@ -82,6 +83,8 @@ export interface CloudDeps {
 export interface Deps {
   /** Trainer accounts (better-auth over D1). */
   accounts: Accounts;
+  /** Plans, gyms, memberships and gym rosters (D1). */
+  team: TeamStore;
   audit: AuditLog;
   /** Durable limiter (memory pre-filter + D1). */
   limiter: RateLimiter;

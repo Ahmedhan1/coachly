@@ -1,5 +1,7 @@
 import { useEffect, useState, type FormEvent } from 'react';
 import { useServices } from '@/app/services';
+import { useLive } from '@/app/useLive';
+import { TEAM_META_KEYS } from '@/services/team/teamService';
 import { checkForAppUpdate, setReloadSafe } from '@/app/pwa/appUpdate';
 import { MIN_PASSWORD_LENGTH, validateSignIn, validateSignUp, type AuthError, type AuthState } from '@/domain/account';
 import { t } from '@/i18n';
@@ -20,7 +22,9 @@ export function authErrorText(error: AuthError): string {
 }
 
 export function SignInScreen({ initialError = null, onSignedIn }: SignInScreenProps) {
-  const { auth } = useServices();
+  const { auth, meta } = useServices();
+  // Opened from a gym's invite link while signed out: say that joining happens right after signing in.
+  const invite = useLive(() => meta.get(TEAM_META_KEYS.pendingJoin), [meta]);
   const [mode, setMode] = useState<Mode>('signIn');
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
@@ -101,6 +105,11 @@ export function SignInScreen({ initialError = null, onSignedIn }: SignInScreenPr
       </span>
       <h1 className={styles.title}>{t('auth.title')}</h1>
       <p className={styles.lead}>{t('auth.lead')}</p>
+      {typeof invite === 'object' && invite !== null && (
+        <p className={styles.invite} role="status">
+          {t('team.join.signInFirst')}
+        </p>
+      )}
 
       <SegmentedControl<Mode>
         label={t('auth.modeLabel')}

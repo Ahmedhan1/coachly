@@ -74,6 +74,14 @@
   font: var(--t-sub);
 }
 
+.invite {
+  margin-block: calc(-1 * var(--sp-3)) var(--sp-5);
+  padding: var(--sp-3) var(--sp-4);
+  border-radius: var(--r-md);
+  background: var(--surface);
+  font: var(--t-sub);
+}
+
 .note {
   margin: 0;
   font: var(--t-caption);

@@ -1,6 +1,7 @@
 import { base64UrlEncode } from '../../shared/bytes';
 import { BetterAuthAccounts, type Accounts } from './auth/accounts';
 import { D1AuditLog, D1RateLimiter } from './d1Store';
+import { TeamStore } from './team/store';
 import { cloudConfigFromEnv, filesDepsFromEnv } from './cloud/config';
 import type { ObjectStore } from './files/objectStore';
 import type { Env } from './env';
@@ -102,6 +103,7 @@ export async function depsFromEnv(env: Env, overrides: DepsOverrides = {}): Prom
   const appOrigins = parseOrigins(env.APP_ORIGIN ?? '');
   const deps: Deps = {
     accounts: overrides.accounts ?? accountsFromEnv(env, appOrigins),
+    team: new TeamStore(env.DB),
     audit: new D1AuditLog(env.DB),
     limiter: new LayeredRateLimiter(memory, d1Limiter),
     localLimiter: memory,

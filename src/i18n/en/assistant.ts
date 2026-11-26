@@ -123,6 +123,7 @@ export const assistant: EnArea<'assistant'> = {
     failed: 'Something went wrong. Try again.',
   },
   execErrors: {
+    client_limit: 'Your plan’s client limit is reached, so the client was not added.',
     not_found: 'I cannot find it; it may have been deleted.',
     no_package: 'This client has no package to renew.',
     invalid: 'The data is not valid; nothing was saved.',

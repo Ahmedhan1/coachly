@@ -1,7 +1,8 @@
 import { useState, type FormEvent } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ZodError } from 'zod';
-import { useRepos } from '@/app/services';
+import { useRepos, useServices } from '@/app/services';
+import { reachedClientLimit } from './clientLimit';
 import { useUiStore } from '@/app/uiStore';
 import { clientGoalSchema, toIsoDate, type ClientGoal } from '@/domain/models';
 import { cleanPhoneInput, phoneProblem } from '@/domain/whatsapp';
@@ -22,6 +23,7 @@ export function AddClientSheet() {
 
 function AddClientForm({ onClose }: { onClose: () => void }) {
   const repos = useRepos();
+  const services = useServices();
   const navigate = useNavigate();
   const showToast = useUiStore((s) => s.showToast);
   const [name, setName] = useState('');
@@ -44,6 +46,12 @@ function AddClientForm({ onClose }: { onClose: () => void }) {
       return;
     }
     setSaving(true);
+    const limit = await reachedClientLimit(services);
+    if (limit !== null) {
+      setSaving(false);
+      setError(t('team.limit.clients', { n: limit }));
+      return;
+    }
     try {
       const settings = await repos.settings.get();
       const total = Number.parseInt(sessions, 10);

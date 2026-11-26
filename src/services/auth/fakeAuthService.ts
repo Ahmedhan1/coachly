@@ -1,4 +1,4 @@
-import type { Account, AuthState } from '@/domain/account';
+import { NO_PLAN, type Account, type AuthState } from '@/domain/account';
 import type { AuthResult, AuthService } from './types';
 
 /** In-memory accounts for component tests. Any password of 8+ characters works; `status` sets approval. */
@@ -20,11 +20,11 @@ export class FakeAuthService implements AuthService {
 
   async signIn(email: string, password: string): Promise<AuthResult> {
     if (password.length < 8) return { ok: false, error: 'invalid_credentials' };
-    return this.become({ id: 'fake-user', name: 'كابتن تجربة', email, status: this.status });
+    return this.become({ id: 'fake-user', name: 'كابتن تجربة', email, status: this.status, role: 'trainer', plan: NO_PLAN, gym: null });
   }
 
   async signUp(name: string, email: string): Promise<AuthResult> {
-    return this.become({ id: 'fake-user', name, email, status: 'pending' });
+    return this.become({ id: 'fake-user', name, email, status: 'pending', role: 'trainer', plan: NO_PLAN, gym: null });
   }
 
   async googleAvailable(): Promise<boolean> {

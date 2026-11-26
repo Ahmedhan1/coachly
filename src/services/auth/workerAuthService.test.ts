@@ -5,6 +5,8 @@ import { AUTH_META_KEYS, WorkerAuthService, type WorkerAuthDeps } from './worker
 const WORKER = 'https://worker.example';
 const APP = 'https://app.example';
 const USER = { id: 'u1', name: 'كابتن أحمد', email: 'a@b.co' };
+/** What parseAccount adds for an account without a plan or gym. */
+const EXTRA = { role: 'trainer', plan: { maxClients: null, maxTrainers: null, expiresAt: null }, gym: null };
 
 function reply(status: number, body: unknown): Response {
   return new Response(JSON.stringify(body), { status, headers: { 'Content-Type': 'application/json' } });
@@ -39,7 +41,7 @@ describe('WorkerAuthService', () => {
       '/api/account': approved,
     });
     const result = await service.signIn('a@b.co', 'secret-123');
-    expect(result).toEqual({ ok: true, state: { status: 'signedIn', account: { ...USER, status: 'approved' } } });
+    expect(result).toEqual({ ok: true, state: { status: 'signedIn', account: { ...USER, ...EXTRA, status: 'approved' } } });
     expect(store.dump()[AUTH_META_KEYS.token]).toBe('tok-1');
     const accountCall = fetchMock.mock.calls.find(([url]) => String(url).endsWith('/api/account'));
     expect((accountCall?.[1]?.headers as Record<string, string>).Authorization).toBe('Bearer tok-1');
@@ -50,10 +52,10 @@ describe('WorkerAuthService', () => {
   it('a new sign-up is pending until the owner approves it', async () => {
     const { service } = setup({
       '/api/auth/sign-up/email': () => reply(200, { token: 'tok-2', user: USER }),
-      '/api/account': () => reply(200, { account: { ...USER, status: 'pending' } }),
+      '/api/account': () => reply(200, { account: { ...USER, ...EXTRA, status: 'pending' } }),
     });
     const result = await service.signUp(USER.name, USER.email, 'secret-123');
-    expect(result.ok && result.state).toEqual({ status: 'signedIn', account: { ...USER, status: 'pending' } });
+    expect(result.ok && result.state).toEqual({ status: 'signedIn', account: { ...USER, ...EXTRA, status: 'pending' } });
   });
 
   it('maps server errors and network failures without throwing', async () => {
@@ -78,7 +80,7 @@ describe('WorkerAuthService', () => {
     });
     expect(await service.completeRedirect('#/clients')).toBeNull();
     const result = await service.completeRedirect('#auth=one-time-abc');
-    expect(result).toEqual({ ok: true, state: { status: 'signedIn', account: { ...USER, status: 'approved' } } });
+    expect(result).toEqual({ ok: true, state: { status: 'signedIn', account: { ...USER, ...EXTRA, status: 'approved' } } });
     expect(JSON.parse(String(fetchMock.mock.calls[0]?.[1]?.body))).toEqual({ token: 'one-time-abc' });
     expect(await service.completeRedirect('#auth_error=google_failed')).toEqual({ ok: false, error: 'google_failed' });
   });
@@ -95,7 +97,7 @@ describe('WorkerAuthService', () => {
   });
 
   it('refresh: picks up approval or disabling, signs out on 401, and stays quiet otherwise', async () => {
-    let answer: () => Response = () => reply(200, { account: { ...USER, status: 'pending' } });
+    let answer: () => Response = () => reply(200, { account: { ...USER, ...EXTRA, status: 'pending' } });
     const { service } = setup({
       '/api/auth/sign-up/email': () => reply(200, { token: 'tok', user: USER }),
       '/api/account': () => answer(),
@@ -103,7 +105,7 @@ describe('WorkerAuthService', () => {
     await service.signUp(USER.name, USER.email, 'secret-123');
     expect(await service.refresh()).toBeNull();
     answer = approved;
-    expect(await service.refresh()).toEqual({ status: 'signedIn', account: { ...USER, status: 'approved' } });
+    expect(await service.refresh()).toEqual({ status: 'signedIn', account: { ...USER, ...EXTRA, status: 'approved' } });
     answer = () => reply(500, { error: 'server_error' });
     expect(await service.refresh()).toBeNull();
     expect((await service.getState()).status).toBe('signedIn');

@@ -16,10 +16,12 @@ import { BrowserNetworkStatus } from '@/services/cloud/networkStatus';
 import { WorkerApi } from '@/services/cloud/workerApi';
 import { FileSyncService, HttpCloudFilesClient } from '@/services/files';
 import { BrowserPushService } from '@/services/push/pushService';
+import { TeamService } from '@/services/team/teamService';
 import { AUTH_META_KEYS } from '@/services/auth/workerAuthService';
 import { buildEnv, createAuthService } from './authFactory';
 import { afterFirstPaint } from './pwa/afterFirstPaint';
 import { importHostedBrand } from '@/features/identity/hostedBrand';
+import { joinRememberedInvite, rememberInvite } from '@/features/team/joinInvite';
 import { HttpBrandHosting } from '@/services/brand/brandHosting';
 import { createAppRouter } from './shell/router';
 import { CLOUD_PASSWORD_KEY, IDENTITY_SETUP_KEY, ServicesProvider, useServices, type AppServices } from './services';
@@ -56,7 +58,7 @@ export function createBrowserServices(): AppServices {
     now: () => Date.now(),
   });
   return {
-    online: { push: new BrowserPushService(api), clientPage: new ClientPageService(api), files },
+    online: { push: new BrowserPushService(api), clientPage: new ClientPageService(api), files, team: new TeamService(api, meta, window.location.origin) },
     data,
     storage: new BrowserStorageService(),
     auth: createAuthService(db),
@@ -110,7 +112,7 @@ function Boot() {
   const route = useCallback(
     async (state: AuthState, error: AuthError | null = null): Promise<BootPhase> => {
       if (state.status === 'signedOut') return { phase: 'signIn', error };
-      if (state.status === 'signedIn' && !canUseApp(state)) return { phase: 'gate', account: state.account };
+      if (state.status === 'signedIn' && !canUseApp(state, new Date())) return { phase: 'gate', account: state.account };
       await services.data.ensureFirstRun(new Date());
       await settle(brandImport);
       const done = await services.meta.get(IDENTITY_SETUP_KEY);
@@ -119,23 +121,33 @@ function Boot() {
     [services, brandImport],
   );
 
-  const go = useCallback(async (state: AuthState) => setBoot(await route(state)), [route]);
+  const go = useCallback(
+    async (state: AuthState) => {
+      // A gym invite opened before signing in is used right after (it may change the account's gym and status).
+      const joined = state.status === 'signedIn' ? await settle(joinRememberedInvite(services)) : null;
+      setBoot(await route(joined ? await services.auth.getState() : state));
+    },
+    [route, services],
+  );
 
   useEffect(() => {
     let cancelled = false;
     (async () => {
       try {
+        // Opened from a gym's invite link: remember it; it is used once the trainer is signed in.
+        if (await rememberInvite(services.meta, window.location.hash)) clearAuthFragment();
         // Back from Google sign-in on the Worker: trade the one-time token for the session.
         const redirect = await services.auth.completeRedirect(window.location.hash);
         if (redirect !== null) clearAuthFragment();
-        const state = redirect?.ok ? redirect.state : await services.auth.getState();
+        if (redirect === null || redirect.ok) await settle(joinRememberedInvite(services));
+        const state = await services.auth.getState();
         const next = await route(state, redirect !== null && !redirect.ok ? redirect.error : null);
         if (cancelled) return;
         setBoot(next);
         // Background: the owner may have disabled the account, or its session ended. Never blocks the app.
-        if (canUseApp(state)) {
+        if (canUseApp(state, new Date())) {
           void services.auth.refresh().then(async (changed) => {
-            if (!cancelled && changed !== null && !canUseApp(changed)) setBoot(await route(changed));
+            if (!cancelled && changed !== null && !canUseApp(changed, new Date())) setBoot(await route(changed));
           });
         }
       } catch {

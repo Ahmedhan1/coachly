@@ -56,6 +56,29 @@ export class WorkerApi {
     });
   }
 
+  /**
+   * Like json(), but a refused request reports the Worker's own `{ error }` code (e.g. `trainer_limit`) when it
+   * sent one, so callers can show a specific message. Network failures stay CloudErrors.
+   */
+  async jsonOrCode<T>(req: WorkerRequest): Promise<Result<T, string>> {
+    let serverCode: string | null = null;
+    const result = await this.exchange(
+      req,
+      async (res) => {
+        const text = await res.text();
+        try {
+          return ok(JSON.parse(text) as T);
+        } catch {
+          return err('server');
+        }
+      },
+      (code) => {
+        serverCode = code;
+      },
+    );
+    return !result.ok && serverCode !== null ? err(serverCode) : result;
+  }
+
   async bytes(req: WorkerRequest): Promise<Result<Uint8Array, CloudError | 'not_signed_in'>> {
     return this.exchange(req, async (res) => ok(new Uint8Array(await res.arrayBuffer())));
   }
@@ -67,6 +90,7 @@ export class WorkerApi {
   private async exchange<T>(
     req: WorkerRequest,
     read: (res: Response) => Promise<Result<T, CloudError>>,
+    onRefused?: (serverCode: string | null) => void,
   ): Promise<Result<T, CloudError | 'not_signed_in'>> {
     if (!this.configured) return err('network');
     if (this.o.network && !this.o.network.isOnline()) return err('offline');
@@ -100,6 +124,7 @@ export class WorkerApi {
       } catch {
         code = null;
       }
+      onRefused?.(code);
       return err(errorFromResponse(res.status, code));
     } catch {
       return err(timedOut ? 'timeout' : 'network');

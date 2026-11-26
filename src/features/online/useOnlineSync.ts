@@ -8,6 +8,7 @@ import { runWebhooks } from './integrations';
 import { pagesSignature, republishChangedPages } from './clientPagePublish';
 import { pullCheckins, syncPush } from './sync';
 import { pullClientPhotos } from '@/features/files/pullClientPhotos';
+import { syncRoster } from '@/features/team/rosterSync';
 
 /** Wait after the last data change before re-uploading pages (editing a program is many small saves). */
 const REPUBLISH_DEBOUNCE_MS = 20_000;
@@ -42,6 +43,8 @@ export function useOnlineSync(active: boolean): void {
         await services.online?.files?.run().catch(() => null);
         // Pages whose data changed (or failed to upload last time) go up again; unchanged ones are skipped.
         await republishChangedPages(services).catch(() => 0);
+        // Gym trainers: the encrypted client summary for the gym manager (at most every 30 minutes).
+        await syncRoster(services, new Date()).catch(() => false);
       } finally {
         running = false;
       }

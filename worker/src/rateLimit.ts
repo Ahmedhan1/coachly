@@ -4,6 +4,9 @@ export const RULES = {
   /** Account writes (sign-in, sign-up, Google start/handoff, one-time token): per IP and for everyone. */
   authWrite: { name: 'auth-write', limit: 20, windowSeconds: 600 },
   authWriteGlobal: { name: 'auth-write-all', limit: 600, windowSeconds: 3600 },
+  /** Gym team: reads by the gym manager, writes (invite, approve, join, roster upload). Per account. */
+  teamRead: { name: 'team-read', limit: 600, windowSeconds: 3600 },
+  teamWrite: { name: 'team-write', limit: 200, windowSeconds: 3600 },
   /** Session reads (get-session, /api/account): per IP. */
   authRead: { name: 'auth-read', limit: 240, windowSeconds: 3600 },
   login: { name: 'login', limit: 5, windowSeconds: 900 },

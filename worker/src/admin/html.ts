@@ -1,5 +1,7 @@
 import type { AccountRecord } from '../auth/accounts';
 import type { AccountStatus } from '../auth/auth';
+import type { Plan } from '../team/access';
+import type { Membership } from '../team/store';
 
 export const STATUS_FILTERS: ReadonlyArray<{ value: '' | AccountStatus; label: string }> = [
   { value: '', label: 'الكل' },
@@ -108,47 +110,97 @@ export function messagePage(title: string, text: string): string {
   return page(title, `<h1>${escapeHtml(title)}</h1><div class="card"><p>${escapeHtml(text)}</p><p><a href="/admin">رجوع للوحة</a></p></div>`);
 }
 
-export type AccountAction = 'approve' | 'disable' | 'enable' | 'password';
+export type AccountAction = 'approve' | 'disable' | 'enable' | 'password' | 'plan';
 
 const ACTION_LABELS: Record<AccountAction, string> = {
   approve: 'موافقة',
   enable: 'تشغيل تاني',
   disable: 'إيقاف',
   password: 'كلمة سر جديدة',
+  plan: 'الخطة',
 };
 
 function actionForm(action: AccountAction, id: string): string {
-  const cls = action === 'disable' ? 'danger' : action === 'password' ? 'quiet' : '';
-  return `<form method="post" action="/admin/accounts/${action}">
+  const cls = action === 'disable' ? 'danger' : action === 'password' || action === 'plan' ? 'quiet' : '';
+  const method = action === 'plan' ? 'get' : 'post';
+  return `<form method="${method}" action="/admin/accounts/${action}">
 <input type="hidden" name="id" value="${escapeHtml(id)}">
 <button type="submit"${cls === '' ? '' : ` class="${cls}"`}>${escapeHtml(ACTION_LABELS[action])}</button></form>`;
 }
 
-export function actionsFor(status: AccountStatus): AccountAction[] {
+/** A trainer who joined a gym and has no approval of their own: the gym approves them, not the owner. */
+export function handledByGym(r: AccountRecord, info: RowInfo): boolean {
+  return r.status === 'pending' && info.membership !== null && info.membership.status !== 'removed';
+}
+
+function statusPill(r: AccountRecord, info: RowInfo): string {
+  if (handledByGym(r, info)) {
+    const active = info.membership?.status === 'active';
+    return `<span class="pill ${active ? 'ok' : 'wait'}">${active ? 'شغّال (عن طريق الجيم)' : 'مستني موافقة الجيم'}</span>`;
+  }
+  return `<span class="pill ${statusTone(r.status)}">${escapeHtml(statusLabel(r.status))}</span>`;
+}
+
+export function actionsFor(status: AccountStatus, viaGym = false): AccountAction[] {
+  if (viaGym) return ['disable', 'plan', 'password'];
   switch (status) {
     case 'pending':
-      return ['approve', 'disable', 'password'];
+      return ['approve', 'disable', 'plan', 'password'];
     case 'approved':
-      return ['disable', 'password'];
+      return ['disable', 'plan', 'password'];
     case 'disabled':
-      return ['enable', 'password'];
+      return ['enable', 'plan', 'password'];
   }
 }
 
-function row(r: AccountRecord): string {
+/** Extra facts for one dashboard row: plan, gym membership, trainers in the gym. */
+export interface RowInfo {
+  plan: Plan | null;
+  membership: Membership | null;
+  /** Active trainers, for gym accounts. */
+  trainers: number;
+}
+
+const MEMBERSHIP_LABEL: Record<Membership['status'], string> = { pending: 'مستني موافقة الجيم', active: 'متوافق عليه من الجيم', removed: 'اتشال من الجيم' };
+
+/** The last Cairo day of a plan (expiresAt is the moment the next day starts). */
+export function lastDay(expiresAt: number): string {
+  return formatDate(expiresAt - 1).slice(0, 10);
+}
+
+function limitText(value: number | null): string {
+  return value === null ? 'من غير حد' : `<span class="ltr">${value}</span>`;
+}
+
+export function planSummary(info: RowInfo): string {
+  const plan = info.plan;
+  const parts: string[] = [];
+  if (plan?.kind === 'gym') parts.push(`<strong>جيم</strong> — مدربين: <span class="ltr">${info.trainers}</span> من ${limitText(plan.maxTrainers)}`);
+  else parts.push('مدرب');
+  if (info.membership !== null) parts.push(`تبع <strong>${escapeHtml(info.membership.gymName)}</strong> (${MEMBERSHIP_LABEL[info.membership.status]})`);
+  if (plan !== null) {
+    parts.push(`عملاء لكل مدرب: ${limitText(plan.maxClients)}`);
+    parts.push(`لحد: ${plan.expiresAt === null ? 'مفتوح' : `<span class="ltr">${lastDay(plan.expiresAt)}</span>`}`);
+  }
+  return parts.join('<br>');
+}
+
+function row(r: AccountRecord, info: RowInfo): string {
   const cell = (label: string, value: string, cls = '') =>
     `<td data-label="${label}"${cls === '' ? '' : ` class="${cls}"`}>${value}</td>`;
   return `<tr>${cell('الاسم', escapeHtml(r.name === '' ? '—' : r.name), 'name')}
 ${cell('الإيميل', `<span class="ltr">${escapeHtml(r.email)}</span>`)}
-${cell('الحالة', `<span class="pill ${statusTone(r.status)}">${escapeHtml(statusLabel(r.status))}</span>`)}
+${cell('الحالة', statusPill(r, info))}
+${cell('النوع والخطة', `<span class="muted">${planSummary(info)}</span>`)}
 ${cell('اتسجل', `<span class="ltr">${formatDate(r.createdAt)}</span>`)}
-<td class="acts">${actionsFor(r.status)
+<td class="acts">${actionsFor(r.status, handledByGym(r, info))
     .map((a) => actionForm(a, r.id))
     .join('')}</td></tr>`;
 }
 
 export interface DashboardView {
   records: readonly AccountRecord[];
+  info: ReadonlyMap<string, RowInfo>;
   total: number;
   /** Count before filtering. */
   all: number;
@@ -179,7 +231,7 @@ function pager(view: DashboardView): string {
 }
 
 export function dashboardPage(view: DashboardView): string {
-  const rows = view.records.map(row).join('');
+  const rows = view.records.map((r) => row(r, view.info.get(r.id) ?? { plan: null, membership: null, trainers: 0 })).join('');
   const statusOptions = STATUS_FILTERS.map(
     (o) => `<option value="${o.value}"${o.value === view.status ? ' selected' : ''}>${escapeHtml(o.label)}</option>`,
   ).join('');
@@ -195,14 +247,15 @@ export function dashboardPage(view: DashboardView): string {
 ${view.notice === null ? '' : `<div class="card notice"><strong>${escapeHtml(view.notice)}</strong></div>`}
 ${waiting}
 <div class="card"><h2>المدربين (${filtered ? `<span class="ltr">${view.total}</span> من <span class="ltr">${view.all}</span>` : `<span class="ltr">${view.all}</span>`})</h2>
-<p class="muted">المدرب بيعمل حسابه من التطبيق (إيميل وكلمة سر، أو جوجل). الحساب الجديد بيفضل مستني لحد ما تدوس «موافقة».</p>
+<p class="muted">المدرب أو الجيم بيعمل حسابه من التطبيق (إيميل وكلمة سر، أو جوجل). الحساب الجديد بيفضل مستني لحد ما تدوس «موافقة».
+عشان تخلي الحساب <strong>جيم</strong>: «الخطة» ← النوع «جيم». مدربين الجيم بيدخلوا بلينك دعوة من الجيم، والجيم هو اللي بيوافق عليهم.</p>
 <form class="filters" method="get" action="/admin" role="search">
 <label>بحث بالاسم أو الإيميل<input type="search" name="q" value="${escapeHtml(view.q)}" autocomplete="off"></label>
 <label>الحالة<select name="status">${statusOptions}</select></label>
 <button type="submit" class="quiet">بحث</button>${filtered ? '<a href="/admin">مسح</a>' : ''}</form>
 <table>
-<thead><tr><th>الاسم</th><th>الإيميل</th><th>الحالة</th><th>اتسجل</th><th></th></tr></thead>
-<tbody>${rows === '' ? `<tr><td colspan="5" class="muted">${empty}</td></tr>` : rows}</tbody></table>
+<thead><tr><th>الاسم</th><th>الإيميل</th><th>الحالة</th><th>النوع والخطة</th><th>اتسجل</th><th></th></tr></thead>
+<tbody>${rows === '' ? `<tr><td colspan="6" class="muted">${empty}</td></tr>` : rows}</tbody></table>
 ${pager(view)}
 ${view.capped ? '<p class="muted">القائمة بتعرض أحدث الحسابات بس. استخدم البحث عشان توصل للأقدم.</p>' : ''}
 </div>`,
@@ -255,3 +308,28 @@ export function passwordSetPage(input: { record: AccountRecord; password: string
   );
 }
 
+
+/** Owner's plan form for one account: type (trainer / gym), limits and end date. */
+export function planPage(record: AccountRecord, plan: Plan | null, gymName: string, error: string | null = null): string {
+  const kind = plan?.kind ?? 'trainer';
+  const value = (n: number | null | undefined) => (n === null || n === undefined ? '' : String(n));
+  const until = plan?.expiresAt === null || plan?.expiresAt === undefined ? '' : lastDay(plan.expiresAt);
+  return page(
+    'الخطة',
+    `<h1>الخطة</h1><div class="card">
+<p><strong>${escapeHtml(record.name === '' ? record.email : record.name)}</strong> (<span class="ltr">${escapeHtml(record.email)}</span>)</p>
+${error === null ? '' : `<p class="error">${escapeHtml(error)}</p>`}
+<form method="post" action="/admin/accounts/plan">
+<input type="hidden" name="id" value="${escapeHtml(record.id)}">
+<label>النوع<select name="kind">
+<option value="trainer"${kind === 'trainer' ? ' selected' : ''}>مدرب</option>
+<option value="gym"${kind === 'gym' ? ' selected' : ''}>جيم (بيدير مدربين)</option></select></label>
+<label>اسم الجيم (للجيم بس)<input name="gymName" maxlength="100" value="${escapeHtml(gymName)}" autocomplete="off"></label>
+<label>أقصى عدد عملاء لكل مدرب (فاضي = من غير حد)<input name="maxClients" type="number" inputmode="numeric" min="0" max="100000" value="${value(plan?.maxClients)}"></label>
+<label>أقصى عدد مدربين في الجيم (للجيم بس، فاضي = من غير حد)<input name="maxTrainers" type="number" inputmode="numeric" min="0" max="10000" value="${value(plan?.maxTrainers)}"></label>
+<label>آخر يوم في الاشتراك (فاضي = مفتوح)<input name="until" type="date" value="${until}"></label>
+<p class="muted">بعد آخر يوم التطبيق بيقفل عند المدرب (ومدربين الجيم كمان)، والنسخة السحابية بتقف. بياناتهم بتفضل على تليفوناتهم.</p>
+<button type="submit">احفظ</button></form>
+<p><a href="/admin">رجوع للوحة</a></p></div>`,
+  );
+}

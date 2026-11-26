@@ -5,7 +5,9 @@ import { MAX_FORM_BODY_BYTES, readLimitedText } from '../http';
 import type { Deps } from '../ports';
 import { dropAccountPush } from '../push/cleanup';
 import { RULES } from '../rateLimit';
-import { ADMIN_SCRIPT, confirmPage, dashboardPage, loginPage, messagePage, passwordSetPage, STATUS_FILTERS, type AccountAction } from './html';
+import type { Plan } from '../team/access';
+import { endOfCairoDay } from './cairoDate';
+import { ADMIN_SCRIPT, confirmPage, dashboardPage, loginPage, messagePage, passwordSetPage, planPage, STATUS_FILTERS, type AccountAction, type RowInfo } from './html';
 import { clearSessionCookie, createSessionCookie, hasValidSession, SESSION_COOKIE } from './session';
 
 /** Read cap for the dashboard list; search and paging run over these rows. */
@@ -69,13 +71,14 @@ function suggestPassword(): string {
 }
 
 const NOTICES: Record<string, string> = {
+  plan: 'الخطة اتحفظت.',
   approve: 'الحساب اتوافق عليه. المدرب يقدر يستخدم التطبيق دلوقتي.',
   enable: 'الحساب اشتغل تاني.',
   disable: 'الحساب اتوقف.',
 };
 const EXPIRED_NOTICE = 'الجلسة خلصت (بتخلص بعد 12 ساعة). ادخل تاني بكلمة السر، وبعدها كرر آخر خطوة لو ما كملتش.';
 
-async function handleAccountAction(request: Request, deps: Deps, action: AccountAction): Promise<Response> {
+async function handleAccountAction(request: Request, deps: Deps, action: Exclude<AccountAction, 'plan'>): Promise<Response> {
   const form = await readForm(request);
   const id = form?.get('id') ?? '';
   const record = id === '' ? null : await deps.accounts.find(id);
@@ -109,6 +112,52 @@ async function handleAccountAction(request: Request, deps: Deps, action: Account
   return html(passwordSetPage({ record, password, appUrl: deps.config.appOrigins[0] ?? null }));
 }
 
+async function showPlan(deps: Deps, id: string): Promise<Response> {
+  const record = id === '' ? null : await deps.accounts.find(id);
+  if (record === null) return html(messagePage('مش موجود', 'الحساب ده مش موجود.'), 404);
+  const [plan, gym] = await Promise.all([deps.team.plan(id), deps.team.gym(id)]);
+  return html(planPage(record, plan, gym?.name ?? ''));
+}
+
+function parseLimit(value: string | null, max: number): number | null | undefined {
+  const text = (value ?? '').trim();
+  if (text === '') return null;
+  const n = Number(text);
+  return Number.isInteger(n) && n >= 0 && n <= max ? n : undefined;
+}
+
+async function savePlan(request: Request, deps: Deps): Promise<Response> {
+  const form = await readForm(request);
+  const id = form?.get('id') ?? '';
+  const record = id === '' ? null : await deps.accounts.find(id);
+  if (record === null || form === null) return html(messagePage('مش موجود', 'الحساب ده مش موجود.'), 404);
+  const kind = form.get('kind') === 'gym' ? 'gym' : 'trainer';
+  const gymName = (form.get('gymName') ?? '').trim().slice(0, 100);
+  const maxClients = parseLimit(form.get('maxClients'), 100_000);
+  const maxTrainers = parseLimit(form.get('maxTrainers'), 10_000);
+  const untilText = (form.get('until') ?? '').trim();
+  const expiresAt = untilText === '' ? null : endOfCairoDay(untilText);
+  const draft: Plan = { kind, maxClients: maxClients ?? null, maxTrainers: kind === 'gym' ? (maxTrainers ?? null) : null, expiresAt };
+  const again = (error: string) => html(planPage(record, draft, gymName, error), 400);
+  if (maxClients === undefined || maxTrainers === undefined) return again('الأرقام لازم تكون صحيحة ومن 0 وطالع، أو سيبها فاضية.');
+  if (untilText !== '' && expiresAt === null) return again('التاريخ مش مظبوط.');
+  if (kind === 'gym' && gymName === '') return again('اكتب اسم الجيم.');
+  const now = deps.now();
+  const existingGym = await deps.team.gym(id);
+  if (kind === 'trainer' && existingGym !== null) {
+    if ((await deps.team.members(id)).length > 0) return again('الجيم ده فيه مدربين. شيلهم من التطبيق الأول قبل ما تحوّله لمدرب.');
+    await deps.team.deleteGym(id);
+  }
+  if (kind === 'gym') {
+    const membership = await deps.team.membership(id);
+    if (membership !== null && membership.status !== 'removed') return again('الحساب ده مدرب تبع جيم تاني. لازم يسيب الجيم الأول.');
+    await deps.team.upsertGym(id, gymName, now);
+  }
+  await deps.team.setPlan(id, draft, now);
+  await deps.audit.audit('plan_set', id, now);
+  return redirect('/admin?done=plan');
+}
+
 function matches(r: AccountRecord, needle: string, status: string): boolean {
   const text = `${r.name} ${r.email}`.toLocaleLowerCase('ar');
   return (needle === '' || text.includes(needle)) && (status === '' || r.status === status);
@@ -130,9 +179,16 @@ async function dashboard(url: URL, deps: Deps): Promise<Response> {
   const pageNumber = Number.isInteger(requested) ? Math.min(Math.max(requested, 1), pages) : 1;
   const records = found.slice((pageNumber - 1) * PAGE_SIZE, pageNumber * PAGE_SIZE);
   const notice = NOTICES[url.searchParams.get('done') ?? ''] ?? null;
-  const pending = all.filter((r) => r.status === 'pending').length;
+  const ids = records.map((r) => r.id);
+  const [plans, allMemberships, trainers] = await Promise.all([deps.team.plans(ids), deps.team.memberships(all.map((r) => r.id)), deps.team.countMembers(ids)]);
+  const memberships = allMemberships;
+  // Trainers who joined a gym wait for the gym, not for the owner.
+  const pending = all.filter((r) => r.status === 'pending' && (allMemberships.get(r.id)?.status ?? 'removed') === 'removed').length;
+  const info = new Map<string, RowInfo>(
+    ids.map((id) => [id, { plan: plans.get(id) ?? null, membership: memberships.get(id) ?? null, trainers: trainers.get(id) ?? 0 }]),
+  );
   return html(
-    dashboardPage({ records, total: found.length, all: all.length, pending, page: pageNumber, pages, q, status, notice, capped: all.length >= LIST_LIMIT }),
+    dashboardPage({ records, info, total: found.length, all: all.length, pending, page: pageNumber, pages, q, status, notice, capped: all.length >= LIST_LIMIT }),
   );
 }
 
@@ -169,7 +225,9 @@ export async function handleAdmin(request: Request, deps: Deps, clientKey: strin
     await hooks.prune?.(now);
     return dashboard(url, deps);
   }
-  const action = /^\/admin\/accounts\/(approve|disable|enable|password)$/.exec(path)?.[1] as AccountAction | undefined;
+  if (path === '/admin/accounts/plan' && method === 'GET') return showPlan(deps, url.searchParams.get('id') ?? '');
+  if (path === '/admin/accounts/plan' && method === 'POST') return savePlan(request, deps);
+  const action = /^\/admin\/accounts\/(approve|disable|enable|password)$/.exec(path)?.[1] as Exclude<AccountAction, 'plan'> | undefined;
   if (method === 'POST' && action !== undefined) return handleAccountAction(request, deps, action);
   return html(messagePage('مش موجود', 'الصفحة دي مش موجودة.'), 404);
 }

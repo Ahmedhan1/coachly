@@ -64,6 +64,21 @@ tables in D1, `worker/migrations/0005_accounts.sql`).
 - **Guest**: "continue as guest" exists only in `npm run dev` and the e2e build (`guestAllowedIn`); never in
   production.
 
+## Hierarchy and plans (owner → gyms → trainers) — server `worker/src/team`, app `src/domain/team`, `src/features/team`
+
+- **Owner** (`/admin`) approves independent trainers and gym managers, and sets each account's **plan**
+  (`account_plans`): kind `trainer` | `gym` (+ gym name), `maxClients` per trainer, `maxTrainers` (gyms),
+  `expiresAt` (last Cairo day). Migration `worker/migrations/0006_teams.sql`.
+- **Gym manager** (Team screen, `/more/team`) makes an invite link `<app>/#join=<code>.<team key>`; a trainer who
+  opens it joins as `pending`, and the manager approves or removes them (`/api/team*`). Gym approval never changes
+  the trainer's own `user.status`; access rules are in `worker/src/team/access.ts` (`resolveAccess`): owner
+  disable wins; an active gym trainer gets the gym's status, end date and per-trainer client limit.
+- **Status** values: `pending | approved | disabled | expired`. The app also expires a plan offline from
+  `plan.expiresAt` (`effectiveStatus`), and blocks adding a client at `maxClients` (`reachedClientLimit`).
+- **Gym sees clients without the server reading them**: each trainer's app uploads a roster (`buildRoster`: names,
+  package, sessions left, dates, last attended session, attention; never phones, notes, measurements or photos)
+  sealed with the team key (PTK1). The key exists only on the manager's phone and inside the invite link fragment.
+
 ## Commands
 
 - `npm run check` — typecheck + lint + unit tests + forbidden-words gate. Must pass before any phase is "done".

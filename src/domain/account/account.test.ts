@@ -2,6 +2,9 @@ import { describe, expect, it } from 'vitest';
 import {
   authErrorFromServer,
   canUseApp,
+  clientLimitReached,
+  effectiveStatus,
+  NO_PLAN,
   parseAccount,
   readAuthFragment,
   validateSignIn,
@@ -47,6 +50,8 @@ describe('authErrorFromServer', () => {
   });
 });
 
+const BASE = { role: 'trainer' as const, plan: NO_PLAN, gym: null };
+
 describe('parseAccount', () => {
   it('accepts the Worker account shape and defaults an unknown status to pending', () => {
     expect(parseAccount({ id: 'u1', name: 'كابتن', email: 'a@b.co', status: 'approved' })).toEqual({
@@ -54,9 +59,24 @@ describe('parseAccount', () => {
       name: 'كابتن',
       email: 'a@b.co',
       status: 'approved',
+      ...BASE,
     });
     expect(parseAccount({ id: 'u1', name: 'x', email: 'a@b.co', status: 'weird' })?.status).toBe('pending');
-    expect(parseAccount({ id: 'u1', email: 'a@b.co' })).toEqual({ id: 'u1', name: '', email: 'a@b.co', status: 'pending' });
+    expect(parseAccount({ id: 'u1', email: 'a@b.co' })).toEqual({ id: 'u1', name: '', email: 'a@b.co', status: 'pending', ...BASE });
+  });
+
+  it('reads role, plan and gym (gym manager or gym trainer), ignoring junk', () => {
+    const gymManager = parseAccount({
+      id: 'g',
+      email: 'g@x.co',
+      status: 'approved',
+      role: 'gym',
+      plan: { maxClients: 30, maxTrainers: 5, expiresAt: 1_900_000_000 },
+      gym: { id: 'g', name: 'جيم الأبطال', membership: 'owner' },
+    });
+    expect(gymManager).toMatchObject({ role: 'gym', plan: { maxClients: 30, maxTrainers: 5, expiresAt: 1_900_000_000 }, gym: { name: 'جيم الأبطال', membership: 'owner' } });
+    const junk = parseAccount({ id: 'u', role: 'boss', plan: { maxClients: -3, expiresAt: 'soon' }, gym: { id: 1 } });
+    expect(junk).toMatchObject({ role: 'trainer', plan: NO_PLAN, gym: null });
   });
 
   it('rejects anything without an id', () => {
@@ -66,14 +86,34 @@ describe('parseAccount', () => {
   });
 });
 
-describe('canUseApp', () => {
-  it('lets approved accounts and guests in; pending and disabled wait', () => {
-    expect(canUseApp({ status: 'guest' })).toBe(true);
-    const account = { id: 'u', name: 'n', email: 'e@x.co' };
-    expect(canUseApp({ status: 'signedIn', account: { ...account, status: 'approved' } })).toBe(true);
-    expect(canUseApp({ status: 'signedIn', account: { ...account, status: 'pending' } })).toBe(false);
-    expect(canUseApp({ status: 'signedIn', account: { ...account, status: 'disabled' } })).toBe(false);
-    expect(canUseApp({ status: 'signedOut' })).toBe(false);
+const NOW = new Date('2026-11-26T10:00:00Z');
+
+describe('canUseApp / effectiveStatus', () => {
+  const account = { id: 'u', name: 'n', email: 'e@x.co', ...BASE };
+  it('lets approved accounts and guests in; pending, disabled and expired wait', () => {
+    expect(canUseApp({ status: 'guest' }, NOW)).toBe(true);
+    expect(canUseApp({ status: 'signedIn', account: { ...account, status: 'approved' } }, NOW)).toBe(true);
+    expect(canUseApp({ status: 'signedIn', account: { ...account, status: 'pending' } }, NOW)).toBe(false);
+    expect(canUseApp({ status: 'signedIn', account: { ...account, status: 'disabled' } }, NOW)).toBe(false);
+    expect(canUseApp({ status: 'signedIn', account: { ...account, status: 'expired' } }, NOW)).toBe(false);
+    expect(canUseApp({ status: 'signedOut' }, NOW)).toBe(false);
+  });
+
+  it('expires offline when the plan end date passes on this device', () => {
+    const until = NOW.getTime() / 1000;
+    const a = { ...account, status: 'approved' as const, plan: { ...NO_PLAN, expiresAt: until } };
+    expect(effectiveStatus(a, new Date(NOW.getTime() - 1000))).toBe('approved');
+    expect(effectiveStatus(a, NOW)).toBe('expired');
+    expect(canUseApp({ status: 'signedIn', account: a }, NOW)).toBe(false);
+    expect(effectiveStatus({ ...a, status: 'pending' }, NOW)).toBe('pending');
+  });
+});
+
+describe('clientLimitReached', () => {
+  it('blocks a new client at the plan limit; no limit without a plan', () => {
+    expect(clientLimitReached(NO_PLAN, 10_000)).toBe(false);
+    expect(clientLimitReached({ ...NO_PLAN, maxClients: 3 }, 2)).toBe(false);
+    expect(clientLimitReached({ ...NO_PLAN, maxClients: 3 }, 3)).toBe(true);
   });
 });
 

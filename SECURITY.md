@@ -19,6 +19,7 @@ almost everything here was planned; see each section's status. Accounts replaced
 | same | Backup key (derived from the trainer's backup password) | Stored as a **non-extractable** `CryptoKey` so automatic backups can run without asking for the password every time — planned (phase 9); must be verified on a real iPhone that Safari persists CryptoKey objects in IndexedDB (MANUAL_QA) | the app only |
 | same | Optional AI API key (trainer's own) | No (device only) — planned (phase 10) | the app; sent only to the AI provider the trainer chose |
 | **Cloudflare D1** | trainer accounts (better-auth: name, email, password hash (scrypt) or Google account id, approval status, created/updated times), sessions (token, expiry, IP, user agent), short-lived verification rows (Google state, 3-minute one-time tokens) | Passwords hashed; no client data in it | the owner (admin dashboard) and Cloudflare |
+| same | plans (limits, end date), gyms (name, SHA-256 of the current invite code), gym memberships, and each gym trainer's client roster as a **PTK1 envelope** | Rosters: **Yes** — AES-GCM with the gym's team key, which only exists on the gym manager's phone, in their device backup, and in the invite link fragment (never sent to a server) | Rosters: the gym manager only. The rest: owner, Cloudflare |
 | same | push subscriptions (endpoint + keys), notification schedule (time slot + **generic** text with no client names, e.g. "عندك حصة بعد 30 دقيقة") | No | owner, Cloudflare |
 | same | client-page index: random page id, SHA-256 of its write token, size, updated-at, revoked flag; R2 usage counters; rate-limit counters | No | owner, Cloudflare |
 | **Cloudflare R2** | cloud backup (one per account) | **Yes** — AES-GCM, key from the trainer's password | only the trainer |
@@ -158,6 +159,16 @@ activation codes and the Ed25519 key were removed on 2026-11-26.
   better-auth's API answers 404. better-auth telemetry is switched off.
 - **Admin dashboard** (`/admin/*`): protected by `ADMIN_PASSWORD`, compared in constant time, login rate-limited,
   session cookie `HttpOnly; Secure; SameSite=Strict`, 12-hour expiry, same-origin form posts only.
+
+### Gyms (2026-11-26)
+
+- A gym manager sees a **summary** of each approved trainer's clients (names, package, sessions left, dates, last
+  attended session, attention flag), never phones, notes, measurements, injuries or photos (`buildRoster`, tested).
+  Trainers joining a gym are told the gym will see it; leaving the gym deletes their roster on the server.
+- Anyone holding an invite link can read rosters uploaded with that key **if** they could also download them, which
+  requires the gym manager's session. A new invite code does not change the key; a manager who suspects the key leaked
+  should ask the owner to recreate the gym (new key). Known, accepted.
+- Gym approval never changes a trainer's own approval by the owner; owner disable always wins (`resolveAccess`).
 
 ## 5. Rate limiting and endpoint protection — planned (phase 3, extended in phase 9)
 

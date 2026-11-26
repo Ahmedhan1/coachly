@@ -27,7 +27,9 @@ const LINKS: ReadonlyArray<{ to: string; key: keyof typeof SCREEN_ICONS }> = [
 ];
 
 export function MoreScreen() {
-  const { storage, data } = useServices();
+  const { storage, data, auth } = useServices();
+  const authState = useLive(() => auth.getState(), [auth]);
+  const managesGym = authState?.status === 'signedIn' && authState.account.role === 'gym';
   const showToast = useUiStore((s) => s.showToast);
   const estimate = useLive(() => storage.estimate(), [storage]);
   const persisted = useLive(() => storage.isPersisted(), [storage]);
@@ -38,6 +40,7 @@ export function MoreScreen() {
       <PageHeader title={t('screens.more.title')} back={{ to: '/', label: t('tabs.home') }} />
       <div>
         <ListSection className={styles.first} label={t('screens.more.title')}>
+          {managesGym && <ListRow to="/more/team" leading={<Icon name="users" />} title={t('team.title')} subtitle={t('team.hint')} />}
           {LINKS.map((link) => (
             <ListRow
               key={link.to}

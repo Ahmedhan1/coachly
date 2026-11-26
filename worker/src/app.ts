@@ -1,6 +1,7 @@
 import { handleAdmin, type AdminHooks } from './admin/routes';
 import { AI_RELAY_PATH, handleAiRelay } from './ai/relay';
 import { routeAuthApi, routeAuthPages } from './auth/routes';
+import { routeTeam } from './team/routes';
 import { routeBackup } from './backup/routes';
 import { clientIp, corsHeaders, json, withHeaders } from './http';
 import type { Deps } from './ports';
@@ -51,6 +52,8 @@ export async function handleRequest(request: Request, deps: Deps, hooks: AdminHo
 async function routeApi(request: Request, path: string, deps: Deps, clientKey: string): Promise<Response> {
   const auth = await routeAuthApi(request, path, deps, clientKey);
   if (auth !== null) return auth;
+  const team = await routeTeam(request, path, deps, clientKey);
+  if (team !== null) return team;
   if (request.method === 'POST' && path === AI_RELAY_PATH) return handleAiRelay(request, deps, clientKey);
   // Cloud files live in the external object store (not R2), so they do not depend on the R2 binding.
   if (path === '/api/files' || path.startsWith('/api/files/')) return (await routeFiles(request, path, deps, clientKey)) ?? notFound(deps, clientKey);

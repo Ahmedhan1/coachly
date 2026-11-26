@@ -1,7 +1,7 @@
 import { json } from '../http';
 import type { Deps } from '../ports';
 import { RULES } from '../rateLimit';
-import { clearAuthCookies } from './accounts';
+import { clearAuthCookies, type AccountRecord } from './accounts';
 import { AUTH_BASE_PATH } from './auth';
 
 /**
@@ -63,8 +63,32 @@ async function accountStatus(request: Request, deps: Deps, clientKey: string): P
   if (!/^Bearer\s+\S+$/.test(request.headers.get('Authorization') ?? '')) return json({ error: 'invalid' }, 401);
   const session = await deps.accounts.session(new Headers({ Authorization: request.headers.get('Authorization') ?? '' }));
   if (session === null) return json({ error: 'invalid' }, 401);
-  const { id, name, email, status } = session.account;
-  return json({ account: { id, name, email, status } });
+  return json({ account: await accountView(deps, session.account) });
+}
+
+/**
+ * What the app needs to know about the signed-in account: effective status (owner + gym approval + end date),
+ * the plan that applies, and the gym (as its manager or as one of its trainers). Times are unix seconds.
+ */
+export async function accountView(deps: Deps, account: AccountRecord) {
+  const now = deps.now();
+  const { access, membership } = await deps.team.access(account.id, account.status, now);
+  const ownGym = access.plan.kind === 'gym' && !access.viaGym ? await deps.team.gym(account.id) : null;
+  const gym =
+    ownGym !== null
+      ? { id: ownGym.id, name: ownGym.name, membership: 'owner' as const }
+      : membership === null || membership.status === 'removed'
+        ? null
+        : { id: membership.gymId, name: membership.gymName, membership: membership.status };
+  return {
+    id: account.id,
+    name: account.name,
+    email: account.email,
+    status: access.status,
+    role: ownGym !== null ? 'gym' : 'trainer',
+    plan: { maxClients: access.plan.maxClients, maxTrainers: ownGym !== null ? access.plan.maxTrainers : null, expiresAt: access.plan.expiresAt },
+    gym,
+  };
 }
 
 /** The app origin to return to: the requested one when it is an allowed app origin, else the first one. */

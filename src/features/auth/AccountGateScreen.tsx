@@ -1,9 +1,10 @@
 import { useEffect, useState } from 'react';
 import { useServices } from '@/app/services';
-import type { Account, AuthState } from '@/domain/account';
+import { effectiveStatus, type Account, type AuthState } from '@/domain/account';
 import { t, tParts } from '@/i18n';
 import { Button, Icon } from '@/ui';
 import { LanguageToggle } from './LanguageToggle';
+import { PasteInviteButton } from '@/features/team/PasteInviteButton';
 import styles from './AuthScreen.module.css';
 
 export interface AccountGateScreenProps {
@@ -35,7 +36,25 @@ export function AccountGateScreen({ account, onChange }: AccountGateScreenProps)
     return () => document.removeEventListener('visibilitychange', onVisible);
   }, [auth, onChange]);
 
-  const pending = account.status === 'pending';
+  const status = effectiveStatus(account, new Date());
+  const pending = status === 'pending';
+  const gymPending = pending && account.gym?.membership === 'pending' ? account.gym.name : null;
+  const title =
+    status === 'expired'
+      ? t('team.expired.title')
+      : gymPending !== null
+        ? t('team.membership.pendingTitle', { gym: gymPending })
+        : pending
+          ? t('auth.gate.pendingTitle')
+          : t('auth.gate.disabledTitle');
+  const lead =
+    status === 'expired'
+      ? t('team.expired.lead')
+      : gymPending !== null
+        ? t('team.membership.pendingLead')
+        : pending
+          ? t('auth.gate.pendingLead')
+          : t('auth.gate.disabledLead');
   return (
     <main className={styles.page}>
       <div className={styles.langRow}>
@@ -44,8 +63,8 @@ export function AccountGateScreen({ account, onChange }: AccountGateScreenProps)
       <span className={pending ? styles.gateIcon : styles.gateIconOff} aria-hidden="true">
         <Icon name={pending ? 'clock' : 'lock'} />
       </span>
-      <h1 className={styles.title}>{pending ? t('auth.gate.pendingTitle') : t('auth.gate.disabledTitle')}</h1>
-      <p className={styles.lead}>{pending ? t('auth.gate.pendingLead') : t('auth.gate.disabledLead')}</p>
+      <h1 className={styles.title}>{title}</h1>
+      <p className={styles.lead}>{lead}</p>
       <p className={styles.who}>
         {tParts('auth.gate.signedInAs', { email: <span dir="ltr">{account.email}</span> })}
       </p>
@@ -57,6 +76,14 @@ export function AccountGateScreen({ account, onChange }: AccountGateScreenProps)
           <p className={styles.note} role="status">
             {t(`auth.gate.${note}`)}
           </p>
+        )}
+        {pending && account.gym === null && (
+          <PasteInviteButton
+            onJoined={async () => {
+              const next = await auth.getState();
+              onChange(next);
+            }}
+          />
         )}
         <Button
           variant="plain"

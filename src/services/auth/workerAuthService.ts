@@ -203,5 +203,5 @@ export class WorkerAuthService implements AuthService {
 }
 
 function sameAccount(a: Account, b: Account): boolean {
-  return a.id === b.id && a.name === b.name && a.email === b.email && a.status === b.status;
+  return JSON.stringify(a) === JSON.stringify(b);
 }

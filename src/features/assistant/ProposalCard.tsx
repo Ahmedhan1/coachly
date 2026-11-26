@@ -104,6 +104,7 @@ function WhatsappButton({ clientId, text, onOpened }: { clientId: string; text: 
 }
 
 function reason(code: ExecError): string {
+  if (code === 'client_limit') return t('assistant.execErrors.client_limit');
   if (code === 'not_found' || code === 'no_package' || code === 'invalid') return t(`assistant.execErrors.${code}`);
   return t(`assistant.errors.${code}`);
 }

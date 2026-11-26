@@ -9,6 +9,7 @@ import { settings } from './ar/settings';
 import { storage } from './ar/storage';
 import { schedule } from './ar/schedule';
 import { training } from './ar/training';
+import { team } from './ar/team';
 
 /**
  * Every user-visible string in the app. Egyptian Arabic, Western digits.
@@ -476,6 +477,7 @@ export const ar = {
   files,
   assistant,
   hub,
+  team,
   units: {
     mb: '{n} ميجا',
     gb: '{n} جيجا',

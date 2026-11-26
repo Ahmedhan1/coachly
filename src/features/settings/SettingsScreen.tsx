@@ -7,26 +7,59 @@ import { CLIENT_PAGES_ENABLED_KEY, clientPagesEnabled } from '@/features/online/
 import { t } from '@/i18n';
 import { Badge, Icon, ListRow, ListSection, PageHeader } from '@/ui';
 import { LanguageSwitch } from './LanguageSwitch';
+import { teamErrorText } from '@/features/team/teamErrors';
+import { PasteInviteButton } from '@/features/team/PasteInviteButton';
+import { toIsoDate } from '@/domain/models';
+import { formatIsoDate } from '@/ui/format';
 import { SignOutSheet } from './SignOutSheet';
 import styles from './SettingsScreen.module.css';
 
 /** Who is signed in on this device (stored on the device; no network). */
 function AccountRow() {
-  const { auth } = useServices();
+  const services = useServices();
+  const { auth } = services;
+  const showToast = useUiStore((st) => st.showToast);
   const state = useLive(() => auth.getState(), [auth]);
+  const clients = useLive(() => services.data.repos.clients.list(), [services]);
   if (state?.status === 'guest') return <ListRow leading={<Icon name="user" />} title={t('auth.guest')} subtitle={t('settings.account.guest')} />;
   if (state?.status !== 'signedIn') return null;
   const { account } = state;
+  const { plan, gym } = account;
+  const facts = [
+    plan.maxClients === null ? null : t('team.limit.clientsShort', { count: clients?.length ?? 0, n: plan.maxClients }),
+    plan.expiresAt === null ? null : t('team.plan.until', { date: formatIsoDate(toIsoDate(new Date(plan.expiresAt * 1000 - 1000))) }),
+  ].filter((f): f is string => f !== null);
+  const leave = async () => {
+    if (!gym || !window.confirm(t('team.membership.leaveConfirm', { gym: gym.name }))) return;
+    const r = await services.online?.team?.leave();
+    if (!r?.ok) return showToast({ message: teamErrorText(r?.error ?? 'server') });
+    showToast({ message: t('team.membership.left'), duration: 2500 });
+    // The account may lose its access with the gym: start again from the account check.
+    await auth.refresh();
+    window.location.reload();
+  };
   return (
-    <ListRow
-      leading={<Icon name="user" />}
-      title={t('settings.account.signedInAs', { name: account.name || account.email })}
-      subtitle={
-        <>
-          <span dir="ltr">{account.email}</span> · {t('settings.account.approved')}
-        </>
-      }
-    />
+    <>
+      <ListRow
+        leading={<Icon name="user" />}
+        title={t('settings.account.signedInAs', { name: account.name || account.email })}
+        subtitle={
+          <>
+            <span dir="ltr">{account.email}</span> · {t('settings.account.approved')}
+            {facts.length > 0 && <> · {facts.join(' · ')}</>}
+          </>
+        }
+      />
+      {gym !== null && gym.membership !== 'owner' && (
+        <ListRow leading={<Icon name="users" />} title={t('team.membership.trainerOf', { gym: gym.name })} subtitle={t('team.membership.leaveHint')} trailing={<span className={styles.leave}>{t('team.membership.leave')}</span>} onClick={() => void leave()} />
+      )}
+      {gym === null && account.role !== 'gym' && (
+        <div className={styles.language}>
+          <PasteInviteButton onJoined={() => window.location.reload()} />
+        </div>
+      )}
+      {gym !== null && gym.membership === 'owner' && <ListRow to="/more/team" leading={<Icon name="users" />} title={t('team.title')} subtitle={gym.name} />}
+    </>
   );
 }
 
