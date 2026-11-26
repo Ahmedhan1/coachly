@@ -1,3 +1,4 @@
+import { fromImageRow } from '@/data/db';
 import { describe, expect, it } from 'vitest';
 import { ARCHIVE_REGISTRY_KEY, parseArchiveRegistry } from '@/domain/backup';
 import { memoryBackupMetaStore } from '@/data/backupMeta';
@@ -30,7 +31,7 @@ async function setup() {
 }
 
 async function bytesOf(db: Awaited<ReturnType<typeof setup>>['db'], id: string) {
-  return new Uint8Array(await (await db.images.get(id))!.blob.arrayBuffer());
+  return new Uint8Array(await fromImageRow(await db.images.get(id))!.blob.arrayBuffer());
 }
 
 describe('PhotoArchiveService', () => {
@@ -58,7 +59,8 @@ describe('PhotoArchiveService', () => {
     for (const id of plan.ids) {
       const img = (await db.images.get(id))!;
       expect(img.bytes).toBeLessThan(200 * 1024);
-      expect(img.bytes).toBe(img.blob.size);
+      expect(img.data?.byteLength).toBe(img.bytes);
+      expect(img.blob).toBeUndefined();
     }
     const registry = parseArchiveRegistry((await db.meta.get(ARCHIVE_REGISTRY_KEY))?.value);
     expect(registry).toHaveLength(1);

@@ -1,9 +1,12 @@
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
 import { ZodError } from 'zod';
 import type { NewEntity } from './repositories';
 import type { Client } from '@/domain/models';
 import { createTestData } from './testing';
 import { undoLastDelete } from './undo';
+import { BYTES_MIGRATED_KEY } from './repositories/imageRepository';
+import { isDeviceLocalMetaKey } from './backupIO';
+import { metaOf } from './db';
 
 const newClient = (name: string, extra: Partial<NewEntity<Client>> = {}): NewEntity<Client> => ({
   name, phone: '', gender: null, birthDate: null, goal: 'fitness', goalNote: '', injuries: [], measurements: {},
@@ -172,5 +175,49 @@ describe('specific repositories', () => {
     await expect(repos.images.save({ blob: new Blob(['x'], { type: 'text/plain' }), width: 1, height: 1 })).rejects.toBeInstanceOf(
       ZodError,
     );
+  });
+
+  // WebKit: Blobs in IndexedDB break (picked photos point at temp files iOS deletes; private sessions refuse
+  // Blobs), so images are stored as raw bytes and handed out as fresh in-memory Blobs.
+  it('images: stored as bytes, never as a Blob or the picked File, and read back as an equal Blob', async () => {
+    const { repos, db } = createTestData();
+    const file = new File([new Uint8Array([9, 8, 7, 6])], 'logo.png', { type: 'image/png' });
+    const meta = await repos.images.save({ blob: file, width: 10, height: 10 });
+    const row = (await db.images.get(meta.id))!;
+    expect(row.blob).toBeUndefined();
+    expect(row.data).toBeInstanceOf(ArrayBuffer);
+    expect([...new Uint8Array(row.data!)]).toEqual([9, 8, 7, 6]);
+    const back = (await repos.images.getBlob(meta.id))!;
+    expect(back.type).toBe('image/png');
+    expect([...new Uint8Array(await back.arrayBuffer())]).toEqual([9, 8, 7, 6]);
+  });
+
+  it('images: migrateBlobsToBytes rewrites legacy Blob rows once and counts ones iOS already lost', async () => {
+    const { repos, db } = createTestData();
+    const meta = await repos.images.save({ blob: new Blob([new Uint8Array([1])], { type: 'image/jpeg' }), width: 1, height: 1 });
+    const base = metaOf((await db.images.get(meta.id))!);
+    // Rows written before the change: a readable Blob, and one whose temp file iOS already deleted.
+    await db.images.bulkPut([
+      { ...base, id: 'img-old' as typeof base.id, blob: new Blob([new Uint8Array([5, 5])], { type: 'image/jpeg' }), bytes: 2 },
+      { ...base, id: 'img-gone' as typeof base.id, blob: new Blob([new Uint8Array([4])], { type: 'image/jpeg' }) },
+    ]);
+    const realGet = db.images.get.bind(db.images);
+    const gone = new Blob([], { type: 'image/jpeg' });
+    Object.defineProperty(gone, 'arrayBuffer', { value: () => Promise.reject(new Error('WebKitBlobResource error 1')) });
+    const spy = vi.spyOn(db.images, 'get').mockImplementation((async (key: string) => {
+      const row = await realGet(key);
+      return key === 'img-gone' && row ? { ...row, blob: gone } : row;
+    }) as never);
+    expect(await repos.images.migrateBlobsToBytes()).toEqual({ migrated: 1, unreadable: 1 });
+    spy.mockRestore();
+    const fixed = (await db.images.get('img-old'))!;
+    expect(fixed.blob).toBeUndefined();
+    expect([...new Uint8Array(fixed.data!)]).toEqual([5, 5]);
+    expect(fixed.bytes).toBe(2);
+    expect([...new Uint8Array(await (await repos.images.getBlob('img-old'))!.arrayBuffer())]).toEqual([5, 5]);
+    // The scan runs once (device-local flag), and the flag never travels in a backup.
+    expect((await db.meta.get(BYTES_MIGRATED_KEY))?.value).toBe(true);
+    expect(isDeviceLocalMetaKey(BYTES_MIGRATED_KEY)).toBe(true);
+    expect(await repos.images.migrateBlobsToBytes()).toEqual({ migrated: 0, unreadable: 0 });
   });
 });

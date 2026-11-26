@@ -1,5 +1,5 @@
 import Dexie, { type Table } from 'dexie';
-import { AppDatabase, type ImageRecord, type MetaRecord } from './db';
+import { AppDatabase, fromImageRow, metaOf, toImageRow, type ImageRecord, type ImageRow, type MetaRecord } from './db';
 import { MIGRATIONS, TABLES, type Migration } from './schema';
 import {
   addArchiveEntry,
@@ -21,7 +21,7 @@ import {
  */
 
 /** Meta keys that belong to this device/install and never travel inside a backup. */
-export const DEVICE_LOCAL_META_PREFIXES: readonly string[] = ['auth.', 'backup.'];
+export const DEVICE_LOCAL_META_PREFIXES: readonly string[] = ['auth.', 'backup.', 'device.'];
 
 export function isDeviceLocalMetaKey(key: string): boolean {
   return DEVICE_LOCAL_META_PREFIXES.some((p) => key.startsWith(p));
@@ -60,7 +60,12 @@ export async function listImageIds(db: AppDatabase): Promise<string[]> {
 
 /** One image at a time, so exporting 500 photos never holds them all in memory. */
 export async function readImage(db: AppDatabase, id: string): Promise<ImageRecord | undefined> {
-  return db.images.get(id);
+  return fromImageRow(await db.images.get(id));
+}
+
+/** Size of the bytes a row actually holds (bytes rows and legacy Blob rows alike); -1 when it holds none. */
+function storedSize(row: ImageRow): number {
+  return row.data?.byteLength ?? row.blob?.size ?? -1;
 }
 
 export interface ImageStats {
@@ -114,9 +119,11 @@ export function rowsLookValid(db: AppDatabase, tables: RestoreTables): string | 
  * of this install are kept. Tables missing from `tables` end up empty.
  */
 export async function replaceAllData(db: AppDatabase, tables: RestoreTables): Promise<void> {
+  // Restored images carry Blobs; they are stored as bytes, read here because a transaction cannot await them.
+  const imageRows = await Promise.all(((tables[TABLES.images] ?? []) as ImageRecord[]).map(toImageRow));
   await db.transaction('rw', db.tables, async (tx) => {
     for (const table of db.tables) {
-      const rows = tables[table.name] ?? [];
+      const rows = table.name === TABLES.images ? imageRows : (tables[table.name] ?? []);
       if (table.name === TABLES.meta) {
         const keys = (await db.meta.toCollection().primaryKeys()).map(String).filter((k) => !isDeviceLocalMetaKey(k));
         await db.meta.bulkDelete(keys);
@@ -246,18 +253,19 @@ export async function deleteUnreferencedImages(db: AppDatabase, ids: readonly st
 
 /** Replaces one image's Blob in place (same id, so every reference keeps working). No-op if it is gone. */
 export async function replaceImageBlob(db: AppDatabase, id: string, image: { blob: Blob; width: number; height: number }): Promise<boolean> {
+  const data = await image.blob.arrayBuffer();
   return db.transaction('rw', db.images, async () => {
     const current = await db.images.get(id);
     if (!current) return false;
     const mime = image.blob.type as ImageRecord['mime'];
-    await db.images.put({ ...current, blob: image.blob, mime, width: image.width, height: image.height, bytes: image.blob.size });
+    await db.images.put({ ...metaOf(current), data, mime, width: image.width, height: image.height, bytes: data.byteLength });
     return true;
   });
 }
 
 /** Reads one image Blob (for re-compression). */
 export async function readImageBlob(db: AppDatabase, id: string): Promise<Blob | undefined> {
-  return (await db.images.get(id))?.blob;
+  return fromImageRow(await db.images.get(id))?.blob;
 }
 
 /* ---------- «أرشفة الصور القديمة»: placeholders + registry ---------- */
@@ -284,18 +292,20 @@ export async function commitPhotoArchive(
   entry: Omit<PhotoArchiveEntry, 'imageIds' | 'count' | 'bytes'>,
   swaps: readonly PlaceholderSwap[],
 ): Promise<{ ids: string[]; freedBytes: number }> {
+  const placeholders = await Promise.all(swaps.map((s) => s.placeholder.blob.arrayBuffer()));
   return db.transaction('rw', db.images, db.meta, async () => {
     const ids: string[] = [];
     let archivedBytes = 0;
     let freedBytes = 0;
-    for (const s of swaps) {
+    for (const [i, s] of swaps.entries()) {
       const current = await db.images.get(s.id);
-      if (!current || current.bytes !== s.expectBytes || current.blob.size !== s.expectBytes || current.mime !== s.expectMime) continue;
-      const blob = s.placeholder.blob;
-      await db.images.put({ ...current, blob, mime: blob.type as ImageRecord['mime'], width: s.placeholder.width, height: s.placeholder.height, bytes: blob.size });
+      if (!current || current.bytes !== s.expectBytes || storedSize(current) !== s.expectBytes || current.mime !== s.expectMime) continue;
+      const data = placeholders[i]!;
+      const mime = s.placeholder.blob.type as ImageRecord['mime'];
+      await db.images.put({ ...metaOf(current), data, mime, width: s.placeholder.width, height: s.placeholder.height, bytes: data.byteLength });
       ids.push(s.id);
       archivedBytes += current.bytes;
-      freedBytes += current.bytes - blob.size;
+      freedBytes += current.bytes - data.byteLength;
     }
     if (ids.length > 0) {
       const registry = parseArchiveRegistry((await db.meta.get(ARCHIVE_REGISTRY_KEY))?.value);
@@ -310,7 +320,8 @@ export async function commitPhotoArchive(
  * Puts full photos from an archive file back (same ids). Only photos this app still has as a placeholder or
  * still lists in the registry are restored, so an archive never brings back photos the trainer deleted since.
  */
-export async function restoreArchivedImages(db: AppDatabase, rows: readonly ImageRecord[], now: number): Promise<{ restored: number; skipped: number }> {
+export async function restoreArchivedImages(db: AppDatabase, records: readonly ImageRecord[], now: number): Promise<{ restored: number; skipped: number }> {
+  const rows = await Promise.all(records.map(toImageRow));
   return db.transaction('rw', db.images, db.meta, async () => {
     const registry = parseArchiveRegistry((await db.meta.get(ARCHIVE_REGISTRY_KEY))?.value);
     const listed = archivedImageIds(registry);
@@ -322,7 +333,7 @@ export async function restoreArchivedImages(db: AppDatabase, rows: readonly Imag
         skipped += 1;
         continue;
       }
-      await db.images.put({ ...row, bytes: row.blob.size });
+      await db.images.put({ ...row, bytes: row.data?.byteLength ?? row.bytes });
       restoredIds.push(row.id);
     }
     if (restoredIds.length > 0) await db.meta.put({ key: ARCHIVE_REGISTRY_KEY, value: markRestored(registry, restoredIds, now) });

@@ -176,7 +176,8 @@ describe('image variants (cloud copy)', () => {
     expect(r.ok && r.value.imageVariant).toBe('thumbnail');
     const img = (await target.images.toArray())[0]!;
     expect(img.width).toBe(400);
-    expect(img.bytes).toBe(img.blob.size);
+    expect(img.data?.byteLength).toBe(img.bytes); // stored as bytes, never as a Blob (WebKit)
+    expect(img.blob).toBeUndefined();
   });
 
   it('exports and restores 500 progress photos', async () => {

@@ -42,3 +42,22 @@ npm run dev
 npm run build
 cd worker && npm test
 ```
+
+### Testing in real WebKit (Safari's engine)
+
+iPhone-only bugs need WebKit, not Chromium pretending to be Safari. Install it once into a separate folder (the
+shared Chromium in `/opt/pw-browsers` stays untouched), then run any e2e or PDF sample against it:
+
+```bash
+PLAYWRIGHT_BROWSERS_PATH=$HOME/.pw-webkit npx playwright install webkit && sudo npx playwright install-deps webkit
+PLAYWRIGHT_BROWSERS_PATH=$HOME/.pw-webkit npx playwright test --project=webkit e2e/brand-icon.spec.ts e2e/pdf-builder.spec.ts
+PLAYWRIGHT_BROWSERS_PATH=$HOME/.pw-webkit npx playwright test -c src/services/pdf/harness/playwright.config.ts --project=webkit
+```
+
+Playwright's WebKit contexts are ephemeral like Safari Private Browsing: IndexedDB refuses Blobs there, which is
+how the image-storage bug below was reproduced. Known driver limits (not app bugs): no `clipboard-write`
+permission, and `setOffline` + reload fails.
+
+**Images are stored as bytes, never Blobs** (`src/data/db.ts` ImageRow): on WebKit a picked photo stored as a Blob
+points at a temp file iOS deletes later, and private sessions refuse Blobs, so logos and photos vanished from
+PDFs. Rows from before 2026-11-27 are rewritten once at startup (`migrateBlobsToBytes`).

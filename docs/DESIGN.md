@@ -146,12 +146,14 @@ caption 12.5/400, buttons 16/500. Numbers tabular (`.num`) at 600–700: hero ti
 - Everything else follows §10: one implementation per control in `src/ui`.
 
 ### PDF look
-Pebble on paper (`src/services/pdf/pageStyles.ts`): Rubik (or Cairo, the trainer's choice in PDF settings), a warm
-off-white page, white rounded cards with a faint warm shadow, section titles with a round brand number (no filled
-bands), light table headers without zebra rows, superset rows washed in the brand tint, pill chips, a rounded brand
-card on the cover and a rounded contact card at its foot. Over a trainer background image, titles and loose text sit
-on white pills. Only treatment changed in Nov 2026: every size the paginator uses (`src/domain/pdf/layout`) is the same,
-so page breaks are unchanged.
+Editorial on paper (`src/services/pdf/pageStyles.ts`), in the trainer's PDF colour (green by default): Rubik
+(or Cairo, the trainer's choice), white paper, a running head over a hairline and a plain folio in the brand
+colour; section titles with a large brand numeral (01, 02…) over a heavy ink rule; the client's figures in
+hairline-divided columns with display numerals; exercise and measurement tables without a box (small grey
+labels over a heavy rule, hairline rows, a closing rule); a full-bleed brand cover top with a 52px client name,
+the facts under heavy rules and the contacts as text over a rule. Over a trainer background image every text
+block sits on a white panel. Blocks are measured with this stylesheet before pagination, so restyling re-flows
+pages safely.
 
 ---
 
