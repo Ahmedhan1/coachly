@@ -267,9 +267,9 @@ function BookingForm({
       title={session ? t('schedule.sheet.editTitle') : t('schedule.sheet.newTitle')}
       cancelLabel={t('common.cancel')}
       primaryAction={
-        <button type="submit" form={FORM_ID} className={styles.save} disabled={saving}>
+        <Button size="small" type="submit" form={FORM_ID} disabled={saving}>
           {session ? t('schedule.sheet.saveEdit') : t('schedule.sheet.save')}
-        </button>
+        </Button>
       }
     >
       <form id={FORM_ID} className={styles.form} onSubmit={submit} noValidate>

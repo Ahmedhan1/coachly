@@ -5,7 +5,7 @@ import { useUiStore } from '@/app/uiStore';
 import { clientGoalSchema, type Client, type ClientGoal } from '@/domain/models';
 import { cleanPhoneInput, phoneProblem } from '@/domain/whatsapp';
 import { t } from '@/i18n';
-import { Button, Select, SegmentedControl, Sheet, TextArea, TextField } from '@/ui';
+import { Button, SegmentedControl, Select, Sheet, TextArea, TextField } from '@/ui';
 import styles from './AddClientSheet.module.css';
 
 const FORM_ID = 'edit-client-form';
@@ -71,9 +71,9 @@ export function EditClientSheet({ client, onClose }: { client: Client; onClose: 
       title={t('clientDetail.editTitle')}
       cancelLabel={t('common.cancel')}
       primaryAction={
-        <button type="submit" form={FORM_ID} className={styles.save}>
+        <Button size="small" type="submit" form={FORM_ID}>
           {t('common.save')}
-        </button>
+        </Button>
       }
     >
       <form id={FORM_ID} className={styles.form} onSubmit={(e) => void submit(e)} noValidate>

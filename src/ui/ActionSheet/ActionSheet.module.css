@@ -1,0 +1,33 @@
+.list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.row {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-3);
+  inline-size: 100%;
+  min-block-size: var(--row-h);
+  padding: 0;
+  border-block-end: var(--hairline) solid var(--line);
+  color: var(--text);
+  font: var(--t-body);
+  text-align: start;
+}
+
+.row:disabled {
+  opacity: 0.4;
+}
+
+.row svg {
+  inline-size: 22px;
+  block-size: 22px;
+  color: var(--text-2);
+}
+
+.danger,
+.danger svg {
+  color: var(--danger);
+}

@@ -1,0 +1,62 @@
+.group {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-2);
+}
+
+.label {
+  font: var(--t-heading);
+  color: var(--text);
+}
+
+.chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--sp-2);
+}
+
+/*
+ * White on a page, --surface-2 inside a sheet (Sheet sets --field-bg), like text fields.
+ * A long label wraps instead of widening the page; horizontal scroll strips set `> * { flex: none }`.
+ */
+.chip {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: var(--sp-1-5);
+  min-block-size: 36px;
+  max-inline-size: 100%;
+  padding: var(--sp-1-5) var(--sp-3);
+  border-radius: var(--r-control);
+  background: var(--field-bg, var(--surface));
+  color: var(--text);
+  font: var(--t-control);
+  text-align: start;
+}
+
+.chip::after {
+  content: '';
+  position: absolute;
+  inset: -4px 0;
+}
+
+.chip svg {
+  flex: none;
+  inline-size: var(--icon-sm);
+  block-size: var(--icon-sm);
+}
+
+.chip[aria-pressed='true'] {
+  background: var(--text);
+  color: var(--surface);
+}
+
+.warn[aria-pressed='true'] {
+  background: var(--warn);
+  color: var(--surface);
+}
+
+.chip:disabled {
+  opacity: 0.45;
+  cursor: default;
+}

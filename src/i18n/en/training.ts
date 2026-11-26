@@ -293,8 +293,6 @@ export const training: EnArea<'training'> = {
       rpe: 'RPE',
       rpeNone: 'None',
       notes: 'Note for the client',
-      decrease: 'Decrease {label}',
-      increase: 'Increase {label}',
       linkNext: 'Superset with the next one',
       unlink: 'Remove from superset',
       swap: 'Swap exercise',

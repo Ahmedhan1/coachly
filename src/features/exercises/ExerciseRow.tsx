@@ -2,10 +2,9 @@ import { memo } from 'react';
 import { Link } from 'react-router-dom';
 import type { CatalogExercise } from '@/domain/exercises';
 import { t } from '@/i18n';
-import { cx } from '@/ui';
+import { Icon, cx } from '@/ui';
 import { ExerciseThumb } from './ExerciseThumb';
 import { equipmentName, exName, muscleName } from './localized';
-import { StarIcon } from './icons';
 import styles from './ExerciseRow.module.css';
 
 export const ROW_HEIGHT = 84;
@@ -42,7 +41,7 @@ export const ExerciseRow = memo(function ExerciseRow({ exercise, favourite, hidd
         aria-label={t(favourite ? 'training.library.favouriteRemove' : 'training.library.favouriteAdd', { name })}
         onClick={() => onToggleFavourite(exercise)}
       >
-        <StarIcon filled={favourite} />
+        <Icon name={favourite ? 'star' : 'starOutline'} />
       </button>
     </div>
   );

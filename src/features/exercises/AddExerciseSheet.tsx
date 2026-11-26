@@ -10,8 +10,7 @@ import {
   type MuscleGroupId,
 } from '@/domain/exercises';
 import { t } from '@/i18n';
-import { Icon, SegmentedControl, Select, Sheet, TextField } from '@/ui';
-import { ChipGroup, ChipToggle } from './ChipToggle';
+import { Button, Chip, ChipGroup, Icon, SegmentedControl, Select, Sheet, TextField } from '@/ui';
 import { toggleIn } from './libraryUi';
 import { equipmentName, levelName, muscleName } from './localized';
 import { useLibraryStore } from './useCatalog';
@@ -67,9 +66,9 @@ export function AddExerciseSheet({ onClose, initialMuscle }: { onClose: () => vo
       cancelLabel={t('common.cancel')}
       initialFocusId={NAME_ID}
       primaryAction={
-        <button type="submit" form={FORM_ID} className={styles.save} disabled={saving}>
+        <Button size="small" type="submit" form={FORM_ID} disabled={saving}>
           {t('common.save')}
-        </button>
+        </Button>
       }
     >
       <form id={FORM_ID} className={styles.form} onSubmit={submit} noValidate>
@@ -99,17 +98,17 @@ export function AddExerciseSheet({ onClose, initialMuscle }: { onClose: () => vo
         />
         <ChipGroup label={t('training.library.add.primary')}>
           {MUSCLE_GROUPS.map((g) => (
-            <ChipToggle
+            <Chip
               key={g.id}
               pressed={primary.includes(g.id)}
-              onToggle={() => {
+              onClick={() => {
                 setPrimary(toggleIn(primary, g.id));
                 setSecondary((s) => s.filter((m) => m !== g.id));
                 setErrors((x) => ({ ...x, muscles: undefined }));
               }}
             >
               {muscleName(g.id)}
-            </ChipToggle>
+            </Chip>
           ))}
         </ChipGroup>
         {errors.muscles && (
@@ -119,9 +118,9 @@ export function AddExerciseSheet({ onClose, initialMuscle }: { onClose: () => vo
         )}
         <ChipGroup label={`${t('training.library.add.secondary')} (${t('common.optional')})`}>
           {MUSCLE_GROUPS.filter((g) => !primary.includes(g.id)).map((g) => (
-            <ChipToggle key={g.id} pressed={secondary.includes(g.id)} onToggle={() => setSecondary(toggleIn(secondary, g.id))}>
+            <Chip key={g.id} pressed={secondary.includes(g.id)} onClick={() => setSecondary(toggleIn(secondary, g.id))}>
               {muscleName(g.id)}
-            </ChipToggle>
+            </Chip>
           ))}
         </ChipGroup>
         <Select label={t('training.library.add.equipment')} options={EQUIPMENT} value={equipment} onChange={setEquipment} />

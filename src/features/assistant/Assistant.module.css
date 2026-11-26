@@ -50,16 +50,6 @@
   gap: var(--sp-2);
 }
 
-.chip {
-  min-height: var(--tap);
-  padding: var(--sp-2) var(--sp-3);
-  border: 1px solid var(--line);
-  border-radius: var(--r-control);
-  background: var(--surface);
-  color: var(--text);
-  font: var(--t-callout);
-}
-
 .bubble {
   max-inline-size: 88%;
   padding: var(--sp-3) var(--sp-4);

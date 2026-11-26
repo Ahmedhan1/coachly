@@ -1,4 +1,4 @@
-import { useEffect, useId, useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { useServices } from '@/app/services';
 import { useUiStore } from '@/app/uiStore';
 import { ARCHIVE_MONTH_CHOICES, DEFAULT_ARCHIVE_MONTHS, shouldRecordSave, type SaveOutcome } from '@/domain/backup';
@@ -12,7 +12,7 @@ import {
   type PhotoArchiveFile,
   type VerifiedPhotoArchive,
 } from '@/services/backup';
-import { Button, SegmentedControl, Sheet, TextField } from '@/ui';
+import { Button, FileButton, SegmentedControl, Sheet, TextField } from '@/ui';
 import { formatBytes } from '@/ui/format';
 import styles from './Storage.module.css';
 
@@ -40,7 +40,6 @@ export function PhotoArchiveSheet({ onClose, onDone, saver: saverProp }: { onClo
   const { backup, meta } = useServices();
   const showToast = useUiStore((s) => s.showToast);
   const saver = useMemo(() => saverProp ?? new BrowserDeviceFileSaver(), [saverProp]);
-  const fileId = useId();
   const [months, setMonths] = useState(DEFAULT_ARCHIVE_MONTHS);
   const [plan, setPlan] = useState<ArchivePlan | null>(null);
   const [step, setStep] = useState<Step>({ kind: 'choose' });
@@ -139,10 +138,9 @@ export function PhotoArchiveSheet({ onClose, onDone, saver: saverProp }: { onClo
             </Button>
             <p className={styles.strong}>{t('storage.archive.stepPick')}</p>
             <p className={styles.body}>{t('storage.archive.stepPickHint')}</p>
-            <label className={styles.fileButton} htmlFor={fileId}>
+            <FileButton icon="upload" block onFiles={([file]) => void verify(step.made, file)}>
               {t('storage.archive.pick')}
-              <input id={fileId} type="file" className={styles.fileInput} onChange={(e) => void verify(step.made, e.target.files?.[0])} />
-            </label>
+            </FileButton>
           </>
         )}
         {step.kind === 'verified' && (

@@ -1,11 +1,11 @@
-import { useEffect, useId, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { CLOUD_PASSWORD_KEY, useServices } from '@/app/services';
 import { useUiStore } from '@/app/uiStore';
 import { useLive } from '@/app/useLive';
 import { t, type TKey } from '@/i18n';
 import { MIN_BACKUP_PASSWORD_LENGTH, type ImportSummary, type SchedulerState } from '@/services/backup';
 import { DeviceBackupFlow } from '@/features/storage/DeviceBackupFlow';
-import { Badge, Button, Icon, ListRow, ListSection, PageHeader, Sheet, TextField, TitleIcon } from '@/ui';
+import { Badge, Button, FileButton, Icon, ListRow, ListSection, PageHeader, Sheet, TextField, TitleIcon } from '@/ui';
 import { formatBytes, formatIsoDate, formatTime } from '@/ui/format';
 import { toIsoDate } from '@/domain/models';
 import styles from './Settings.module.css';
@@ -165,9 +165,9 @@ function PasswordSheet({ title, confirm, onClose, onSave, note }: { title: strin
       title={title}
       cancelLabel={t('common.cancel')}
       primaryAction={
-        <button type="button" className={styles.sheetSave} onClick={submit}>
+        <Button size="small" onClick={submit}>
           {t('common.save')}
-        </button>
+        </Button>
       }
     >
       <div className={styles.form}>
@@ -185,7 +185,6 @@ function fullConfirmText(s: ImportSummary): string {
 
 function ImportSheet({ onClose }: { onClose: () => void }) {
   const { backup } = useServices();
-  const fileId = useId();
   const [file, setFile] = useState<File | null>(null);
   const [needsPassword, setNeedsPassword] = useState(false);
   const [password, setPassword] = useState('');
@@ -236,17 +235,16 @@ function ImportSheet({ onClose }: { onClose: () => void }) {
       title={t('settings.backup.import')}
       cancelLabel={t('common.cancel')}
       primaryAction={
-        <button type="button" className={styles.sheetSave} disabled={!file || working || (needsPassword && !password)} onClick={() => void run()}>
+        <Button size="small" disabled={!file || working || (needsPassword && !password)} onClick={() => void run()}>
           {working ? t('settings.backup.importing') : t('settings.backup.importConfirmYes')}
-        </button>
+        </Button>
       }
     >
       <div className={styles.form}>
         <p className={styles.warnBox}>{t('settings.backup.importHint')}</p>
-        <label className={styles.fileButton} htmlFor={fileId}>
+        <FileButton icon="upload" block onFiles={([file]) => void pick(file)}>
           {file ? file.name : t('settings.backup.import')}
-          <input id={fileId} type="file" className={styles.fileInput} onChange={(e) => void pick(e.target.files?.[0])} />
-        </label>
+        </FileButton>
         {needsPassword && (
           <TextField label={t('settings.backup.importPassword')} type="password" autoComplete="current-password" value={password} onChange={(e) => setPassword(e.target.value)} ltr />
         )}
@@ -287,9 +285,9 @@ function RestoreCloudSheet({ onClose }: { onClose: () => void }) {
       title={t('settings.backup.restoreCloud')}
       cancelLabel={t('common.cancel')}
       primaryAction={
-        <button type="button" className={styles.sheetSave} disabled={!present || password.length < MIN_BACKUP_PASSWORD_LENGTH || working} onClick={() => void run()}>
+        <Button size="small" disabled={!present || password.length < MIN_BACKUP_PASSWORD_LENGTH || working} onClick={() => void run()}>
           {working ? t('settings.backup.importing') : t('settings.backup.importConfirmYes')}
-        </button>
+        </Button>
       }
     >
       <div className={styles.form}>

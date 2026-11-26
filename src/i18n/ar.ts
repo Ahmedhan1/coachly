@@ -32,6 +32,8 @@ export const ar = {
     delete: 'حذف',
     undo: 'تراجع',
     back: 'رجوع',
+    decrease: 'قلّل {label}',
+    increase: 'زوّد {label}',
     add: 'إضافة',
     edit: 'تعديل',
     search: 'بحث',

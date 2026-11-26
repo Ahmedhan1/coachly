@@ -101,7 +101,6 @@
   object-fit: cover;
 }
 
-
 .rowThumb {
   inline-size: 44px;
   block-size: 44px;
@@ -157,13 +156,6 @@
 .photoRemove svg {
   inline-size: 14px;
   block-size: 14px;
-}
-
-.fileInput {
-  position: absolute;
-  inset: 0;
-  opacity: 0;
-  cursor: pointer;
 }
 
 .navyNote {

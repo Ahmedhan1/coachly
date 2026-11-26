@@ -2,9 +2,7 @@ import { useState } from 'react';
 import type { ProgramItem } from '@/domain/models';
 import { formatReps, normalizeTempo, parseReps, type ProgramItemPatch, type RepsSpec } from '@/domain/programs';
 import { t } from '@/i18n';
-import { Button, Icon, SegmentedControl, Select, Sheet, TextField } from '@/ui';
-import { Glyph } from './glyphs';
-import { Stepper } from './Stepper';
+import { Button, Icon, SegmentedControl, Select, Sheet, Stepper, TextField } from '@/ui';
 import styles from './Shared.module.css';
 
 const TEMPO = /^(\d|X)?(-(\d|X)){0,3}$|^$/i;
@@ -37,7 +35,7 @@ export function SetEditorSheet(props: SetEditorSheetProps) {
       cancelLabel={t('common.close')}
       initialFocusId="set-editor-done"
       primaryAction={
-        <Button icon="check" size="small" id="set-editor-done" onClick={onClose}>
+        <Button size="small" id="set-editor-done" onClick={onClose}>
           {t('training.programs.editor.done')}
         </Button>
       }
@@ -203,12 +201,12 @@ function EditorBody({ item, onChange, onMove, canMoveUp, canMoveDown, onToggleSu
       <div className={styles.editorActions}>
         {(item.supersetGroup !== null || canLinkNext) && (
           <button type="button" className={styles.textAction} onClick={onToggleSuperset}>
-            <Glyph name="link" />
+            <Icon name="link" />
             {item.supersetGroup !== null ? t('training.programs.editor.unlink') : t('training.programs.editor.linkNext')}
           </button>
         )}
         <button type="button" className={styles.textAction} onClick={onSwap}>
-          <Glyph name="swap" />
+          <Icon name="swap" />
           {t('training.programs.editor.swap')}
         </button>
         <button type="button" className={`${styles.textAction} ${styles.danger}`} onClick={onRemove}>

@@ -30,12 +30,6 @@
   gap: var(--sp-3);
 }
 
-.grid3 {
-  display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: var(--sp-3);
-}
-
 .muted {
   color: var(--text-2);
   font: var(--t-sub);
@@ -128,66 +122,8 @@
   gap: var(--sp-4);
 }
 
-.sheetSave {
-  min-block-size: var(--tap);
-  padding-inline: var(--sp-2);
-  color: var(--brand-ink);
-  font: var(--t-button);
-}
-
-.sheetSave:disabled {
-  opacity: 0.4;
-}
-
-.fileButton {
-  position: relative;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: var(--sp-2);
-  min-block-size: var(--tap);
-  padding-inline: var(--sp-4);
-  border-radius: var(--r-md);
-  background: var(--surface-2);
-  color: var(--text);
-  font: var(--t-callout);
-  cursor: pointer;
-}
-
-.fileButton svg {
-  inline-size: 20px;
-  block-size: 20px;
-}
-
-.fileButton:has(:focus-visible) {
-  outline: 3px solid var(--brand-ink);
-}
-
 .chips {
   display: flex;
   flex-wrap: wrap;
   gap: var(--sp-1-5);
-}
-
-.chip {
-  position: relative;
-  display: inline-flex;
-  align-items: center;
-  min-block-size: 32px;
-  padding-inline: var(--sp-3);
-  border-radius: var(--r-control);
-  background: var(--surface);
-  color: var(--text-2);
-  font: var(--t-control);
-}
-
-.chip::after {
-  content: '';
-  position: absolute;
-  inset: -6px 0;
-}
-
-.chip[aria-pressed='true'] {
-  background: var(--text);
-  color: var(--bg);
 }

@@ -1,7 +1,7 @@
 import { useState, type ReactNode } from 'react';
 import { convertAmount, type KcalPerGramLike, type MacroAmount, type MacroSpec, type MacroTargets, type MacroUnit } from '@/domain/meals';
 import { t } from '@/i18n';
-import { SegmentedControl, Tx } from '@/ui';
+import { Chip, SegmentedControl, Tx } from '@/ui';
 import { parseDecimal } from '../shared/numbers';
 import styles from './Cal.module.css';
 import diet from './Diet.module.css';
@@ -101,9 +101,9 @@ function MacroRow({ name, amount, units, sub, onSet, onUnit }: RowProps) {
       </div>
       <div className={styles.unitRow} role="group" aria-label={t('nutrition.cal.unitPick', { name })}>
         {units.map((u) => (
-          <button key={u} type="button" className={styles.chip} aria-pressed={u === amount.unit} onClick={() => u !== amount.unit && onUnit(u)}>
+          <Chip key={u} pressed={u === amount.unit} onClick={() => u !== amount.unit && onUnit(u)}>
             {t(`nutrition.cal.unit.${u}`)}
-          </button>
+          </Chip>
         ))}
       </div>
     </div>

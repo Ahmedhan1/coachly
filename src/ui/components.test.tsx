@@ -2,10 +2,13 @@
 import { act, cleanup, fireEvent, render, screen } from '@testing-library/react';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import { initials } from './Avatar/Avatar';
+import { Chip } from './Chip/Chip';
 import { EmptyState } from './EmptyState/EmptyState';
+import { FileButton } from './FileButton/FileButton';
 import { IconButton } from './IconButton/IconButton';
 import { SearchField } from './SearchField/SearchField';
 import { SegmentedControl } from './SegmentedControl/SegmentedControl';
+import { Stepper } from './Stepper/Stepper';
 import { Sheet } from './Sheet/Sheet';
 import { SwipeRow } from './SwipeRow/SwipeRow';
 import { TextField } from './TextField/TextField';
@@ -80,6 +83,56 @@ describe('form controls', () => {
     render(<SearchField value="سارة" onChange={onChange} placeholder="" label="بحث" clearLabel="مسح" />);
     fireEvent.click(screen.getByRole('button', { name: 'مسح' }));
     expect(onChange).toHaveBeenCalledWith('');
+  });
+
+  it('Chip exposes its pressed state only when it is a toggle', () => {
+    const onClick = vi.fn();
+    render(
+      <>
+        <Chip pressed onClick={onClick}>
+          جلوتس
+        </Chip>
+        <Chip>إضافة</Chip>
+      </>,
+    );
+    const toggle = screen.getByRole('button', { name: 'جلوتس' });
+    expect(toggle.getAttribute('aria-pressed')).toBe('true');
+    expect(screen.getByRole('button', { name: 'إضافة' }).hasAttribute('aria-pressed')).toBe(false);
+    fireEvent.click(toggle);
+    expect(onClick).toHaveBeenCalledOnce();
+  });
+
+  it('Stepper clamps to its range and accepts Arabic-Indic digits', () => {
+    const onChange = vi.fn();
+    render(<Stepper label="عدات" value={1} min={1} max={20} step={1} onChange={onChange} />);
+    expect((screen.getByRole('button', { name: 'قلّل عدات' }) as HTMLButtonElement).disabled).toBe(true);
+    fireEvent.click(screen.getByRole('button', { name: 'زوّد عدات' }));
+    expect(onChange).toHaveBeenLastCalledWith(2);
+    fireEvent.change(screen.getByLabelText('عدات'), { target: { value: '٢٥' } });
+    expect(onChange).toHaveBeenLastCalledWith(20);
+  });
+
+  it('FileButton hands over the picked files, clears the input, and locks while busy', () => {
+    const onFiles = vi.fn();
+    const { rerender } = render(
+      <FileButton onFiles={onFiles} accept="image/*">
+        صورة
+      </FileButton>,
+    );
+    const input = screen.getByLabelText('صورة') as HTMLInputElement;
+    expect(input.type).toBe('file');
+    const file = new File(['x'], 'a.png', { type: 'image/png' });
+    fireEvent.change(input, { target: { files: [file] } });
+    expect(onFiles).toHaveBeenCalledWith([file]);
+    expect(input.value).toBe('');
+    fireEvent.change(input, { target: { files: [] } });
+    expect(onFiles).toHaveBeenCalledOnce();
+    rerender(
+      <FileButton onFiles={onFiles} busy>
+        صورة
+      </FileButton>,
+    );
+    expect(input.disabled).toBe(true);
   });
 
   it('IconButton always has an accessible name', () => {

@@ -74,9 +74,9 @@ function SetupSheet({ onClose, onSubmit }: { onClose: () => void; onSubmit: (c: 
       title={t('storage.device.setupTitle')}
       cancelLabel={t('common.cancel')}
       primaryAction={
-        <button type="button" className={styles.sheetSave} onClick={submit}>
+        <Button size="small" onClick={submit}>
           {t('storage.device.start')}
-        </button>
+        </Button>
       }
     >
       <div className={styles.form}>

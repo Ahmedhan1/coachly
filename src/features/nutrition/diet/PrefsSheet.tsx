@@ -2,7 +2,7 @@ import { useMemo, useState } from 'react';
 import { ALLERGENS, type FoodPrefs, type IngredientEntry } from '@/domain/meals';
 import { t } from '@/i18n';
 import { pick } from '@/i18n/locale';
-import { Icon, SearchField, Sheet, TitleIcon } from '@/ui';
+import { Chip, Icon, SearchField, Sheet, TitleIcon } from '@/ui';
 import { FoodImage } from '../shared/FoodImage';
 import common from '../shared/common.module.css';
 import styles from './Cal.module.css';
@@ -38,9 +38,9 @@ export function PrefsSheet({ prefs, foods, onChange, onClose }: Props) {
         <h3 className={common.sectionTitle}><TitleIcon name="warning" />{t('nutrition.cal.allergyTitle')}</h3>
         <div className={styles.chips}>
           {ALLERGENS.map((a) => (
-            <button key={a} type="button" className={styles.chip} aria-pressed={prefs.allergies.includes(a)} onClick={() => toggleAllergy(a)}>
+            <Chip key={a} pressed={prefs.allergies.includes(a)} onClick={() => toggleAllergy(a)}>
               {t(`nutrition.cal.allergy.${a}`)}
-            </button>
+            </Chip>
           ))}
         </div>
         <p className={styles.rowSub}>{t('nutrition.cal.porkNote')}</p>
@@ -63,9 +63,10 @@ export function PrefsSheet({ prefs, foods, onChange, onClose }: Props) {
                   </button>
                 );
               })}
-              <button type="button" className={styles.chip} onClick={() => setPicking(key)}>
-                + {t('nutrition.cal.addFood')}
-              </button>
+              <Chip onClick={() => setPicking(key)}>
+                <Icon name="plus" />
+                {t('nutrition.cal.addFood')}
+              </Chip>
             </div>
           </div>
         ))}

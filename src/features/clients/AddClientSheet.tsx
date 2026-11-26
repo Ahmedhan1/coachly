@@ -6,7 +6,7 @@ import { useUiStore } from '@/app/uiStore';
 import { clientGoalSchema, toIsoDate, type ClientGoal } from '@/domain/models';
 import { cleanPhoneInput, phoneProblem } from '@/domain/whatsapp';
 import { t } from '@/i18n';
-import { SegmentedControl, Sheet, TextField } from '@/ui';
+import { Button, SegmentedControl, Sheet, TextField } from '@/ui';
 import styles from './AddClientSheet.module.css';
 
 const GOALS = clientGoalSchema.options.map((value) => ({ value, label: t(`goals.${value}`) }));
@@ -81,9 +81,9 @@ function AddClientForm({ onClose }: { onClose: () => void }) {
       cancelLabel={t('common.cancel')}
       initialFocusId={NAME_ID}
       primaryAction={
-        <button type="submit" form={FORM_ID} className={styles.save} disabled={saving}>
+        <Button size="small" type="submit" form={FORM_ID} disabled={saving}>
           {t('common.save')}
-        </button>
+        </Button>
       }
     >
       <form id={FORM_ID} className={styles.form} onSubmit={submit} noValidate>

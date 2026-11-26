@@ -1,11 +1,11 @@
-import { useId, useState, type FormEvent } from 'react';
+import { useState, type FormEvent } from 'react';
 import { useServices } from '@/app/services';
 import { useLive } from '@/app/useLive';
 import { useUiStore } from '@/app/uiStore';
 import { toIsoDate, type ClientId, type ImageId, type ProgressEntry } from '@/domain/models';
 import { entryNavyEstimate, type EntryNavyEstimate } from '@/domain/nutrition';
 import { t, type TKey } from '@/i18n';
-import { Button, Icon, Sheet, TextArea, TextField } from '@/ui';
+import { Button, FileButton, Icon, Sheet, TextArea, TextField } from '@/ui';
 import { formatNumber, LIST_SEP } from '@/ui/format';
 import { navyErrorText } from '../shared/errors';
 import { parseDecimal } from '../shared/numbers';
@@ -59,7 +59,6 @@ export function EntrySheet({ clientId, entry, onClose }: { clientId: string; ent
   const services = useServices();
   const repos = services.data.repos;
   const showToast = useUiStore((s) => s.showToast);
-  const fileId = useId();
   const client = useClient(clientId);
   const store = useNutritionStore();
   const nutrition = useLive(() => store.getSettings(), [store]);
@@ -131,9 +130,9 @@ export function EntrySheet({ clientId, entry, onClose }: { clientId: string; ent
       title={entry ? t('nutrition.progress.editTitle') : t('nutrition.progress.newTitle')}
       cancelLabel={t('common.cancel')}
       primaryAction={
-        <button type="submit" form="entry-form" className={common.sheetSave} disabled={busy}>
+        <Button size="small" type="submit" form="entry-form" disabled={busy}>
           {t('common.save')}
-        </button>
+        </Button>
       }
     >
       <form id="entry-form" className={common.form} onSubmit={(e) => void submit(e)} noValidate>
@@ -167,32 +166,26 @@ export function EntrySheet({ clientId, entry, onClose }: { clientId: string; ent
               </span>
             ))}
             {photos.length < 12 && (
-              <label className={common.fileButton} htmlFor={fileId} aria-busy={busy}>
-                <Icon name="image" />
-                {t('nutrition.progress.addPhoto')}
-                <input
-                  id={fileId}
-                  className={styles.fileInput}
-                  type="file"
-                  accept="image/*"
-                  multiple
-                  disabled={busy}
-                  onChange={async (e) => {
-                    const files = [...(e.target.files ?? [])].slice(0, 12 - photos.length);
-                    e.target.value = '';
-                    setBusy(true);
-                    try {
-                      for (const f of files) {
-                        const stored = await storePhoto(services, f);
-                        setPhotos((p) => [...p, stored.imageId]);
-                        setThumbs((m) => ({ ...m, [stored.imageId]: stored.thumbId }));
-                      }
-                    } finally {
-                      setBusy(false);
+              <FileButton
+                icon="image"
+                accept="image/*"
+                multiple
+                busy={busy}
+                onFiles={async (picked) => {
+                  setBusy(true);
+                  try {
+                    for (const f of picked.slice(0, 12 - photos.length)) {
+                      const stored = await storePhoto(services, f);
+                      setPhotos((p) => [...p, stored.imageId]);
+                      setThumbs((m) => ({ ...m, [stored.imageId]: stored.thumbId }));
                     }
-                  }}
-                />
-              </label>
+                  } finally {
+                    setBusy(false);
+                  }
+                }}
+              >
+                {t('nutrition.progress.addPhoto')}
+              </FileButton>
             )}
           </div>
         </div>

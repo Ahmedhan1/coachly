@@ -3,7 +3,7 @@ import { useRepos } from '@/app/services';
 import { useUiStore } from '@/app/uiStore';
 import type { ImageId, Supplement } from '@/domain/models';
 import { t } from '@/i18n';
-import { Sheet, TextArea, TextField } from '@/ui';
+import { Button, Sheet, TextArea, TextField } from '@/ui';
 import { currencyLabel } from '@/ui/format';
 import { moneyInputValue, parseMoneyInput } from '@/features/clients/moneyInput';
 import { PhotoField } from '../shared/PhotoField';
@@ -55,9 +55,9 @@ export function SupplementSheet({ supplement, currency, onClose }: { supplement:
       title={supplement ? t('nutrition.supplements.editTitle') : t('nutrition.supplements.newTitle')}
       cancelLabel={t('common.cancel')}
       primaryAction={
-        <button type="submit" form={FORM_ID} className={common.sheetSave}>
+        <Button size="small" type="submit" form={FORM_ID}>
           {t('common.save')}
-        </button>
+        </Button>
       }
     >
       <form id={FORM_ID} className={common.form} onSubmit={(e) => void submit(e)} noValidate>

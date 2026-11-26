@@ -75,10 +75,6 @@
   flex: none;
 }
 
-.chips > button[aria-pressed='false'] {
-  background: var(--surface);
-}
-
 .activeChip {
   position: relative;
   display: inline-flex;

@@ -293,8 +293,6 @@ export const training = {
       rpe: 'RPE',
       rpeNone: 'من غير',
       notes: 'ملاحظة للعميل',
-      decrease: 'قلّل {label}',
-      increase: 'زوّد {label}',
       linkNext: 'اربطه سوبر سيت مع اللي بعده',
       unlink: 'فكّه من السوبر سيت',
       swap: 'غيّر التمرين',

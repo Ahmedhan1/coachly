@@ -250,3 +250,22 @@ font-picker (SPEC: Cairo/Tajawal/Plex) changes `--font-ui` only; `--font-display
 - Muscle map is a simplified in-house SVG; Phase 5 swaps in `react-body-highlighter` (check license) with the same CSS-variable coloring.
 - Mockups use Chromium; Safari/WebKit rendering of Naskh and Alexandria must be verified on a real iPhone (add to `docs/MANUAL_QA.md`).
 - Largest iOS Dynamic Type sizes not yet mocked.
+
+---
+
+## 10. Shared components — use them, don't restyle them
+
+**Added 2026-11-26.** Every control below has exactly one implementation in `src/ui` (import from `@/ui`). A feature
+never re-creates one in its own CSS module; if a screen needs something the component can't do, extend the component.
+
+| Need | Component | Notes |
+| --- | --- | --- |
+| Save / Done / Restore in a sheet header | `<Button size="small">` as `Sheet`'s `primaryAction` | Filled brand, no icon, label only. |
+| Filter, choice or inline-action chip | `<Chip pressed?>` · `<ChipGroup label>` | 36pt, 44pt hit. Dark fill when pressed; `tone="warn"` for injuries. Leave out `pressed` for action chips ("+ Add"). |
+| − value + number entry | `<Stepper>` | `size="big"` in session mode. |
+| List of actions in a sheet | `<ActionSheet actions>` | `danger` rows in red. |
+| Pick a photo or file | `<FileButton onFiles>` | Clears the input after each pick; `busy` while processing; `block` for full width. |
+| Remove a photo / attachment | `<Button variant="danger" size="small" icon="trash">` | |
+
+Chips, file buttons and text fields sit on `--field-bg`: white on a page, `--surface-2` inside a sheet (`Sheet` sets it).
+Static labels inside a row (muscle, "custom", sets×reps) are tags, not chips, and stay with their row's CSS.

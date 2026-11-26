@@ -1,10 +1,10 @@
-import { useEffect, useId, useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { useServices } from '@/app/services';
 import { useStoredImageUrl } from '@/features/files/useStoredImageUrl';
 import { applyBrand } from '@/app/useBrandTheme';
 import { auditBrand, BRAND_PRESETS, deriveBrand, normalizeHex } from '@/domain/branding';
 import { t, type TKey } from '@/i18n';
-import { Button, cx, Icon, Num, SegmentedControl, Select, TextField, Tx } from '@/ui';
+import { Button, FileButton, Icon, Num, SegmentedControl, Select, TextField, Tx, cx } from '@/ui';
 import { timeParts } from '@/ui/format';
 import { CURRENCIES, type IdentityDraft } from './identityDraft';
 import styles from './Identity.module.css';
@@ -35,7 +35,6 @@ const LOGO_MAX_SIDE = 512;
 
 export function LogoSection({ draft, update }: SectionProps) {
   const { data, images } = useServices();
-  const inputId = useId();
   const url = useImageUrl(draft.logoImageId);
   const [state, setState] = useState<'idle' | 'busy' | 'error'>('idle');
 
@@ -59,20 +58,9 @@ export function LogoSection({ draft, update }: SectionProps) {
         {url ? <img src={url} alt={t('identity.logo.alt')} className={styles.logoImg} /> : <Icon name="image" />}
       </div>
       <div className={styles.logoActions}>
-        <label htmlFor={inputId} className={styles.fileButton}>
-          <Icon name="image" />
+        <FileButton icon="image" accept="image/*" onFiles={([file]) => void pick(file)}>
           {state === 'busy' ? t('identity.logo.processing') : draft.logoImageId ? t('identity.logo.change') : t('identity.logo.pick')}
-        </label>
-        <input
-          id={inputId}
-          type="file"
-          accept="image/*"
-          className="visually-hidden"
-          onChange={(e) => {
-            void pick(e.target.files?.[0]);
-            e.target.value = '';
-          }}
-        />
+        </FileButton>
         {draft.logoImageId && (
           <Button icon="trash"
             variant="danger"
@@ -247,7 +235,6 @@ const PHOTO_MAX_SIDE = 800;
 /** The trainer's own photo: round, shown to clients on their page next to the logo. */
 export function TrainerPhotoSection({ draft, update }: SectionProps) {
   const { images, data } = useServices();
-  const inputId = useId();
   const url = useImageUrl(draft.photoImageId);
   const [state, setState] = useState<'idle' | 'busy' | 'error'>('idle');
 
@@ -269,20 +256,9 @@ export function TrainerPhotoSection({ draft, update }: SectionProps) {
         {url ? <img src={url} alt={t('files.trainerPhoto.alt')} className={styles.photoImg} /> : <Icon name="user" />}
       </div>
       <div className={styles.logoActions}>
-        <label htmlFor={inputId} className={styles.fileButton}>
-          <Icon name="camera" />
+        <FileButton icon="camera" accept="image/*" onFiles={([file]) => void pick(file)}>
           {state === 'busy' ? t('identity.logo.processing') : draft.photoImageId ? t('files.trainerPhoto.change') : t('files.trainerPhoto.pick')}
-        </label>
-        <input
-          id={inputId}
-          type="file"
-          accept="image/*"
-          className="visually-hidden"
-          onChange={(e) => {
-            void pick(e.target.files?.[0]);
-            e.target.value = '';
-          }}
-        />
+        </FileButton>
         {draft.photoImageId && (
           <Button icon="trash" variant="danger" size="small" onClick={() => update({ photoImageId: null })}>
             {t('files.trainerPhoto.remove')}

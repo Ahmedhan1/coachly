@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useId, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { useServices } from '@/app/services';
 import { useUiStore } from '@/app/uiStore';
 import { useLive } from '@/app/useLive';
@@ -6,7 +6,7 @@ import { hasFreshBackup, STORAGE_CATEGORIES, storagePressure, type PhotoArchiveE
 import { FILE_PASSWORD_KEY } from '@/data/backupMeta';
 import { t, type TKey } from '@/i18n';
 import type { DeviceStorageReport } from '@/services/storage';
-import { Badge, Button, PageHeader, TextField, TitleIcon } from '@/ui';
+import { Badge, Button, FileButton, PageHeader, TextField, TitleIcon } from '@/ui';
 import { formatBytes } from '@/ui/format';
 import { DeviceBackupFlow } from './DeviceBackupFlow';
 import { PhotoArchiveSheet } from './PhotoArchiveSheet';
@@ -205,7 +205,6 @@ export function StorageScreen() {
 function ArchivesCard({ registry, onRestored }: { registry: PhotoArchiveEntry[]; onRestored: () => void }) {
   const { backup, meta } = useServices();
   const showToast = useUiStore((s) => s.showToast);
-  const fileId = useId();
   const [file, setFile] = useState<File | null>(null);
   const [password, setPassword] = useState('');
   const [needsPassword, setNeedsPassword] = useState(false);
@@ -256,10 +255,9 @@ function ArchivesCard({ registry, onRestored }: { registry: PhotoArchiveEntry[];
       )}
       <p className={styles.strong}>{t('storage.archive.restoreTitle')}</p>
       <p className={styles.body}>{t('storage.archive.restoreHint')}</p>
-      <label className={styles.fileButton} htmlFor={fileId}>
+      <FileButton icon="upload" block onFiles={([file]) => void pick(file)}>
         {file ? file.name : t('storage.archive.pick')}
-        <input id={fileId} type="file" className={styles.fileInput} onChange={(e) => void pick(e.target.files?.[0])} />
-      </label>
+      </FileButton>
       {needsPassword && (
         <TextField label={t('storage.archive.password')} type="password" autoComplete="current-password" value={password} onChange={(e) => setPassword(e.target.value)} ltr />
       )}

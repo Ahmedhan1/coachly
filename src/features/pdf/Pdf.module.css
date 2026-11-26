@@ -213,19 +213,6 @@
   gap: var(--sp-4);
 }
 
-.sheetSave {
-  min-block-size: var(--tap);
-  padding-inline: var(--sp-2);
-  border: 0;
-  background: none;
-  color: var(--brand-ink);
-  font: var(--t-button);
-}
-
-.sheetSave:disabled {
-  opacity: 0.4;
-}
-
 @supports ((-webkit-backdrop-filter: blur(1px)) or (backdrop-filter: blur(1px))) {
   .actionbar {
     background: var(--material-bg);

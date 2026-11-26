@@ -255,14 +255,6 @@
   font: var(--t-caption);
 }
 
-.backupRow svg {
-  color: var(--text-3);
-}
-
-.backupDue svg {
-  color: var(--danger, var(--brand));
-}
-
 .followBtn {
   flex: none;
 }

@@ -5,8 +5,7 @@ import {
   MUSCLE_GROUPS,
 } from '@/domain/exercises';
 import { t } from '@/i18n';
-import { Button, Sheet } from '@/ui';
-import { ChipGroup, ChipToggle } from './ChipToggle';
+import { Button, Chip, ChipGroup, Sheet } from '@/ui';
 import { NO_FILTERS, toggleIn, type LibraryFilters } from './libraryUi';
 import { equipmentName, levelName, muscleName } from './localized';
 import styles from './Sheets.module.css';
@@ -39,35 +38,35 @@ export function FilterSheet({ initial, countFor, onApply, onClose }: FilterSheet
       <div className={styles.form}>
         <ChipGroup label={t('training.library.filterSheet.muscles')}>
           {MUSCLE_GROUPS.map((g) => (
-            <ChipToggle key={g.id} pressed={draft.muscles.includes(g.id)} onToggle={() => set({ muscles: toggleIn(draft.muscles, g.id) })}>
+            <Chip key={g.id} pressed={draft.muscles.includes(g.id)} onClick={() => set({ muscles: toggleIn(draft.muscles, g.id) })}>
               {muscleName(g.id)}
-            </ChipToggle>
+            </Chip>
           ))}
         </ChipGroup>
         <ChipGroup label={t('training.library.filterSheet.equipment')}>
           {EQUIPMENT_IDS.map((id) => (
-            <ChipToggle key={id} pressed={draft.equipment.includes(id)} onToggle={() => set({ equipment: toggleIn(draft.equipment, id) })}>
+            <Chip key={id} pressed={draft.equipment.includes(id)} onClick={() => set({ equipment: toggleIn(draft.equipment, id) })}>
               {equipmentName(id)}
-            </ChipToggle>
+            </Chip>
           ))}
         </ChipGroup>
         <ChipGroup label={t('training.library.filterSheet.level')}>
           {LEVEL_IDS.map((id) => (
-            <ChipToggle key={id} pressed={draft.levels.includes(id)} onToggle={() => set({ levels: toggleIn(draft.levels, id) })}>
+            <Chip key={id} pressed={draft.levels.includes(id)} onClick={() => set({ levels: toggleIn(draft.levels, id) })}>
               {levelName(id)}
-            </ChipToggle>
+            </Chip>
           ))}
         </ChipGroup>
         <ChipGroup label={t('training.library.filterSheet.more')}>
-          <ChipToggle pressed={draft.favouritesOnly} onToggle={() => set({ favouritesOnly: !draft.favouritesOnly })}>
+          <Chip pressed={draft.favouritesOnly} onClick={() => set({ favouritesOnly: !draft.favouritesOnly })}>
             {t('training.library.favourites')}
-          </ChipToggle>
-          <ChipToggle pressed={draft.customOnly} onToggle={() => set({ customOnly: !draft.customOnly })}>
+          </Chip>
+          <Chip pressed={draft.customOnly} onClick={() => set({ customOnly: !draft.customOnly })}>
             {t('training.library.customOnly')}
-          </ChipToggle>
-          <ChipToggle pressed={draft.showHidden} onToggle={() => set({ showHidden: !draft.showHidden })}>
+          </Chip>
+          <Chip pressed={draft.showHidden} onClick={() => set({ showHidden: !draft.showHidden })}>
             {t('training.library.showHidden')}
-          </ChipToggle>
+          </Chip>
         </ChipGroup>
       </div>
       <div className={styles.footer}>

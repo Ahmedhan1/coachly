@@ -8,7 +8,7 @@ import { searchItems } from '@/data';
 import { useLive } from '@/app/useLive';
 import { t } from '@/i18n';
 import { isEnglish, pick } from '@/i18n/locale';
-import { Icon, IconButton, Num, SearchField, Sheet, TextArea, TextField } from '@/ui';
+import { Button, Icon, IconButton, Num, SearchField, Sheet, TextArea, TextField } from '@/ui';
 import { FoodImage } from '../shared/FoodImage';
 import { fieldText, gramsText, kcalText, parseDecimal } from '../shared/numbers';
 import { PhotoField } from '../shared/PhotoField';
@@ -128,9 +128,9 @@ export function RecipeSheet({ recipe, onClose }: { recipe: Recipe | null; onClos
       title={recipe ? t('nutrition.book.editTitle') : t('nutrition.book.newTitle')}
       cancelLabel={t('common.cancel')}
       primaryAction={
-        <button type="submit" form="recipe-form" className={common.sheetSave}>
+        <Button size="small" type="submit" form="recipe-form">
           {t('common.save')}
-        </button>
+        </Button>
       }
     >
       <form id="recipe-form" className={common.form} onSubmit={(e) => void submit(e)} noValidate>

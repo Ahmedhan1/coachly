@@ -6,22 +6,6 @@
   gap: var(--sp-5);
 }
 
-.save {
-  position: relative;
-  min-block-size: 36px;
-  padding-inline: var(--sp-4);
-  border-radius: var(--r-control);
-  background: var(--brand);
-  color: var(--brand-on);
-  font: var(--t-button);
-}
-
-.save::after {
-  content: '';
-  position: absolute;
-  inset: -4px 0;
-}
-
 .bodyField {
   display: flex;
   flex-direction: column;
@@ -37,22 +21,6 @@
   display: flex;
   flex-wrap: wrap;
   gap: var(--sp-2);
-}
-
-.chip {
-  position: relative;
-  min-block-size: 32px;
-  padding-inline: var(--sp-3);
-  border-radius: var(--r-control);
-  background: var(--brand-tint);
-  color: var(--brand-ink);
-  font: var(--t-button-sm); line-height: 32px;
-}
-
-.chip::after {
-  content: '';
-  position: absolute;
-  inset: -6px -2px;
 }
 
 .preview {

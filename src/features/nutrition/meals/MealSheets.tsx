@@ -4,7 +4,7 @@ import type { Meal, RecipeId } from '@/domain/models';
 import { searchItems } from '@/data';
 import { t } from '@/i18n';
 import { pick } from '@/i18n/locale';
-import { Button, Icon, Num, SearchField, Sheet, TextField } from '@/ui';
+import { Button, Chip, Icon, Num, SearchField, Sheet, TextField } from '@/ui';
 import { kcalText, gramsText } from '../shared/numbers';
 import type { RecipeWithNutrition } from './useRecipeLookup';
 import common from '../shared/common.module.css';
@@ -45,9 +45,9 @@ export function AddItemSheet({ recipes, onClose, onAdd }: { recipes: RecipeWithN
           </span>
           <div className={common.chips}>
             {SERVING_STEPS.map((s) => (
-              <button key={s} type="button" role="radio" aria-checked={servings === s} aria-pressed={servings === s} className={common.chip} onClick={() => setServings(s)}>
+              <Chip key={s} role="radio" aria-checked={servings === s} pressed={servings === s} onClick={() => setServings(s)}>
                 <Num>{s}</Num>
-              </button>
+              </Chip>
             ))}
           </div>
         </div>
@@ -123,9 +123,9 @@ export function MealSheet({ meal, onClose, onSave }: { meal: Meal | undefined; o
       title={meal ? t('nutrition.plan.editMealTitle') : t('nutrition.plan.addMeal')}
       cancelLabel={t('common.cancel')}
       primaryAction={
-        <button type="submit" form={formId} className={common.sheetSave} disabled={!name.trim()}>
+        <Button size="small" type="submit" form={formId} disabled={!name.trim()}>
           {t('common.save')}
-        </button>
+        </Button>
       }
     >
       <form

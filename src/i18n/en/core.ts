@@ -23,6 +23,8 @@ export const core: StringShape<Pick<Strings, CoreKeys>> = {
     delete: 'Delete',
     undo: 'Undo',
     back: 'Back',
+    decrease: 'Decrease {label}',
+    increase: 'Increase {label}',
     add: 'Add',
     edit: 'Edit',
     search: 'Search',

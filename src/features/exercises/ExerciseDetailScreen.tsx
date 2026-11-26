@@ -15,7 +15,6 @@ import { alternativesFor } from '@/domain/exercises';
 import { ExerciseThumb } from './ExerciseThumb';
 import { categoryName, equipmentName, exAltName, exCues, exName, levelName, muscleName } from './localized';
 import { useExerciseClients } from './useExerciseClients';
-import { StarIcon } from './icons';
 import { PhotoCarousel } from './PhotoCarousel';
 import { RenameSheet } from './RenameSheet';
 import { useCatalog, type CatalogState } from './useCatalog';
@@ -113,7 +112,7 @@ function ExerciseDetail({ exercise, catalog }: { exercise: CatalogExercise; cata
             aria-label={t(favourite ? 'training.library.favouriteRemove' : 'training.library.favouriteAdd', { name: exName(exercise) })}
             onClick={() => toggleFavourite(exercise)}
           >
-            <StarIcon filled={favourite} />
+            <Icon name={favourite ? 'star' : 'starOutline'} />
           </button>
         }
       />

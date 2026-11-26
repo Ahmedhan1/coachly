@@ -5,7 +5,7 @@ import { useUiStore } from '@/app/uiStore';
 import { useLive } from '@/app/useLive';
 import { deviceZone } from '@/features/schedule/zone';
 import { t, type TKey } from '@/i18n';
-import { Button, IconButton, PageHeader, TitleIcon } from '@/ui';
+import { Button, Chip, IconButton, PageHeader, TitleIcon } from '@/ui';
 import { readAiSettings, readGroqKey, saveAiSettings } from './aiSettings';
 import { localNow } from './assistantData';
 import { ProposalCard } from './ProposalCard';
@@ -133,14 +133,14 @@ function Chat({ focus, back }: { focus: { id: string; name: string } | null; bac
             <p className={`${styles.bubble} ${styles.bot}`}>{t('assistant.intro')}</p>
             <div className={styles.chips}>
               {focus && (
-                <button type="button" className={styles.chip} onClick={() => setText(t('assistant.chips.bulkFor', { name: focus.name }))}>
+                <Chip onClick={() => setText(t('assistant.chips.bulkFor', { name: focus.name }))}>
                   {t('assistant.chips.bulkFor', { name: focus.name })}
-                </button>
+                </Chip>
               )}
               {CHIPS.map((c) => (
-                <button key={c} type="button" className={styles.chip} disabled={!online} onClick={() => submit(t(`assistant.chipPrompts.${c}` as TKey))}>
+                <Chip key={c} disabled={!online} onClick={() => submit(t(`assistant.chipPrompts.${c}` as TKey))}>
                   {t(`assistant.chips.${c}` as TKey)}
-                </button>
+                </Chip>
               ))}
             </div>
           </>

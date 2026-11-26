@@ -2,12 +2,10 @@ import { useCallback, useDeferredValue, useEffect, useLayoutEffect, useMemo } fr
 import { useSearchParams } from 'react-router-dom';
 import { isMuscleGroupId, type CatalogExercise } from '@/domain/exercises';
 import { t } from '@/i18n';
-import { Button, EmptyState, Icon, IconButton, PageHeader, SearchField, Tx, cx } from '@/ui';
+import { Button, Chip, EmptyState, Icon, IconButton, PageHeader, SearchField, Tx, cx } from '@/ui';
 import { AddExerciseSheet } from './AddExerciseSheet';
-import { ChipToggle } from './ChipToggle';
 import { ExerciseRow, ROW_HEIGHT } from './ExerciseRow';
 import { FilterSheet } from './FilterSheet';
-import { DownloadIcon, FilterIcon } from './icons';
 import { activeFilterCount, NO_FILTERS, toggleIn, useLibraryUi, type LibraryFilters } from './libraryUi';
 import { equipmentName, levelName, muscleName } from './localized';
 import { OfflinePhotosSheet } from './OfflinePhotosSheet';
@@ -93,7 +91,7 @@ export function ExercisesScreen() {
                 title={t('training.library.offline.title')}
                 onClick={() => setSheet('offline', true)}
               >
-                <DownloadIcon />
+                <Icon name="download" />
               </button>
             )}
             <IconButton icon="plus" label={t('training.library.addCustom')} onClick={() => setSheet('add', true)} />
@@ -115,17 +113,17 @@ export function ExercisesScreen() {
             onClick={() => setSheet('filters', true)}
             aria-label={filterCount > 0 ? t('training.library.filtersActive', { n: filterCount }) : t('training.library.filters')}
           >
-            <FilterIcon />
+            <Icon name="filter" />
             {filterCount > 0 && <span className={cx('num', styles.filterCount)}>{filterCount}</span>}
           </button>
         </div>
         <div className={styles.chips}>
-          <ChipToggle pressed={filters.favouritesOnly} onToggle={() => setFilters({ ...filters, favouritesOnly: !filters.favouritesOnly })}>
+          <Chip pressed={filters.favouritesOnly} onClick={() => setFilters({ ...filters, favouritesOnly: !filters.favouritesOnly })}>
             {t('training.library.favourites')}
-          </ChipToggle>
-          <ChipToggle pressed={filters.customOnly} onToggle={() => setFilters({ ...filters, customOnly: !filters.customOnly })}>
+          </Chip>
+          <Chip pressed={filters.customOnly} onClick={() => setFilters({ ...filters, customOnly: !filters.customOnly })}>
             {t('training.library.customOnly')}
-          </ChipToggle>
+          </Chip>
           {filters.showHidden && (
             <ActiveChip label={t('training.library.showHidden')} onRemove={() => setFilters({ ...filters, showHidden: false })} />
           )}

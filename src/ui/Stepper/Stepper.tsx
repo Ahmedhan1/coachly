@@ -1,8 +1,8 @@
 import { useId, useState } from 'react';
 import { t } from '@/i18n';
-import { Icon, cx } from '@/ui';
-import { Glyph } from './glyphs';
-import styles from './Shared.module.css';
+import { Icon } from '../icons/Icon';
+import { cx } from '../cx';
+import styles from './Stepper.module.css';
 
 export interface StepperProps {
   label: string;
@@ -29,24 +29,24 @@ export function Stepper({ label, value, onChange, step, min = 0, max = 1000, uni
   const [draft, setDraft] = useState<string | null>(null);
   const set = (n: number) => onChange(clamp(Math.round(n * 100) / 100, min, max));
   return (
-    <div className={cx(styles.stepper, size === 'big' && styles.stepperBig)} data-testid={testId}>
-      <label htmlFor={id} className={styles.stepperLabel}>
+    <div className={cx(styles.root, size === 'big' && styles.big)} data-testid={testId}>
+      <label htmlFor={id} className={styles.label}>
         {label}
       </label>
-      <div className={styles.stepperRow}>
+      <div className={styles.row}>
         <button
           type="button"
-          className={styles.stepBtn}
-          aria-label={decreaseLabel ?? t('training.programs.editor.decrease', { label })}
+          className={styles.button}
+          aria-label={decreaseLabel ?? t('common.decrease', { label })}
           disabled={value <= min}
           onClick={() => set(value - step)}
         >
-          <Glyph name="minus" />
+          <Icon name="minus" />
         </button>
-        <span className={styles.stepValue}>
+        <span className={styles.value}>
           <input
             id={id}
-            className={cx(styles.stepInput, 'num')}
+            className={cx(styles.input, 'num')}
             type="text"
             inputMode={decimals ? 'decimal' : 'numeric'}
             dir="ltr"
@@ -60,12 +60,12 @@ export function Stepper({ label, value, onChange, step, min = 0, max = 1000, uni
               if (text !== '' && Number.isFinite(n)) set(n);
             }}
           />
-          {unit && <span className={styles.stepUnit}>{unit}</span>}
+          {unit && <span className={styles.unit}>{unit}</span>}
         </span>
         <button
           type="button"
-          className={styles.stepBtn}
-          aria-label={increaseLabel ?? t('training.programs.editor.increase', { label })}
+          className={styles.button}
+          aria-label={increaseLabel ?? t('common.increase', { label })}
           disabled={value >= max}
           onClick={() => set(value + step)}
         >

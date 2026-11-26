@@ -24,22 +24,6 @@
   background: var(--surface-2);
 }
 
-.fileButton {
-  display: inline-flex;
-  align-items: center;
-  gap: var(--sp-2);
-  min-block-size: var(--field-h);
-  padding-inline: var(--sp-4);
-  border-radius: var(--r-md);
-  background: var(--field-bg, var(--surface));
-  font: var(--t-button);
-  cursor: pointer;
-}
-
-.fileButton:has(+ input:focus-visible) {
-  outline: 3px solid var(--brand-ink);
-}
-
 .hint {
   font: var(--t-caption);
   color: var(--text-2);

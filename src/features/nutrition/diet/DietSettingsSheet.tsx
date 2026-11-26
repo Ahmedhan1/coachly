@@ -109,9 +109,9 @@ function Form({ current, onClose, onSaved, store, showToast }: FormProps) {
       title={t('nutrition.diet.settingsTitle')}
       cancelLabel={t('common.cancel')}
       primaryAction={
-        <button type="submit" form="diet-settings-form" className={common.sheetSave}>
+        <Button size="small" type="submit" form="diet-settings-form">
           {t('common.save')}
-        </button>
+        </Button>
       }
     >
       <form id="diet-settings-form" className={common.form} onSubmit={(e) => void submit(e)} noValidate>
