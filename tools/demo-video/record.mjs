@@ -113,24 +113,17 @@ const page = filmed.page;
 const framesDir = join(out, 'frames');
 mkdirSync(framesDir, { recursive: true });
 const frames = [];
-let cdp = await filmed.context.newCDPSession(page);
 let filming = true;
-const withTimeout = (p, ms) => Promise.race([p, new Promise((_, reject) => setTimeout(() => reject(new Error('capture timeout')), ms))]);
-// Back-to-back captures at full device pixels (headless screencast ignores the 2× scale). A capture that stalls
-// (page reload) is abandoned and the capture session reopened, so filming never freezes.
+// Back-to-back screenshots of the visible screen at full device pixels (headless screencast ignores the 2× scale).
+// Each capture is bounded, so a page reload never freezes filming.
 const camera = (async () => {
   while (filming) {
     try {
-      const { data } = await withTimeout(
-        cdp.send('Page.captureScreenshot', { format: 'jpeg', quality: 90, optimizeForSpeed: true, clip: { x: 0, y: 0, width: VIEW.width, height: VIEW.height, scale: 2 } }),
-        1500,
-      );
+      const data = await page.screenshot({ type: 'jpeg', quality: 88, scale: 'device', animations: 'allow', caret: 'initial', timeout: 1500 });
       const file = join(framesDir, `f${String(frames.length).padStart(5, '0')}.jpg`);
-      writeFileSync(file, Buffer.from(data, 'base64'));
+      writeFileSync(file, data);
       frames.push({ file, ms: Date.now() });
     } catch {
-      await cdp.detach().catch(() => undefined);
-      cdp = await filmed.context.newCDPSession(page).catch(() => cdp);
       await new Promise((r) => setTimeout(r, 30));
     }
   }
@@ -287,6 +280,6 @@ try {
   });
   lines.push(`file '${frames[frames.length - 1].file}'`);
   writeFileSync(join(out, 'frames.ffconcat'), lines.join('\n'));
-  execFileSync('ffmpeg', ['-y', '-v', 'error', '-f', 'concat', '-safe', '0', '-i', join(out, 'frames.ffconcat'), '-vf', 'fps=30,format=yuv420p', '-c:v', 'libx264', '-crf', '14', '-preset', 'fast', join(out, 'raw.mp4')]);
+  execFileSync('ffmpeg', ['-y', '-v', 'error', '-f', 'concat', '-safe', '0', '-i', join(out, 'frames.ffconcat'), '-vf', 'scale=780:1688:flags=lanczos,setsar=1,fps=30,format=yuv420p', '-c:v', 'libx264', '-crf', '14', '-preset', 'fast', join(out, 'raw.mp4')]);
 }
 console.log(`recorded ${out}/raw.mp4 (${frames.length} frames) with ${events.length} events`);
