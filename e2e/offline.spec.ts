@@ -23,7 +23,7 @@ test('works fully offline after the first load', async ({ page, context }) => {
   // Bundled fonts come from the precache too (no network).
   const fontsLoaded = await page.evaluate(async () => {
     await document.fonts.ready;
-    return ['800 30px Alexandria', '400 16px "Readex Pro"'].map((f) => document.fonts.check(f, 'نص'));
+    return ['700 28px Rubik', '400 16px Rubik'].map((f) => document.fonts.check(f, 'نص'));
   });
   expect(fontsLoaded).toEqual([true, true]);
 

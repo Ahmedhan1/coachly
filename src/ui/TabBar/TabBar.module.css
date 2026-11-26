@@ -1,25 +1,27 @@
+/*
+ * Floating pill tab bar (Pebble): inset from the screen sides, lifted off the bottom edge (just above the home
+ * indicator), soft shadow. Everything that must clear it uses --tabbar-space.
+ */
 .bar {
   position: fixed;
-  inset-inline: 0;
-  inset-block-end: 0;
+  inset-inline: calc(var(--gutter) + var(--safe-left)) calc(var(--gutter) + var(--safe-right));
+  inset-block-end: max(var(--tabbar-gap), var(--safe-bottom));
   z-index: 40;
-  padding-block-end: var(--safe-bottom);
-  padding-inline: var(--safe-left) var(--safe-right);
-  background: var(--bg);
-  -webkit-backdrop-filter: var(--material-blur);
-  backdrop-filter: var(--material-blur);
-  border-block-start: var(--hairline) solid var(--material-line);
+  max-inline-size: calc(var(--content-max) - 2 * var(--gutter));
+  margin-inline: auto;
+  border-radius: var(--r-full);
+  background: var(--surface);
+  box-shadow: var(--shadow-float);
 }
 
 .list {
   display: grid;
-  grid-template-columns: 1fr 1fr 72px 1fr 1fr;
+  grid-template-columns: 1fr 1fr 64px 1fr 1fr;
   align-items: center;
   block-size: var(--tabbar-h);
-  margin: 0 auto;
-  padding: 0;
+  margin: 0;
+  padding: 0 var(--sp-1);
   list-style: none;
-  max-inline-size: var(--content-max);
 }
 
 .item {
@@ -52,13 +54,13 @@
   white-space: nowrap;
 }
 
-/* Center quick-add: 52×44 brand block. */
+/* Center quick-add: a 48pt brand circle. */
 .add {
   display: grid;
   place-items: center;
-  inline-size: 52px;
-  block-size: 44px;
-  border-radius: var(--r-control);
+  inline-size: 48px;
+  block-size: 48px;
+  border-radius: var(--r-full);
   background: var(--brand);
   color: var(--brand-on);
 }
@@ -66,10 +68,4 @@
 .add svg {
   inline-size: 26px;
   block-size: 26px;
-}
-
-@supports ((-webkit-backdrop-filter: blur(1px)) or (backdrop-filter: blur(1px))) {
-  .bar {
-    background: var(--material-bg);
-  }
 }

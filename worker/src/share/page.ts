@@ -1,15 +1,15 @@
 // The client page served at GET /c/:shareId: one self-contained Arabic RTL HTML document, inline CSS/JS with a
 // per-response nonce, no third-party requests. The key is read from location.hash and never reaches the server.
-// Styling follows design direction B (src/ui/tokens.css) with system fonts (no font downloads).
+// Styling follows the app's Pebble tokens (src/ui/tokens.css) with system fonts (no font downloads).
 // The 3D muscle model is deferred on this page (see docs/CLOUD.md).
 import { escapeHtml } from '../admin/html';
 import { VIEWER_SCRIPT } from './viewerScript';
 
 const STYLE = `
-:root{color-scheme:light dark;--bg:#EDEDEA;--surface:#FFFFFF;--surface-2:#F3F3F1;--line:#E3E3DF;--text:#0E0F0F;--text-2:#4A4D4E;--text-3:#5F6364;
---brand:#F25C1F;--brand-on:#111111;--brand-tint:rgba(242,92,31,.12);--danger:#B42318;--ok:#1B7040;--r-sm:10px;--r-md:14px;--r-lg:18px;--r-full:999px;--tap:44px;
+:root{color-scheme:light dark;--bg:#F3F1ED;--surface:#FFFFFF;--surface-2:#EFECE6;--line:#E6E2DA;--text:#1C1A17;--text-2:#57524A;--text-3:#6B665D;
+--brand:#F25C1F;--brand-on:#111111;--brand-tint:rgba(242,92,31,.12);--danger:#B42318;--ok:#1B7040;--r-sm:16px;--r-md:22px;--r-lg:28px;--r-full:999px;--tap:44px;
 --font:system-ui,-apple-system,"SF Arabic","Segoe UI",Tahoma,sans-serif}
-@media (prefers-color-scheme:dark){:root{--bg:#0B0C0C;--surface:#161818;--surface-2:#1F2222;--line:#252828;--text:#F2F3F1;--text-2:#A3A8A6;--text-3:#8E9391;--danger:#FF8A7E;--ok:#5CC88A}}
+@media (prefers-color-scheme:dark){:root{--bg:#131211;--surface:#1E1C1A;--surface-2:#282623;--line:#2F2C29;--text:#F3F0EA;--text-2:#B0AAA0;--text-3:#948E84;--danger:#FF8A7E;--ok:#5CC88A}}
 *{box-sizing:border-box}
 html{-webkit-text-size-adjust:100%}
 body{margin:0;background:var(--bg);color:var(--text);font:400 16px/1.55 var(--font);font-variant-numeric:lining-nums tabular-nums}

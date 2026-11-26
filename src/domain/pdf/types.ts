@@ -114,7 +114,7 @@ export interface PdfBranding {
   logoSize: PdfLogoSize;
   primaryColor: string;
   secondaryColor: string;
-  /** CSS font-family name, e.g. 'Readex Pro'. */
+  /** CSS font-family name, e.g. 'Rubik'. */
   fontFamily: string;
   /** Page background with opacity 0..1 (content pages). */
   background: { image: PdfImageRef; opacity: number } | null;

@@ -39,7 +39,7 @@ function useScrolledPast(target: RefObject<HTMLElement | null>): boolean {
 const pathOf = (to: string) => to.split('?')[0] ?? to;
 
 /**
- * Large Alexandria title, start-aligned, with round 44pt buttons. Pads for the status bar safe area.
+ * Large title, start-aligned, with round 44pt buttons. Pads for the status bar safe area.
  * When the large title scrolls away, a translucent compact bar with the title (and back) fades in at the top,
  * like an iOS navigation bar. The compact bar repeats what is already in the page, so it is hidden from
  * assistive tech and the keyboard.

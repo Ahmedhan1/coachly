@@ -4,7 +4,7 @@ import { useStoredImageUrl } from '@/app/useStoredImageUrl';
 import { applyBrand } from '@/app/useBrandTheme';
 import { auditBrand, BRAND_PRESETS, deriveBrand, normalizeHex } from '@/domain/branding';
 import { t, type TKey } from '@/i18n';
-import { Button, FileButton, Icon, Num, SegmentedControl, Select, TextField, Tx, cx } from '@/ui';
+import { Badge, Button, FileButton, Icon, Num, SegmentedControl, Select, TextField, Tx, cx } from '@/ui';
 import { timeParts } from '@/ui/format';
 import { CURRENCIES, type IdentityDraft } from './identityDraft';
 import styles from './Identity.module.css';
@@ -187,9 +187,9 @@ function BrandPreview() {
         </span>
       </div>
       <div className={styles.previewRow}>
-        <span className={styles.previewChip}>
+        <Badge tone="brand">
           <Tx k="identity.color.previewChip" params={{ n: 5 }} />
-        </span>
+        </Badge>
         <span className={styles.previewLink}>{t('home.scheduleLink')}</span>
         <span className={styles.previewAdd}>
           <Icon name="plus" />

@@ -21,7 +21,7 @@ export interface ListSectionProps {
   label?: string;
 }
 
-/** Direction B section: Alexandria title + rows grouped in a rounded tile on --bg. */
+/** Section: title + rows grouped in a rounded, lifted tile on --bg. */
 export function ListSection({ title, icon, count, footer, children, action, bare, className, label }: ListSectionProps) {
   return (
     <section className={cx(styles.section, className)} aria-label={title ? undefined : label}>

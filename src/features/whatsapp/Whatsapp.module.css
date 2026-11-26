@@ -50,6 +50,7 @@
 .emptyTile {
   border-radius: var(--r-lg);
   background: var(--surface);
+  box-shadow: var(--shadow-card);
 }
 
 .notice {
