@@ -121,7 +121,8 @@ and **2 LGPL packages**:
 `public/fonts/cairo-{arabic,latin}.woff2` — the unmodified variable-weight woff2 subset files from
 `@fontsource-variable/rubik@5.3.0` and `@fontsource-variable/cairo@5.3.0` (renamed only; the npm packages are not
 dependencies). Rubik is declared in `src/ui/fonts.css` (`font-display: swap`, Arabic/Latin `unicode-range`); both
-are embedded by the PDF renderer (`src/services/pdf/fonts.ts`); all are precached by the service worker. License texts
+are embedded by the PDF renderer (`src/services/pdf/fonts.ts`); all are precached by the service worker. Rubik is also served to
+clients by the Worker's client page (`worker/src/share/viewerFonts.ts`, generated from the same files), with the same licence. License texts
 shipped next to them: `public/fonts/OFL-Rubik.txt`, `public/fonts/OFL-Cairo.txt` (the packages' LICENSE files).
 
 OFL obligations: ship the OFL.txt next to the font files (e.g. `public/fonts/<font>/OFL.txt`), do not sell the

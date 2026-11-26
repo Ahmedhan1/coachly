@@ -195,14 +195,18 @@ App flow: `GET /api/checkins` → for each: `GET …/checkins/:id` → `openWith
 ### The viewer page
 
 `GET /c/:shareId` returns one self-contained Arabic RTL page (inline CSS + JS with a fresh nonce per response,
-no framework, no fonts or scripts from anywhere). Headers: `Content-Security-Policy: default-src 'none';
-script-src 'nonce-…'; style-src 'nonce-…'; img-src 'self' data: blob: <app origin>; connect-src 'self';
+no framework, no fonts or scripts from any third party). Headers: `Content-Security-Policy: default-src 'none';
+script-src 'nonce-…'; style-src 'nonce-…'; img-src 'self' data: blob: <app origin>; font-src 'self'; connect-src 'self';
 base-uri 'none'; form-action 'none'; frame-ancestors 'none'`, `Referrer-Policy: no-referrer`, `Cache-Control:
 no-store`, `X-Robots-Tag: noindex`. It reads `#k=`, fetches and decrypts the envelope with Web Crypto (an inline port
 of the PTK1 format; byte compatibility with `shared/envelope.ts` is tested both ways in Chromium), validates
 the document, renders it with `textContent` only, applies the trainer's colour, and offers the check-in form
-(weight, waist, notes, one photo; Arabic-Indic digits are accepted and converted). Mobile first, 44 px targets,
-light and dark, Western digits, system fonts, styled after design direction B.
+(weight, waist, notes, photos; Arabic-Indic digits are converted to 0-9 as the client types). Mobile first, 44 px
+targets, light and dark, Western digits, in the app's Pebble design: Rubik, a brand-coloured next-session card, one
+card of facts (next workout, package with a progress bar, goal, streak), lifted cards, pill controls and a floating
+tab bar at the bottom. Rubik is served by the Worker itself at `/c/_/rubik-{arabic,latin}.<hash>.woff2`
+(`Cache-Control: immutable`), generated from `public/fonts` by `worker/scripts/gen-viewer-fonts.mjs`;
+`scripts/viewer-fonts.test.ts` fails if the two drift apart.
 **Deferred:** the 3D muscle model on the client page.
 
 ## Configuration (`worker/wrangler.toml`)
