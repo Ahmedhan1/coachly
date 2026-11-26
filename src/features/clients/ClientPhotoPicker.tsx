@@ -2,7 +2,7 @@ import { useId, useState } from 'react';
 import { useServices } from '@/app/services';
 import { useUiStore } from '@/app/uiStore';
 import type { Client } from '@/domain/models';
-import { useStoredImageUrl } from '@/features/files/useStoredImageUrl';
+import { useStoredImageUrl } from '@/app/useStoredImageUrl';
 import { t } from '@/i18n';
 import { Icon } from '@/ui';
 import { setClientPhoto } from './clientPhoto';

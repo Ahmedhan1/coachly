@@ -4,7 +4,7 @@ import reactHooks from 'eslint-plugin-react-hooks';
 import tseslint from 'typescript-eslint';
 
 export default tseslint.config(
-  { ignores: ['dist', 'dev-dist', 'node_modules', 'worker', 'design', 'assets-src/model3d/blender', 'public/draco'] },
+  { ignores: ['dist', 'dev-dist', 'node_modules', 'worker', 'tools/promo-video', 'assets-src/model3d/blender', 'public/draco'] },
   js.configs.recommended,
   ...tseslint.configs.recommended,
   {
@@ -21,11 +21,30 @@ export default tseslint.config(
     plugins: { 'react-hooks': reactHooks },
     rules: reactHooks.configs.recommended.rules,
   },
+  // Layers (CLAUDE.md): screens → domain / data → services. Each block bans the layers above it.
   {
-    // domain layer is pure TypeScript: no React, no browser storage, no data/services imports
+    // domain is pure TypeScript: no React, no browser storage, no data/services imports.
     files: ['src/domain/**/*.ts'],
     rules: {
-      'no-restricted-imports': ['error', { patterns: ['react', 'react-*', 'dexie', 'dexie-*', '@/data/*', '@/services/*', '@/app/*', '@/features/*', '@/ui/*'] }],
+      'no-restricted-imports': ['error', { patterns: ['react', 'react-*', 'dexie', 'dexie-*', '@/data/*', '@/services/*', '@/app/*', '@/features/*', '@/ui/*', '@/i18n/*'] }],
     },
+  },
+  {
+    // ui is presentational: props in, events out. No app state, storage or services.
+    files: ['src/ui/**/*.{ts,tsx}'],
+    ignores: ['**/*.test.*'],
+    rules: { 'no-restricted-imports': ['error', { patterns: ['@/app/*', '@/features/*', '@/data/*', '@/services/*'] }] },
+  },
+  {
+    // data and services never know about screens.
+    files: ['src/data/**/*.ts', 'src/services/**/*.ts'],
+    ignores: ['**/*.test.*'],
+    rules: { 'no-restricted-imports': ['error', { patterns: ['react', 'react-*', '@/app/*', '@/features/*', '@/ui/*'] }] },
+  },
+  {
+    // i18n is a leaf for everything but domain types: strings and name lookups only.
+    files: ['src/i18n/**/*.ts'],
+    ignores: ['**/*.test.*'],
+    rules: { 'no-restricted-imports': ['error', { patterns: ['@/app/*', '@/features/*', '@/data/*', '@/services/*', '@/ui/*'] }] },
   },
 );

@@ -5,7 +5,7 @@ import {
   contrastRatio,
   DEFAULT_BRAND,
   deriveBrand,
-  IRON_SURFACES,
+  APP_SURFACES,
   mixHex,
   normalizeHex,
   ON_DARK,
@@ -51,17 +51,17 @@ describe('deriveBrand', () => {
     expect(theme.light.brandOn).toBe(ON_DARK);
     expect(theme.dark.brand).toBe('#F25C1F');
     expect(theme.dark.brandOn).toBe(ON_DARK);
-    // tint-strong matches the reference algorithm and design/direction-b/tokens.css
-    expect(theme.light.brandTintStrong).toBe('#EED0C1');
-    expect(theme.dark.brandTintStrong).toBe('#4C2211');
+    // tint-strong matches the fallbacks in src/ui/tokens.css (derived over the Pebble surfaces)
+    expect(theme.light.brandTintStrong).toBe('#F3D3C4');
+    expect(theme.dark.brandTintStrong).toBe('#512715');
   });
 
   it('flips the on-brand text to white for crimson', () => {
     const theme = deriveBrand('#C81E3A');
     expect(theme.light.brandOn).toBe(ON_LIGHT);
     expect(theme.dark.brandOn).toBe(ON_LIGHT);
-    expect(theme.light.brandTintStrong).toBe('#E6C4C7');
-    expect(theme.dark.brandTint).toBe('#290F13');
+    expect(theme.light.brandTintStrong).toBe('#EAC7C9');
+    expect(theme.dark.brandTint).toBe('#301418');
   });
 
   it('accepts lower-case and short hex', () => {
@@ -75,15 +75,15 @@ describe('deriveBrand', () => {
 
   it('lifts a fill that disappears into the dark background', () => {
     const theme = deriveBrand('#101820');
-    expect(contrastRatio(theme.dark.brand, IRON_SURFACES.dark.bg)).toBeGreaterThanOrEqual(3);
+    expect(contrastRatio(theme.dark.brand, APP_SURFACES.dark.bg)).toBeGreaterThanOrEqual(3);
     expect(theme.light.brand).toBe('#101820');
   });
 
   it('brand-ink stays readable on the background and on the brand tint (chips)', () => {
     const theme = deriveBrand(DEFAULT_BRAND);
-    expect(contrastRatio(theme.light.brandInk, IRON_SURFACES.light.bg)).toBeGreaterThanOrEqual(4.5);
+    expect(contrastRatio(theme.light.brandInk, APP_SURFACES.light.bg)).toBeGreaterThanOrEqual(4.5);
     expect(contrastRatio(theme.light.brandInk, theme.light.brandTint)).toBeGreaterThanOrEqual(4.5);
-    expect(contrastRatio(theme.dark.brandInk, IRON_SURFACES.dark.bg)).toBeGreaterThanOrEqual(5.5);
+    expect(contrastRatio(theme.dark.brandInk, APP_SURFACES.dark.bg)).toBeGreaterThanOrEqual(5.5);
     expect(contrastRatio(theme.dark.brandInk, theme.dark.brandTint)).toBeGreaterThanOrEqual(4.5);
   });
 

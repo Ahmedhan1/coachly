@@ -1,6 +1,6 @@
 import type { CatalogExercise } from '@/domain/exercises';
 import { t } from '@/i18n';
-import { exName } from './localized';
+import { exName } from '@/i18n/exerciseNames';
 import { MuscleFallback } from './MuscleFallback';
 import { useExerciseIllustration } from './useExerciseIllustration';
 import styles from './ExerciseThumb.module.css';

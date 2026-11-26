@@ -3,7 +3,7 @@ import { useServices } from '@/app/services';
 import { useLive } from '@/app/useLive';
 import { BUILTIN_KINDS, mergeTemplates, type BuiltinKind, type WhatsappTemplate } from '@/domain/whatsapp';
 import { t } from '@/i18n';
-import type { MetaStore } from '@/services/license/metaStore';
+import type { MetaStore } from '@/data/metaStore';
 
 /** Edited built-ins and custom templates, in the meta table (travels inside backups). */
 export const WHATSAPP_TEMPLATES_KEY = 'whatsapp.templates';

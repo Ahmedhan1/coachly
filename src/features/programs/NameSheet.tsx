@@ -15,17 +15,19 @@ export interface NameSheetProps {
 /** Small sheet with one text field (program / day name). */
 export function NameSheet({ open, title, label, initial, required, onClose, onSave }: NameSheetProps) {
   return (
-    <Sheet open={open} onClose={onClose} title={title} cancelLabel={t('common.cancel')} primaryAction={<SaveButton form="name-sheet-form" />}>
+    <Sheet
+      open={open}
+      onClose={onClose}
+      title={title}
+      cancelLabel={t('common.cancel')}
+      primaryAction={
+        <Button size="small" type="submit" form="name-sheet-form">
+          {t('common.save')}
+        </Button>
+      }
+    >
       {open && <NameForm key={initial} label={label} initial={initial} required={required} onSave={onSave} />}
     </Sheet>
-  );
-}
-
-function SaveButton({ form }: { form: string }) {
-  return (
-    <Button icon="check" size="small" type="submit" form={form}>
-      {t('common.save')}
-    </Button>
   );
 }
 

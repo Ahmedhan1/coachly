@@ -1,0 +1,93 @@
+// English for src/i18n/ar/team.ts (gyms, plans, Team screen).
+import type { EnArea } from './types';
+
+export const team: EnArea<'team'> = {
+  title: 'Team',
+  hint: 'Your gym’s trainers and their clients',
+  plan: {
+    title: 'Gym plan',
+    trainers: 'Trainers: {n} of {max}',
+    trainersOpen: 'Trainers: {n}',
+    clientsPerTrainer: 'Up to {n} clients per trainer',
+    clientsOpen: 'No client limit',
+    until: 'Plan until {date}',
+    open: 'Open-ended plan',
+  },
+  invite: {
+    title: 'Add a trainer',
+    lead: 'Send this link to the trainer. They open it on their iPhone, create an account, then you approve them here.',
+    create: 'Create invite link',
+    renew: 'New link (the old one stops working)',
+    share: 'Send link',
+    copy: 'Copy link',
+    copied: 'Link copied',
+    message: 'Join the {gym} team on the Coach app: {link}',
+    keyNote: 'The link carries the team key: only with it can you read your trainers’ client summaries. The server itself cannot.',
+  },
+  members: {
+    pending: 'Waiting for your approval',
+    active: 'Trainers',
+    none: 'No trainers yet. Send the invite link.',
+    approve: 'Approve',
+    remove: 'Remove from team',
+    removeConfirm: 'Remove {name} from the team? Their app locks until they are approved again. Their data stays on their phone.',
+    noRoster: 'No client summary sent yet',
+    rosterLocked: 'Summary locked with another key (make a new link and send it to them)',
+    updated: 'Updated {date}',
+    clients: '{n} clients',
+    attention: '{n} need follow-up',
+  },
+  totals: {
+    title: 'Summary',
+    trainers: 'trainers',
+    clients: 'clients',
+    attention: 'need follow-up',
+  },
+  client: {
+    sessionsLeft: '{n} of {total} left',
+    noPackage: 'No package',
+    lastSession: 'Last session {date}',
+    never: 'No session yet',
+    attention: {
+      ending_soon: 'Subscription ending soon',
+      ended: 'Subscription ended',
+      low_sessions: 'Few sessions left',
+    },
+  },
+  errors: {
+    trainer_limit: 'Your plan’s trainer limit is reached. Contact the app owner to raise it.',
+    invalid_invite: 'This invite link does not work. Ask the gym for a new one.',
+    in_other_gym: 'You are approved in another gym. Leave it first.',
+    own_gym: 'This is your own gym’s link.',
+    is_gym: 'Your account is a gym; it cannot join another gym.',
+    disabled: 'This account is turned off.',
+    offline: 'No internet right now. Try again when you are back online.',
+    generic: 'Something went wrong. Try again in a bit.',
+  },
+  paste: {
+    button: 'I have a gym invite link',
+    prompt: 'Paste the invite link you got from the gym',
+    invalid: 'That is not an invite link. Copy the whole link as you received it.',
+  },
+  join: {
+    joined: 'Your request was sent to {gym}. The app opens as soon as they approve.',
+    signInFirst: 'Sign in or create an account; you will join the gym right after.',
+  },
+  membership: {
+    pendingTitle: 'Waiting for {gym} to approve you',
+    pendingLead: 'Your request reached the gym. Once they approve, tap “Check again” or open the app again.',
+    trainerOf: 'Trainer at {gym}',
+    leave: 'Leave the gym',
+    leaveHint: 'The gym will no longer see your clients',
+    leaveConfirm: 'Leave {gym}? If only the gym approved your account, the app locks until the app owner or another gym approves you.',
+    left: 'You left the gym.',
+  },
+  limit: {
+    clients: 'Your plan allows {n} clients. Delete an old client or contact the app owner to raise it.',
+    clientsShort: '{count} of {n} clients',
+  },
+  expired: {
+    title: 'Your plan has ended',
+    lead: 'The plan ended and the app is locked until it is renewed. Your data is still on this iPhone; nothing was deleted. Contact the app owner (or your gym).',
+  },
+};

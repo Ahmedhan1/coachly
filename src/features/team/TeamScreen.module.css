@@ -1,0 +1,125 @@
+.muted {
+  margin: 0;
+  padding: var(--sp-3) var(--sp-4);
+  color: var(--text-2);
+  font: var(--t-sub);
+}
+
+.note {
+  margin: 0;
+  color: var(--text-3);
+  font: var(--t-caption);
+}
+
+.totals {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: var(--sp-2);
+  padding: var(--sp-3);
+}
+
+.total,
+.totalWarn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--sp-1);
+  padding: var(--sp-3) var(--sp-2);
+  border-radius: var(--r-md);
+  background: var(--bg);
+  color: var(--text-2);
+  font: var(--t-caption);
+  text-align: center;
+}
+
+.totalWarn {
+  background: var(--warn-tint);
+}
+
+.totalValue {
+  color: var(--text);
+  font: var(--t-num-md);
+}
+
+.invite {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-3);
+  padding: var(--sp-3) var(--sp-4) var(--sp-4);
+}
+
+.invite > .muted {
+  padding: 0;
+}
+
+.link {
+  display: block;
+  padding: var(--sp-3);
+  border-radius: var(--r-md);
+  background: var(--bg);
+  font: var(--t-code);
+  overflow-wrap: anywhere;
+  user-select: all;
+  -webkit-user-select: all;
+}
+
+.wa {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--sp-2);
+  min-block-size: 50px;
+  border-radius: var(--r-md);
+  background: var(--ok);
+  color: #fff;
+  font: var(--t-button);
+  text-decoration: none;
+}
+
+.pending,
+.member {
+  border-block-end: 1px solid var(--line);
+}
+
+.pending:last-child,
+.member:last-child {
+  border-block-end: 0;
+}
+
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--sp-2);
+  padding: 0 var(--sp-4) var(--sp-3);
+}
+
+.clients {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-2);
+  margin: 0;
+  padding: 0 var(--sp-4) var(--sp-4);
+  list-style: none;
+}
+
+.client {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--sp-1) var(--sp-2);
+  padding: var(--sp-2) var(--sp-3);
+  border-radius: var(--r-md);
+  background: var(--bg);
+}
+
+.clientName {
+  flex: 1 1 100%;
+  font: var(--t-label);
+}
+
+.clientMeta {
+  flex: 1;
+  color: var(--text-2);
+  font: var(--t-caption);
+  font-variant-numeric: tabular-nums;
+}

@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { base64UrlDecode, base64UrlEncode } from '../../shared/license';
+import { base64UrlDecode, base64UrlEncode } from '../../shared/bytes';
 import { audienceOf, importVapidKeys, signVapidJwt, vapidAuthorization, VapidConfigError } from '../src/push/vapid';
 import { deriveSecrets, ecdhParams, encryptPushPayload, importEcPrivateKey, MAX_PLAINTEXT, PushKeyError } from '../src/push/webpush';
 import { TEST_VAPID_PRIVATE, TEST_VAPID_PUBLIC } from './fixtures';

@@ -5,8 +5,8 @@ import { useServices } from '@/app/services';
 import { useLive } from '@/app/useLive';
 import { toIsoDate, type Client } from '@/domain/models';
 import { buildOutbox, OUTBOX_KINDS, SENT_LOG_MAX_ENTRIES, updateSentLog, type OutboxItem, type OutboxKind, type SentEntry } from '@/domain/outbox';
-import type { MetaStore } from '@/services/license/metaStore';
-import { deviceZone } from '@/features/schedule/zone';
+import type { MetaStore } from '@/data/metaStore';
+import { deviceZone } from '@/app/deviceZone';
 
 const SENT_KEY = 'outbox.sent';
 const KINDS_KEY = 'outbox.kinds';

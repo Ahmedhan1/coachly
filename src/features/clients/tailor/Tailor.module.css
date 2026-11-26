@@ -4,22 +4,6 @@
   gap: var(--sp-5);
 }
 
-.save {
-  position: relative;
-  min-block-size: 36px;
-  padding-inline: var(--sp-4);
-  border-radius: var(--r-control);
-  background: var(--brand);
-  color: var(--brand-on);
-  font: var(--t-button);
-}
-
-.save::after {
-  content: '';
-  position: absolute;
-  inset: -4px 0;
-}
-
 .group {
   display: flex;
   flex-direction: column;
@@ -46,29 +30,6 @@
   display: flex;
   flex-wrap: wrap;
   gap: var(--sp-2);
-}
-
-.chip {
-  position: relative;
-  min-block-size: 40px;
-  padding-inline: var(--sp-3);
-  border: 1px solid var(--line);
-  border-radius: var(--r-control);
-  background: var(--surface);
-  color: var(--text);
-  font: var(--t-label);
-}
-
-.chip[aria-pressed='true'] {
-  border-color: var(--text);
-  background: var(--text);
-  color: var(--bg);
-}
-
-.warnChip[aria-pressed='true'] {
-  border-color: var(--warn);
-  background: var(--warn);
-  color: var(--bg);
 }
 
 .list {
@@ -113,6 +74,7 @@
   border: 1px solid var(--line);
   border-radius: var(--r-md);
   background: var(--surface);
+  box-shadow: var(--shadow-card);
 }
 
 .cardHead {

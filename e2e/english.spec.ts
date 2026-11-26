@@ -176,18 +176,18 @@ test('main screens show no Arabic UI text in English', async ({ page }) => {
   await expectNoArabicUi(page, userData, 'whatsapp');
 });
 
-test('the activation screen offers the language switch before activating', async ({ page }) => {
+test('the sign-in screen offers the language switch before signing in', async ({ page }) => {
   await page.goto('/?standalone=1');
   await settle(page);
-  const toggle = page.getByTestId('activation-language');
+  const toggle = page.getByTestId('auth-language');
   await expect(toggle).toHaveText(/English/);
   await toggle.click();
   await settle(page);
   await expect(page.locator('html')).toHaveAttribute('dir', 'ltr');
-  await expect(page.getByLabel('Activation code')).toBeVisible();
-  await expect(page.getByTestId('activation-language')).toHaveText(/العربية/);
+  await expect(page.getByLabel('Email')).toBeVisible();
+  await expect(page.getByTestId('auth-language')).toHaveText(/العربية/);
   await settle(page);
-  await page.screenshot({ path: `${SHOTS}/activation.png` });
+  await page.screenshot({ path: `${SHOTS}/sign-in.png` });
 });
 
 test('PDF in English: generates, previews LTR pages, and a session screen in English', async ({ page }) => {

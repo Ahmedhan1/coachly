@@ -1,6 +1,6 @@
 // Small byte helpers for the push code. Imports use the `.ts` extension so `bench/push-benchmark.mjs` can load
 // these files directly in Node 22 (type stripping) as well as through wrangler/vitest.
-import { base64UrlDecode, base64UrlEncode } from '../../../shared/license.ts';
+import { base64UrlDecode, base64UrlEncode } from '../../../shared/bytes.ts';
 
 export { base64UrlDecode, base64UrlEncode };
 

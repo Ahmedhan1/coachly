@@ -1,6 +1,6 @@
 /**
  * One brand color → every brand token, for light and dark (docs/DESIGN.md §2).
- * Port of design/brand-derive.mjs with two additions that turn its intent into guarantees:
+ * Port of the design-phase brand-derive.mjs reference with two additions that turn its intent into guarantees:
  *  - brand-ink must also read on the brand tint (chips, selected rows), not only on the page background;
  *  - text on a brand fill always reaches 4.5:1 — when neither white nor near-black does, the fill is
  *    nudged (darker for white text, lighter for dark text) until one does.
@@ -35,10 +35,10 @@ export interface Surfaces {
   dark: ModeSurfaces;
 }
 
-/** Neutrals of direction B «الحديد» (src/ui/tokens.css). */
-export const IRON_SURFACES: Surfaces = {
-  light: { bg: '#EDEDEA', surface: '#FFFFFF', surface2: '#F3F3F1' },
-  dark: { bg: '#0B0C0C', surface: '#161818', surface2: '#1F2222' },
+/** The app's neutrals (Pebble, src/ui/tokens.css): brand tokens are derived to stay readable on each of these. */
+export const APP_SURFACES: Surfaces = {
+  light: { bg: '#F3F1ED', surface: '#FFFFFF', surface2: '#EFECE6' },
+  dark: { bg: '#131211', surface: '#1E1C1A', surface2: '#282623' },
 };
 
 export const ON_LIGHT = '#FFFFFF';
@@ -160,7 +160,7 @@ function darkTokens(brand: string, s: ModeSurfaces): BrandTokens {
   return { ...fillWithOn(lifted), brandInk, brandTint, brandTintStrong };
 }
 
-export function deriveBrand(color: string, surfaces: Surfaces = IRON_SURFACES): BrandTheme {
+export function deriveBrand(color: string, surfaces: Surfaces = APP_SURFACES): BrandTheme {
   const source = requireHex(color);
   return { source, light: lightTokens(source, surfaces.light), dark: darkTokens(source, surfaces.dark) };
 }
@@ -176,7 +176,7 @@ export interface ContrastCheck {
 }
 
 /** Re-run whenever the trainer changes the color; show a warning if a 'text' pair fails. */
-export function auditBrand(theme: BrandTheme, surfaces: Surfaces = IRON_SURFACES): ContrastCheck[] {
+export function auditBrand(theme: BrandTheme, surfaces: Surfaces = APP_SURFACES): ContrastCheck[] {
   const checks: ContrastCheck[] = [];
   const add = (mode: 'light' | 'dark', pair: string, a: string, b: string, min: number, kind: 'text' | 'fill') => {
     const ratio = contrastRatio(a, b);

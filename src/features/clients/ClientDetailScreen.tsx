@@ -6,7 +6,7 @@ import { useGo } from '@/app/shell/nav';
 import { useUiStore } from '@/app/uiStore';
 import { useLive } from '@/app/useLive';
 import { readAiKey } from '@/features/online/integrations';
-import { clientPagesEnabled } from '@/features/online/prefs';
+import { clientPagesEnabled } from '@/data/prefs/online';
 import { sessionForWorkout } from '@/domain/clientHub';
 import { localDayRange, subscriptionAttention, type Client, type Payment, type Program } from '@/domain/models';
 import type { BuiltinKind } from '@/domain/whatsapp';

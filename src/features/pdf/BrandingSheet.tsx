@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { useServices } from '@/app/services';
 import { useUiStore } from '@/app/uiStore';
 import { t } from '@/i18n';
-import { SegmentedControl, Select, Sheet, TextArea, TextField } from '@/ui';
+import { Button, SegmentedControl, Select, Sheet, TextArea, TextField } from '@/ui';
 import { PhotoField } from '@/features/nutrition/shared/PhotoField';
 import { Slider } from '@/features/nutrition/shared/Slider';
 import { PDF_FONTS, savePdfBranding, type PdfBrandingSettings } from './pdfBranding';
@@ -34,9 +34,9 @@ export function BrandingSheet({ initial, onClose }: { initial: PdfBrandingSettin
       title={t('pdf.branding.title')}
       cancelLabel={t('common.cancel')}
       primaryAction={
-        <button type="button" className={styles.sheetSave} onClick={() => void save()}>
+        <Button size="small" onClick={() => void save()}>
           {t('common.save')}
-        </button>
+        </Button>
       }
     >
       <div className={styles.form}>

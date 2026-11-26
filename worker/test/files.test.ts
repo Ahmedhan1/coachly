@@ -1,15 +1,15 @@
 import { describe, expect, it } from 'vitest';
 import { generateRawKey, openWithKey, sealWithKey } from '../../shared/envelope';
-import { base64UrlEncode } from '../../shared/license';
+import { base64UrlEncode } from '../../shared/bytes';
 import type { CloudFileInfo } from '../../shared/files';
 import { MemoryObjectStore } from '../src/files/objectStore';
 import { fileKey } from '../src/files/routes';
-import { envelopeBytes, freshIp, harness, readJson, type Harness } from './helpers';
+import { envelopeBytes, freshIp, harness, readJson, storedBytes, type Harness } from './helpers';
 import { SAMPLE_DOCUMENT } from './sampleDocument';
 
 async function setup(store = new MemoryObjectStore()) {
   const h = await harness({ objectStore: store });
-  return { h, store, token: await h.license() };
+  return { h, store, token: await h.account() };
 }
 
 function upload(h: Harness, token: string, body: Uint8Array, query: string, method = 'POST', path = '/api/files'): Promise<Response> {
@@ -28,7 +28,7 @@ async function list(h: Harness, token: string, query = ''): Promise<CloudFileInf
 }
 
 describe('files API auth', () => {
-  it('needs a valid license on every trainer endpoint', async () => {
+  it('needs an approved account on every trainer endpoint', async () => {
     const { h } = await setup();
     for (const [method, path] of [
       ['GET', '/api/files'],
@@ -42,9 +42,9 @@ describe('files API auth', () => {
     }
   });
 
-  it('refuses a revoked license', async () => {
+  it('refuses a disabled account', async () => {
     const { h, token } = await setup();
-    await h.revoke(token);
+    await h.disable(token);
     expect((await h.authed('/api/files', token)).status).toBe(403);
   });
 });
@@ -96,7 +96,7 @@ describe('files CRUD', () => {
 
   it("one trainer cannot see, read, replace or delete another trainer's files", async () => {
     const { h, token } = await setup();
-    const other = await h.license('كابتن تاني');
+    const other = await h.account('كابتن تاني');
     const file = await created(await upload(h, token, envelopeBytes('PTK1', 64), '?kind=pdf'));
     expect(await list(h, other)).toEqual([]);
     expect((await h.authed(`/api/files/${file.id}`, other)).status).toBe(404);
@@ -139,7 +139,7 @@ describe('files CRUD', () => {
 
   it('answers 503 files_unavailable when no bucket is configured', async () => {
     const h = await harness({ objectStore: null });
-    const token = await h.license();
+    const token = await h.account();
     const res = await h.authed('/api/files', token);
     expect(res.status).toBe(503);
     expect(await readJson(res)).toEqual({ error: 'files_unavailable' });
@@ -231,7 +231,28 @@ describe('client page uploads', () => {
     const shareId = await publishShare(h, token, key);
     await clientUpload(h, shareId, key, 'client_photo', envelopeBytes('PTK1', 64));
     const [file] = await list(h, token);
-    const lid = JSON.parse(new TextDecoder().decode(Uint8Array.from(atob(token.split('.')[0]!.replace(/-/g, '+').replace(/_/g, '/')), (c) => c.charCodeAt(0)))).lid as string;
-    expect([...store.objects.keys()]).toEqual([fileKey(lid, file!.id)]);
+    expect([...store.objects.keys()]).toEqual([fileKey(await h.accountId(token), file!.id)]);
+  });
+});
+
+describe('files in the Worker R2 bucket (no iDrive keys set)', () => {
+  it('stores in R2 under files/<account>/<id>, counts toward the global guard, and gives the bytes back on delete', async () => {
+    const { env } = await import('cloudflare:workers');
+    const h = await harness();
+    const token = await h.account();
+    const before = await storedBytes();
+    const file = await created(await upload(h, token, envelopeBytes('PTK1', 4096), '?kind=client_photo&ref=c1'));
+    expect(await env.BACKUPS.head(fileKey(await h.accountId(token), file.id))).not.toBeNull();
+    expect(await storedBytes()).toBe(before + 4096);
+    expect((await h.authed(`/api/files/${file.id}`, token)).status).toBe(200);
+    expect((await h.authed(`/api/files/${file.id}`, token, { method: 'DELETE' })).status).toBe(200);
+    expect(await storedBytes()).toBe(before);
+  });
+
+  it('refuses growth past the global guard with storage_full', async () => {
+    const h = await harness({ cloudConfig: { storageGuardBytes: 1 } });
+    const token = await h.account();
+    const res = await upload(h, token, envelopeBytes('PTK1', 2048), '?kind=client_photo&ref=c2');
+    expect([res.status, await readJson(res)]).toEqual([507, { error: 'storage_full' }]);
   });
 });

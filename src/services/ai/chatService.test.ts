@@ -62,13 +62,13 @@ describe('GroqChatService relay fallback', () => {
     expect(calls[2]?.url).toBe('https://worker.example/api/ai/relay');
   });
 
-  it('does not relay HTTP errors or timeouts, and needs an activated license', async () => {
+  it('does not relay HTTP errors or timeouts, and needs a signed-in account', async () => {
     const calls: Call[] = [];
     const svc = new GroqChatService(fakeFetch([{ status: 401, body: { error: { message: 'Invalid API Key' } } }], calls), { relay: relay() });
     expect(await svc.complete(req)).toEqual({ ok: false, error: 'auth' });
     expect(calls).toHaveLength(1);
-    const noLicense = new GroqChatService(fakeFetch(['network'], calls), { relay: relay(null) });
-    expect(await noLicense.complete(req)).toEqual({ ok: false, error: 'offline' });
+    const signedOut = new GroqChatService(fakeFetch(['network'], calls), { relay: relay(null) });
+    expect(await signedOut.complete(req)).toEqual({ ok: false, error: 'offline' });
     const slow = new GroqChatService(
       ((_u: RequestInfo | URL, init?: RequestInit) => new Promise<Response>((_r, reject) => init?.signal?.addEventListener('abort', () => reject(new DOMException('aborted', 'AbortError'))))) as typeof fetch,
       { relay: relay(), timeoutMs: 5 },

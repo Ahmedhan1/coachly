@@ -2,7 +2,7 @@ import { z } from 'zod';
 import type { AppServices } from '@/app/services';
 import { toIsoDate } from '@/domain/models';
 import { addDays, toDayNumber } from '@/domain/schedule';
-import type { MetaStore } from '@/services/license/metaStore';
+import type { MetaStore } from '@/data/metaStore';
 import { postWebhook, type WebhookEvent } from '@/services/integrations/webhook';
 
 /** Device-local (`backup.` prefix, never inside a backup file): the trainer's own AI key. */

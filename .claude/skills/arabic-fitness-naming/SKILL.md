@@ -11,7 +11,7 @@ foreign and amateur to the buyer.
 
 ## Rules
 
-1. **Every user-visible string comes from `src/i18n/ar.ts`.** No hard-coded UI text in components.
+1. **Every user-visible string comes from `src/i18n/ar/`.** No hard-coded UI text in components.
 2. **Gym terms come from the dictionary `src/i18n/fitness-terms.ts`.** Muscles, equipment, movements,
    modifiers, named exercises. Examples: Glutes جلوتس · Quads كوادز · Hamstrings هامسترينج · Lats لاتس ·
    Traps ترابس · Chest تشيست · Shoulders شولدرز · Biceps Curl بايسبس كيرل · Bench Press بنش برس ·
@@ -37,7 +37,7 @@ foreign and amateur to the buyer.
 
 ## Checklist before saying "done"
 
-- [ ] New Arabic text lives in `src/i18n/ar.ts` (or the dictionary for gym terms).
+- [ ] New Arabic text lives in `src/i18n/ar/` (or the dictionary for gym terms).
 - [ ] `npx vitest run src/i18n scripts` passes.
 - [ ] `npm run check:words` passes (show its output).
 - [ ] If exercise data changed: rerun the transliteration script and report the coverage line.

@@ -2,7 +2,7 @@
   display: flex;
   align-items: center;
   block-size: 100%;
-  background: var(--surface);
+  background: var(--row-bg, var(--bg));
   border-block-end: var(--hairline) solid var(--line);
 }
 
@@ -13,7 +13,7 @@
   align-items: center;
   gap: var(--sp-3);
   block-size: 100%;
-  padding-inline: var(--sp-3) 0;
+  padding-inline: 0;
   color: var(--text);
   text-decoration: none;
 }
@@ -53,7 +53,7 @@
   block-size: 24px;
   padding-inline: var(--sp-2);
   border-radius: var(--r-control);
-  background: var(--surface-2);
+  background: var(--tint-ink);
   color: var(--text);
   font: var(--t-label);
 }

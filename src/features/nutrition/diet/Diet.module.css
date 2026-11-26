@@ -28,6 +28,7 @@
   border-radius: var(--r-md);
   background: var(--surface);
   text-align: center;
+  box-shadow: var(--shadow-card);
 }
 
 .targets dt {
@@ -55,11 +56,6 @@
   margin-inline-start: var(--sp-2);
   border-radius: var(--r-full);
   background: var(--warn);
-}
-
-.dayTotal {
-  margin-block: var(--sp-3);
-  font: var(--t-callout);
 }
 
 .notes {
@@ -116,13 +112,10 @@
   place-items: center;
   inline-size: var(--tap);
   block-size: var(--tap);
-  padding: 0;
   border: 1px solid var(--line);
-  border-radius: var(--r-md);
+  border-radius: var(--r-control);
   background: var(--bg);
   color: var(--text);
-  font: var(--t-title);
-  line-height: 1;
 }
 
 .stepBtn:active,
@@ -132,6 +125,11 @@
 
 .lockBtn {
   color: var(--text-3);
+}
+
+.stepBtn svg {
+  inline-size: 20px;
+  block-size: 20px;
 }
 
 .lockBtn svg {
@@ -183,6 +181,7 @@
   padding: var(--sp-3);
   border-radius: var(--r-lg);
   background: var(--surface);
+  box-shadow: var(--shadow-card);
 }
 
 .dayBoxHead {

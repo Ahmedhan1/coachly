@@ -18,7 +18,7 @@ import { DEFAULT_SCHEDULE_PREFS, useLateCancelIds, useSchedulePrefs } from './pr
 import { shouldShowRemindersPrompt } from './reminders';
 import { RemindersSheet } from './RemindersSheet';
 import { SessionRow } from './SessionRow';
-import { deviceZone } from './zone';
+import { deviceZone } from '@/app/deviceZone';
 import styles from './Schedule.module.css';
 
 type View = 'day' | 'week';

@@ -4,6 +4,7 @@ import { createRepositories, type Repositories } from './repositories';
 import { undoLastDelete, type UndoneDelete } from './undo';
 import { ensureFirstRun, hasDemoData, removeDemoData } from './demoSeed';
 import { runDailyPurge, type PurgeReport } from './purge';
+import { eraseLocalData, hasUserData } from './accountData';
 import { renewPackage, undoRenewal, type RenewPackageResult } from './renewal';
 import type { IsoDate } from '@/domain/models';
 import type { StorageProblemListener } from './storageProblems';
@@ -15,6 +16,10 @@ export interface DataLayer {
   hasDemoData(): Promise<boolean>;
   removeDemoData(): Promise<number>;
   ensureFirstRun(now: Date): Promise<boolean>;
+  /** True when the phone holds the trainer's own data (not only the demo data). */
+  hasUserData(): Promise<boolean>;
+  /** Erases all local data and the previous account's backup keys (account switch). The session stays. */
+  eraseLocalData(): Promise<void>;
   /** "جدّد": package dates + pending charge in one transaction; null when there is no package to renew. */
   renewPackage(clientId: string, today: IsoDate): Promise<RenewPackageResult | null>;
   undoRenewal(clientId: string, result: RenewPackageResult): Promise<void>;
@@ -33,6 +38,8 @@ export function createDataLayer(db: AppDatabase = new AppDatabase(), clock: Cloc
     hasDemoData: () => hasDemoData(db),
     removeDemoData: () => removeDemoData(db),
     ensureFirstRun: (now) => ensureFirstRun(repos, db, now),
+    hasUserData: () => hasUserData(db),
+    eraseLocalData: () => eraseLocalData(db),
     renewPackage: (clientId, today) => renewPackage(db, repos, clientId, today),
     undoRenewal: (clientId, result) => undoRenewal(db, repos, clientId, result),
     runDailyPurge: (now) => runDailyPurge(db, now),
@@ -42,6 +49,7 @@ export function createDataLayer(db: AppDatabase = new AppDatabase(), clock: Cloc
 }
 
 export { AppDatabase } from './db';
+export { DATA_OWNER_KEY } from './accountData';
 export { normalizeForSearch, matchesQuery, searchItems, prepareSearch, filterPrepared, type PreparedSearch } from './search';
 export type { Repositories, NewEntity, EntityPatch, SettingsPatch } from './repositories';
 export type { UndoneDelete } from './undo';

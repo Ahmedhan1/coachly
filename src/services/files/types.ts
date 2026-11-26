@@ -2,7 +2,7 @@ import type { Result } from '@/domain/nutrition/result';
 import type { CloudError } from '@/services/cloud/types';
 import type { CloudFileInfo, FileKind, FileSource } from '../../../shared/files';
 
-export type FilesError = CloudError | 'not_activated';
+export type FilesError = CloudError | 'not_signed_in';
 
 export interface FileListQuery {
   kind?: FileKind;

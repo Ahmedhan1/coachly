@@ -11,6 +11,7 @@ import { schedule } from './schedule';
 import { settings } from './settings';
 import { storage } from './storage';
 import { training } from './training';
+import { team } from './team';
 import type { StringShape } from './types';
 
 export type { StringShape } from './types';
@@ -33,4 +34,5 @@ export const en: DeepPartial<StringShape<Strings>> = {
   assistant,
   hub,
   nutrition,
+  team,
 };

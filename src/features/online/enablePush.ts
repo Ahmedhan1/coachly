@@ -1,6 +1,6 @@
 import type { AppServices } from '@/app/services';
 import type { PushError } from '@/services/push/pushService';
-import { readPushPrefs, savePushPrefs } from './prefs';
+import { readPushPrefs, savePushPrefs } from '@/data/prefs/online';
 import { syncPush } from './sync';
 
 export type EnablePushOutcome = { ok: true; scheduled: number | null } | { ok: false; error: PushError | 'unavailable' };

@@ -1,7 +1,7 @@
 import type { MuscleLoad } from '@/domain/exercises';
-import { fillShare, paletteFill, type MuscleIntensities, type MuscleMapPalette } from '@/services/model3d/palette';
+import { fillShare, paletteFill, type MuscleIntensities, type MuscleMapPalette } from '@/domain/exercises/musclePalette';
 
-export { fillStep, INTENSITY_STEPS, mixHex, type MuscleIntensities, type MuscleMapPalette } from '@/services/model3d/palette';
+export { fillStep, INTENSITY_STEPS, mixHex, type MuscleIntensities, type MuscleMapPalette } from '@/domain/exercises/musclePalette';
 
 export function intensitiesFromLoad(loads: readonly MuscleLoad[]): MuscleIntensities {
   const out: MuscleIntensities = {};

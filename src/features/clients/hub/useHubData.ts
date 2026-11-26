@@ -3,8 +3,8 @@ import { useServices } from '@/app/services';
 import { useLive } from '@/app/useLive';
 import { clientOverview, plannedDay, splitClientPrograms } from '@/domain/clientHub';
 import { toIsoDate, type Client, type Payment, type Program, type ProgressEntry, type Session, type WorkoutLog } from '@/domain/models';
-import { readActivePrograms } from '@/features/programs/activePrograms';
-import { readSessionDays } from '@/features/schedule/sessionDays';
+import { readActivePrograms } from '@/data/prefs/activePrograms';
+import { readSessionDays } from '@/data/prefs/sessionDays';
 
 export interface HubData {
   payments: Payment[];

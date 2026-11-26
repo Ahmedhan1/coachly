@@ -153,9 +153,9 @@ function ClientRowSheet({ row, name, onClose, onSave }: { row: ClientSupplement;
       title={t('nutrition.supplements.clientEditTitle', { name })}
       cancelLabel={t('common.cancel')}
       primaryAction={
-        <button type="submit" form="client-supp" className={common.sheetSave}>
+        <Button size="small" type="submit" form="client-supp">
           {t('common.save')}
-        </button>
+        </Button>
       }
     >
       <form id="client-supp" className={common.form} onSubmit={submit}>

@@ -2,9 +2,9 @@
  * Keeps installed copies of the app current. The service worker (vite-plugin-pwa, skipWaiting + clientsClaim)
  * installs a new version in the background, but the open page keeps running the old JavaScript. Without this,
  * a phone could run an outdated build for days (that is how an old build without the server address kept
- * failing every activation).
+ * failing every sign-in).
  *
- * Policy: switch to the new version immediately while a gate screen is showing (install/activation — nothing
+ * Policy: switch to the new version immediately while a gate screen is showing (install/sign-in — nothing
  * to lose). Anywhere else, wait until the trainer comes back after the app sat in the background for a while
  * (AWAY_MS): a quick hop to WhatsApp and back must never wipe a half-filled form or a running workout. A cold
  * start always runs the newest version anyway.

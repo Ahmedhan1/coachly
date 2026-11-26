@@ -1,6 +1,5 @@
 import { env } from 'cloudflare:workers';
 import { describe, expect, it } from 'vitest';
-import { decodeLicenseToken } from '../../shared/license';
 import { backupKey } from '../src/backup/store';
 import { envelopeBytes, harness, readJson, storedBytes, type Harness } from './helpers';
 
@@ -8,10 +7,6 @@ const MiB = 1024 * 1024;
 
 function put(h: Harness, token: string, body: Uint8Array, path = '/api/backup'): Promise<Response> {
   return h.authed(path, token, { method: 'PUT', body, headers: { 'Content-Length': String(body.length) } });
-}
-
-function lidOf(token: string): string {
-  return decodeLicenseToken(token)?.payload.lid ?? '';
 }
 
 describe('backup auth', () => {
@@ -34,14 +29,14 @@ describe('backup auth', () => {
     }
   });
 
-  it('answers 403 revoked for a revoked license on every backup endpoint', async () => {
+  it('answers 403 disabled for a disabled account on every backup endpoint', async () => {
     const h = await harness();
-    const token = await h.license();
-    await h.revoke(token);
+    const token = await h.account();
+    await h.disable(token);
     for (const [method, path] of endpoints) {
       const res = await h.authed(path, token, { method });
       expect(res.status, `${method} ${path}`).toBe(403);
-      if (method !== 'HEAD') expect(await readJson(res)).toEqual({ error: 'revoked' });
+      if (method !== 'HEAD') expect(await readJson(res)).toEqual({ error: 'disabled' });
     }
   });
 });
@@ -49,7 +44,7 @@ describe('backup auth', () => {
 describe('PUT /api/backup', () => {
   it('stores, reports and streams back the envelope; the second upload keeps the first as previous', async () => {
     const h = await harness();
-    const token = await h.license();
+    const token = await h.account();
     const first = envelopeBytes('PTP1', 2048, 1);
     const res = await put(h, token, first);
     expect(res.status).toBe(201);
@@ -84,7 +79,7 @@ describe('PUT /api/backup', () => {
 
   it('keeps the R2 total in D1 in step with puts and deletes', async () => {
     const h = await harness();
-    const token = await h.license();
+    const token = await h.account();
     const before = await storedBytes();
     await put(h, token, envelopeBytes('PTP1', 1000));
     await put(h, token, envelopeBytes('PTP1', 3000));
@@ -93,13 +88,13 @@ describe('PUT /api/backup', () => {
     expect(await storedBytes()).toBe(before + 3500);
     expect((await h.authed('/api/backup', token, { method: 'DELETE' })).status).toBe(200);
     expect(await storedBytes()).toBe(before);
-    expect(await env.BACKUPS.head(backupKey(lidOf(token), 0))).toBeNull();
+    expect(await env.BACKUPS.head(backupKey(await h.accountId(token), 0))).toBeNull();
     expect((await h.authed('/api/backup', token)).status).toBe(404);
   });
 
   it('drops the previous copy when latest + previous would pass the per-trainer cap', async () => {
     const h = await harness({ cloudConfig: { backupMaxBytes: 10_000 } });
-    const token = await h.license();
+    const token = await h.account();
     await put(h, token, envelopeBytes('PTP1', 6000));
     const res = await put(h, token, envelopeBytes('PTP1', 6000, 9));
     expect(await readJson(res)).toMatchObject({ previousKept: false });
@@ -108,7 +103,7 @@ describe('PUT /api/backup', () => {
 
   it('refuses bodies over the cap, without a length, empty, or not a PTP1 envelope', async () => {
     const h = await harness({ cloudConfig: { backupMaxBytes: 5000, singlePutMaxBytes: 4000 } });
-    const token = await h.license();
+    const token = await h.account();
     const big = await put(h, token, envelopeBytes('PTP1', 5001));
     expect(big.status).toBe(413);
     expect(await readJson(big)).toEqual({ error: 'too_large', maxBytes: 5000 });
@@ -127,7 +122,7 @@ describe('PUT /api/backup', () => {
 
   it('refuses a body shorter than its Content-Length and keeps the old backup', async () => {
     const h = await harness();
-    const token = await h.license();
+    const token = await h.account();
     const good = envelopeBytes('PTP1', 300);
     await put(h, token, good);
     const res = await h.authed('/api/backup', token, {
@@ -142,7 +137,7 @@ describe('PUT /api/backup', () => {
   it('answers storage_full for uploads that grow storage past the global guard, but allows same-size replacements', async () => {
     const used = await storedBytes();
     const h = await harness({ cloudConfig: { storageGuardBytes: used + 4200 } });
-    const token = await h.license();
+    const token = await h.account();
     expect((await put(h, token, envelopeBytes('PTP1', 4000))).status).toBe(201);
 
     const grow = await put(h, token, envelopeBytes('PTP1', 4500));
@@ -154,13 +149,13 @@ describe('PUT /api/backup', () => {
     // Over the guard the previous copy is not kept either.
     expect(await readJson(same)).toMatchObject({ previousKept: false });
 
-    const other = await h.license();
+    const other = await h.account();
     expect((await put(h, other, envelopeBytes('PTP1', 2000))).status).toBe(507);
   });
 
-  it('rate-limits uploads per license', async () => {
+  it('rate-limits uploads per account', async () => {
     const h = await harness();
-    const token = await h.license();
+    const token = await h.account();
     const statuses: number[] = [];
     for (let i = 0; i < 25; i++) statuses.push((await put(h, token, envelopeBytes('PTP1', 64))).status);
     expect(statuses.slice(0, 24).every((s) => s === 201)).toBe(true);
@@ -174,7 +169,7 @@ describe('multipart backup', () => {
 
   it('uploads in parts, checks the magic on part 1 and part sizes, and completes as latest', async () => {
     const h = await harness({ cloudConfig: { backupPartBytes: partBytes } });
-    const token = await h.license();
+    const token = await h.account();
     const size = partBytes + 1234;
     const data = envelopeBytes('PTP1', size, 4);
 
@@ -195,7 +190,7 @@ describe('multipart backup', () => {
       expect(res.status).toBe(200);
       parts.push(await res.json());
     }
-    const other = await h.license();
+    const other = await h.account();
     expect((await h.authed(`/api/backup/uploads/${uploadId}/complete`, other, { method: 'POST', body: JSON.stringify({ parts }) })).status).toBe(404);
 
     const done = await h.authed(`/api/backup/uploads/${uploadId}/complete`, token, { method: 'POST', body: JSON.stringify({ parts }) });
@@ -209,7 +204,7 @@ describe('multipart backup', () => {
 
   it('refuses a declared size over the cap and can abort', async () => {
     const h = await harness({ cloudConfig: { backupPartBytes: partBytes, backupMaxBytes: 6 * MiB } });
-    const token = await h.license();
+    const token = await h.account();
     const big = await h.authed('/api/backup/uploads', token, { method: 'POST', body: JSON.stringify({ size: 6 * MiB + 1 }) });
     expect(big.status).toBe(413);
     const ok = await h.authed('/api/backup/uploads', token, { method: 'POST', body: JSON.stringify({ size: 100 }) });

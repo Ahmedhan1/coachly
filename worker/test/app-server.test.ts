@@ -100,3 +100,13 @@ describe('deploy/app upload endpoint', () => {
     expect(res.status).toBe(413);
   });
 });
+
+describe('deploy/app in Static Assets mode (wrangler.assets.toml)', () => {
+  it('hands non-brand paths to ASSETS instead of D1', async () => {
+    const ctx = createExecutionContext();
+    const ASSETS = { fetch: async () => new Response('from assets') } as unknown as Fetcher;
+    const res = await appWorker.fetch(new Request(`${ORIGIN}/clients`), { APP: env.DB, ASSETS }, ctx);
+    await waitOnExecutionContext(ctx);
+    expect(await res.text()).toBe('from assets');
+  });
+});

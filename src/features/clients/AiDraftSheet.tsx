@@ -8,7 +8,7 @@ import { aiClients } from '@/features/assistant/aiClient';
 import { readAiConfig } from '@/features/assistant/aiSettings';
 import { localNow } from '@/features/assistant/assistantData';
 import { draftMealDay, draftProgram } from '@/features/assistant/drafts';
-import { deviceZone } from '@/features/schedule/zone';
+import { deviceZone } from '@/app/deviceZone';
 import { t } from '@/i18n';
 import { Button, SegmentedControl, Select, Sheet, TextArea } from '@/ui';
 import styles from './ClientDetail.module.css';

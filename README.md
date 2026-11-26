@@ -7,18 +7,19 @@ Full spec (Arabic): `docs/SPEC.md`.
 
 ```
 src/                 the app
-  app/               App root, services provider, stores
+  app/               App root, services provider, app-wide hooks (live queries, catalog, device zone, stored images)
     pwa/             service worker updates, install prompt, boot splash, standalone detection
     shell/           tab shell, router, route tables, nav helpers
-  features/          one folder per screen area (clients, schedule, programs, nutrition, pdf, settings…)
-  ui/                shared components and design tokens
+  features/          one folder per screen area (clients, schedule, programs, nutrition, pdf, settings…);
+                     code two areas share moves down to app/, data/ or i18n/, not into another feature
+  ui/                the only components and design tokens (Button, Sheet, Chip, Stepper, FileButton…)
   domain/            pure TypeScript logic (no React / DOM / Dexie), each area behind an index.ts
     meals/           calculator/, foods/, plan/, diet/, grams/ (+ cross-area tests at the root)
-  data/              Dexie schema, migrations, repositories, seeds
+  data/              Dexie schema, migrations, repositories, seeds, key/value store (metaStore) and prefs/
   services/          calendar, files, 3D, PDF, backup, cloud — each behind an interface with a fake
-  i18n/              ar.ts (+ ar/ per feature), en/, fitness-terms.ts
-shared/              code shared by app and worker (license, envelope, brand icon, headers)
-worker/              Cloudflare Worker (activation, push, backup, client page, admin) with its own tests
+  i18n/              ar/ and en/ (core.ts + one file per feature), localized names, fitness-terms.ts
+shared/              code shared by app and worker (byte helpers, envelope, brand icon, headers)
+worker/              Cloudflare Worker (accounts via better-auth, gyms, push, backup, client page, admin) with its own tests
 deploy/app/          Worker that serves the installed app's files from D1
 e2e/                 Playwright scenarios
 public/              static files shipped with the app (exercise pack, food photos, fonts, 3D model)
@@ -26,10 +27,12 @@ assets-src/          raw sources, not shipped as-is
   exercises/         exercise dataset, Arabic/English names and cues, extras and fixes
   model3d/           Blender export scripts and the public model repo template
 scripts/             build and check scripts (exercise pack, forbidden words)
-tools/               offline owner tools (key generation, offline activation codes)
-design/              design directions, fonts, promo video tooling
+tools/               offline owner tools (promo video)
 docs/                SPEC, PLAN, DESIGN, LIMITS, MANUAL_QA, deployment and feature notes
 ```
+
+Layer boundaries are lint errors (`eslint.config.js`): `domain` imports nothing app-side; `ui` never imports
+`app`/`features`/`data`/`services`; `data` and `services` never import screens; `i18n` only reads `domain` types.
 
 ## Commands
 
@@ -39,3 +42,22 @@ npm run dev
 npm run build
 cd worker && npm test
 ```
+
+### Testing in real WebKit (Safari's engine)
+
+iPhone-only bugs need WebKit, not Chromium pretending to be Safari. Install it once into a separate folder (the
+shared Chromium in `/opt/pw-browsers` stays untouched), then run any e2e or PDF sample against it:
+
+```bash
+PLAYWRIGHT_BROWSERS_PATH=$HOME/.pw-webkit npx playwright install webkit && sudo npx playwright install-deps webkit
+PLAYWRIGHT_BROWSERS_PATH=$HOME/.pw-webkit npx playwright test --project=webkit e2e/brand-icon.spec.ts e2e/pdf-builder.spec.ts
+PLAYWRIGHT_BROWSERS_PATH=$HOME/.pw-webkit npx playwright test -c src/services/pdf/harness/playwright.config.ts --project=webkit
+```
+
+Playwright's WebKit contexts are ephemeral like Safari Private Browsing: IndexedDB refuses Blobs there, which is
+how the image-storage bug below was reproduced. Known driver limits (not app bugs): no `clipboard-write`
+permission, and `setOffline` + reload fails.
+
+**Images are stored as bytes, never Blobs** (`src/data/db.ts` ImageRow): on WebKit a picked photo stored as a Blob
+points at a temp file iOS deletes later, and private sessions refuse Blobs, so logos and photos vanished from
+PDFs. Rows from before 2026-11-27 are rewritten once at startup (`migrateBlobsToBytes`).

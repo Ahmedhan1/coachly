@@ -2,27 +2,29 @@
 
 > **ملخص بالعربي:** كل بيانات العملاء (أسماء، مقاسات، صور) بتفضل على آيفون المدرب. أي حاجة بتطلع للسيرفر
 > بتتشفّر على الآيفون الأول، بكلمة سر المدرب (النسخة الاحتياطية) أو بمفتاح جوه اللينك نفسه (صفحة العميل)،
-> فلا صاحب التطبيق ولا Cloudflare يقدروا يقروها. السيرفر يعرف بس: رقم الترخيص، رقم الجهاز، اشتراك الإشعارات،
-> ميعاد الإشعار، ونص عام من غير أسماء. الحدود بصراحة: مبرمج اشترى ترخيص سليم يقدر يستخرج نسخته، ولو المدرب
-> نسي كلمة السر النسخة السحابية بتضيع.
+> فلا صاحب التطبيق ولا Cloudflare يقدروا يقروها. السيرفر يعرف بس: حساب المدرب (الاسم، الإيميل، بصمة كلمة السر أو
+> حساب جوجل، وحالة الموافقة)، اشتراك الإشعارات، ميعاد الإشعار، ونص عام من غير أسماء عملاء. الحدود بصراحة:
+> مبرمج عنده حساب متوافق عليه يقدر يستخرج نسخة التطبيق، ولو المدرب نسي كلمة سر النسخة الاحتياطية النسخة
+> السحابية بتضيع.
 
 Status legend: **implemented** · **planned (phase N)** — phase numbers follow docs/PLAN.md. As of 2026-11-16
-almost everything here is planned; only the license token format (`shared/license.ts`) is being built now.
+almost everything here was planned; see each section's status. Accounts replaced licenses on 2026-11-26.
 
 ## 1. What is stored where
 
 | Where | What | Encrypted? | Who can read it |
 | --- | --- | --- | --- |
 | **Trainer's iPhone — IndexedDB (Dexie)** | Clients (names, phone, goals, injuries, measurements, photos), sessions, programs, payments, nutrition, settings, logo, PDF templates | Not encrypted at rest by the app (iOS device encryption + passcode protects it) | The trainer, anyone with the unlocked phone, and the app's own code |
-| same | `deviceId` (random UUID created at install), license token, data-bundle key (`dataKey`), latest-seen time (clock-rollback guard) | No | same |
+| same | account session token (`auth.token`) and last known account (`auth.account`: id, name, email, approval status) — device-local, never inside a backup | No | same |
 | same | Backup key (derived from the trainer's backup password) | Stored as a **non-extractable** `CryptoKey` so automatic backups can run without asking for the password every time — planned (phase 9); must be verified on a real iPhone that Safari persists CryptoKey objects in IndexedDB (MANUAL_QA) | the app only |
 | same | Optional AI API key (trainer's own) | No (device only) — planned (phase 10) | the app; sent only to the AI provider the trainer chose |
-| **Cloudflare D1** | licenses (license id, SHA-256 of the activation code, buyer name = the owner's customer, issue/expiry dates, features, revoked flag), device fingerprint `dev` (first 32 hex of SHA-256(deviceId)), activation time | No (no client data in it) | the owner (admin dashboard) and Cloudflare |
+| **Cloudflare D1** | trainer accounts (better-auth: name, email, password hash (scrypt) or Google account id, approval status, created/updated times), sessions (token, expiry, IP, user agent), short-lived verification rows (Google state, 3-minute one-time tokens) | Passwords hashed; no client data in it | the owner (admin dashboard) and Cloudflare |
+| same | plans (limits, end date), gyms (name, SHA-256 of the current invite code), gym memberships, and each gym trainer's client roster as a **PTK1 envelope** | Rosters: **Yes** — AES-GCM with the gym's team key, which only exists on the gym manager's phone, in their device backup, and in the invite link fragment (never sent to a server) | Rosters: the gym manager only. The rest: owner, Cloudflare |
 | same | push subscriptions (endpoint + keys), notification schedule (time slot + **generic** text with no client names, e.g. "عندك حصة بعد 30 دقيقة") | No | owner, Cloudflare |
 | same | client-page index: random page id, SHA-256 of its write token, size, updated-at, revoked flag; R2 usage counters; rate-limit counters | No | owner, Cloudflare |
-| **Cloudflare R2** | cloud backup (one per license) | **Yes** — AES-GCM, key from the trainer's password | only the trainer |
+| **Cloudflare R2** | cloud backup (one per account) | **Yes** — AES-GCM, key from the trainer's password | only the trainer |
 | same | client-page content and weekly check-ins | **Yes** — AES-GCM, key only in the link fragment | the trainer and whoever holds the link |
-| **Cloudflare Pages** | app code, encrypted data bundle (exercise data + 3D model), fonts | bundle encrypted with `dataKey` | public files; bundle needs the key from activation |
+| **Cloudflare Pages** | app code, exercise data + 3D model, fonts | No (public content; see docs/EXERCISE_PACK.md) | public files |
 | **Device backup file** (saved outside the app by the trainer: «حفظ في الملفات», WhatsApp/mail to self, any app the trainer picks) | full database + full-size photos | **Yes by default** — chunked PTB1 envelope (below). The app has no Google Drive / iCloud integration and the owner runs nothing for it | the trainer |
 | **Photo archive file** («أرشفة الصور القديمة») | old client/progress photos only (full size) + their metadata | Yes when the trainer gives a password (same PTB1 envelope) | the trainer |
 
@@ -33,14 +35,14 @@ are off by default and must show a clear Arabic warning before enabling — plan
 
 ## 2. What the server can and cannot see
 
-Can see: license id, device fingerprint, activation code hash, the buyer's name and license dates (the owner
-enters these), push subscription, notification time slots and generic text, encrypted blob sizes and
+Can see: the trainer's account (name, email, approval status, sign-in method; never the password itself),
+session metadata (IP, user agent), push subscription, notification time slots and generic text, encrypted blob sizes and
 timestamps, request IPs (Cloudflare logs).
 
 Also, only when the trainer chooses a logo on the install page (or asks for a "new icon" link inside the app):
 the generated home-screen icon set (180 px and 512 px icons, the logo ≤ 512 px, one launch image) and the brand
 colour, stored unencrypted in the app's D1 (`brands`, `brand_assets`) under a content hash, because iOS has to
-fetch them itself at "Add to Home Screen". Nothing else goes with them: no name, no device id, no license. The
+fetch them itself at "Add to Home Screen". Nothing else goes with them: no name, no device id, no account. The
 upload endpoint (`POST /api/brand`, deploy/app/src/brand.ts) accepts only same-origin requests with exact-size
 PNGs under fixed caps, and is rate-limited per IP (12 a day) and in total (1500 a day).
 
@@ -59,8 +61,8 @@ client-page key. A full dump of D1 + R2 gives an attacker ciphertext only.
   X25519 (<https://developer.mozilla.org/en-US/docs/Web/API/SubtleCrypto/deriveKey>). Argon2 would need a WASM
   library (memory-hungry; risky on old iPhones under memory pressure) → **not used**.
 - **Ed25519** in Web Crypto: Safari/iOS **17.0+** only (caniuse data as reported in search results on 2026-11-16, <https://caniuse.com/mdn-api_subtlecrypto_generatekey_ed25519>; page not opened directly);
-  X25519 enabled in WebKit in 2024. Since we support 16.4, the app verifies licenses with **@noble/ed25519**
-  (pure JS, MIT) — no dependency on Web Crypto Ed25519.
+  X25519 enabled in WebKit in 2024. (The app used @noble/ed25519 for licenses until 2026-11-26; licenses are
+  gone and nothing uses Ed25519 any more.)
 
 ### Password → key (cloud backup and local backup file) — planned (phase 4 local, phase 9 cloud)
 
@@ -104,7 +106,7 @@ Link format: `https://<app-host>/c/<pageId>#k=<base64url(32-byte key)>`
 Encrypted end-to-end to the browser push service per RFC 8291 (ECDH P-256 + HKDF + AES-128-GCM) and signed with
 VAPID (ES256), all with Web Crypto inside the Worker (Node's `web-push` package does not run on Workers). The
 text itself is stored in D1 in plain form, so it must stay **generic** (no client names) — enforced by building
-it from fixed templates in `src/i18n/ar.ts` with only a time/count inserted.
+it from fixed templates in `src/i18n/ar/` with only a time/count inserted.
 
 ### Device backup file envelope "PTB1" (implemented, `src/services/backup/chunkedEnvelope.ts`)
 
@@ -115,12 +117,12 @@ between files or truncated. Sealing/opening reads one chunk at a time from the B
 300-photo / 19 MB test never hands Web Crypto more than one chunk). Older single-message PTP1 files still open.
 The cloud copy keeps PTP1 (thumbnails, small).
 
-- **Why not the license `dataKey`?** It is one key shared by every licence (it unlocks the exercise bundle), so a
-  file sealed with it would be readable by any trainer. Device files use the trainer's password only.
+- **Why not a server-provided key?** Any key the server hands out could be read by the owner or shared between
+  trainers. Device files use the trainer's password only.
 - **Remembered password.** For the one-tap weekly file the trainer may keep the file password on this phone
   (`backup.filePassword`, device-local, same treatment as `backup.cloudPassword`). It protects the copy that
   leaves the phone, not the phone itself (the IndexedDB data is already there in clear).
-- **Device-local keys never travel.** Meta keys starting `license.` or `backup.` (licence token, `dataKey`,
+- **Device-local keys never travel.** Meta keys starting `auth.` or `backup.` (session token, account,
   passwords, backup status) are excluded from every backup and kept untouched by a restore (tested in
   `src/services/backup/deviceBackup.test.ts`).
 - **Photo archives cannot wipe data.** Their manifest is `kind: "photos"`, `formatVersion: 2`: older app versions
@@ -137,38 +139,50 @@ The cloud copy keeps PTP1 (thumbnails, small).
   Persisted storage is not evicted under storage pressure; non-persisted origins can be. Deleting the home-screen
   app still deletes everything, which is why the device file is the primary safety net.
 
-## 4. License key handling
+## 4. Accounts and sessions
 
-Contract in CLAUDE.md; implemented in `shared/license.ts` (phase 3, in progress by another agent).
+Contract in CLAUDE.md ("Account contract"); server in `worker/src/auth`, app in `src/services/auth`. Licenses,
+activation codes and the Ed25519 key were removed on 2026-11-26.
 
-- **Ed25519 private key**: lives only as the Worker secret `LICENSE_PRIVATE_KEY` and in the owner's offline copy
-  (e.g. password manager + a USB stick). Never in the repo (`.gitignore` blocks `*.pem`, `*.key`, `keys/`,
-  `.dev.vars`), never in the site bundle. The public key is embedded in the app.
-- **Activation code**: 12 characters from a 30-symbol alphabet → 30¹² ≈ 5.3 × 10¹⁷ (~59 bits). D1 stores
-  `SHA-256(code)` so a leaked database does not reveal unused codes. Codes expire at `actBy` and are single-use
-  (bound to the first device fingerprint).
-- **License token** is bound to `dev` = first 32 hex chars of SHA-256(deviceId); on another install the
-  fingerprint differs and verification fails.
-- **Clock rollback**: the app stores the latest time it has seen; a jump back of more than 24 h locks
-  time-limited licenses (lifetime licenses unaffected).
-- **Admin dashboard** (`/admin/*`): protected by the `ADMIN_PASSWORD` secret, compared in constant time, login
-  rate-limited, session cookie `HttpOnly; Secure; SameSite=Strict`, short expiry — planned (phase 3).
-- **Offline long code** (`PT1.<token>`) is produced by the owner's tool in `tools/` on the owner's computer,
-  with the private key read from a local file outside the repo — planned (phase 3).
+- **Secrets** (Worker only, never in the repo or the bundle): `BETTER_AUTH_SECRET` (signs cookies/tokens and
+  derives the Worker's HMAC keys for IP hashing and admin sessions), `ADMIN_PASSWORD`, `GOOGLE_CLIENT_SECRET`.
+- **Passwords**: better-auth hashes them (scrypt). Minimum 8 characters. No email is ever sent, so there is no
+  "forgot password" mail: the owner sets a new password in /admin, which also ends every session of the account.
+- **Approval**: new accounts are `pending` (`status` cannot be set by a sign-up request); only `approved`
+  accounts pass `authenticate()` for cloud endpoints. Disabling keeps sessions so the app learns "disabled".
+- **Session token** is sent only as `Authorization: Bearer`. A cookie alone never authorises a cloud call (tested),
+  and the app calls the Worker with `credentials: 'omit'`.
+- **Google**: the OAuth flow runs entirely on the Worker's own site (first-party state cookie). The session reaches
+  the app through a single-use, hashed, 3-minute one-time token in the URL fragment (never sent to a server by the
+  browser); the Worker clears its cookies after the handoff. The return origin must be one of `APP_ORIGIN`.
+- **Only the auth endpoints the app uses are reachable** (`worker/src/auth/routes.ts` allow-list); the rest of
+  better-auth's API answers 404. better-auth telemetry is switched off.
+- **Admin dashboard** (`/admin/*`): protected by `ADMIN_PASSWORD`, compared in constant time, login rate-limited,
+  session cookie `HttpOnly; Secure; SameSite=Strict`, 12-hour expiry, same-origin form posts only.
+
+### Gyms (2026-11-26)
+
+- A gym manager sees a **summary** of each approved trainer's clients (names, package, sessions left, dates, last
+  attended session, attention flag), never phones, notes, measurements, injuries or photos (`buildRoster`, tested).
+  Trainers joining a gym are told the gym will see it; leaving the gym deletes their roster on the server.
+- Anyone holding an invite link can read rosters uploaded with that key **if** they could also download them, which
+  requires the gym manager's session. A new invite code does not change the key; a manager who suspects the key leaked
+  should ask the owner to recreate the gym (new key). Known, accepted.
+- Gym approval never changes a trainer's own approval by the owner; owner disable always wins (`resolveAccess`).
 
 ## 5. Rate limiting and endpoint protection — planned (phase 3, extended in phase 9)
 
-- Every endpoint except `/api/activate` and the public client-page read requires a valid license token
-  (signature + not revoked) or a page write token.
-- Limits (starting values): activation 10 attempts / 10 min per IP and 5 per code; status check 60 / hour per
-  license; backup upload 4 / day per license and the per-license size cap from docs/LIMITS.md; client-page reads 120 /
+- Every cloud endpoint requires an approved account session (or a page write token for client uploads); the
+  public client-page read and the auth endpoints are the exceptions.
+- Limits (starting values): sign-in / sign-up / one-time-token 20 / 10 min per IP and 600 / hour in total (D1),
+  plus better-auth's own per-IP limiter; session reads 240 / hour per IP (memory); backup upload 4 / day per
+  account and the per-account size cap from docs/LIMITS.md; client-page reads 120 /
   hour per pageId; check-in writes 20 / day per pageId, max 5 MB each.
 - Mechanism: Cloudflare's Rate Limiting binding if it is confirmed available on the Free plan (docs/LIMITS.md says
   this is not yet verified; it is approximate and per location), otherwise a D1 counter table keyed by
   `(key, minute bucket)` with an index and daily cleanup (fits the D1 write budget in docs/LIMITS.md). **Not KV**
   (1,000 writes/day).
-- Responses never reveal whether a code exists vs. is used beyond the contract's `invalid | used | expired |
-  rate_limited`.
+- A wrong email and a wrong password get the same answer (`INVALID_EMAIL_OR_PASSWORD`).
 - Every Cloudflare call from the app has a short timeout and fails silently (golden rule) — rate limiting can
   never lock the trainer out of the app itself.
 
@@ -176,16 +190,16 @@ Contract in CLAUDE.md; implemented in `shared/license.ts` (phase 3, in progress 
 
 | Threat | Mitigation | Residual risk |
 | --- | --- | --- |
-| Cloudflare / server breach or a curious owner | Only ciphertext for client data; generic push text; hashed codes | Metadata (who is a customer, sizes, times) is visible |
-| Someone copies the site files | Data bundle encrypted, key delivered only on activation | Low |
-| One code shared with a friend | Code is single-use and bound to the first device | Owner can move/revoke; low |
-| Paying programmer extracts the app + `dataKey` from their own phone (Web Inspector, backup extraction) | None that is free and offline-safe | **Accepted.** They get a working unlicensed copy for themselves or others. True for every offline app; not worth more complexity (owner agreed in the spec). |
-| Forged license token | Ed25519 signature; private key never shipped | Private-key theft from owner's machine → rotate key, ship new public key |
-| Clock set back to extend a time-limited license | Latest-seen-time guard (24 h) | A user who never lets the clock move forward can stretch it a little; lifetime licenses unaffected |
-| Lost / stolen iPhone | iOS passcode + device encryption; cloud backup restorable to a new device via owner's "move device" | Thief with the passcode sees everything in the app; the app has no separate PIN yet (open question) |
+| Cloudflare / server breach or a curious owner | Only ciphertext for client data; generic push text; hashed passwords | Metadata (who is a customer, sizes, times) is visible |
+| Someone copies the site files | The app opens only after an approved sign-in on that device | Low |
+| One account shared with a friend | Owner sees the accounts and can disable one; sessions are per device | Sharing a password works until the owner notices; accepted |
+| An approved user extracts the app from their own phone (Web Inspector, backup extraction) and edits the local account state | None that is free and offline-safe | **Accepted.** They get a working copy without cloud features (the Worker still checks every cloud call). True for every offline app. |
+| Stolen session token | Bearer token only in device-local storage, HTTPS only, owner can disable the account or set a new password (ends sessions) | Valid until then |
+| Leaked `BETTER_AUTH_SECRET` | Worker secret only | Rotate it: every trainer signs in again; local data unaffected |
+| Lost / stolen iPhone | iOS passcode + device encryption; cloud backup restorable on a new device by signing in to the same account | Thief with the passcode sees everything in the app; the app has no separate PIN yet (open question) |
 | Client-page link forwarded | Bearer link; revoke + renew | Anyone with the link reads it until revoked |
 | XSS in the app or client page (would expose keys and data) | No third-party scripts, strict CSP, React escaping, no `dangerouslySetInnerHTML`, Zod validation on every input and on decrypted content | Supply-chain risk of dependencies → pinned versions + license/audit review per phase |
-| Brute-forcing activation codes | ~59-bit codes + rate limiting | Negligible |
+| Guessing passwords | Min 8 characters, scrypt, per-IP + global rate limits | Weak passwords remain weak |
 | Brute-forcing a stolen backup's password | PBKDF2 with high iteration count + salt; minimum length | Weak passwords remain weak — strength hint only |
 | iOS evicts website storage under disk pressure | `navigator.storage.persist()` (boot + Settings button), image downscaling, photo archiving, weekly device-file reminder (Home card), optional cloud copy | Data since the last device file |
 | Trainer enables AI / webhooks | Off by default, explicit Arabic warning, trainer's own keys/endpoints | Data goes to the provider the trainer chose |
@@ -201,12 +215,12 @@ Server side of cloud backup, Web Push and the client page, built 2026-11-16 in `
 steps: `docs/CLOUD.md`). Sections 1, 3 and 5 above described these as planned; this is what was built and where
 it differs.
 
-- **Auth on every non-public endpoint**: license token signature + not revoked/replaced in D1 + not expired
-  (`worker/src/cloud/auth.ts`); per-IP memory pre-filter before the signature check, then a per-license (or
+- **Auth on every non-public endpoint**: an approved account's session token (better-auth session in D1;
+  `worker/src/cloud/auth.ts`); per-IP memory pre-filter before the session lookup, then a per-account (or
   per-device for push) D1 rate limit. Public endpoints: `GET /api/push/vapid`, `GET /api/share/:id`,
   `POST /api/share/:id/checkins`, `GET /c/:id` — each rate-limited (per IP, plus per page id where it applies).
 - **Cloud backup**: R2 stores only the PTP1 envelope; the Worker checks the 4-byte magic and the size, never the
-  content. Two slots per license with a D1 pointer, so an interrupted upload can never destroy the latest copy.
+  content. Two slots per account with a D1 pointer, so an interrupted upload can never destroy the latest copy.
   Per-trainer cap 100 MiB; global guard `storage_full` at 9 GiB (tracked in D1, no bucket listing).
 - **Client page**: as planned in section 3 — key only in the fragment; `writeToken = HKDF-SHA-256(k, salt = empty,
   info = "pt-checkin-write")`; D1 stores `base64url(SHA-256(writeToken))`; check-ins are accepted only with the

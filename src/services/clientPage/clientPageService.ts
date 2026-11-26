@@ -1,5 +1,5 @@
 import { generateRawKey, openWithKey, sealWithKey } from '../../../shared/envelope';
-import { base64UrlDecode, base64UrlEncode } from '../../../shared/license';
+import { base64UrlDecode, base64UrlEncode } from '../../../shared/bytes';
 import { parseCheckin, type CheckinDocumentV1, type ShareDocumentV1 } from '@/domain/clientPage';
 import { err, ok, type Result } from '@/domain/nutrition/result';
 import type { CloudError } from '@/services/cloud/types';
@@ -11,7 +11,7 @@ export interface ClientShare {
   key: string;
 }
 
-export type ShareError = CloudError | 'not_activated' | 'revoked' | 'too_many_shares';
+export type ShareError = CloudError | 'not_signed_in' | 'revoked' | 'too_many_shares';
 
 const enc = new TextEncoder();
 const dec = new TextDecoder();

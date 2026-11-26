@@ -1,6 +1,6 @@
 import { Color, Mesh, MeshStandardMaterial, type Material, type Object3D } from 'three';
 import type { MuscleGroupId } from '@/domain/exercises';
-import { paletteFill, type MuscleIntensities, type MuscleMapPalette } from './palette';
+import { paletteFill, type MuscleIntensities, type MuscleMapPalette } from '@/domain/exercises/musclePalette';
 import { roleOfObject } from './meshNames';
 
 /** Reads the theme's muscle colours as hex (CSS variables resolved); the defaults match tokens.css light. */

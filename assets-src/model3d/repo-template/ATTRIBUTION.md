@@ -1,7 +1,7 @@
 # Attribution text for the app's "About" screen (عن التطبيق)
 
 Replace `<MODEL_REPO_URL>` with the public GitHub repo URL once it exists. In the app these strings belong in
-`src/i18n/ar.ts` (Arabic) — not hard-coded in a component.
+`src/i18n/ar/` (Arabic) — not hard-coded in a component.
 
 ## English
 

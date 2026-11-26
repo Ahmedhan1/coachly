@@ -3,7 +3,7 @@ import type { CloudBackupClient, CloudBackupInfo, CloudError, TokenProvider } fr
 import { openBackup } from './localBackupService';
 import type { ImportError, ImportOptions, ImportSummary } from './types';
 
-export type CloudRestoreError = CloudError | ImportError | 'not_activated';
+export type CloudRestoreError = CloudError | ImportError | 'not_signed_in';
 
 export interface CloudRestoreDeps {
   client: CloudBackupClient;
@@ -18,14 +18,14 @@ export class CloudRestoreService {
   /** What is on the server (size, date), or null when nothing is stored. */
   async info(): Promise<Result<CloudBackupInfo | null, CloudRestoreError>> {
     const token = await this.deps.tokens.getToken();
-    if (!token) return err('not_activated');
+    if (!token) return err('not_signed_in');
     return this.deps.client.head(token);
   }
 
   async restore(password: string, options: Omit<ImportOptions, 'password'> = {}): Promise<Result<ImportSummary, CloudRestoreError>> {
     try {
       const token = await this.deps.tokens.getToken();
-      if (!token) return err('not_activated');
+      if (!token) return err('not_signed_in');
       options.onProgress?.({ phase: 'read', done: 0, total: 1 });
       const downloaded = await this.deps.client.download(token);
       if (!downloaded.ok) return downloaded;

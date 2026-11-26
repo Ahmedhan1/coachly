@@ -1,7 +1,7 @@
 import { z } from 'zod';
 import { DEFAULT_MODEL, addTask, parseTasks, removeTask, toggleTask, type Task } from '@/domain/ai';
 import { AI_KEY } from '@/features/online/integrations';
-import type { MetaStore } from '@/services/license/metaStore';
+import type { MetaStore } from '@/data/metaStore';
 
 /** Device-local (`backup.` prefix: never inside a backup file, never synced). */
 export const AI_SETTINGS_KEY = 'backup.ai.settings';

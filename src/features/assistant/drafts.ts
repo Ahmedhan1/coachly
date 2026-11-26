@@ -17,7 +17,7 @@ import {
 } from '@/domain/ai';
 import type { Client } from '@/domain/models';
 import { err, ok, type Result } from '@/domain/nutrition/result';
-import { loadBuiltinCatalog } from '@/features/programs/catalog';
+import { loadBuiltinCatalog } from '@/app/catalog';
 import { newLocalId } from '@/features/programs/ids';
 import { getLocale, t } from '@/i18n';
 import type { AiConfig, AiService } from '@/services/ai/aiService';

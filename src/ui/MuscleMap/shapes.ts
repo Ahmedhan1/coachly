@@ -1,7 +1,7 @@
 import type { MuscleGroupId } from '@/domain/exercises';
 
 /**
- * Front and back body for a 100×230 viewBox, adapted from the design agent's map (design/build.mjs).
+ * Front and back body for a 100×230 viewBox, adapted from the design-phase mockup map.
  * Each list holds paths for the LEFT half of the figure (x ≤ 50); the component mirrors them for the right
  * half, so one region = both sides of one muscle group. Drawing order = list order (later on top).
  */

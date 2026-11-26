@@ -1,26 +1,24 @@
 import { expect, type Download, type Page } from '@playwright/test';
 
-export const DEMO_CODE = 'ABCD-EFGH-JKMN';
+export const GUEST_BUTTON = 'ادخل كضيف (للتجربة)';
 export const ADD_BUTTON = 'إضافة: عميل، حصة، برنامج';
 
-/** Fake activation with the demo code (e2e build). Leaves the app on the identity setup screen. */
-export async function activateWithFakeCode(page: Page, path = '/'): Promise<void> {
+/** "Continue as guest" (dev and e2e builds only). Leaves the app on the identity setup screen. */
+export async function enterAsGuest(page: Page, path = '/'): Promise<void> {
   await page.goto(`${path}${path.includes('?') ? '&' : '?'}standalone=1`);
-  await page.getByLabel('كود التفعيل').fill(DEMO_CODE);
-  await page.getByRole('button', { name: 'تفعيل', exact: true }).click();
+  await page.getByRole('button', { name: GUEST_BUTTON }).click();
 }
 
-/** Opens the app past the install gate (e2e bypass), activation (fake service) and identity setup (skipped). */
+/** Opens the app past the install gate (e2e bypass), sign-in (guest) and identity setup (skipped). */
 export async function openApp(page: Page, path = '/'): Promise<void> {
   await page.goto(`${path}${path.includes('?') ? '&' : '?'}standalone=1`);
-  const codeField = page.getByLabel('كود التفعيل');
+  const guest = page.getByRole('button', { name: GUEST_BUTTON });
   const later = page.getByRole('button', { name: 'بعدين' });
   const tabs = page.getByRole('navigation', { name: 'التنقل الرئيسي' });
   const backToClients = page.getByRole('link', { name: 'رجوع للعملاء' });
-  await expect(codeField.or(later).or(tabs).or(backToClients)).toBeVisible();
-  if (await codeField.isVisible()) {
-    await codeField.fill(DEMO_CODE);
-    await page.getByRole('button', { name: 'تفعيل', exact: true }).click();
+  await expect(guest.or(later).or(tabs).or(backToClients)).toBeVisible();
+  if (await guest.isVisible()) {
+    await guest.click();
     await expect(later.or(tabs)).toBeVisible();
   }
   if (await later.isVisible()) await later.click();
@@ -77,4 +75,32 @@ export async function saveDeviceBackup(page: Page, password: string | null): Pro
   await page.getByRole('button', { name: 'أيوه، لقيته' }).click();
   await expect(page.getByText('النسخة اتحفظت برة التطبيق')).toBeVisible();
   return file;
+}
+
+/**
+ * Waits until the running session the app keeps in IndexedDB (meta 'session.active') has `doneSets` sets marked
+ * done. The app saves after every tap, but asynchronously: a reload in the same few milliseconds would simulate
+ * the phone dying mid-write, not the app being reopened, so tests that reload wait for the save first.
+ */
+export async function waitForSavedSession(page: Page, doneSets: number): Promise<void> {
+  await expect
+    .poll(
+      () =>
+        page.evaluate(async () => {
+          const db: IDBDatabase = await new Promise((res, rej) => {
+            const r = indexedDB.open('pt-coach');
+            r.onsuccess = () => res(r.result);
+            r.onerror = () => rej(r.error);
+          });
+          const row: { value?: { exercises?: { sets: { done: boolean }[] }[] } } | undefined = await new Promise((res) => {
+            const r = db.transaction('meta').objectStore('meta').get('session.active');
+            r.onsuccess = () => res(r.result as never);
+            r.onerror = () => res(undefined);
+          });
+          db.close();
+          return (row?.value?.exercises ?? []).flatMap((e) => e.sets).filter((s) => s.done).length;
+        }),
+      { timeout: 5_000 },
+    )
+    .toBe(doneSets);
 }

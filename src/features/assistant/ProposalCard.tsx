@@ -1,7 +1,7 @@
 import { useServices } from '@/app/services';
 import { useLive } from '@/app/useLive';
 import { whatsappLink } from '@/domain/whatsapp/templates';
-import { deviceZone } from '@/features/schedule/zone';
+import { deviceZone } from '@/app/deviceZone';
 import { t } from '@/i18n';
 import { Button } from '@/ui';
 import type { ExecError } from './executor';
@@ -104,6 +104,7 @@ function WhatsappButton({ clientId, text, onOpened }: { clientId: string; text: 
 }
 
 function reason(code: ExecError): string {
+  if (code === 'client_limit') return t('assistant.execErrors.client_limit');
   if (code === 'not_found' || code === 'no_package' || code === 'invalid') return t(`assistant.execErrors.${code}`);
   return t(`assistant.errors.${code}`);
 }

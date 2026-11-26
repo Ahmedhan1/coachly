@@ -73,25 +73,6 @@
   grid-column: 1 / -1;
 }
 
-.unitRow .chip,
-.chip {
-  position: relative;
-  display: inline-flex;
-  align-items: center;
-  min-block-size: 36px;
-  padding-inline: var(--sp-3);
-  border: 1px solid var(--line);
-  border-radius: var(--r-control);
-  background: var(--bg);
-  color: var(--text-2);
-  font: var(--t-control);
-}
-
-.chip[aria-pressed='true'] {
-  border-color: var(--text);
-  background: var(--text);
-  color: var(--bg);
-}
 
 .chips {
   display: flex;

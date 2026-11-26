@@ -22,7 +22,7 @@ mkdirSync(shotDir, { recursive: true });
 const entry = join(outDir, 'entry.ts');
 writeFileSync(
   entry,
-  `export { viewerHtml, viewerHeaders } from ${JSON.stringify(join(here, '../src/share/page.ts'))};
+  `export { viewerHtml, viewerHeaders, viewerFont } from ${JSON.stringify(join(here, '../src/share/page.ts'))};
 export { sealWithKey, openWithKey, generateRawKey } from ${JSON.stringify(join(here, '../../shared/envelope.ts'))};
 export { parseCheckinDocument } from ${JSON.stringify(join(here, '../src/share/document.ts'))};
 export { SAMPLE_DOCUMENT } from ${JSON.stringify(join(here, '../test/sampleDocument.ts'))};
@@ -86,6 +86,10 @@ try {
       postedFile = { body: req.postDataBuffer(), token: req.headers()['x-checkin-token'], kind: url.searchParams.get('kind') };
       return route.fulfill({ status: 201, contentType: 'application/json', body: '{"id":"f"}' });
     }
+    if (url.origin === ORIGIN && url.pathname.startsWith('/c/_/')) {
+      const font = lib.viewerFont(url.pathname);
+      if (font) return route.fulfill({ status: 200, headers: Object.fromEntries(font.headers), body: Buffer.from(await font.arrayBuffer()) });
+    }
     if (url.origin === APP && url.pathname.startsWith('/exercise-pack/img/')) {
       return route.fulfill({ status: 200, contentType: 'image/png', body: bigPhoto });
     }
@@ -103,6 +107,13 @@ try {
   await step('decrypts a document sealed by shared/envelope.ts and renders it', async () => {
     await page.goto(`${ORIGIN}/c/${shareId}#k=${b64url(key)}`);
     await page.waitForSelector('body[data-ready="1"]', { timeout: 10_000 });
+    // The app's font, served by the page's own origin (no third party): Arabic and Latin faces both load.
+    const fonts = await page.evaluate(async () => {
+      await document.fonts.ready;
+      return { ar: document.fonts.check('16px Rubik', 'أهلاً'), la: document.fonts.check('16px Rubik', '2400'), family: getComputedStyle(document.body).fontFamily };
+    });
+    assert.ok(fonts.ar && fonts.la, `Rubik not loaded: ${JSON.stringify(fonts)}`);
+    assert.ok(fonts.family.startsWith('Rubik'), fonts.family);
     const text = await page.textContent('#app');
     // nextDay = 1 opens day 2 first; day 1 is one tap away.
     assert.ok(text.includes('هيب ثرست'), 'next day not shown first');
@@ -117,9 +128,13 @@ try {
     assert.equal(await page.locator('#brand img.logo').count(), 1, 'trainer logo');
     assert.equal(await page.textContent('.brand-name'), 'كابتن سارة فيتنس');
     assert.equal(await page.title(), 'كابتن سارة فيتنس');
-    const brand = await page.evaluate(() => getComputedStyle(document.getElementById('brand')).backgroundColor);
+    // The trainer's colour fills the next-session card (the page's one brand block).
+    const brand = await page.evaluate(() => getComputedStyle(document.querySelector('.next')).backgroundColor);
     assert.equal(brand, 'rgb(200, 30, 58)');
     assert.equal(await page.getAttribute('html', 'dir'), 'rtl');
+    // Ranges and tempos sit in their own LTR isolate, so "8-10" never shows as "10-8" inside Arabic.
+    assert.ok((await page.locator('.ex-main .num').allTextContents()).includes('8-10'), 'rep range isolated');
+    assert.ok((await page.locator('.chip .num').allTextContents()).includes('3-1-1'), 'tempo isolated');
     await page.waitForFunction(() => document.querySelector('.ex-img')?.complete);
     assert.equal(await page.getAttribute('.ex-img', 'src'), `${APP}/exercise-pack/img/Barbell_Bench_Press_-_Medium_Grip-0.webp`);
     await page.screenshot({ path: join(shotDir, 'viewer-program-light.png'), fullPage: true });
@@ -241,7 +256,7 @@ try {
     const files = shots.map((s, i) => ({ name: `p${i}.${s.type === 'png' ? 'png' : 'jpg'}`, mimeType: `image/${s.type}`, buffer: s.buffer }));
     const thumbCount = () => safari.locator('#p-checkin .thumb').count();
     const addButton = safari.locator('#p-checkin .add-photo');
-    assert.equal((await addButton.textContent()).trim(), '+ أضف صورة', 'Arabic add-photo button, not the browser\'s "Choose Files"');
+    assert.equal((await addButton.textContent()).trim(), 'أضف صورة', 'Arabic add-photo button, not the browser\'s "Choose Files"');
     const addBox = await addButton.boundingBox();
     assert.ok(addBox && addBox.height >= 44, `add-photo height ${addBox?.height}`);
     await safari.locator('#p-checkin .add-photo').scrollIntoViewIfNeeded();
@@ -340,7 +355,7 @@ try {
     await page.goto(`${ORIGIN}/c/${shareId}#k=${b64url(key)}`);
     await page.waitForSelector('body[data-ready="1"]');
     const bg = await page.evaluate(() => getComputedStyle(document.body).backgroundColor);
-    assert.equal(bg, 'rgb(11, 12, 12)');
+    assert.equal(bg, 'rgb(19, 18, 17)'); // Pebble dark --bg #131211
     await page.screenshot({ path: join(shotDir, 'viewer-program-dark.png'), fullPage: true });
   });
   await step('an English document (lang: en) renders LTR with English labels, light and dark', async () => {

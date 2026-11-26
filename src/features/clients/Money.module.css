@@ -6,22 +6,6 @@
   gap: var(--sp-5);
 }
 
-.save {
-  position: relative;
-  min-block-size: 36px;
-  padding-inline: var(--sp-4);
-  border-radius: var(--r-control);
-  background: var(--brand);
-  color: var(--brand-on);
-  font: var(--t-button);
-}
-
-.save::after {
-  content: '';
-  position: absolute;
-  inset: -4px 0;
-}
-
 .pair {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -30,28 +14,6 @@
 
 .pair input {
   min-inline-size: 0;
-}
-
-.payRow {
-  display: flex;
-  align-items: center;
-  background: var(--surface);
-  padding-inline-end: var(--sp-3);
-}
-
-.payMain {
-  flex: 1;
-  min-inline-size: 0;
-}
-
-.amount {
-  font: var(--t-num);
-}
-
-.pkgActions {
-  display: flex;
-  gap: var(--sp-2);
-  margin-block-start: var(--sp-3);
 }
 
 .hint {

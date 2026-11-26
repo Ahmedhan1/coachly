@@ -2,6 +2,7 @@
 import type { EnArea } from './types';
 
 export const files: EnArea<'files'> = {
+  recovered: '{n} photos came back from the cloud copy',
   clientPhoto: {
     add: 'Add photo',
     change: 'Change photo',

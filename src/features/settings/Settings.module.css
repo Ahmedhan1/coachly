@@ -9,6 +9,7 @@
   border-radius: var(--r-lg);
   background: var(--surface);
   --field-bg: var(--surface-2);
+  box-shadow: var(--shadow-card);
 }
 
 .cardHead {
@@ -51,19 +52,6 @@
   gap: var(--sp-4);
 }
 
-.sheetSave {
-  min-block-size: var(--tap);
-  padding-inline: var(--sp-2);
-  border: 0;
-  background: none;
-  color: var(--brand-ink);
-  font: var(--t-button);
-}
-
-.sheetSave:disabled {
-  opacity: 0.4;
-}
-
 .check {
   display: flex;
   align-items: flex-start;
@@ -83,28 +71,6 @@
   display: block;
   color: var(--text-2);
   font: var(--t-caption);
-}
-
-.fileButton {
-  position: relative;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  min-block-size: 50px;
-  padding-inline: var(--sp-4);
-  overflow: hidden;
-  border-radius: var(--r-md);
-  background: var(--surface-2);
-  color: var(--text);
-  font: var(--t-callout);
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
-.fileInput {
-  position: absolute;
-  inset: 0;
-  opacity: 0;
 }
 
 .grid {

@@ -8,7 +8,7 @@ import { recipeIconHex } from '@/domain/meals';
 import type { Recipe } from '@/domain/models';
 import { t } from '@/i18n';
 import { pick } from '@/i18n/locale';
-import { Button, EmptyState, IconButton, ListRow, ListSection, PageHeader, SearchField, SwipeRow } from '@/ui';
+import { Button, Chip, EmptyState, IconButton, ListRow, ListSection, PageHeader, SearchField, SwipeRow } from '@/ui';
 import { useRecipesWithNutrition } from '../meals/useRecipeLookup';
 import { gramsText, kcalText } from '../shared/numbers';
 import { FoodPhotosOffline } from '../shared/FoodPhotosOffline';
@@ -36,9 +36,9 @@ export function RecipesScreen() {
   const photoStems = [...new Set([...(recipes ?? []).flatMap((r) => (r.recipe.photo ? [r.recipe.photo] : [])), ...(foods ?? []).flatMap((f) => (f.photo ? [f.photo] : []))])];
   const cuisines = RECIPE_CUISINES.filter((c) => (recipes ?? []).some((r) => r.recipe.cuisine === c));
   const chip = (key: string, label: string, pressed: boolean, onClick: () => void) => (
-    <button key={key} type="button" className={styles.chip} aria-pressed={pressed} onClick={onClick}>
+    <Chip key={key} pressed={pressed} onClick={onClick}>
       {label}
-    </button>
+    </Chip>
   );
   const starterSet = new Set(starter ?? []);
   const hasStarter = (recipes ?? []).some((r) => starterSet.has(r.recipe.id));

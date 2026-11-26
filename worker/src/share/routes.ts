@@ -1,6 +1,6 @@
 // Client page (feature 12): encrypted page content per client, plus weekly check-ins from the client's browser.
 // The key lives only in the link fragment (#k=...), so the Worker stores and serves ciphertext only.
-import { base64UrlDecode, base64UrlEncode } from '../../../shared/license';
+import { base64UrlDecode, base64UrlEncode } from '../../../shared/bytes';
 import { authenticate } from '../cloud/auth';
 import { checkedStream, declaredLength } from '../cloud/stream';
 import { adjustUsage, storageFull, wouldOverfill } from '../cloud/usage';
@@ -18,7 +18,7 @@ const OCTET = 'application/octet-stream';
 
 interface ShareRow {
   share_id: string;
-  /** Account id (root license id), so the page follows the trainer to a new device. */
+  /** Account id (the user id), so the page follows the trainer to a new device. */
   lid: string;
   /** Lid in this page's R2 keys (page and check-ins) when it differs from `lid` (pages from before migration 0003). */
   key_lid: string | null;
@@ -66,7 +66,7 @@ async function putStream(deps: Deps, key: string, stream: ReadableStream<Uint8Ar
   }
 }
 
-/** Loads a share and checks it belongs to this license. */
+/** Loads a share and checks it belongs to this account. */
 async function ownedShare(deps: Deps, shareId: string, lid: string): Promise<{ ok: true; row: ShareRow } | { ok: false; response: Response }> {
   const row = await getShare(deps.cloud.db, shareId);
   if (row === null) return { ok: false, response: json({ error: 'not_found' }, 404) };
@@ -87,10 +87,10 @@ async function putShare(request: Request, deps: Deps, lid: string, shareId: stri
   if (existing?.revoked === 1) return json({ error: 'revoked' }, 410);
   if (existing === null) {
     const count = await cloud.db.prepare('SELECT COUNT(*) AS n FROM shares WHERE lid = ? AND revoked = 0').bind(lid).first<{ n: number }>();
-    if ((count?.n ?? 0) >= cloud.config.maxSharesPerLicense) return json({ error: 'too_many_shares' }, 409);
+    if ((count?.n ?? 0) >= cloud.config.maxSharesPerAccount) return json({ error: 'too_many_shares' }, 409);
   }
   if (await wouldOverfill(cloud, check.length, existing?.size ?? 0)) return storageFull();
-  if (await overPagesQuota(cloud.db, lid, check.length, existing?.size ?? 0, cloud.config.pagesLicenseMaxBytes)) return storageFull();
+  if (await overPagesQuota(cloud.db, lid, check.length, existing?.size ?? 0, cloud.config.pagesAccountMaxBytes)) return storageFull();
 
   const body = request.body;
   if (body === null) return json({ error: 'length_required' }, 411);
@@ -174,7 +174,7 @@ async function postCheckin(request: Request, deps: Deps, clientKey: string, shar
   if (!check.ok) return json(check.status === 413 ? { error: check.error, maxBytes: cloud.config.checkinMaxBytes } : { error: check.error }, check.status);
   const pending = await cloud.db.prepare('SELECT COUNT(*) AS n FROM checkins WHERE share_id = ?').bind(shareId).first<{ n: number }>();
   if ((pending?.n ?? 0) >= cloud.config.maxPendingCheckins) return json({ error: 'too_many_pending' }, 429);
-  if (await overPagesQuota(cloud.db, row.lid, check.length, 0, cloud.config.pagesLicenseMaxBytes)) {
+  if (await overPagesQuota(cloud.db, row.lid, check.length, 0, cloud.config.pagesAccountMaxBytes)) {
     return json({ error: 'too_many_pending' }, 429);
   }
   if (await wouldOverfill(cloud, check.length, 0)) return storageFull();

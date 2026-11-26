@@ -1,3 +1,4 @@
+import { reachedClientLimit } from '@/features/clients/clientLimit';
 import type { AppServices } from '@/app/services';
 import type { AiError, ProposedAction } from '@/domain/ai';
 import type { ClientId } from '@/domain/models';
@@ -16,7 +17,7 @@ import { draftMealDay, draftProgram } from './drafts';
  */
 
 export type Undo = () => Promise<void>;
-export type ExecError = 'not_found' | 'no_package' | 'invalid' | AiError;
+export type ExecError = 'not_found' | 'no_package' | 'invalid' | 'client_limit' | AiError;
 
 export interface Executed {
   undo: Undo | null;
@@ -46,6 +47,7 @@ export async function executeProposal(action: ProposedAction, d: ExecDeps): Prom
   try {
     switch (action.type) {
       case 'add_client': {
+        if ((await reachedClientLimit(d.services)) !== null) return err('client_limit');
         const settings = await repos.settings.get();
         const total = action.sessions ?? 0;
         const c = await repos.clients.create({

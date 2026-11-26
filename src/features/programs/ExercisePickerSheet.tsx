@@ -4,8 +4,8 @@ import { assessExercise, rankForClient, saferAlternatives, type ExerciseFit, typ
 import { t } from '@/i18n';
 import { Num, SearchField, Sheet, Tx, cx } from '@/ui';
 import { ExerciseThumb } from './ExerciseThumb';
-import { exName, muscleName } from '@/features/exercises/localized';
-import { exerciseSubline } from './names';
+import { exName, muscleName } from '@/i18n/exerciseNames';
+import { exerciseSubline } from '@/i18n/programNames';
 import styles from './Shared.module.css';
 
 const LIMIT = 60;

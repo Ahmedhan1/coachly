@@ -1,0 +1,86 @@
+.root {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-1);
+  min-inline-size: 0;
+}
+
+.label {
+  color: var(--text-2);
+  font: var(--t-caption);
+}
+
+.row {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-1);
+  padding: var(--sp-0);
+  border-radius: var(--r-md);
+  background: var(--field-bg, var(--surface-2));
+}
+
+.button {
+  display: grid;
+  flex: none;
+  place-items: center;
+  inline-size: var(--tap);
+  block-size: var(--tap);
+  border-radius: var(--r-control);
+  background: var(--surface);
+  color: var(--text);
+}
+
+.button:disabled {
+  opacity: 0.35;
+}
+
+.button:active:not(:disabled) {
+  background: var(--surface-2);
+}
+
+.button svg {
+  inline-size: 20px;
+  block-size: 20px;
+}
+
+.value {
+  display: flex;
+  flex: 1;
+  align-items: baseline;
+  justify-content: center;
+  gap: var(--sp-0);
+  min-inline-size: 0;
+}
+
+.input {
+  inline-size: 100%;
+  min-inline-size: 2ch;
+  border: 0;
+  background: none;
+  color: var(--text);
+  font: var(--t-num);
+  text-align: center;
+}
+
+.input:focus {
+  outline: none;
+}
+
+.unit {
+  color: var(--text-2);
+  font: var(--t-caption);
+}
+
+/* Session mode: one-handed, 56pt buttons. */
+.big .row {
+  padding: var(--sp-1);
+}
+
+.big .button {
+  inline-size: 56px;
+  block-size: 56px;
+}
+
+.big .input {
+  font: var(--t-num-lg);
+}

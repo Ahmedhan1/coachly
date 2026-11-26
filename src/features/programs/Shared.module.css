@@ -1,14 +1,5 @@
 /* Shared pieces of the programs area: glyphs, steppers, exercise thumbs, pickers and action sheets. */
 
-.glyph {
-  inline-size: var(--icon);
-  block-size: var(--icon);
-}
-
-.grip {
-  color: var(--text-3);
-}
-
 /* Toast sits above the pushed screen's bottom bar. */
 :global(html[data-pushed-screen='bar'] .toast-host),
 :global(html[data-pushed-screen='full'] .toast-host) {
@@ -90,90 +81,6 @@
   text-align: center;
 }
 
-/* Stepper */
-.stepper {
-  display: flex;
-  flex-direction: column;
-  gap: var(--sp-1);
-  min-inline-size: 0;
-}
-
-.stepperLabel {
-  color: var(--text-2);
-  font: var(--t-caption);
-}
-
-.stepperRow {
-  display: flex;
-  align-items: center;
-  gap: var(--sp-1);
-  padding: var(--sp-0);
-  border-radius: var(--r-md);
-  background: var(--surface-2);
-}
-
-.stepBtn {
-  display: grid;
-  flex: none;
-  place-items: center;
-  inline-size: var(--tap);
-  block-size: var(--tap);
-  border: 0;
-  border-radius: var(--r-control);
-  background: var(--surface);
-  color: var(--text);
-}
-
-.stepBtn:disabled {
-  opacity: 0.35;
-}
-
-.stepBtn svg {
-  inline-size: 20px;
-  block-size: 20px;
-}
-
-.stepValue {
-  display: flex;
-  flex: 1;
-  align-items: baseline;
-  justify-content: center;
-  gap: var(--sp-0);
-  min-inline-size: 0;
-}
-
-.stepInput {
-  inline-size: 100%;
-  min-inline-size: 2ch;
-  border: 0;
-  background: none;
-  color: var(--text);
-  font: var(--t-num);
-  text-align: center;
-}
-
-.stepInput:focus {
-  outline: none;
-}
-
-.stepUnit {
-  color: var(--text-2);
-  font: var(--t-caption);
-}
-
-.stepperBig .stepperRow {
-  padding: var(--sp-1);
-}
-
-.stepperBig .stepBtn {
-  inline-size: 56px;
-  block-size: 56px;
-}
-
-.stepperBig .stepInput {
-  font: var(--t-num-lg);
-}
-
 /* Set editor */
 .editor {
   display: flex;
@@ -204,44 +111,6 @@
 }
 
 .danger {
-  color: var(--danger);
-}
-
-/* Action sheet */
-.actionList {
-  margin: 0;
-  padding: 0;
-  list-style: none;
-}
-
-.actionRow {
-  display: flex;
-  align-items: center;
-  gap: var(--sp-3);
-  inline-size: 100%;
-  min-block-size: var(--row-h);
-  padding: 0;
-  border: 0;
-  border-block-end: var(--hairline) solid var(--line);
-  background: none;
-  color: var(--text);
-  font: var(--t-body);
-  text-align: start;
-}
-
-.actionRow:disabled {
-  opacity: 0.4;
-}
-
-.actionRow svg {
-  flex: none;
-  inline-size: 22px;
-  block-size: 22px;
-  color: var(--text-2);
-}
-
-.actionRow.danger,
-.actionRow.danger svg {
   color: var(--danger);
 }
 

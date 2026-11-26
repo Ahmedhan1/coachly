@@ -59,3 +59,26 @@ export const APP_SECURITY_HEADERS: Readonly<Record<string, string>> = {
   // the owner does not control sibling hosts.
   'Strict-Transport-Security': 'max-age=63072000',
 };
+
+/** Files that must be checked on every visit (an update must reach the phone). */
+export const APP_NO_CACHE_PATHS: readonly string[] = ['/', '/index.html', '/sw.js', '/registerSW.js', '/push-sw.js', '/manifest.webmanifest'];
+
+/** Content-hashed or never-changing files: cached for a year at the edge and on the phone. */
+export const APP_IMMUTABLE_PATHS: readonly string[] = ['/assets/*', '/fonts/*', '/exercise-pack/img/*'];
+
+/**
+ * The `_headers` file for Cloudflare Workers Static Assets (deploy/app): the security headers on every file, plus
+ * the cache rules. Generated at build (vite.config.ts) from the constants above, so production, `vite preview` and
+ * e2e can never drift apart.
+ */
+export function appHeadersFile(): string {
+  const block = (path: string, headers: Record<string, string>) =>
+    `${path}\n${Object.entries(headers)
+      .map(([k, v]) => `  ${k}: ${v}`)
+      .join('\n')}`;
+  return [
+    block('/*', APP_SECURITY_HEADERS),
+    ...APP_NO_CACHE_PATHS.map((p) => block(p, { 'Cache-Control': 'no-cache' })),
+    ...APP_IMMUTABLE_PATHS.map((p) => block(p, { 'Cache-Control': 'public, max-age=31536000, immutable' })),
+  ].join('\n\n') + '\n';
+}

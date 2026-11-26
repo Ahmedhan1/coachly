@@ -17,18 +17,3 @@
   border-radius: var(--r-sm);
   object-fit: cover;
 }
-
-.input {
-  position: absolute;
-  inset: 0;
-  opacity: 0;
-  cursor: pointer;
-}
-
-.remove {
-  min-block-size: var(--tap);
-  border: 0;
-  background: none;
-  color: var(--danger);
-  font: var(--t-label);
-}

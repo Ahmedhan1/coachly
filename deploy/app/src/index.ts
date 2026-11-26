@@ -1,6 +1,7 @@
 /**
- * Serves the installed PWA's files from D1 (table `files`). Used instead of Workers static assets because
- * the files are uploaded with the plain API token (deploy/app/upload.py). Responses are cached at the edge;
+ * Serves the installed PWA's files from D1 (table `files`), uploaded by deploy/app/upload.py (`npm run deploy`).
+ * With wrangler.assets.toml the same Worker runs in Workers Static Assets mode instead (faster; needs a deploy
+ * from a computer whose API token is not swapped by a proxy, see docs/DEPLOYMENT.md). Responses are cached at the edge;
  * the service worker then keeps everything on the phone, so D1 is read rarely.
  */
 import { APP_SECURITY_HEADERS } from '../../../shared/appHeaders';
@@ -8,6 +9,8 @@ import { brandRoute } from './brand';
 
 export interface Env {
   APP: D1Database;
+  /** Set only by wrangler.assets.toml (Workers Static Assets mode): files come from the edge, not D1. */
+  ASSETS?: Fetcher;
   /** Secret: lets deploy/app/upload.py write files (POST /__deploy/files, /__deploy/hashes). */
   UPLOAD_KEY?: string;
 }
@@ -119,6 +122,8 @@ export default {
     if (url.pathname.startsWith('/__deploy/')) return deploy(request, env, url.pathname);
     const brand = await brandRoute(request, env, url, ctx, SECURITY_HEADERS);
     if (brand) return brand;
+    // Static Assets mode (wrangler.assets.toml): Cloudflare serves files itself; this only runs for unknown paths.
+    if (env.ASSETS) return env.ASSETS.fetch(request);
     if (request.method !== 'GET' && request.method !== 'HEAD') return new Response('Method not allowed', { status: 405 });
     let path: string;
     try {

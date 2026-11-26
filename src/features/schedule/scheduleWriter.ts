@@ -12,7 +12,7 @@ import {
 import { addDays, type Client, type ClientId, type ProgramId, type Session } from '@/domain/models';
 import type { AttendanceStatus, RecurrenceError, ZonedClock } from '@/domain/schedule';
 import { ok, type Result } from '@/domain/nutrition/result';
-import type { MetaStore } from '@/services/license/metaStore';
+import type { MetaStore } from '@/data/metaStore';
 import { consumingStatuses, LATE_CANCEL_KEY, parseIdList, readPrefs, setLateCancel } from './prefs';
 
 /**

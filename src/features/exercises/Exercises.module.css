@@ -75,10 +75,6 @@
   flex: none;
 }
 
-.chips > button[aria-pressed='false'] {
-  background: var(--surface);
-}
-
 .activeChip {
   position: relative;
   display: inline-flex;
@@ -106,9 +102,7 @@
 
 .list {
   margin-inline: var(--gutter);
-  border-radius: var(--r-lg);
-  overflow: hidden;
-  background: var(--surface);
+  border-block-start: var(--hairline) solid var(--line);
   contain: layout paint;
 }
 

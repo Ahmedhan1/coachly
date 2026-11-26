@@ -29,7 +29,7 @@ export interface ChatService {
 export interface RelayConfig {
   /** Worker base URL (no trailing slash). */
   baseUrl: string;
-  /** License token for `Authorization: Bearer`; null = not activated (relay unavailable). */
+  /** Account session token for `Authorization: Bearer`; null = not signed in (relay unavailable). */
   getToken(): Promise<string | null>;
 }
 

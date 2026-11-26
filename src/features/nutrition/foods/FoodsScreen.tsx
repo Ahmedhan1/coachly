@@ -5,7 +5,7 @@ import { searchItems } from '@/data';
 import { FOOD_CATEGORIES, ingredientEntrySchema, shownMacros, type FoodCategory, type IngredientEntry, type Portion } from '@/domain/meals';
 import { t } from '@/i18n';
 import { pick } from '@/i18n/locale';
-import { Button, IconButton, ListRow, ListSection, Num, PageHeader, SearchField, Select, Sheet, SwipeRow, TextField, Tx } from '@/ui';
+import { Button, Chip, IconButton, ListRow, ListSection, Num, PageHeader, SearchField, Select, Sheet, SwipeRow, TextField, Tx } from '@/ui';
 import { FoodImage } from '../shared/FoodImage';
 import { PhotoField } from '../shared/PhotoField';
 import { fieldText, parseDecimal } from '../shared/numbers';
@@ -131,9 +131,9 @@ function FoodCalculator({ foods, onClose }: { foods: IngredientEntry[]; onClose:
         {food?.portions && food.portions.length > 0 && (
           <div className={styles.portions} role="group" aria-label={t('nutrition.foods.calcPortions')}>
             {food.portions.map((p) => (
-              <button key={p.label} type="button" className={common.chip} aria-pressed={g === p.grams} onClick={() => setGrams(String(p.grams))}>
+              <Chip key={p.label} pressed={g === p.grams} onClick={() => setGrams(String(p.grams))}>
                 {pick(p.label, p.labelEn)} <Num>{p.grams}</Num>
-              </button>
+              </Chip>
             ))}
           </div>
         )}
@@ -203,9 +203,9 @@ function FoodSheet({ food, onClose, onSave }: { food: IngredientEntry | null; on
       title={food ? t('nutrition.foods.editTitle') : t('nutrition.foods.newTitle')}
       cancelLabel={t('common.cancel')}
       primaryAction={
-        <button type="submit" form="food-form" className={common.sheetSave}>
+        <Button size="small" type="submit" form="food-form">
           {t('common.save')}
-        </button>
+        </Button>
       }
     >
       <form id="food-form" className={common.form} onSubmit={submit} noValidate>

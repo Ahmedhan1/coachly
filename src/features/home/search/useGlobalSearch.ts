@@ -3,8 +3,8 @@ import { useRepos } from '@/app/services';
 import { useLive } from '@/app/useLive';
 import { prepareSearch, filterPrepared } from '@/data';
 import { searchExercises } from '@/domain/exercises';
-import { useExerciseCatalog } from '@/features/programs/catalog';
-import { exerciseName, exerciseSubline } from '@/features/programs/names';
+import { useExerciseCatalog } from '@/app/catalog';
+import { exerciseName, exerciseSubline } from '@/i18n/programNames';
 import { useNutritionStore } from '@/features/nutrition/shared/useNutritionStore';
 import { t } from '@/i18n';
 

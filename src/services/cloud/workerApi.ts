@@ -16,7 +16,7 @@ export interface WorkerRequest {
   json?: unknown;
   bytes?: Uint8Array;
   headers?: Record<string, string>;
-  /** Public endpoints skip the license token. */
+  /** Public endpoints skip the session token. */
   auth?: boolean;
 }
 
@@ -41,11 +41,11 @@ export class WorkerApi {
     return `${this.base}${path}`;
   }
 
-  async send(req: WorkerRequest): Promise<Result<Response, CloudError | 'not_activated'>> {
+  async send(req: WorkerRequest): Promise<Result<Response, CloudError | 'not_signed_in'>> {
     return this.exchange(req, async (res) => ok(res));
   }
 
-  async json<T>(req: WorkerRequest): Promise<Result<T, CloudError | 'not_activated'>> {
+  async json<T>(req: WorkerRequest): Promise<Result<T, CloudError | 'not_signed_in'>> {
     return this.exchange(req, async (res) => {
       const text = await res.text();
       try {
@@ -56,7 +56,30 @@ export class WorkerApi {
     });
   }
 
-  async bytes(req: WorkerRequest): Promise<Result<Uint8Array, CloudError | 'not_activated'>> {
+  /**
+   * Like json(), but a refused request reports the Worker's own `{ error }` code (e.g. `trainer_limit`) when it
+   * sent one, so callers can show a specific message. Network failures stay CloudErrors.
+   */
+  async jsonOrCode<T>(req: WorkerRequest): Promise<Result<T, string>> {
+    let serverCode: string | null = null;
+    const result = await this.exchange(
+      req,
+      async (res) => {
+        const text = await res.text();
+        try {
+          return ok(JSON.parse(text) as T);
+        } catch {
+          return err('server');
+        }
+      },
+      (code) => {
+        serverCode = code;
+      },
+    );
+    return !result.ok && serverCode !== null ? err(serverCode) : result;
+  }
+
+  async bytes(req: WorkerRequest): Promise<Result<Uint8Array, CloudError | 'not_signed_in'>> {
     return this.exchange(req, async (res) => ok(new Uint8Array(await res.arrayBuffer())));
   }
 
@@ -67,13 +90,14 @@ export class WorkerApi {
   private async exchange<T>(
     req: WorkerRequest,
     read: (res: Response) => Promise<Result<T, CloudError>>,
-  ): Promise<Result<T, CloudError | 'not_activated'>> {
+    onRefused?: (serverCode: string | null) => void,
+  ): Promise<Result<T, CloudError | 'not_signed_in'>> {
     if (!this.configured) return err('network');
     if (this.o.network && !this.o.network.isOnline()) return err('offline');
     const headers: Record<string, string> = { ...req.headers };
     if (req.auth !== false) {
       const token = await this.o.tokens.getToken();
-      if (!token) return err('not_activated');
+      if (!token) return err('not_signed_in');
       headers.Authorization = `Bearer ${token}`;
     }
     let body: BodyInit | undefined;
@@ -100,6 +124,7 @@ export class WorkerApi {
       } catch {
         code = null;
       }
+      onRefused?.(code);
       return err(errorFromResponse(res.status, code));
     } catch {
       return err(timedOut ? 'timeout' : 'network');

@@ -21,7 +21,7 @@ import type { PdfRenderer, PdfRenderError, PdfRenderOptions, RenderedPdf } from 
 export interface HtmlPdfRendererOptions {
   images: PdfImageSource;
   downscaler?: ImageDownscaler;
-  /** Where readex-pro-*.woff2 / alexandria-*.woff2 live. Default '/fonts/'. */
+  /** Where rubik-*.woff2 / cairo-*.woff2 live. Default '/fonts/'. */
   fontBaseUrl?: string;
   /** Canvas pixels per CSS px. 2 → 1588 × 2246 px per page ≈ 192 dpi (crisp logo and small text). */
   pixelRatio?: number;
@@ -120,7 +120,7 @@ export class HtmlPdfRenderer implements PdfRenderer {
       ensureStyles();
 
       progress?.({ phase: 'fonts', done: 0, total: 1 });
-      const families = [...new Set([input.branding.fontFamily, 'Readex Pro'])];
+      const families = [...new Set([input.branding.fontFamily, 'Rubik'])];
       const fonts = await loadPdfFonts(families, this.o.fontBaseUrl ?? DEFAULT_FONT_BASE_URL);
       progress?.({ phase: 'fonts', done: 1, total: 1 });
       if (cancelled()) return err('cancelled');

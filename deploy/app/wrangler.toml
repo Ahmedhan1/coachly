@@ -1,5 +1,7 @@
 # The installed app (static PWA). Its address must never change: trainers' data is tied to this origin.
-# Files live in D1 (`pt-coach-app`), uploaded by deploy/app/upload.py after `npm run build`.
+# Files live in D1 (`pt-coach-app`), uploaded by deploy/app/upload.py: run `npm run deploy` in the repo root.
+# (Workers Static Assets would be faster, but its upload step cannot run through a credential-injecting proxy;
+#  see docs/DEPLOYMENT.md for the one-time switch from a normal computer.)
 name = "pt-coach"
 main = "src/index.ts"
 compatibility_date = "2026-08-01"
@@ -8,3 +10,7 @@ compatibility_date = "2026-08-01"
 binding = "APP"
 database_name = "pt-coach-app"
 database_id = "477aa926-49b7-4bb0-964b-bc5879286839"
+
+[observability]
+enabled = true
+head_sampling_rate = 0.1

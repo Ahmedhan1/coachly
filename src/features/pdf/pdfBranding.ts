@@ -1,16 +1,17 @@
 import { z } from 'zod';
-import type { MetaStore } from '@/services/license/metaStore';
+import type { MetaStore } from '@/data/metaStore';
 
 /** PDF look the trainer controls (logo placement/size, font, backgrounds, footer, contacts, disclaimer). */
 export const PDF_BRANDING_KEY = 'pdf.branding';
 
-export const PDF_FONTS = ['Readex Pro', 'Alexandria'] as const;
+export const PDF_FONTS = ['Rubik', 'Cairo'] as const;
 
 export const pdfBrandingSchema = z.object({
   logoPlacement: z.enum(['start', 'center', 'end']),
   /** Older saves had a pixel slider (logoHeightPx, now dropped); they read as the default 'large'. */
   logoSize: z.enum(['small', 'medium', 'large']).catch('large'),
-  fontFamily: z.enum(PDF_FONTS),
+  /** Fonts that are no longer bundled (Readex Pro, Alexandria before 2026-11-26) read as Rubik; the rest of the look is kept. */
+  fontFamily: z.enum(PDF_FONTS).catch('Rubik'),
   backgroundImageId: z.string().min(1).nullable(),
   backgroundOpacity: z.number().min(0).max(1),
   coverImageId: z.string().min(1).nullable(),
@@ -25,7 +26,7 @@ export type PdfBrandingSettings = z.infer<typeof pdfBrandingSchema>;
 export const DEFAULT_PDF_BRANDING: PdfBrandingSettings = {
   logoPlacement: 'start',
   logoSize: 'large',
-  fontFamily: 'Readex Pro',
+  fontFamily: 'Rubik',
   backgroundImageId: null,
   backgroundOpacity: 0.12,
   coverImageId: null,

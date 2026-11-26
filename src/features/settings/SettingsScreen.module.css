@@ -5,3 +5,8 @@
 .language {
   padding-inline: var(--sp-4);
 }
+
+.leave {
+  color: var(--danger);
+  font: var(--t-sub);
+}

@@ -1,6 +1,6 @@
 import type { Env } from '../env';
 import { FILE_MAX_BYTES } from '../../../shared/files';
-import { MemoryObjectStore, S3ObjectStore, type ObjectStore } from '../files/objectStore';
+import { MemoryObjectStore, R2ObjectStore, S3ObjectStore, type ObjectStore } from '../files/objectStore';
 import type { CloudConfig, FilesDeps } from '../ports';
 
 const MiB = 1024 * 1024;
@@ -22,9 +22,9 @@ export const DEFAULT_CLOUD_CONFIG: CloudConfig = {
   shareMaxBytes: 5 * MiB,
   checkinMaxBytes: 3 * MiB,
   maxPendingCheckins: 20,
-  maxSharesPerLicense: 200,
-  // ~40 clients x (page + a few photo check-ins); bounds one license to ~2% of the 10 GB free R2.
-  pagesLicenseMaxBytes: 200 * MiB,
+  maxSharesPerAccount: 200,
+  // ~40 clients x (page + a few photo check-ins); bounds one account to ~2% of the 10 GB free R2.
+  pagesAccountMaxBytes: 200 * MiB,
   pushBatchSize: PUSH_BATCH_SIZE,
 };
 
@@ -56,8 +56,11 @@ export function filesDepsFromEnv(env: Env, store?: ObjectStore | null): FilesDep
     secretAccessKey: env.FILES_SECRET_ACCESS_KEY?.trim() ?? '',
   };
   const configured = Object.values(settings).every((v) => v !== '');
+  // iDrive e2 when its keys are set; otherwise the Worker's own R2 bucket (free, nothing to configure).
+  const chosen = store !== undefined ? store : configured ? new S3ObjectStore(settings) : env.BACKUPS ? new R2ObjectStore(env.BACKUPS) : null;
   return {
-    store: store !== undefined ? store : configured ? new S3ObjectStore(settings) : null,
+    store: chosen,
+    sharesR2: chosen instanceof R2ObjectStore,
     maxBytes: FILE_MAX_BYTES,
     clientMaxBytes: 4 * MiB,
     accountMaxBytes: positiveInt(env.FILES_ACCOUNT_MAX_BYTES, GiB),
@@ -65,4 +68,4 @@ export function filesDepsFromEnv(env: Env, store?: ObjectStore | null): FilesDep
   };
 }
 
-export { MemoryObjectStore };
+export { MemoryObjectStore, R2ObjectStore };

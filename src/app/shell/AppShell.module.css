@@ -6,7 +6,7 @@
 .main {
   max-inline-size: var(--content-max);
   margin-inline: auto;
-  padding-block-end: calc(var(--tabbar-h) + var(--safe-bottom) + var(--sp-6));
+  padding-block-end: calc(var(--tabbar-space) + var(--sp-6));
 }
 
 /* Pushed screen: no tab bar; room for the bottom action bar (52pt button + padding) instead. */

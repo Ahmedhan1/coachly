@@ -1,5 +1,6 @@
 // Strings for photos and cloud files: client photo, trainer photo, payment receipts, PDF archive. Merged as `files`.
 export const files = {
+  recovered: 'رجع {n} صورة من النسخة السحابية',
   clientPhoto: {
     add: 'أضف صورة',
     change: 'غيّر الصورة',

@@ -21,7 +21,7 @@ describe('replaceAllData', () => {
     db.sessions.hook('creating', () => void (creatingHooks += 1));
     await db.sessions.bulkAdd(Array.from({ length: 300 }, (_, i) => ({ id: `old${i}`, clientId: 'c', startsAt: i, ...meta }) as never));
     await db.meta.bulkAdd([
-      { key: 'license.token', value: 'mine' },
+      { key: 'auth.token', value: 'mine' },
       { key: 'firstRunAt', value: 1 },
     ]);
     creatingHooks = 0;
@@ -33,8 +33,8 @@ describe('replaceAllData', () => {
     expect(await db.sessions.toCollection().primaryKeys()).toEqual(['new1']);
     expect(await db.clients.count()).toBe(1);
     expect((await db.meta.toArray()).sort((a, b) => a.key.localeCompare(b.key))).toEqual([
+      { key: 'auth.token', value: 'mine' },
       { key: 'firstRunAt', value: 2 },
-      { key: 'license.token', value: 'mine' },
     ]);
     // Clearing goes straight to IndexedDB (no per-row reads for the hook); new rows still notify listeners.
     expect(deletingHooks).toBe(0);

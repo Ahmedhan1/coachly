@@ -182,7 +182,7 @@ export async function routePush(request: Request, path: string, deps: Deps, clie
   }
   if (path === '/api/push/subscribe' && method === 'POST') {
     const auth = await authenticate(request, deps, clientKey, RULES.pushSubscribe, 'device');
-    return auth.ok ? subscribe(request, deps, auth.who.lid, auth.who.deviceKey) : auth.response;
+    return auth.ok ? subscribe(request, deps, auth.who.userId, auth.who.deviceKey) : auth.response;
   }
   if (path === '/api/push/schedule' && method === 'PUT') {
     const auth = await authenticate(request, deps, clientKey, RULES.pushSchedule, 'device');

@@ -5,9 +5,9 @@ import type { Client, ClientId, Program } from '@/domain/models';
 import { autoProgram, type AutoDayKey } from '@/domain/programs/auto';
 import { fitProfileOf } from '@/domain/programs/tailor';
 import { t } from '@/i18n';
-import { markActiveProgram } from '@/features/programs/activePrograms';
+import { markActiveProgram } from '@/data/prefs/activePrograms';
 import { newLocalId } from '@/features/programs/ids';
-import { templateDayName } from '@/features/programs/names';
+import { templateDayName } from '@/i18n/programNames';
 
 /** Day names of a generated program: the template words (بوش، أبر بادي…), and "فول بادي A/B/C". */
 export const autoDayName = (key: AutoDayKey): string => (key.startsWith('full_') ? `${templateDayName('full')} ${key.slice(5).toUpperCase()}` : templateDayName(key));

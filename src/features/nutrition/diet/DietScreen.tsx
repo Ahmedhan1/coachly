@@ -388,7 +388,7 @@ function DietView({ client, saved, settings, dietSettings, recipes, foods, heade
           <span className={styles.kcalLabel}>{t('nutrition.diet.kcalTarget')}</span>
           <div className={styles.stepper}>
             <button type="button" className={styles.stepBtn} aria-label={t('nutrition.diet.kcalLess')} onClick={() => setKcal(targets.kcal - KCAL_STEP)}>
-              −
+              <Icon name="minus" />
             </button>
             <input
               className={`${styles.kcalInput} num`}
@@ -402,7 +402,7 @@ function DietView({ client, saved, settings, dietSettings, recipes, foods, heade
               }}
             />
             <button type="button" className={styles.stepBtn} aria-label={t('nutrition.diet.kcalMore')} onClick={() => setKcal(targets.kcal + KCAL_STEP)}>
-              +
+              <Icon name="plus" />
             </button>
           </div>
         </div>

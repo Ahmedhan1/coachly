@@ -4,28 +4,27 @@ import { defineConfig } from 'vitest/config';
 import {
   TEST_ADMIN_PASSWORD,
   TEST_APP_ORIGIN,
-  TEST_DATA_KEY,
-  TEST_PRIVATE_KEY,
-  TEST_PUBLIC_KEY,
+  TEST_AUTH_SECRET,
+  TEST_AUTH_URL,
+  TEST_GOOGLE_CLIENT_ID,
+  TEST_GOOGLE_CLIENT_SECRET,
   TEST_VAPID_PRIVATE,
   TEST_VAPID_PUBLIC,
   TEST_VAPID_SUBJECT,
 } from './test/fixtures.ts';
 
 export default defineConfig({
-  resolve: {
-    alias: { '@noble/ed25519': fileURLToPath(new URL('./node_modules/@noble/ed25519/index.js', import.meta.url).href) },
-  },
   plugins: [
     cloudflareTest(async () => ({
       wrangler: { configPath: './wrangler.toml' },
       miniflare: {
         bindings: {
           TEST_MIGRATIONS: await readD1Migrations(fileURLToPath(new URL('./migrations', import.meta.url).href)),
-          LICENSE_PRIVATE_KEY: TEST_PRIVATE_KEY,
-          LICENSE_PUBLIC_KEY: TEST_PUBLIC_KEY,
+          BETTER_AUTH_SECRET: TEST_AUTH_SECRET,
+          BETTER_AUTH_URL: TEST_AUTH_URL,
+          GOOGLE_CLIENT_ID: TEST_GOOGLE_CLIENT_ID,
+          GOOGLE_CLIENT_SECRET: TEST_GOOGLE_CLIENT_SECRET,
           ADMIN_PASSWORD: TEST_ADMIN_PASSWORD,
-          DATA_KEY: TEST_DATA_KEY,
           APP_ORIGIN: `${TEST_APP_ORIGIN},http://localhost:5173`,
           VAPID_PRIVATE_KEY: TEST_VAPID_PRIVATE,
           VAPID_PUBLIC_KEY: TEST_VAPID_PUBLIC,

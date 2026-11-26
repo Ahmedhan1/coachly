@@ -18,8 +18,8 @@ import {
 } from '@/domain/ai';
 import { addDays, type Client } from '@/domain/models';
 import type { ZonedClock } from '@/domain/schedule';
-import { loadBuiltinCatalog } from '@/features/programs/catalog';
-import type { MetaStore } from '@/services/license/metaStore';
+import { loadBuiltinCatalog } from '@/app/catalog';
+import type { MetaStore } from '@/data/metaStore';
 import { readTasks } from './aiSettings';
 
 /**

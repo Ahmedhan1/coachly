@@ -169,6 +169,8 @@ shared ids for the 2D map regions and the 3D mesh groups; Arabic labels come fro
 
 ## Encrypting the pack with the activation `dataKey`?
 
+> 2026-11-26: activation and `dataKey` no longer exist (accounts replaced licenses). The pack stays unencrypted.
+
 The spec suggests the activation response returns a `dataKey` that decrypts the data pack (exercises + 3D
 model). **Recommendation: do not encrypt the exercise pack.**
 

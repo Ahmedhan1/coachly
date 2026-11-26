@@ -1,13 +1,14 @@
-import { generateShortCode } from '../../shared/license';
-import { D1LicenseStore, D1RateLimiter } from './d1Store';
-import { base64UrlEncode } from '../../shared/license';
+import { base64UrlEncode } from '../../shared/bytes';
+import { BetterAuthAccounts, type Accounts } from './auth/accounts';
+import { D1AuditLog, D1RateLimiter } from './d1Store';
+import { TeamStore } from './team/store';
 import { cloudConfigFromEnv, filesDepsFromEnv } from './cloud/config';
 import type { ObjectStore } from './files/objectStore';
 import type { Env } from './env';
 import type { CloudConfig, Deps, RateLimiter, ServerCrypto, VapidSource } from './ports';
 import { importVapidKeys, type VapidKeys } from './push/vapid';
 import { LayeredRateLimiter, MemoryRateLimiter } from './rateLimit';
-import { createServerCrypto } from './serverCrypto';
+import { ConfigError, createServerCrypto } from './serverCrypto';
 
 export function parseOrigins(value: string): string[] {
   return value
@@ -25,12 +26,14 @@ export interface DepsOverrides {
   vapid?: VapidSource;
   /** Object store for cloud files (tests pass memory; null = not configured). */
   objectStore?: ObjectStore | null;
+  /** Account system (tests may pass their own). */
+  accounts?: Accounts;
 }
 
 let cachedVapid: { fingerprint: string; value: Promise<VapidKeys | null> } | null = null;
 
 /**
- * VAPID keys are optional: without them push is disabled but backup, client page and licenses keep working.
+ * VAPID keys are optional: without them push is disabled but backup, client page and accounts keep working.
  * Malformed keys also give null (never an error page that could describe the secret).
  */
 function vapidFor(env: Env): VapidSource {
@@ -56,8 +59,7 @@ let cachedCrypto: { fingerprint: string; value: Promise<ServerCrypto> } | null =
 /** Key import and hashing happen once per isolate, not per request. */
 function serverCryptoFor(env: Env): Promise<ServerCrypto> {
   const secrets = {
-    privateKeyHex: env.LICENSE_PRIVATE_KEY ?? '',
-    publicKeyHex: env.LICENSE_PUBLIC_KEY ?? '',
+    authSecret: env.BETTER_AUTH_SECRET ?? '',
     adminPassword: env.ADMIN_PASSWORD ?? '',
   };
   const fingerprint = JSON.stringify(secrets);
@@ -71,18 +73,43 @@ function serverCryptoFor(env: Env): Promise<ServerCrypto> {
   return cachedCrypto.value;
 }
 
+function googleFromEnv(env: Env): { clientId: string; clientSecret: string } | null {
+  const clientId = env.GOOGLE_CLIENT_ID?.trim() ?? '';
+  const clientSecret = env.GOOGLE_CLIENT_SECRET?.trim() ?? '';
+  return clientId === '' || clientSecret === '' ? null : { clientId, clientSecret };
+}
+
+let cachedAccounts: { db: D1Database; fingerprint: string; value: Accounts } | null = null;
+
+/**
+ * One better-auth instance per isolate (building it costs CPU on every request otherwise, and the Free plan allows
+ * 10 ms per request). Safe because D1 bindings may be reused across requests; rebuilt when a setting changes.
+ */
+function accountsFromEnv(env: Env, appOrigins: readonly string[]): Accounts {
+  const baseURL = (env.BETTER_AUTH_URL ?? '').trim().replace(/\/+$/, '');
+  if (!/^https?:\/\/[^\s/]+$/.test(baseURL)) throw new ConfigError('BETTER_AUTH_URL must be the Worker address');
+  const settings = { secret: env.BETTER_AUTH_SECRET.trim(), baseURL, appOrigins, google: googleFromEnv(env) };
+  const fingerprint = JSON.stringify(settings);
+  if (cachedAccounts?.db !== env.DB || cachedAccounts.fingerprint !== fingerprint) {
+    cachedAccounts = { db: env.DB, fingerprint, value: new BetterAuthAccounts({ database: env.DB, ...settings }) };
+  }
+  return cachedAccounts.value;
+}
+
 export async function depsFromEnv(env: Env, overrides: DepsOverrides = {}): Promise<{ deps: Deps; d1Limiter: D1RateLimiter }> {
   const memory = overrides.memoryLimiter ?? new MemoryRateLimiter();
   const d1Limiter = new D1RateLimiter(env.DB);
+  const serverCrypto = await serverCryptoFor(env);
+  const appOrigins = parseOrigins(env.APP_ORIGIN ?? '');
   const deps: Deps = {
-    store: new D1LicenseStore(env.DB),
+    accounts: overrides.accounts ?? accountsFromEnv(env, appOrigins),
+    team: new TeamStore(env.DB),
+    audit: new D1AuditLog(env.DB),
     limiter: new LayeredRateLimiter(memory, d1Limiter),
     localLimiter: memory,
-    crypto: await serverCryptoFor(env),
+    crypto: serverCrypto,
     now: overrides.now ?? (() => Math.floor(Date.now() / 1000)),
-    newCode: () => generateShortCode(),
-    newId: () => crypto.randomUUID(),
-    config: { appOrigins: parseOrigins(env.APP_ORIGIN ?? ''), dataKey: env.DATA_KEY ?? '' },
+    config: { appOrigins },
     cloud: {
       db: env.DB,
       bucket: env.BACKUPS,

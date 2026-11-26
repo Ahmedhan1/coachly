@@ -1,6 +1,6 @@
 import { readFileSync } from 'node:fs';
 import { expect, test, type Page } from '@playwright/test';
-import { DEMO_CODE } from './helpers';
+import { GUEST_BUTTON } from './helpers';
 
 // The trainer's logo on the home-screen icon. The app Worker endpoints (/api/brand, /b/<id>/...) are not
 // served by `vite preview`, so they are mocked here; their own validation is unit-tested in shared/brandIcon.
@@ -74,13 +74,29 @@ test.describe('installed app', () => {
   test('first launch from a branded icon brings the logo in, and later launches show it instantly', async ({ page }) => {
     await mockBrandServer(page);
     await page.goto(`/?brand=${ID}&standalone=1`);
-    await page.getByLabel('كود التفعيل').fill(DEMO_CODE);
-    await page.getByRole('button', { name: 'تفعيل', exact: true }).click();
+    await page.getByRole('button', { name: GUEST_BUTTON }).click();
     await expect(page.getByRole('heading', { level: 1, name: 'اسمك إيه؟' })).toBeVisible();
     await page.getByRole('textbox').first().fill('كابتن اختبار');
     await page.getByRole('button', { name: 'التالي' }).click();
     await expect(page.getByRole('heading', { level: 1, name: 'اللوجو بتاعك' })).toBeVisible();
     await expect(page.getByRole('img', { name: 'اللوجو' })).toBeVisible();
+    // Stored as raw bytes, never as a Blob: WebKit loses Blobs in IndexedDB (picked photos point at temp files
+    // iOS deletes; private sessions refuse them), which emptied logos and photos in PDFs on iPhone.
+    const rows = await page.evaluate(async () => {
+      const db: IDBDatabase = await new Promise((res, rej) => {
+        const r = indexedDB.open('pt-coach');
+        r.onsuccess = () => res(r.result);
+        r.onerror = () => rej(r.error);
+      });
+      const all: { data?: unknown; blob?: unknown }[] = await new Promise((res) => {
+        const r = db.transaction('images').objectStore('images').getAll();
+        r.onsuccess = () => res(r.result as never);
+      });
+      db.close();
+      return all.map((row) => ({ bytes: row.data instanceof ArrayBuffer, blob: row.blob !== undefined }));
+    });
+    expect(rows.length).toBeGreaterThan(0);
+    expect(rows.every((r) => r.bytes && !r.blob)).toBe(true);
 
     // Next launch: the splash with the logo is on screen before the app bundle has run.
     await page.addInitScript(() => {
@@ -96,8 +112,7 @@ test.describe('installed app', () => {
     await context.grantPermissions(['clipboard-read', 'clipboard-write']);
     const uploads = await mockBrandServer(page);
     await page.goto(`/?brand=${ID}&standalone=1`);
-    await page.getByLabel('كود التفعيل').fill(DEMO_CODE);
-    await page.getByRole('button', { name: 'تفعيل', exact: true }).click();
+    await page.getByRole('button', { name: GUEST_BUTTON }).click();
     await page.getByRole('button', { name: 'بعدين' }).click();
     await expect(page.getByRole('navigation', { name: 'التنقل الرئيسي' })).toBeVisible();
     await page.goto('/more/settings/identity?standalone=1');

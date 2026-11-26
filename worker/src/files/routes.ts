@@ -1,7 +1,7 @@
 // Cloud files API (photos, thumbnails, invoices, PDFs). Bodies are PTK1 envelopes encrypted on the device; the
 // Worker checks the magic and the size, stores the bytes in the object store (iDrive e2) and indexes them in D1.
 //
-// Trainer (Authorization: Bearer <license token>):
+// Trainer (Authorization: Bearer <session token>):
 //   GET    /api/files[?kind=&ref=&source=&since=]  list (newest change last, up to 500)
 //   POST   /api/files?kind=<kind>[&ref=<ref>]        create        → 201 { file }
 //   GET    /api/files/:id                            download (octet-stream)
@@ -10,7 +10,7 @@
 // Client page (X-Checkin-Token, the same write token as check-ins):
 //   POST   /api/share/:shareId/files?kind=client_photo|client_upload → 201 { id }
 //          A new client_photo replaces the client's previous one from that page.
-import { base64UrlDecode, base64UrlEncode } from '../../../shared/license';
+import { base64UrlDecode, base64UrlEncode } from '../../../shared/bytes';
 import {
   FILE_ID,
   FILE_MAGIC,
@@ -21,6 +21,7 @@ import {
   type FileKind,
   type FileSource,
 } from '../../../shared/files';
+import { adjustUsage, storageFull, wouldOverfill } from '../cloud/usage';
 import { authenticate } from '../cloud/auth';
 import { declaredLength, hasMagic } from '../cloud/stream';
 import { json } from '../http';
@@ -91,6 +92,15 @@ async function readBody(request: Request, maxBytes: number): Promise<{ ok: true;
   return { ok: true, bytes };
 }
 
+/** Files in the shared R2 bucket also respect the global guard (docs/LIMITS.md) and move the stored total. */
+async function overGuard(deps: Deps, newSize: number, replacedSize: number): Promise<boolean> {
+  return deps.cloud.files.sharesR2 && (await wouldOverfill(deps.cloud, newSize, replacedSize));
+}
+
+async function trackUsage(deps: Deps, delta: number): Promise<void> {
+  if (deps.cloud.files.sharesR2 && delta !== 0) await adjustUsage(deps.cloud.db, delta).run();
+}
+
 async function store(files: FilesDeps, key: string, bytes: Uint8Array): Promise<boolean> {
   try {
     await files.store!.put(key, bytes);
@@ -151,8 +161,10 @@ async function createFile(request: Request, deps: Deps, account: string): Promis
   if ((await accountBytes(db, account)) + body.bytes.length > files.accountMaxBytes) {
     return json({ error: 'quota_exceeded', maxBytes: files.accountMaxBytes }, 507);
   }
+  if (await overGuard(deps, body.bytes.length, 0)) return storageFull();
   const id = deps.cloud.newId();
   if (!(await store(files, fileKey(account, id), body.bytes))) return json({ error: 'upload_failed' }, 502);
+  await trackUsage(deps, body.bytes.length);
   const now = deps.now();
   const row: FileRow = { id, account, kind, ref, source: 'trainer', share_id: null, size: body.bytes.length, created_at: now, updated_at: now };
   await db
@@ -192,7 +204,9 @@ async function replaceFile(request: Request, deps: Deps, account: string, id: st
   if ((await accountBytes(db, account)) - row.size + body.bytes.length > files.accountMaxBytes) {
     return json({ error: 'quota_exceeded', maxBytes: files.accountMaxBytes }, 507);
   }
+  if (await overGuard(deps, body.bytes.length, row.size)) return storageFull();
   if (!(await store(files, fileKey(account, id), body.bytes))) return json({ error: 'upload_failed' }, 502);
+  await trackUsage(deps, body.bytes.length - row.size);
   const now = Math.max(deps.now(), row.updated_at + 1);
   await db.prepare('UPDATE cloud_files SET size = ?, updated_at = ? WHERE id = ?').bind(body.bytes.length, now, id).run();
   return json({ file: toInfo({ ...row, size: body.bytes.length, updated_at: now }) });
@@ -205,6 +219,7 @@ async function removeRow(deps: Deps, row: FileRow): Promise<boolean> {
     return false;
   }
   await deps.cloud.db.prepare('DELETE FROM cloud_files WHERE id = ?').bind(row.id).run();
+  await trackUsage(deps, -row.size);
   return true;
 }
 
@@ -257,9 +272,11 @@ export async function postClientFile(request: Request, deps: Deps, clientKey: st
   if ((await accountBytes(db, share.lid)) - replaced + body.bytes.length > files.accountMaxBytes) {
     return json({ error: 'quota_exceeded' }, 507);
   }
+  if (await overGuard(deps, body.bytes.length, replaced)) return storageFull();
 
   const id = deps.cloud.newId();
   if (!(await store(files, fileKey(share.lid, id), body.bytes))) return json({ error: 'upload_failed' }, 502);
+  await trackUsage(deps, body.bytes.length);
   await db
     .prepare('INSERT INTO cloud_files (id, account, kind, ref, source, share_id, size, created_at, updated_at) VALUES (?, ?, ?, NULL, ?, ?, ?, ?, ?)')
     .bind(id, share.lid, kind, 'client', shareId, body.bytes.length, now, now)

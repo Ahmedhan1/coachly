@@ -78,7 +78,7 @@ export async function seedDatabase(db: AppDatabase, options: { images?: number; 
     source: 'trainer',
   });
   await db.meta.put({ key: 'firstRunDone', value: true });
-  await db.meta.put({ key: 'license.token', value: 'device-a-token' });
+  await db.meta.put({ key: 'auth.token', value: 'device-a-token' });
   return { repos, imageIds, clientIds: [a.id, b.id] };
 }
 
@@ -87,7 +87,7 @@ export async function dumpDatabase(db: AppDatabase): Promise<Record<string, unkn
   const out: Record<string, unknown[]> = {};
   for (const table of db.tables) {
     let rows = (await table.toArray()) as Record<string, unknown>[];
-    if (table.name === 'meta') rows = rows.filter((r) => !String(r.key).startsWith('license.') && !String(r.key).startsWith('backup.'));
+    if (table.name === 'meta') rows = rows.filter((r) => !String(r.key).startsWith('auth.') && !String(r.key).startsWith('backup.'));
     const withBytes = await Promise.all(
       rows.map(async (r) => (r.blob instanceof Blob ? { ...r, blob: Array.from(new Uint8Array(await r.blob.arrayBuffer())), blobType: r.blob.type } : r)),
     );

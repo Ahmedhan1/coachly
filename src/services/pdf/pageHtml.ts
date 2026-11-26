@@ -202,7 +202,7 @@ export function blockHtml(b: PdfBlock, urlOf: UrlOf, color: string, ctx: BlockCo
 /** Font stack: the trainer's font, then the bundled fonts, then the system. */
 export function fontStack(family: string): string {
   const safe = family.replace(/['";]/g, '');
-  return `'${safe}', 'Readex Pro', 'Alexandria', system-ui, sans-serif`;
+  return `'${safe}', 'Rubik', system-ui, sans-serif`;
 }
 
 /** dir/lang attributes for a page, from the document language (Arabic RTL by default). */

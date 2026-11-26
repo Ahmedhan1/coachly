@@ -1,0 +1,47 @@
+/* Same shape as a secondary button; white on a page, --surface-2 inside a sheet (Sheet sets --field-bg). */
+.button {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--sp-2);
+  min-block-size: var(--field-h);
+  min-inline-size: 0;
+  padding-inline: var(--sp-4);
+  border-radius: var(--r-control);
+  background: var(--field-bg, var(--surface));
+  color: var(--text);
+  font: var(--t-button);
+  cursor: pointer;
+}
+
+.button:active {
+  opacity: 0.85;
+}
+
+.button:has(input:focus-visible) {
+  outline: 3px solid var(--brand-ink);
+}
+
+.button[aria-busy='true'] {
+  opacity: 0.6;
+  cursor: progress;
+}
+
+.button svg {
+  inline-size: 20px;
+  block-size: 20px;
+}
+
+.block {
+  display: flex;
+  inline-size: 100%;
+}
+
+/* Long file names (backup-2026-11-26.zip) truncate instead of widening the sheet. */
+.text {
+  min-inline-size: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}

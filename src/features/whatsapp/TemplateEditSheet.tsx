@@ -3,7 +3,7 @@ import { useServices } from '@/app/services';
 import { useUiStore } from '@/app/uiStore';
 import { PLACEHOLDERS, placeholderToken, renderTemplate, type Placeholder, type WhatsappTemplate } from '@/domain/whatsapp';
 import { isEnglish, t } from '@/i18n';
-import { Button, Sheet, TextArea, TextField } from '@/ui';
+import { Button, Chip, Sheet, TextArea, TextField } from '@/ui';
 import { defaultTemplate, removeTemplate, saveTemplate } from './templatesStore';
 import styles from './Whatsapp.module.css';
 
@@ -84,9 +84,9 @@ export function TemplateEditSheet({ template, onClose, onDelete }: TemplateEditS
       title={template ? t('schedule.wa.editTitle') : t('schedule.wa.newTitle')}
       cancelLabel={t('common.cancel')}
       primaryAction={
-        <button type="submit" form={FORM_ID} className={styles.save}>
+        <Button size="small" type="submit" form={FORM_ID}>
           {t('common.save')}
-        </button>
+        </Button>
       }
     >
       <form id={FORM_ID} className={styles.form} onSubmit={submit} noValidate>
@@ -115,9 +115,9 @@ export function TemplateEditSheet({ template, onClose, onDelete }: TemplateEditS
           />
           <div className={styles.chips} role="group" aria-label={t('schedule.wa.insert')}>
             {PLACEHOLDERS.map((p) => (
-              <button key={p} type="button" className={styles.chip} aria-label={t('schedule.wa.insertNamed', { name: placeholderToken(p, isEnglish()) })} onClick={() => insert(p)}>
+              <Chip key={p} aria-label={t('schedule.wa.insertNamed', { name: placeholderToken(p, isEnglish()) })} onClick={() => insert(p)}>
                 {placeholderToken(p, isEnglish())}
-              </button>
+              </Chip>
             ))}
           </div>
         </div>

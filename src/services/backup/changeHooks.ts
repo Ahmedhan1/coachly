@@ -3,7 +3,7 @@ import { TABLES } from '@/data/schema';
 
 /**
  * Calls `onChange` (outside the write transaction) whenever any table except `meta` is written.
- * `meta` is excluded because license and backup bookkeeping live there and would re-trigger backups.
+ * `meta` is excluded because account and backup bookkeeping live there and would re-trigger backups.
  * Returns a function that removes the hooks.
  */
 export function watchDataChanges(db: AppDatabase, onChange: () => void): () => void {

@@ -2,10 +2,10 @@ import { packFile, unpackFile, type PackedHeader } from '@/domain/files';
 import type { CloudFileRecord } from '@/data/db';
 import type { CloudFileRepository } from '@/data/repositories/cloudFileRepository';
 import type { ImageRepository } from '@/data/repositories/imageRepository';
-import type { MetaStore } from '@/services/license/metaStore';
+import type { MetaStore } from '@/data/metaStore';
 import type { ImageDownscaler } from '@/services/storage/types';
 import { generateRawKey, openWithKey, sealWithKey } from '../../../shared/envelope';
-import { base64UrlDecode, base64UrlEncode } from '../../../shared/license';
+import { base64UrlDecode, base64UrlEncode } from '../../../shared/bytes';
 import type { CloudFileInfo } from '../../../shared/files';
 import type { CloudFilesClient } from './types';
 
@@ -86,7 +86,7 @@ export class FileSyncService {
         report.failed++;
         await this.d.files.markFailed(row.id);
         // Offline or not activated: the rest would fail the same way; try again later.
-        if (this.lastError === 'offline' || this.lastError === 'not_activated') break;
+        if (this.lastError === 'offline' || this.lastError === 'not_signed_in') break;
       }
     }
     return report;
@@ -151,6 +151,12 @@ export class FileSyncService {
     }
     await this.d.files.forget(row.id);
     return 'ok';
+  }
+
+  /** The trainer's own files of one kind on the server (not client uploads). null when the server is unreachable. */
+  async remoteFiles(kind: CloudFileInfo['kind']): Promise<CloudFileInfo[] | null> {
+    const r = await this.d.client.list({ kind, source: 'trainer' });
+    return r.ok ? r.value : null;
   }
 
   /** Downloads and decrypts a file (to view a PDF or invoice that is no longer on this phone). null on any failure. */

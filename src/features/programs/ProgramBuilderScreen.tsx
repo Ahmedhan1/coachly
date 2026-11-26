@@ -26,21 +26,19 @@ import {
   type ProgramEditError,
 } from '@/domain/programs';
 import { t } from '@/i18n';
-import { Button, EmptyState, Icon, IconButton, PageHeader, Tx } from '@/ui';
-import { ActionSheet, type SheetAction } from './ActionSheet';
-import { markActiveProgram } from './activePrograms';
+import { ActionSheet, Button, EmptyState, Icon, IconButton, PageHeader, type SheetAction, Tx } from '@/ui';
+import { markActiveProgram } from '@/data/prefs/activePrograms';
 import { DayPills, DayTile, WeekSummary } from './BuilderParts';
-import { useExerciseCatalog } from './catalog';
+import { useExerciseCatalog } from '@/app/catalog';
 import { ClientPickerSheet } from './ClientPickerSheet';
 import { DayList } from './DayList';
 import { ExercisePickerSheet } from './ExercisePickerSheet';
-import { Glyph } from './glyphs';
 import { newLocalId } from './ids';
-import { exerciseName } from './names';
+import { exerciseName } from '@/i18n/programNames';
 import { NameSheet } from './NameSheet';
 import { SetEditorSheet } from './SetEditorSheet';
 import { useProgramEditor } from './useProgramEditor';
-import { usePushedScreen } from './usePushedScreen';
+import { usePushedScreen } from '@/app/shell/usePushedScreen';
 import { clientNoteText, fitProfileOf } from '@/domain/programs/tailor';
 import { ClientNoteSheet } from '@/features/clients/tailor/ClientNoteSheet';
 import styles from './Builder.module.css';
@@ -370,7 +368,7 @@ export function ProgramBuilderScreen() {
         ) : (
           <>
             <button type="button" className={styles.stack} disabled={!day || day.items.length < 2} onClick={() => setSelecting(true)}>
-              <Glyph name="link" />
+              <Icon name="link" />
               {t('training.programs.builder.superset')}
             </button>
             <button type="button" className={styles.stack} onClick={() => setSheet('copy')}>

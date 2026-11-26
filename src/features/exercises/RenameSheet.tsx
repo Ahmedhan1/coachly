@@ -105,9 +105,9 @@ export function RenameSheet({
       cancelLabel={t('common.cancel')}
       initialFocusId={NAME_ID}
       primaryAction={
-        <button type="submit" form={FORM_ID} className={styles.save}>
+        <Button size="small" type="submit" form={FORM_ID}>
           {t('common.save')}
-        </button>
+        </Button>
       }
     >
       <form id={FORM_ID} className={styles.form} onSubmit={submit} noValidate>

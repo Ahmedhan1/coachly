@@ -41,7 +41,7 @@ export interface PdfNutrition {
   waterMl: number | null;
 }
 
-/** Every user-visible word the PDF prints. The UI fills it from src/i18n/ar.ts. */
+/** Every user-visible word the PDF prints. The UI fills it from src/i18n/ar/. */
 export interface PdfLabels {
   sections: Record<PdfSection, string>;
   cover: { client: string; preparedBy: string; date: string; planFor: string; contact: string };
@@ -114,7 +114,7 @@ export interface PdfBranding {
   logoSize: PdfLogoSize;
   primaryColor: string;
   secondaryColor: string;
-  /** CSS font-family name, e.g. 'Readex Pro'. */
+  /** CSS font-family name, e.g. 'Rubik'. */
   fontFamily: string;
   /** Page background with opacity 0..1 (content pages). */
   background: { image: PdfImageRef; opacity: number } | null;
