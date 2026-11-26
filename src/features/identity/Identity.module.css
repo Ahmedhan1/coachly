@@ -124,22 +124,6 @@
   gap: var(--sp-2);
 }
 
-.fileButton {
-  display: inline-flex;
-  align-items: center;
-  gap: var(--sp-2);
-  min-block-size: var(--field-h);
-  padding-inline: var(--sp-4);
-  border-radius: var(--r-md);
-  background: var(--field-bg, var(--surface));
-  font: var(--t-button);
-  cursor: pointer;
-}
-
-.fileButton:has(+ input:focus-visible) {
-  outline: 3px solid var(--brand-ink);
-}
-
 .error {
   font: var(--t-caption);
   color: var(--danger);
@@ -292,17 +276,6 @@
   margin-block-start: var(--sp-3);
 }
 
-.previewChip {
-  display: inline-flex;
-  align-items: center;
-  block-size: 28px;
-  padding-inline: var(--sp-2);
-  border-radius: var(--r-control);
-  background: var(--brand-tint);
-  color: var(--brand-ink);
-  font: var(--t-label);
-}
-
 .previewLink {
   flex: 1;
   color: var(--brand-ink);
@@ -341,6 +314,7 @@
   border-radius: var(--r-lg);
   background: var(--surface);
   --field-bg: var(--surface-2);
+  box-shadow: var(--shadow-card);
 }
 
 .editTitle {

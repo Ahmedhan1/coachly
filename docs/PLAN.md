@@ -65,7 +65,6 @@
 │  ├─ exercises/        قاعدة التمارين، الأسماء المعرّبة، الإضافات والتصحيحات
 │  └─ model3d/          سكربت Blender (blender/) وقالب ريبو المجسم (repo-template/) — المرحلة 6
 ├─ deploy/app/          Worker بيقدّم ملفات التطبيق المتثبت من D1 (التفاصيل في docs/DEPLOYMENT.md)
-├─ design/              صور اتجاهات التصميم (المرحلة 1)
 ├─ public/              ملفات ثابتة: الأيقونات، الخطوط، حزمة البيانات المشفّرة
 ├─ e2e/                 سيناريوهات Playwright (اختبار التطبيق كأنه مستخدم)
 ├─ docs/                SPEC.md (التصور)، PLAN.md (الملف ده)، MANUAL_QA.md، DESIGN.md، LIMITS.md

@@ -4,7 +4,7 @@
   flex: none;
   inline-size: 44px;
   block-size: 44px;
-  border-radius: var(--r-sm);
+  border-radius: var(--r-full);
   background: var(--surface-2);
   color: var(--text-2);
   font: var(--t-heading);

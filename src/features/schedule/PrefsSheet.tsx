@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { useServices } from '@/app/services';
 import { useUiStore } from '@/app/uiStore';
 import { t } from '@/i18n';
-import { SegmentedControl, Select, Sheet } from '@/ui';
+import { Button, SegmentedControl, Select, Sheet } from '@/ui';
 import { savePrefs, type SchedulePrefs } from './prefs';
 import styles from './Schedule.module.css';
 
@@ -50,9 +50,9 @@ export function PrefsSheet({ prefs, onClose }: { prefs: SchedulePrefs; onClose: 
       title={t('schedule.prefs.title')}
       cancelLabel={t('common.cancel')}
       primaryAction={
-        <button type="button" className={styles.save} onClick={() => void save()}>
+        <Button size="small" onClick={() => void save()}>
           {t('common.save')}
-        </button>
+        </Button>
       }
     >
       <div className={styles.form}>

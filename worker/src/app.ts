@@ -7,7 +7,7 @@ import { clientIp, corsHeaders, json, withHeaders } from './http';
 import type { Deps } from './ports';
 import { routePush } from './push/routes';
 import { RULES } from './rateLimit';
-import { viewerHeaders, viewerHtml } from './share/page';
+import { viewerFont, viewerHeaders, viewerHtml } from './share/page';
 import { routeShare, SHARE_ID } from './share/routes';
 import { postClientFile, routeFiles } from './files/routes';
 
@@ -19,6 +19,10 @@ export async function handleRequest(request: Request, deps: Deps, hooks: AdminHo
   if (url.pathname === '/admin' || url.pathname.startsWith('/admin/')) return handleAdmin(request, deps, clientKey, hooks);
   const authPage = await routeAuthPages(request, url, deps, clientKey);
   if (authPage !== null) return authPage;
+
+  // The client page's font (Rubik, same origin, immutable URL).
+  const font = request.method === 'GET' ? viewerFont(url.pathname) : null;
+  if (font !== null) return font;
 
   const viewer = /^\/c\/([^/]+)$/.exec(url.pathname);
   if (viewer !== null && request.method === 'GET' && !deps.cloud.bucket) return json({ error: 'storage_unavailable' }, 503);

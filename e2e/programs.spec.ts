@@ -1,5 +1,5 @@
 import { expect, test, type Page } from '@playwright/test';
-import { openApp } from './helpers';
+import { openApp, waitForSavedSession } from './helpers';
 
 async function openSaraProgramFromTemplate(page: Page) {
   await openApp(page);
@@ -62,6 +62,7 @@ test('session: resumes after a reload and never overwrites an unsaved session si
   const url = page.url();
 
   // App killed and reopened on the same session: the set and the running rest timer are back.
+  await waitForSavedSession(page, 1);
   await page.reload();
   await expect(page.getByText('1 من 16 سيت')).toBeVisible();
   await expect(page.getByRole('timer')).toBeVisible();

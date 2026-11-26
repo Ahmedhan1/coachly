@@ -3,7 +3,7 @@ import { useServices } from '@/app/services';
 import { checkForAppUpdate } from '@/app/pwa/appUpdate';
 import { useUiStore } from '@/app/uiStore';
 import { useLive } from '@/app/useLive';
-import { CLIENT_PAGES_ENABLED_KEY, clientPagesEnabled } from '@/features/online/prefs';
+import { CLIENT_PAGES_ENABLED_KEY, clientPagesEnabled } from '@/data/prefs/online';
 import { t } from '@/i18n';
 import { Badge, Icon, ListRow, ListSection, PageHeader } from '@/ui';
 import { LanguageSwitch } from './LanguageSwitch';

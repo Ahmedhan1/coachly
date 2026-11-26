@@ -18,12 +18,12 @@ const ARABIC_RANGE =
 const LATIN_RANGE =
   'U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD';
 
-/** Same files and ranges as src/ui/fonts.css (public/fonts). */
+/** Files in public/fonts: Rubik (the app's font, also in src/ui/fonts.css) and Cairo (PDF-only alternative). */
 export const PDF_FONT_FILES: readonly PdfFontFile[] = [
-  { family: 'Readex Pro', file: 'readex-pro-arabic.woff2', weight: '400 700', unicodeRange: ARABIC_RANGE },
-  { family: 'Readex Pro', file: 'readex-pro-latin.woff2', weight: '400 700', unicodeRange: LATIN_RANGE },
-  { family: 'Alexandria', file: 'alexandria-arabic.woff2', weight: '500 900', unicodeRange: ARABIC_RANGE },
-  { family: 'Alexandria', file: 'alexandria-latin.woff2', weight: '500 900', unicodeRange: LATIN_RANGE },
+  { family: 'Rubik', file: 'rubik-arabic.woff2', weight: '300 900', unicodeRange: ARABIC_RANGE },
+  { family: 'Rubik', file: 'rubik-latin.woff2', weight: '300 900', unicodeRange: LATIN_RANGE },
+  { family: 'Cairo', file: 'cairo-arabic.woff2', weight: '200 1000', unicodeRange: ARABIC_RANGE },
+  { family: 'Cairo', file: 'cairo-latin.woff2', weight: '200 1000', unicodeRange: LATIN_RANGE },
 ];
 
 export const DEFAULT_FONT_BASE_URL = '/fonts/';

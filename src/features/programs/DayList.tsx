@@ -18,8 +18,7 @@ import { compactTempo, dayBlocks, displayReps } from '@/domain/programs';
 import { t } from '@/i18n';
 import { Icon, Num, Tx, cx } from '@/ui';
 import { ExerciseThumb } from './ExerciseThumb';
-import { Glyph } from './glyphs';
-import { exerciseName, exerciseSubline } from './names';
+import { exerciseName, exerciseSubline } from '@/i18n/programNames';
 import styles from './Builder.module.css';
 
 export interface DayListProps {
@@ -90,7 +89,7 @@ export function DayList({ day, catalog, onEdit, onReorder, selecting, selected, 
           return (
             <div key={`ss-${block.items[0]?.id}`} className={cx(styles.tile, styles.superset)} data-testid="superset">
               <div className={styles.ssHead}>
-                <Glyph name="link" />
+                <Icon name="link" />
                 <span>{t('training.programs.builder.superset')}</span>
                 {last && (
                   <span className={styles.ssRest}>
@@ -197,7 +196,7 @@ function SortableCard({ item, exercise, tag, onEdit, selecting, selected, onTogg
           {...listeners}
           aria-label={t('training.programs.builder.dragHandle', { name })}
         >
-          <Glyph name="grip" />
+          <Icon name="grip" />
         </button>
       )}
     </article>

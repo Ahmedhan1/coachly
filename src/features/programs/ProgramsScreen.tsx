@@ -9,9 +9,9 @@ import { BUILTIN_TEMPLATES, duplicateProgram, instantiateTemplate, type BuiltinT
 import { searchItems } from '@/data';
 import { t } from '@/i18n';
 import { Badge, Button, EmptyState, Icon, IconButton, ListRow, ListSection, PageHeader, SearchField, SwipeRow, Tx, TitleIcon } from '@/ui';
-import { markActiveProgram } from './activePrograms';
+import { markActiveProgram } from '@/data/prefs/activePrograms';
 import { newLocalId } from './ids';
-import { templateDayName, templateName } from './names';
+import { templateDayName, templateName } from '@/i18n/programNames';
 import styles from './Programs.module.css';
 
 function daysLabel(n: number) {

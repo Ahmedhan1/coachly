@@ -87,7 +87,7 @@ var AR = {
   tooBig: 'الصور كبيرة. جرّب صور أقل.',
   failed: 'ما اتبعتش. اتأكد من النت وجرّب تاني.',
   photoFailed: 'مش قادرين نقرا الصورة دي.',
-  addPhoto: '+ أضف صورة',
+  addPhoto: 'أضف صورة',
   myPhotoTitle: 'صورتك',
   myPhotoHint: 'حط صورة ليك، والمدرب هيشوفها في ملفك عنده.',
   myPhotoPick: 'اختار صورة',
@@ -206,7 +206,7 @@ var EN = {
   tooBig: 'The photos are too large. Try fewer photos.',
   failed: 'Not sent. Check your internet and try again.',
   photoFailed: 'We could not read this photo.',
-  addPhoto: '+ Add a photo',
+  addPhoto: 'Add a photo',
   myPhotoTitle: 'Your photo',
   myPhotoHint: 'Add a photo of yourself; your coach sees it in your file.',
   myPhotoPick: 'Choose a photo',
@@ -243,6 +243,13 @@ var EN = {
   howWeek: 'How was your week?'
 };
 var T = AR;
+// Tab icons: Material Symbols Rounded (Apache-2.0), the same paths as the app (src/ui/icons/paths.ts).
+var ICONS = {
+  'p-program': 'M268-650 147-529q-9 9-21 9t-21-9q-8-8-8.5-20.5T104-571l36-37-35-35q-9-9-9-21t9-21l64-64-21-21q-9-9-9-21t9-21q8-8 20.5-8.5T190-813l22 21 63-63q9-9 21-9t21 9l35 35 37-36q9-8 21-8t21 9q9 9 9 21t-9 21L310-692l382 382 121-121q9-9 21-9t21 9q8 8 8.5 20.5T856-389l-36 37 35 35q9 9 9 21t-9 21l-65 65 21 21q9 9 9 21t-9 21q-9 9-21 9t-21-9l-21-21-63 63q-9 9-21 9t-21-9l-35-35-37 36q-9 8-21 8t-21-9q-9-9-9-21t9-21l121-121-382-382Z',
+  'p-meals': 'M285-600v-250q0-12.75 8.68-21.38 8.67-8.62 21.5-8.62 12.82 0 21.32 8.62 8.5 8.63 8.5 21.38v250h65v-250q0-12.75 8.68-21.38 8.67-8.62 21.5-8.62 12.82 0 21.32 8.62 8.5 8.63 8.5 21.38v249.73q0 58.27-36.5 99.77Q397-459 345-448v338q0 12.75-8.68 21.37-8.67 8.63-21.5 8.63-12.82 0-21.32-8.63Q285-97.25 285-110v-338q-52-11-88.5-52.5T160-600.27V-850q0-12.75 8.68-21.38 8.67-8.62 21.5-8.62 12.82 0 21.32 8.62 8.5 8.63 8.5 21.38v250h65Zm415 200h-85q-12.75 0-21.37-8.63Q585-417.25 585-430v-275q0-69 42.5-122t98.5-53q14 0 24 10.13T760-846v736q0 12.75-8.68 21.37-8.67 8.63-21.5 8.63-12.82 0-21.32-8.63Q700-97.25 700-110v-290Z',
+  'p-progress': 'M102-252q-9-9-9-21.5t9-21.5l228-227q16.93-17 41.97-17Q397-539 414-522l125 125 241-241h-97q-12.75 0-21.37-8.68-8.63-8.67-8.63-21.5 0-12.82 8.63-21.32 8.62-8.5 21.37-8.5h167q12.75 0 21.38 8.62Q880-680.75 880-668v167q0 12-8.27 21t-20.5 9Q839-471 830-480t-9-21v-93L580-354q-16.93 17-41.97 17Q513-337 496-354L371-478 145-252q-9 9-21.5 9t-21.5-9Z',
+  'p-checkin': 'm222-299 158-158q9-9 21-8.5t21.39 9.5q8.61 9 8.61 21t-9 21L243-235q-9 9-21 9t-21-9L101-335q-9-9-9-21t9-21q9-9 21-8.5t21 8.5l79 78Zm0-320 158-158q9-9 21-8.5t21.39 9.5q8.61 9 8.61 21t-9 21L243-555q-9 9-21 9t-21-9L101-655q-9-9-9-21t9-21q9-9 21-8.5t21 8.5l79 78Zm328 329q-12.75 0-21.37-8.68-8.63-8.67-8.63-21.5 0-12.82 8.63-21.32 8.62-8.5 21.37-8.5h300q12.75 0 21.38 8.68 8.62 8.67 8.62 21.5 0 12.82-8.62 21.32-8.63 8.5-21.38 8.5H550Zm0-320q-12.75 0-21.37-8.68-8.63-8.67-8.63-21.5 0-12.82 8.63-21.32 8.62-8.5 21.37-8.5h300q12.75 0 21.38 8.68 8.62 8.67 8.62 21.5 0 12.82-8.62 21.32-8.63 8.5-21.38 8.5H550Z'
+};
 
 /** The trainer's app language (doc.lang): English pages are LTR with English labels; Arabic is the default. */
 function applyLanguage(doc) {
@@ -392,19 +399,30 @@ function hero(doc) {
     face.src = doc.brand.photo;
     top.appendChild(face);
   }
-  top.appendChild(el('span', 'brand-name', doc.brand.name));
+  var id = el('div', 'brand-id');
+  id.appendChild(el('span', 'brand-name', doc.brand.name));
+  if (isNum(doc.updatedAt)) id.appendChild(el('p', 'sub', T.updated + isoDay(formatDate(doc.updatedAt))));
+  top.appendChild(id);
   wrap.appendChild(top);
   wrap.appendChild(el('h1', 'hello', T.hello + doc.client.firstName));
-  if (isNum(doc.updatedAt)) wrap.appendChild(el('p', 'sub', T.updated + isoDay(formatDate(doc.updatedAt))));
   head.appendChild(wrap);
 }
 
-function stat(label, value, sub, accent) {
-  var c = el('div', 'stat' + (accent ? ' accent' : ''));
-  c.appendChild(el('span', 'stat-label', label));
-  c.appendChild(el('span', 'stat-value', value));
-  if (sub) c.appendChild(el('span', 'stat-sub', sub));
-  return c;
+function fact(label, value, sub, meter) {
+  var row = el('div', 'fact');
+  row.appendChild(el('span', 'fact-label', label));
+  var main = el('div', 'fact-main');
+  main.appendChild(el('span', 'fact-value', value));
+  if (isNum(meter)) {
+    var m = el('div', 'meter');
+    var fill = el('span');
+    fill.style.inlineSize = Math.max(0, Math.min(100, meter * 100)) + '%';
+    m.appendChild(fill);
+    main.appendChild(m);
+  }
+  if (sub) main.appendChild(el('span', 'fact-sub', sub));
+  row.appendChild(main);
+  return row;
 }
 function upcoming(doc) {
   var now = Date.now();
@@ -415,27 +433,34 @@ function upcoming(doc) {
 function nextDayIndex(doc) {
   return isNum(doc.nextDay) && doc.nextDay >= 0 && doc.nextDay < doc.days.length ? doc.nextDay : 0;
 }
+// The next session is the one brand block (like the app's Home); everything else is one card of facts.
 function summary(doc) {
-  var box = el('div', 'cards');
+  var box = el('div', 'summary');
   var s = upcoming(doc);
+  var facts = el('div', 'card facts');
   if (s) {
     var d = new Date(s.at * 1000);
-    box.appendChild(stat(T.nextSession, dayLabel(d), clock(d) + ' · ' + s.durationMin + T.minutes, true));
+    var next = el('div', 'next');
+    next.appendChild(el('span', 'next-label', T.nextSession));
+    next.appendChild(el('span', 'next-day', dayLabel(d)));
+    next.appendChild(el('span', 'next-time', clock(d) + ' · ' + s.durationMin + T.minutes));
+    box.appendChild(next);
   } else if (Array.isArray(doc.sessions)) {
-    box.appendChild(stat(T.nextSession, T.noNextSession, ''));
+    facts.appendChild(fact(T.nextSession, T.noNextSession, ''));
   }
   if (doc.days.length > 0) {
     var day = doc.days[nextDayIndex(doc)];
-    if (day && isStr(day.title, 80)) box.appendChild(stat(T.nextWorkout, day.title, count(arr(day.exercises).length, T.exFew, T.exMany)));
+    if (day && isStr(day.title, 80)) facts.appendChild(fact(T.nextWorkout, day.title, count(arr(day.exercises).length, T.exFew, T.exMany)));
   }
   var p = doc.package;
   if (p && isNum(p.left) && isNum(p.total) && p.total > 0) {
-    box.appendChild(stat(T.packageLabel, T.packageLeft + p.left + T.of + p.total + T.sessions + T.packageSuffix, isStr(p.endDate, 10) ? T.until + isoDay(p.endDate) : ''));
+    facts.appendChild(fact(T.packageLabel, T.packageLeft + p.left + T.of + p.total + T.sessions + T.packageSuffix, isStr(p.endDate, 10) ? T.until + isoDay(p.endDate) : '', p.left / p.total));
   }
-  if (doc.goal && isStr(doc.goal.title, 80) && doc.goal.title) box.appendChild(stat(T.goal, doc.goal.title, ''));
+  if (doc.goal && isStr(doc.goal.title, 80) && doc.goal.title) facts.appendChild(fact(T.goal, doc.goal.title, ''));
   if (isNum(doc.streakWeeks) && doc.streakWeeks > 0) {
-    box.appendChild(stat(T.streak, doc.streakWeeks + (doc.streakWeeks > 1 ? T.weeksInRow : T.weekInRow), isNum(doc.attended) && doc.attended > 0 ? T.attended + doc.attended + T.sessions : ''));
+    facts.appendChild(fact(T.streak, doc.streakWeeks + (doc.streakWeeks > 1 ? T.weeksInRow : T.weekInRow), isNum(doc.attended) && doc.attended > 0 ? T.attended + doc.attended + T.sessions : ''));
   }
+  if (facts.childNodes.length) box.appendChild(facts);
   return box.childNodes.length ? box : null;
 }
 
@@ -470,6 +495,13 @@ function exerciseImage(file) {
   img.src = imgBase + encodeURIComponent(file);
   return img;
 }
+// "label 8-10": the value in its own LTR isolate (.num) so ranges and tempos never read reversed in Arabic.
+function labelled(cls, label, value) {
+  var e = el('span', cls);
+  e.appendChild(document.createTextNode(label));
+  e.appendChild(el('span', 'num', String(value)));
+  return e;
+}
 function exerciseCard(x, n) {
   var li = el('li', 'ex');
   var media = el('div', 'ex-media');
@@ -486,16 +518,19 @@ function exerciseCard(x, n) {
   top.appendChild(el('span', 'ex-n', n));
   top.appendChild(el('div', 'ex-name', isStr(x.name, 120) ? x.name : ''));
   body.appendChild(top);
-  var main = [];
-  if (isNum(x.sets)) main.push(T.sets + x.sets);
-  if (isStr(x.reps, 20) && x.reps) main.push(T.reps + x.reps);
-  if (main.length) body.appendChild(el('div', 'ex-main', main.join(' × ')));
+  var main = el('div', 'ex-main');
+  if (isNum(x.sets)) main.appendChild(labelled('', T.sets, x.sets));
+  if (isStr(x.reps, 20) && x.reps) {
+    if (main.childNodes.length) main.appendChild(document.createTextNode(' × '));
+    main.appendChild(labelled('', T.reps, x.reps));
+  }
+  if (main.childNodes.length) body.appendChild(main);
   var chips = el('div', 'chips');
   var add = function (label, value, cls) { if (value !== undefined && value !== null && value !== '') chips.appendChild(el('span', 'chip' + (cls ? ' ' + cls : ''), label + value)); };
   add(T.superset, isStr(x.group, 4) && x.group ? x.group : undefined, 'brand');
   add(T.rest, isNum(x.restSec) ? x.restSec + T.sec : undefined);
-  add(T.tempo, isStr(x.tempo, 20) ? x.tempo : undefined);
-  add(T.rpe, isNum(x.rpe) ? x.rpe : undefined);
+  if (isStr(x.tempo, 20) && x.tempo) chips.appendChild(labelled('chip', T.tempo, x.tempo));
+  if (isNum(x.rpe)) chips.appendChild(labelled('chip', T.rpe, x.rpe));
   if (chips.childNodes.length) body.appendChild(chips);
   if (isStr(x.notes, 500) && x.notes) body.appendChild(el('p', 'sub', x.notes));
   li.appendChild(body);
@@ -840,6 +875,14 @@ function field(label, input) {
 }
 function numberInput(name) {
   var i = el('input'); i.name = name; i.inputMode = 'decimal'; i.autocomplete = 'off'; i.dir = 'ltr';
+  // Arabic keyboards type Eastern-Arabic digits; the page shows Western 0-9, so convert as the client types.
+  i.addEventListener('input', function () {
+    var w = i.value
+      .replace(/[٠-٩]/g, function (d) { return String(d.charCodeAt(0) - 0x0660); })
+      .replace(/[۰-۹]/g, function (d) { return String(d.charCodeAt(0) - 0x06F0); })
+      .replace(/٫/g, '.');
+    if (w !== i.value) i.value = w;
+  });
   return i;
 }
 function toNumber(text) {
@@ -1148,12 +1191,16 @@ function render(doc, raw) {
     });
   };
   panels.forEach(function (p) {
-    var t = el('button', 'tab', p[1]);
+    var t = el('button', 'tab');
     t.type = 'button'; t.id = 't-' + p[0]; t.setAttribute('role', 'tab');
+    var ic = svg('svg', { viewBox: '0 -960 960 960', 'aria-hidden': 'true', focusable: 'false' });
+    ic.appendChild(svg('path', { d: ICONS[p[0]] }));
+    t.appendChild(ic);
+    t.appendChild(el('span', '', p[1]));
     t.addEventListener('click', function () {
       show(p[0]);
-      var top = tabs.getBoundingClientRect().top;
-      if (top < 0) tabs.scrollIntoView();
+      // The bar floats at the bottom: switching tabs starts the new panel at its top.
+      if (p[2].getBoundingClientRect().top < 0) p[2].scrollIntoView();
     });
     tabs.appendChild(t);
   });

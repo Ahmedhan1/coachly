@@ -4,7 +4,7 @@ export {
   contrastRatio,
   DEFAULT_BRAND,
   deriveBrand,
-  IRON_SURFACES,
+  APP_SURFACES,
   mixHex,
   normalizeHex,
   ON_DARK,

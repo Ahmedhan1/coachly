@@ -2,7 +2,7 @@ import { packFile, unpackFile, type PackedHeader } from '@/domain/files';
 import type { CloudFileRecord } from '@/data/db';
 import type { CloudFileRepository } from '@/data/repositories/cloudFileRepository';
 import type { ImageRepository } from '@/data/repositories/imageRepository';
-import type { MetaStore } from '@/services/meta/metaStore';
+import type { MetaStore } from '@/data/metaStore';
 import type { ImageDownscaler } from '@/services/storage/types';
 import { generateRawKey, openWithKey, sealWithKey } from '../../../shared/envelope';
 import { base64UrlDecode, base64UrlEncode } from '../../../shared/bytes';

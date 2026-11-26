@@ -11,7 +11,7 @@ working on a feature.
   interface in `src/services`, has a short timeout, fails silently, and queues a retry. Test with and
   without network.
 - **Target.** Safari on iOS 16.4+, installed to the home screen (standalone PWA).
-- **Arabic, RTL.** Every user-visible string comes from `src/i18n/ar.ts`. No hard-coded UI text in components.
+- **Arabic, RTL.** Every user-visible string comes from `src/i18n/ar/`. No hard-coded UI text in components.
   Digits are Western (0-9). Use CSS logical properties (`margin-inline-start`, never `margin-left`).
 - **Fitness terms are transliterated, never translated**: Glutes → جلوتس, Biceps Curl → بايسبس كيرل,
   Quads → كوادز, Hamstrings → هامسترينج, Deadlift → ديدليفت. Dictionary: `src/i18n/fitness-terms.ts`.

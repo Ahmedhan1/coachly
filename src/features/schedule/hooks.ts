@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from 'react';
 import { useServices } from '@/app/services';
-import { deviceZone } from './zone';
+import { deviceZone } from '@/app/deviceZone';
 import { createScheduleWriter } from './scheduleWriter';
 
 /** Re-renders once a minute so "today" and the next session stay right while the screen is open. */

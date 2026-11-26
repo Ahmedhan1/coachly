@@ -1,5 +1,5 @@
 import { describe, expect, it, vi } from 'vitest';
-import { memoryMetaStore } from '@/services/meta/metaStore';
+import { memoryMetaStore } from '@/data/metaStore';
 import { AUTH_META_KEYS, WorkerAuthService, type WorkerAuthDeps } from './workerAuthService';
 
 const WORKER = 'https://worker.example';

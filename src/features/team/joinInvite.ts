@@ -1,7 +1,7 @@
 import type { AppServices } from '@/app/services';
 import { readJoinFragment } from '@/domain/team';
 import { TEAM_META_KEYS } from '@/services/team/teamService';
-import type { MetaStore } from '@/services/meta/metaStore';
+import type { MetaStore } from '@/data/metaStore';
 import { teamErrorText } from './teamErrors';
 
 /** An invite link was opened (`#join=…`): keep it until the trainer is signed in. Returns true when found. */

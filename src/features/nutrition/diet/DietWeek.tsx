@@ -32,7 +32,7 @@ import {
 import type { Client, Meal } from '@/domain/models';
 import { t } from '@/i18n';
 import { pick } from '@/i18n/locale';
-import { Badge, Button, Icon, Sheet, Tx, TitleIcon } from '@/ui';
+import { Badge, Button, Chip, Icon, Sheet, TitleIcon, Tx } from '@/ui';
 import { FoodImage } from '../shared/FoodImage';
 import { parseDecimal } from '../shared/numbers';
 import { useNutritionStore } from '../shared/useNutritionStore';
@@ -356,7 +356,7 @@ function LineRow({ line, food, onSet, onLock }: { line: GramLine; food: Ingredie
       {!fixed && (
         <div className={styles.lineControls}>
           <button type="button" className={styles.stepBtn} aria-label={t('nutrition.diet.less', { name })} onClick={() => onSet(Math.max(step, line.grams - step))}>
-            −
+            <Icon name="minus" />
           </button>
           <input
             className={`${styles.gramsInput} num`}
@@ -371,7 +371,7 @@ function LineRow({ line, food, onSet, onLock }: { line: GramLine; food: Ingredie
             }}
           />
           <button type="button" className={styles.stepBtn} aria-label={t('nutrition.diet.more', { name })} onClick={() => onSet(line.grams + step)}>
-            +
+            <Icon name="plus" />
           </button>
           <button
             type="button"
@@ -470,13 +470,13 @@ function MealChoices(props: {
   return (
     <div className={cal.chips} role="group" aria-label={t('nutrition.goal.optionsTitle')}>
       {list.map((o, i) => (
-        <button key={o.recipeId} type="button" className={cal.chip} aria-pressed={i === 0} onClick={() => i > 0 && onPick(o)} title={t('nutrition.goal.option', { n: i + 1 })}>
+        <Chip key={o.recipeId} pressed={i === 0} onClick={() => i > 0 && onPick(o)} title={t('nutrition.goal.option', { n: i + 1 })}>
           {name(o.recipeId)} · <bdi className="num">{o.meal.totals.kcal}</bdi>
-        </button>
+        </Chip>
       ))}
-      <button type="button" className={cal.chip} onClick={onAuto}>
+      <Chip onClick={onAuto}>
         {t('nutrition.goal.pickForMe')}
-      </button>
+      </Chip>
     </div>
   );
 }

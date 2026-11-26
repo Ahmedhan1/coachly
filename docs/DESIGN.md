@@ -1,26 +1,13 @@
 # DESIGN.md — PT Coach visual system
 
-> **Status: OWNER CHOSE DIRECTION B «الحديد» (Iron) on 2026-11-16.** The app adopts `design/direction-b/tokens.css`; direction A is kept for reference only. Two directions are proposed: **A «الدفتر» (The Ledger)** and
-> **B «الحديد» (Iron)**. The owner picks one from `design/compare.html` / `design/screenshots/compare.png`.
-> Until then, Phase 2 builds components against the shared token *names* below; the chosen direction's
-> `design/direction-*/tokens.css` becomes `src/ui/tokens.css`. Nothing else should need to change.
-
-Files:
-
-| Path | What |
-| --- | --- |
-| `design/direction-a/`, `design/direction-b/` | `tokens.css` (swappable), `ui.css` (component reference), 3 static screens |
-| `design/fonts/` | Locally bundled woff2 (Arabic + Latin subsets, OFL-1.1) + `fonts.css` |
-| `design/icons.svg` | Hand-drawn stroke icon sprite + exercise pictograms (photo-slot stand-ins) |
-| `design/build.mjs` | Injects the sprite, generated front/back muscle maps and the mock status bar into each screen |
-| `design/brand-derive.mjs` | Reference algorithm: one brand hex → all brand tokens (port to `src/domain` with tests) |
-| `design/capture.mjs` | Playwright screenshots (SE 375×667, Pro Max 430×932, light/dark, @2x) |
-
-Regenerate: `node design/build.mjs && node design/capture.mjs`.
+> **Status:** **Pebble «حصى»**, chosen by the owner on 2026-11-26, is what ships (it replaced Direction B «الحديد»
+> Iron, 2026-11-16 → 2026-11-26). Its values live in `src/ui/tokens.css` (the only place visual values live);
+> components are in `src/ui`. Pebble was picked from four directions (Steel, Pebble, Night Shift, Paper) rendered on
+> the real app; older mockups remain in git history (`git show 708815f:design/`).
 
 ---
 
-## 1. Shared principles (both directions)
+## 1. Principles
 
 1. **One brand color, everything else neutral.** The trainer picks one color; the app derives every
    brand token from it (§2). No second accent, no gradients between hues.
@@ -46,12 +33,13 @@ Regenerate: `node design/build.mjs && node design/capture.mjs`.
 10. **Copy is plain Egyptian Arabic, short, actionable** ("فكّرها"، "جدّد"، "ابعت البرنامج"). No slogans.
 
 **Hard bans:** purple/blue gradients · glassmorphism/blurred cards · emoji as icons · grids of identical
-stat cards · large blurry shadows, radii > 22px on surfaces · motion on every element · empty marketing
-copy · one font for everything · translated fitness terms · Eastern-Arabic digits.
+stat cards · dark or grey shadows (Pebble's are faint and warm-tinted, `--shadow-card`/`--shadow-float` only) ·
+hard-cornered controls · motion on every element · empty marketing copy · translated fitness terms ·
+Eastern-Arabic digits.
 
 ---
 
-## 2. Brand color derivation (identical for both directions)
+## 2. Brand color derivation
 
 The trainer picks **one** hex. `brand-derive.mjs` (pure, to be ported to `src/domain/brand.ts`) computes:
 
@@ -62,13 +50,12 @@ The trainer picks **one** hex. `brand-derive.mjs` (pure, to be ported to `src/do
 | `--brand-ink` | brand used *as text* (links, active tab label): mixed toward black until ≥ 4.5:1 on `--bg` | mixed toward white until ≥ 5.5:1 on `--bg` |
 | `--brand-tint` | 10% brand over `--bg` (selected rows, brand chips background) | 16% over dark `--bg` |
 | `--brand-tint-strong` | 20% (focus rings, halo of the next-session dot) | 28% |
-| `--muscle-hit` / `--muscle-hit-2` | primary / secondary target muscles: brand, and `color-mix(in oklab, brand 45%, --muscle-off)` | `--muscle-hit` uses `--brand-ink` in A for visibility |
+| `--muscle-hit` / `--muscle-hit-2` | primary / secondary target muscles: brand, and `color-mix(in oklab, brand 45%, --muscle-off)` | same |
 
-Proven in the mockups with a second color per direction (`#alt` on any screen URL):
-A default pine `#1F6B53` → alt terracotta `#B4532A`; B default signal orange `#F25C1F` (on-color
-resolves to **dark** text) → alt crimson `#C81E3A` (on-color flips to **white**).
+Default signal orange `#F25C1F` resolves to **dark** on-brand text; crimson `#C81E3A` flips it to **white**
+(both pinned in `src/domain/branding/brand.test.ts`).
 
-Semantic colors (`--ok`, `--warn`, `--danger` + `-tint`) are fixed per direction and never derived from
+Semantic colors (`--ok`, `--warn`, `--danger` + `-tint`) are fixed and never derived from
 the brand, so a red brand can't be confused with "late payment".
 
 **Contrast audit (all 8 theme × brand combinations):** text, text-2, text-3, brand-ink, semantic-on-tint,
@@ -101,129 +88,70 @@ Dark mode: `@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]
 
 ---
 
-## 4. Direction A — «الدفتر» The Ledger
+## 5. Pebble «حصى» (shipping)
 
-**Rationale (عربي):** زي دفتر المدرب الشخصي بس متنظّم: خلفية لون الورق، خطوط رفيعة بتفصل بدل الكروت،
-وعناوين بخط نسخ فيه روح وشخصية. لون الهوية بيظهر في حاجات قليلة ومهمة: الحصة الجاية والزرار الأساسي
-والتبويب الحالي. البحث وزرار الإضافة تحت عند الصباع. هادي ومحترم ومريح للعين، والأرقام مرصوصة زي جدول حسابات.
+**Rationale (عربي):** شكل هادي ودود ومريح للعين: كل حاجة مدوّرة، الزراير والشيبس كبسولات، والكروت مرفوعة شوية بضل
+خفيف على أرضية لونها أوف وايت دافي. خط واحد بس (Rubik) أطرافه ناعمة، والتدرّج بييجي من الحجم والوزن مش من خط تاني.
+شريط التبويبات عايم فوق المحتوى زي كبسولة، وزرار الإضافة دايرة بلون الهوية في النص. لون الهوية بيظهر بجرأة على
+الحصة الجاية والزرار الأساسي وزرار الإضافة.
 
-### Color
-| Token | Light | Dark |
-| --- | --- | --- |
-| `--bg` | `#F4F1EA` warm paper | `#141311` |
-| `--surface` | `#FBFAF7` | `#1C1B18` |
-| `--surface-2` | `#EDE9E0` | `#252320` |
-| `--line` / `--line-strong` | `#E0DBD0` / `#CFC9BC` | `#2F2D29` / `#3D3A35` |
-| `--text` / `-2` / `-3` | `#1B1A17` / `#5E5A52` / `#6A655C` | `#EDEAE3` / `#ABA69C` / `#948F85` |
-| `--ok` `--warn` `--danger` | `#2A7343` `#8C5200` `#B3261E` | `#6BBF85` `#E0A64A` `#F08A80` |
-| brand default | `#1F6B53` (ink same) | fill `#236E56`, ink `#6FA592` |
-
-Brand usage is **sparse**: next-session row tint + dot, active tab, primary button, links, superset rail.
-
-### Type
-- Headings: **Noto Naskh Arabic 700** — `--t-display` 34/1.25 (30 on ≤380px wide), `--t-title` 24/1.3, section titles 21.
-- UI + numbers: **IBM Plex Sans Arabic** 400/500/600/700 — body 16/1.55, headline 17/600, sub 14, caption 12.5.
-- Numbers: Plex, tabular, medium weight, 17px in lists, 28px for the one big package number. Never bigger.
-
-### Space, shape, elevation
-- Gutter 20px; rows 56px min (timeline 64). 4pt scale.
-- Radii: 4 (tags) · 6 (photo slots, small buttons) · 10 (buttons, fields) · 14 (sheet). Lists are full-bleed with hairlines, **not cards**.
-- Hairlines 0.5px. Elevation only on sheets (`--shadow-sheet`) and a 1px lift on the search field; none in dark mode.
-
-### Components
-- **Tab bar**: 5 tabs (الرئيسية، العملاء، المواعيد، التمارين، المزيد), 50pt + safe area, solid `--surface`, hairline top; icons 25px stroke 1.6, active = `--brand-ink` + stroke 2.
-- **Command bar** (Home and list screens): pinned above the tab bar — search field "دوّر على عميل أو تمرين" + square brand "+" (quick add sheet: عميل، حصة، برنامج). Thumb-reachable, iOS-Safari-like.
-- **List row**: title 17/600, sub 14 `--text-2`, trailing value/chevron; separators inset from the start.
-- **Timeline row**: time column (start) `5:00` + `م` under it, a 1px rail with status dot, done rows muted, next row on `--brand-tint` with brand dot + halo.
-- **Swipe**: leading (from the right in RTL) and trailing actions 76px wide each; brand action = `--brand`, neutral = `#6F6A61`, destructive = `--danger`.
-- **Buttons**: primary 50pt brand fill; secondary hairline outline on `--surface`; plain = brand-ink text; small 34pt visual / 44pt hit.
-- **Action bar** (pushed screens): `--surface` + hairline, primary flex-1, secondaries with icon+label; on ≤400px wide secondaries become 50pt icon-only (label kept in `aria-label`).
-- **Fields**: 44pt, `--surface`, hairline `--line-strong`, radius 10, label above in caption.
-- **Tags/chips**: 24px high, radius 4, `--surface-2`; brand/warn/danger variants on tints.
-- **Ledger spec grid** (program): 5 equal columns سيتات/عدات/راحة/تمبو/RPE, hairline cells, caption label over a 16px tabular value.
-- **Sheet**: radius 14 top, grabber 36×5, `--scrim` behind.
-- **Empty state**: one Naskh line saying what to do + one primary button; no illustration ("لسه ما ضفتش عملاء. ابدأ بأول عميل").
-- **Toast/undo**: inverted (`--text` bg), 48pt, "تراجع" underlined, 5s, above the action bar.
-
-### Iconography
-**Updated 2026-11-19 (owner):** filled, rounded icons everywhere — Material Symbols Rounded, fill 1, weight 400
-(Apache-2.0), path data in `src/ui/icons/paths.ts`, rendered by `<Icon>` in `currentColor`. Every section title has
-one in a brand-tinted tile, rows have a leading icon, actions have an icon before the label, section footers start
-with an info icon. The only outline icon is the empty favourite star (to show the off state).
-`design/icons.svg` (the old stroke set) is kept for the design mockups only.
-
-### Photo / 3D treatment
-Photo slots: 60×60 square, radius 6, hairline frame, neutral `--photo` fill; real photos are shown
-unfiltered. Next to each photo a 26×60 back/front body silhouette with target muscles in brand.
-Day header shows front+back at 40×92. 3D viewer: model on `--bg`, muscles `--muscle-off`, target in `--brand`.
-
-### PDF look
-Paper-colored background, Naskh headings, Plex body, hairline-ruled exercise tables exactly like the
-ledger spec grid, brand used only for the trainer's name rule and target muscles. Feels like a printed program.
-
----
-
-## 5. Direction B — «الحديد» Iron
-
-**Rationale (عربي):** روح صالة الجيم: خط عناوين عريض وتقيل، وأرقام كبيرة بس لما يكون ليها معنى زي ميعاد
-الحصة الجاية وعدد الحصص الباقية. لون الهوية بيتحط بجرأة على الحصة الجاية واليوم المختار والزرار الأساسي.
-صور التمارين أكبر وعليها خريطة العضلة. زرار الإضافة في نص شريط التبويبات. واضح وسريع وبيتقري من بعيد،
-ومعمول للاستعمال بين السيتات.
+### Editorial layer (2026-11-26, owner: "editorial, keep the font and colours")
+Pebble's palette, Rubik and the trainer's brand colour stay; the layout became type-led:
+- **Masthead** (`PageHeader`): the subtitle is a small brand-ink kicker (`--t-eyebrow`) *above* a 40px title.
+- **Sections** (`ListSection`, `common.sectionTitle`): a 22px title over a full-width hairline rule (`--line-strong`),
+  40px of space between sections. Title icons are quiet inline glyphs in brand ink, not tinted tiles.
+- **Indexes vs objects**: lists are rows set on the page divided by hairlines (no box); things the trainer acts on
+  (next-session hero, package, follow-ups, session) stay rounded cards with a faint lift.
+- **Display numerals**: `--t-num-hero` 76px for the one number a screen is about; `--t-num-lg` 52, `--t-num-xl` 40.
+- Neutral chips and badges use `--tint-ink` (translucent ink) so they read on the page and inside cards.
 
 ### Color
 | Token | Light | Dark |
 | --- | --- | --- |
-| `--bg` | `#EDEDEA` concrete | `#0B0C0C` |
-| `--surface` | `#FFFFFF` | `#161818` |
-| `--surface-2` | `#F3F3F1` | `#1F2222` |
-| `--line` / `--line-strong` | `#E3E3DF` / `#D2D3CF` | `#252828` / `#2E3232` |
-| `--text` / `-2` / `-3` | `#0E0F0F` / `#4A4D4E` / `#5F6364` | `#F2F3F1` / `#A3A8A6` / `#868B89` |
+| `--bg` | `#F3F1ED` warm off-white | `#131211` |
+| `--surface` | `#FFFFFF` | `#1E1C1A` |
+| `--surface-2` | `#EFECE6` | `#282623` |
+| `--line` / `--line-strong` | `#E6E2DA` / `#D7D2C8` | `#2F2C29` / `#3B3834` |
+| `--text` / `-2` / `-3` | `#1C1A17` / `#57524A` / `#6B665D` | `#F3F0EA` / `#B0AAA0` / `#948E84` |
 | `--ok` `--warn` `--danger` | `#1B7040` `#8F5600` `#B42318` | `#5CC88A` `#F0B04F` `#FF8A7E` |
-| brand default | `#F25C1F`, on `#111111`, ink `#AA3F14` | same fill, ink `#FF7A45` |
+| brand default | `#F25C1F`, on `#111111`, ink `#AE4216` | same fill, ink `#F36931` |
 
-Brand usage is **bold**: next-session hero block fully in brand, selected day pill, primary buttons,
-center add button, A1/A2 superset tags, target muscles.
+Contrast (checked 2026-11-26 with `src/domain/branding` contrastRatio): every text token and semantic colour is
+≥ 4.5:1 on `--bg`, `--surface` and `--surface-2` in both modes, semantic colours ≥ 4.5:1 on their tints, and all 8
+brand presets pass `auditBrand` on these surfaces (`APP_SURFACES` in `src/domain/branding/brand.ts`).
 
 ### Type
-- Display + numbers: **Alexandria** 700/800 — `--t-display` 30/800, hero time 52/800, remaining sessions 34/800, weights 24/800.
-- UI: **Readex Pro** 400/500/600 — body 16, headline 17/500, sub 14, caption 12.5.
-- Numbers: Alexandria tabular in lists 18–19/700. Sets×reps shown as `4 سيت × 8–10 عدة` at 22/800.
+One family, **Rubik** (variable 300–900, SIL OFL), for headings, text and numbers. Hierarchy by size and weight:
+display 30/700, large title 28/700, title 20/600, heading 17/600, body 16/400, callout 15/500, sub 14/400,
+caption 12.5/400, buttons 16/500. Numbers tabular (`.num`) at 600–700: hero time 52, remaining sessions 34–44.
 
 ### Space, shape, elevation
-- Gutter 16px; content grouped in **tiles** (radius 18) on `--bg`, rows 60–64pt.
-- Radii: 6 (A1 tags) · 10 (small buttons, avatars) · 14 (buttons, photos) · 18 (tiles) · 22 (sheet) · pill for chips/day pills.
-- No shadows on tiles; only the sheet casts one. Borders 1px.
+- Gutter 16px; content grouped in **lifted tiles** on `--bg`: `--surface` + `--shadow-card` (faint, warm) in light;
+  no shadow in dark (surfaces are lighter than `--bg` instead).
+- Radii: 10 (tags) · 16 (small tiles, photos) · 22 (cards) · 28 (big tiles) · 34 (sheet) · **24 for every control**:
+  half of a 48pt control, so buttons, chips, fields and segments are pills while taller blocks stay soft rectangles.
 
 ### Components
-- **Tab bar**: 4 tabs + center 52×44 brand "+" (quick add sheet). "المزيد"/settings lives behind the trainer's initial/logo button at top of Home.
-- **Top bar**: large title start-aligned, round 44pt buttons (search, profile) on `--surface`.
-- **Hero (next session)**: brand block — status line, time 52px, client name 22px, then on-brand inverse button "ابدأ الحصة" + outline WhatsApp.
-- **List row**: in tiles, 1px separators; done sessions struck-through + `تم` ok chip.
-- **Expiring row**: renew button + a days-left column (big number in brand-ink when ≤3 days).
-- **Segmented control** (client): 4 segments on `--surface`, selected = inverted (`--text` bg).
-- **Package ring**: 12 segments, fills counter-clockwise from the top (RTL), used = `--text-3`, booked = `--brand`, left = `--surface-2`; big remaining number centered.
-- **Buttons**: primary 48–52pt brand fill; secondary `--surface-2`; stacked icon-over-label 64×52 buttons in the action bar.
-- **Chips**: 28px pill, `--surface-2`, values in Alexandria bold.
-- **Fields**: 48pt, `--surface`, radius 14, no border in light, 1px `--line-strong` in dark.
-- **Sheet**: radius 22, grabber 40×5.
-- **Empty state**: tile with Alexandria headline + one primary button.
-- **Toast/undo**: inverted, 52pt, radius 14.
-
-### Iconography
-Same sprite as A, rendered at stroke 2 (heavier, matches Alexandria).
-
-### Photo / 3D treatment
-Photo slots 96×96 radius 14, with the muscle map in a small `--surface` badge in the corner and A1/A2
-superset tags on the photo. Day tile shows front+back maps 40×92 with a direct link "شوفها على المجسم 3D".
-3D viewer: dark stage even in light mode is acceptable; target muscles in `--brand`.
+- **Tab bar**: a floating pill (`--r-full`, `--shadow-float`) inset by the gutter, sitting just above the home
+  indicator (`--tabbar-gap` on phones without one). 4 tabs + a 48pt brand circle "+" in the middle. Anything that
+  must clear it uses `--tabbar-space`.
+- **Hero (next session)**: brand block, radius 28, time 52px, on-brand "ابدأ الحصة" pill + round WhatsApp button.
+- **Buttons / chips / segments / fields**: pills (`--r-control`); selected segment and pressed chip = `--text` fill.
+- **Section title icons**: brand-tint circles.
+- **Sheet**: radius 34, grabber 40×5, faint warm shadow.
+- Everything else follows §10: one implementation per control in `src/ui`.
 
 ### PDF look
-White pages, bold Alexandria headers, a brand-colored band on the cover with the trainer logo, exercise
-cards with large photos and the muscle badge, sets×reps in big numerals — reads well printed or on a phone.
+Pebble on paper (`src/services/pdf/pageStyles.ts`): Rubik (or Cairo, the trainer's choice in PDF settings), a warm
+off-white page, white rounded cards with a faint warm shadow, section titles with a round brand number (no filled
+bands), light table headers without zebra rows, superset rows washed in the brand tint, pill chips, a rounded brand
+card on the cover and a rounded contact card at its foot. Over a trainer background image, titles and loose text sit
+on white pills. Only treatment changed in Nov 2026: every size the paginator uses (`src/domain/pdf/layout`) is the same,
+so page breaks are unchanged.
 
 ---
 
-## 6. Motion (both)
+## 6. Motion
 
 - What moves: sheets (`--dur-3`, `--ease-sheet`), pushes (system-like 300ms), swipe actions (follow finger,
   settle `--dur-2`), toast in/out (`--dur-2`), drag-reorder lift (scale 1.02, `--dur-1`), checkmark on
@@ -240,13 +168,34 @@ cards with large photos and the muscle badge, sets×reps in big numerals — rea
 
 ## 8. Fonts and licensing
 
-All four families are SIL OFL 1.1 (Google Fonts), bundled as woff2 subsets in `design/fonts/` — they work
-offline and must be listed in `LICENSES.md` when Phase 2 copies them into `public/`. The trainer's
-font-picker (SPEC: Cairo/Tajawal/Plex) changes `--font-ui` only; `--font-display` stays with the direction.
+Rubik (the app) and Cairo (second PDF option) are SIL OFL 1.1, bundled as variable woff2 subsets in `public/fonts/`
+with their licence texts, listed in `LICENSES.md`, and precached so they work offline. The trainer's font choice
+applies to the PDF (`PDF_FONTS` in `src/features/pdf/pdfBranding.ts`); a saved font that is no longer bundled reads
+as Rubik without resetting the rest of the trainer's PDF look.
 
-## 9. Known gaps (to resolve after the choice)
+## 9. Known gaps
 
 - Exercise photo slots use pictograms; real `free-exercise-db` photos must be checked in both themes.
 - Muscle map is a simplified in-house SVG; Phase 5 swaps in `react-body-highlighter` (check license) with the same CSS-variable coloring.
-- Mockups use Chromium; Safari/WebKit rendering of Naskh and Alexandria must be verified on a real iPhone (add to `docs/MANUAL_QA.md`).
+- Screens are checked in Chromium; Rubik, the floating tab bar and backdrop/shadow rendering must be verified in
+  Safari on a real iPhone (`docs/MANUAL_QA.md`).
 - Largest iOS Dynamic Type sizes not yet mocked.
+
+---
+
+## 10. Shared components — use them, don't restyle them
+
+**Added 2026-11-26.** Every control below has exactly one implementation in `src/ui` (import from `@/ui`). A feature
+never re-creates one in its own CSS module; if a screen needs something the component can't do, extend the component.
+
+| Need | Component | Notes |
+| --- | --- | --- |
+| Save / Done / Restore in a sheet header | `<Button size="small">` as `Sheet`'s `primaryAction` | Filled brand, no icon, label only. |
+| Filter, choice or inline-action chip | `<Chip pressed?>` · `<ChipGroup label>` | 36pt, 44pt hit. Dark fill when pressed; `tone="warn"` for injuries. Leave out `pressed` for action chips ("+ Add"). |
+| − value + number entry | `<Stepper>` | `size="big"` in session mode. |
+| List of actions in a sheet | `<ActionSheet actions>` | `danger` rows in red. |
+| Pick a photo or file | `<FileButton onFiles>` | Clears the input after each pick; `busy` while processing; `block` for full width. |
+| Remove a photo / attachment | `<Button variant="danger" size="small" icon="trash">` | |
+
+Chips, file buttons and text fields sit on `--field-bg`: white on a page, `--surface-2` inside a sheet (`Sheet` sets it).
+Static labels inside a row (muscle, "custom", sets×reps) are tags, not chips, and stay with their row's CSS.

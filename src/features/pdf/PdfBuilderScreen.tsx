@@ -9,10 +9,10 @@ import { normalizeSections, PDF_PRESET_IDS, PDF_PRESETS, presetTemplate, type Pd
 import { whatsappLink } from '@/domain/whatsapp';
 import { t } from '@/i18n';
 import { formatBytes } from '@/ui/format';
-import { Button, Icon, IconButton, PageHeader, Select, Sheet, TextArea, TextField, cx, TitleIcon } from '@/ui';
+import { Button, Icon, IconButton, PageHeader, Select, Sheet, TextArea, TextField, TitleIcon, cx } from '@/ui';
 import { createImageSource, HtmlPdfRenderer, type PdfRenderProgress, type RenderedPdf } from '@/services/pdf';
 import { BrowserShareService } from '@/services/share';
-import { useExerciseCatalog } from '@/features/programs/catalog';
+import { useExerciseCatalog } from '@/app/catalog';
 import { buildPdfInput } from './buildPdfInput';
 import { muscleMapRefs } from './muscleMapImage';
 import { BrandingSheet } from './BrandingSheet';
@@ -376,9 +376,9 @@ function SaveTemplateSheet({ onClose, onSave }: { onClose: () => void; onSave: (
       title={t('pdf.saveTemplate')}
       cancelLabel={t('common.cancel')}
       primaryAction={
-        <button type="button" className={styles.sheetSave} disabled={!name.trim()} onClick={() => void onSave(name.trim())}>
+        <Button size="small" disabled={!name.trim()} onClick={() => void onSave(name.trim())}>
           {t('common.save')}
-        </button>
+        </Button>
       }
     >
       <TextField label={t('pdf.templateName')} value={name} onChange={(e) => setName(e.target.value)} autoComplete="off" />

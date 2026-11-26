@@ -13,12 +13,12 @@ import { googleCalendarUrl } from '@/services/calendar';
 import { addSessionToCalendar, calendarEventFor } from './calendarExport';
 import { ClientPicker } from './ClientPicker';
 import { useActiveProgram } from '@/features/programs/activePrograms';
-import { programDayName } from '@/features/programs/names';
-import { attachSessionDay, readSessionDays } from './sessionDays';
+import { programDayName } from '@/i18n/programNames';
+import { attachSessionDay, readSessionDays } from '@/data/prefs/sessionDays';
 import { useScheduleWriter } from './hooks';
 import { futureOfSeries } from './scheduleWriter';
 import type { SchedulePrefs } from './prefs';
-import { deviceZone } from './zone';
+import { deviceZone } from '@/app/deviceZone';
 import styles from './Schedule.module.css';
 
 export type BookingTarget = { mode: 'new'; date: IsoDate; clientId: string | null } | { mode: 'edit'; session: Session };
@@ -267,9 +267,9 @@ function BookingForm({
       title={session ? t('schedule.sheet.editTitle') : t('schedule.sheet.newTitle')}
       cancelLabel={t('common.cancel')}
       primaryAction={
-        <button type="submit" form={FORM_ID} className={styles.save} disabled={saving}>
+        <Button size="small" type="submit" form={FORM_ID} disabled={saving}>
           {session ? t('schedule.sheet.saveEdit') : t('schedule.sheet.save')}
-        </button>
+        </Button>
       }
     >
       <form id={FORM_ID} className={styles.form} onSubmit={submit} noValidate>

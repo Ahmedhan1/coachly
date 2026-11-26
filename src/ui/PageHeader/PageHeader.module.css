@@ -38,14 +38,29 @@
 }
 
 .bar + .title {
+  margin-block-start: var(--sp-3);
+}
+
+/* Kicker: the date, count or context line, set small above the title like a magazine standfirst. */
+.subtitle {
+  margin-block-start: var(--sp-3);
+  padding-inline-end: var(--sp-2);
+  font: var(--t-eyebrow);
+  color: var(--brand-ink);
+}
+
+.subtitle + .title {
+  margin-block-start: var(--sp-1);
+}
+
+/* Without a back bar the kicker opens the header, above the title row. */
+.subtitleTop {
   margin-block-start: var(--sp-2);
 }
 
-.subtitle {
+.subtitleTop + .top {
+  min-block-size: 0;
   margin-block-start: var(--sp-1);
-  padding-inline-end: var(--sp-2);
-  font: var(--t-callout);
-  color: var(--text-2);
 }
 
 /* Compact bar (iOS navigation bar): fixed, translucent, fades in once the large title has scrolled away. */

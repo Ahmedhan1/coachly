@@ -1,8 +1,8 @@
-import { useId, useState } from 'react';
+import { useState } from 'react';
 import { useServices } from '@/app/services';
 import { t } from '@/i18n';
-import { Button, Icon } from '@/ui';
-import { useStoredImageUrl } from './useStoredImageUrl';
+import { Button, FileButton } from '@/ui';
+import { useStoredImageUrl } from '@/app/useStoredImageUrl';
 import styles from './Files.module.css';
 
 const RECEIPT_MAX_SIDE = 1600;
@@ -13,7 +13,6 @@ const RECEIPT_MAX_SIDE = 1600;
  */
 export function ReceiptField({ value, onChange }: { value: string | null; onChange: (imageId: string | null) => void }) {
   const { images, data } = useServices();
-  const inputId = useId();
   const url = useStoredImageUrl(value);
   const [state, setState] = useState<'idle' | 'busy' | 'error'>('idle');
 
@@ -35,22 +34,11 @@ export function ReceiptField({ value, onChange }: { value: string | null; onChan
       <span className={styles.receiptLabel}>{t('files.invoice.label')}</span>
       <div className={styles.receiptRow}>
         {url && <img src={url} alt={t('files.invoice.alt')} className={styles.receiptThumb} />}
-        <label htmlFor={inputId} className={styles.fileButton}>
-          <Icon name="camera" />
+        <FileButton icon="camera" accept="image/*" onFiles={([file]) => void pick(file)}>
           {state === 'busy' ? t('files.clientPhoto.processing') : value ? t('files.invoice.change') : t('files.invoice.attach')}
-        </label>
-        <input
-          id={inputId}
-          type="file"
-          accept="image/*"
-          className="visually-hidden"
-          onChange={(e) => {
-            void pick(e.target.files?.[0]);
-            e.target.value = '';
-          }}
-        />
+        </FileButton>
         {value && (
-          <Button icon="trash" variant="secondary" size="small" onClick={() => onChange(null)}>
+          <Button icon="trash" variant="danger" size="small" onClick={() => onChange(null)}>
             {t('files.invoice.remove')}
           </Button>
         )}

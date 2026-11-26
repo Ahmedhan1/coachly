@@ -3,7 +3,7 @@ import { base64UrlDecode, base64UrlEncode } from '../../../shared/bytes';
 import { err, ok, type Result } from '@/domain/nutrition/result';
 import { inviteLink, parseRoster, type Roster } from '@/domain/team';
 import type { WorkerApi } from '@/services/cloud/workerApi';
-import type { MetaStore } from '@/services/meta/metaStore';
+import type { MetaStore } from '@/data/metaStore';
 
 /**
  * Meta keys. `team.key` is the gym's team key (32 random bytes, base64url): on the manager's phone it is created

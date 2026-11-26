@@ -1,6 +1,6 @@
 import { SPLIT_PRESETS, setShare, workoutRoles, type DietSlot, type SplitPreset } from '@/domain/meals';
 import { t } from '@/i18n';
-import { Tx } from '@/ui';
+import { Chip, Tx } from '@/ui';
 import styles from './Cal.module.css';
 import diet from './Diet.module.css';
 
@@ -28,16 +28,14 @@ export function SplitPanel({ slots, kcal, preset, workoutTime, onPreset, onShare
       <p className={styles.rowSub}>{t('nutrition.cal.splitHint')}</p>
       <div className={styles.chips} role="group" aria-label={t('nutrition.cal.presetTitle')}>
         {[...SPLIT_PRESETS, 'custom' as const].map((p) => (
-          <button
+          <Chip
             key={p}
-            type="button"
-            className={styles.chip}
-            aria-pressed={p === preset}
+            pressed={p === preset}
             disabled={p === 'custom'}
             onClick={() => p !== 'custom' && onPreset(p)}
           >
             {t(`nutrition.cal.preset.${p}`)}
-          </button>
+          </Chip>
         ))}
       </div>
       <label className={diet.check}>

@@ -216,12 +216,6 @@
   font: var(--t-label);
 }
 
-.legend {
-  padding: var(--sp-2) var(--gutter) 0;
-  font: var(--t-caption);
-  color: var(--text-2);
-}
-
 /* Attribution for CC BY-SA photos (e.g. Everkinetic drawings). */
 .credit {
   margin: var(--sp-1) var(--gutter) 0;

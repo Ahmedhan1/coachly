@@ -1,5 +1,5 @@
 import { authErrorFromServer, parseAccount, readAuthFragment, type Account, type AuthState } from '@/domain/account';
-import type { MetaStore } from '@/services/meta/metaStore';
+import type { MetaStore } from '@/data/metaStore';
 import type { AuthResult, AuthService } from './types';
 
 /** Device-local (never inside a backup: see DEVICE_LOCAL_META_PREFIXES). */

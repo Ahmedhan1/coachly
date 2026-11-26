@@ -9,7 +9,7 @@ import { IdentitySetupScreen } from '@/features/identity/IdentitySetupScreen';
 import { InstallGateScreen } from '@/features/install/InstallGateScreen';
 import { t } from '@/i18n';
 import { canUseApp, dataOwnership, type Account, type AuthError, type AuthState } from '@/domain/account';
-import { dexieMetaStore } from '@/services/meta/metaStore';
+import { dexieMetaStore } from '@/data/metaStore';
 import { BrowserStorageService, CanvasImageDownscaler } from '@/services/storage';
 import { createBackupServices } from '@/services/backup';
 import { ClientPageService } from '@/services/clientPage/clientPageService';

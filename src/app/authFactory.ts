@@ -2,7 +2,7 @@ import type { AppDatabase } from '@/data';
 import type { AuthService } from '@/services/auth/types';
 import { WorkerAuthService } from '@/services/auth/workerAuthService';
 import { resolveWorkerUrl } from '@/services/cloud/serverConfig';
-import { dexieMetaStore } from '@/services/meta/metaStore';
+import { dexieMetaStore } from '@/data/metaStore';
 
 export interface BuildEnv {
   e2e: boolean;

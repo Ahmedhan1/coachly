@@ -4,12 +4,12 @@ import { addDays } from '@/domain/schedule';
 import { computeOutbox } from '@/features/outbox/useOutbox';
 import { toIsoDate, type ClientId, type ImageId } from '@/domain/models';
 import { t } from '@/i18n';
-import { deviceZone } from '@/features/schedule/zone';
+import { deviceZone } from '@/app/deviceZone';
 import { storePhoto } from '@/features/nutrition/shared/photos';
 import { NutritionStore } from '@/data/nutritionStore';
 import { mealPicksKey, parseMealPicks } from '@/domain/meals';
 import { entryNavyEstimate } from '@/domain/nutrition';
-import { readPushPrefs, readShare, savePushPrefs } from './prefs';
+import { readPushPrefs, readShare, savePushPrefs } from '@/data/prefs/online';
 
 /** Rebuilds this device's push schedule from the next 40 days of sessions and subscription ends. */
 export async function syncPush(services: AppServices, now = Date.now()): Promise<number | null> {

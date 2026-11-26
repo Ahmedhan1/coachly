@@ -3,7 +3,7 @@ import { t } from '@/i18n';
 import { Icon, ListRow, ListSection, Money, Num, Tx, type IconName } from '@/ui';
 import { formatIsoDate, formatMoney, timeParts } from '@/ui/format';
 import { toIsoDate } from '@/domain/models';
-import { programDayName } from '@/features/programs/names';
+import { programDayName } from '@/i18n/programNames';
 import { InjuriesSection, MeasurementsSection, PackageSection } from './sections';
 import type { HubData } from './useHubData';
 import type { HubTab } from './tabs';

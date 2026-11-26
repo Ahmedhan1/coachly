@@ -118,17 +118,20 @@ and **2 LGPL packages**:
 
 | Font | License | Verified | Verdict |
 | --- | --- | --- | --- |
-| Cairo | OFL-1.1 | upstream `google/fonts/ofl/cairo/OFL.txt` ("Copyright 2009 The Cairo Project Authors") + `npm view @fontsource/cairo` → OFL-1.1 | OK |
+| Cairo | OFL-1.1 | upstream `google/fonts/ofl/cairo/OFL.txt` ("Copyright 2009 The Cairo Project Authors") + `npm view @fontsource/cairo` → OFL-1.1; LICENSE in `@fontsource-variable/cairo@5.3.0` checked 2026-11-26, no Reserved Font Name | OK. **Bundled** (second PDF font the trainer can pick) |
+| Rubik | OFL-1.1 | LICENSE in `@fontsource-variable/rubik@5.3.0` ("Copyright 2015 The Rubik Project Authors", no Reserved Font Name) + `npm view @fontsource/rubik` → OFL-1.1, checked 2026-11-26 | OK. **Bundled** (the app's only UI font, Pebble design) |
 | Tajawal | OFL-1.1 | upstream `google/fonts/ofl/tajawal/OFL.txt` ("Copyright 2018 Boutros International") + npm view @fontsource/tajawal | OK |
 | IBM Plex Sans Arabic | OFL-1.1 | upstream `google/fonts/ofl/ibmplexsansarabic/OFL.txt` ("Copyright © 2017 IBM Corp. with Reserved Font Name 'Plex'") + npm view | OK — Reserved Font Name: if we subset/modify the font file we must not call it "Plex" |
-| Readex Pro | OFL-1.1 | upstream `google/fonts/ofl/readexpro/OFL.txt` (Reserved Font Name "RevReading Lexend") + npm view | OK — same reserved-name note. **Bundled** (UI font, direction B) |
-| Alexandria | OFL-1.1 | upstream `google/fonts/ofl/alexandria/OFL.txt` fetched 2026-11-16 ("Copyright 2022 The Alexandria Project Authors", no Reserved Font Name) | OK. **Bundled** (display + numbers, direction B) |
+| Readex Pro | OFL-1.1 | upstream `google/fonts/ofl/readexpro/OFL.txt` (Reserved Font Name "RevReading Lexend") + npm view | OK. No longer bundled (removed 2026-11-26) |
+| Alexandria | OFL-1.1 | upstream `google/fonts/ofl/alexandria/OFL.txt` fetched 2026-11-16 ("Copyright 2022 The Alexandria Project Authors", no Reserved Font Name) | OK. No longer bundled (removed 2026-11-26) |
 
-**Bundled in the app (Phase 2b, 2026-11-16):** `public/fonts/alexandria-{arabic,latin}.woff2` and
-`public/fonts/readex-pro-{arabic,latin}.woff2` — unmodified Google Fonts woff2 subset files (copied from
-`design/fonts/`, renamed only), declared in `src/ui/fonts.css` with `font-display: swap` and Arabic/Latin
-`unicode-range`, precached by the service worker. License texts shipped next to them:
-`public/fonts/OFL-Alexandria.txt`, `public/fonts/OFL-ReadexPro.txt` (official upstream files).
+**Bundled in the app (2026-11-26, replaces Alexandria + Readex Pro):** `public/fonts/rubik-{arabic,latin}.woff2` and
+`public/fonts/cairo-{arabic,latin}.woff2` — the unmodified variable-weight woff2 subset files from
+`@fontsource-variable/rubik@5.3.0` and `@fontsource-variable/cairo@5.3.0` (renamed only; the npm packages are not
+dependencies). Rubik is declared in `src/ui/fonts.css` (`font-display: swap`, Arabic/Latin `unicode-range`); both
+are embedded by the PDF renderer (`src/services/pdf/fonts.ts`); all are precached by the service worker. Rubik is also served to
+clients by the Worker's client page (`worker/src/share/viewerFonts.ts`, generated from the same files), with the same licence. License texts
+shipped next to them: `public/fonts/OFL-Rubik.txt`, `public/fonts/OFL-Cairo.txt` (the packages' LICENSE files).
 
 OFL obligations: ship the OFL.txt next to the font files (e.g. `public/fonts/<font>/OFL.txt`), do not sell the
 font on its own (embedding in an app is fine), subsetted/modified copies must not use a Reserved Font Name.

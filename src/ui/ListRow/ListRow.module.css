@@ -4,14 +4,15 @@
   gap: var(--sp-3);
   inline-size: 100%;
   min-block-size: var(--row-h);
-  padding: var(--sp-3) var(--sp-4);
-  background: var(--surface);
+  padding: var(--sp-3) 0;
+  background: transparent;
   text-align: start;
   color: var(--text);
 }
 
 .interactive:active {
   background: var(--surface-2);
+  border-radius: var(--r-sm);
 }
 
 .leading {

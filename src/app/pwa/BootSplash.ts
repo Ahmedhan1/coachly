@@ -107,7 +107,7 @@ export function showBootSplash(cache: BrandCache | null, fallbackIcon = '/icons/
   el.setAttribute('aria-hidden', 'true');
   el.style.cssText =
     'position:fixed;inset:0;z-index:2147483000;pointer-events:none;display:flex;align-items:center;justify-content:center;' +
-    `background:${cache?.color ?? 'var(--bg, #ededea)'};transition:opacity 280ms ease-out;`;
+    `background:${cache?.color ?? 'var(--bg, #f3f1ed)'};transition:opacity 280ms ease-out;`;
   const img = document.createElement('img');
   img.alt = '';
   img.src = cache?.logo ?? cache?.icon512 ?? fallbackIcon;

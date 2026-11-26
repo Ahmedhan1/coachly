@@ -48,6 +48,7 @@
   padding: var(--sp-4);
   border-radius: var(--r-lg);
   background: var(--surface);
+  box-shadow: var(--shadow-card);
 }
 
 .totalsHead {
@@ -132,6 +133,7 @@
   padding: var(--sp-2) var(--sp-4) var(--sp-3);
   border-radius: var(--r-lg);
   background: var(--surface);
+  box-shadow: var(--shadow-card);
 }
 
 .mealHead {

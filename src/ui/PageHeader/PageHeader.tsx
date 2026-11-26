@@ -39,7 +39,7 @@ function useScrolledPast(target: RefObject<HTMLElement | null>): boolean {
 const pathOf = (to: string) => to.split('?')[0] ?? to;
 
 /**
- * Large Alexandria title, start-aligned, with round 44pt buttons. Pads for the status bar safe area.
+ * Editorial masthead: a small kicker (the subtitle) above a large start-aligned title, with round 44pt buttons. Pads for the status bar safe area.
  * When the large title scrolls away, a translucent compact bar with the title (and back) fades in at the top,
  * like an iOS navigation bar. The compact bar repeats what is already in the page, so it is hidden from
  * assistive tech and the keyboard.
@@ -82,6 +82,7 @@ export function PageHeader({ title, subtitle, back, actions, compactTitle, watch
             </Link>
             {actions && <div className={styles.actions}>{actions}</div>}
           </div>
+          {subtitle && <p className={styles.subtitle}>{subtitle}</p>}
           {title && (
             <h1 ref={own} className={styles.title}>
               {title}
@@ -89,14 +90,16 @@ export function PageHeader({ title, subtitle, back, actions, compactTitle, watch
           )}
         </>
       ) : (
-        <div className={styles.top}>
-          <h1 ref={own} className={styles.title}>
-            {title}
-          </h1>
-          {actions && <div className={styles.actions}>{actions}</div>}
-        </div>
+        <>
+          {subtitle && <p className={cx(styles.subtitle, styles.subtitleTop)}>{subtitle}</p>}
+          <div className={styles.top}>
+            <h1 ref={own} className={styles.title}>
+              {title}
+            </h1>
+            {actions && <div className={styles.actions}>{actions}</div>}
+          </div>
+        </>
       )}
-      {subtitle && <p className={styles.subtitle}>{subtitle}</p>}
     </header>
   );
 }

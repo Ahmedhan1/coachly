@@ -14,7 +14,7 @@ import {
   type ProposedAction,
 } from '@/domain/ai';
 import { getLocale } from '@/i18n';
-import { deviceZone } from '@/features/schedule/zone';
+import { deviceZone } from '@/app/deviceZone';
 import { aiClients } from './aiClient';
 import { readAiConfig } from './aiSettings';
 import { buildPlanContext, localNow, runReadTool } from './assistantData';

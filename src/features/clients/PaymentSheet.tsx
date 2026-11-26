@@ -107,9 +107,9 @@ export function PaymentSheet({ client, payment, currency, onClose, onDelete, rec
       title={payment ? t('schedule.pay.editTitle') : t('schedule.pay.newTitle')}
       cancelLabel={t('common.cancel')}
       primaryAction={
-        <button type="submit" form={FORM_ID} className={styles.save}>
+        <Button size="small" type="submit" form={FORM_ID}>
           {t('common.save')}
-        </button>
+        </Button>
       }
     >
       <form id={FORM_ID} className={styles.form} onSubmit={submit} noValidate>

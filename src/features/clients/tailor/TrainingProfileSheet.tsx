@@ -8,11 +8,11 @@ import {
   type TrainingProfile,
 } from '@/domain/models';
 import { t } from '@/i18n';
-import { IconButton, SegmentedControl, Select, Sheet, TextField } from '@/ui';
-import { equipmentName } from '@/features/exercises/localized';
-import { useExerciseCatalog } from '@/features/programs/catalog';
+import { Button, Chip, Icon, IconButton, SegmentedControl, Select, Sheet, TextField } from '@/ui';
+import { equipmentName } from '@/i18n/exerciseNames';
+import { useExerciseCatalog } from '@/app/catalog';
 import { ExercisePickerSheet } from '@/features/programs/ExercisePickerSheet';
-import { exerciseName } from '@/features/programs/names';
+import { exerciseName } from '@/i18n/programNames';
 import styles from './Tailor.module.css';
 
 const FORM_ID = 'training-profile-form';
@@ -81,9 +81,10 @@ export function TrainingProfileSheet({ client, onClose }: { client: Client; onCl
         </ul>
       )}
       <div className={styles.chips}>
-        <button type="button" className={styles.chip} disabled={!catalog} onClick={() => setPicking(kind)}>
-          + {add}
-        </button>
+        <Chip disabled={!catalog} onClick={() => setPicking(kind)}>
+          <Icon name="plus" />
+          {add}
+        </Chip>
       </div>
     </fieldset>
   );
@@ -96,9 +97,9 @@ export function TrainingProfileSheet({ client, onClose }: { client: Client; onCl
         title={t('hub.tailor.sheetTitle', { name: client.name })}
         cancelLabel={t('common.cancel')}
         primaryAction={
-          <button type="submit" form={FORM_ID} className={styles.save}>
+          <Button size="small" type="submit" form={FORM_ID}>
             {t('common.save')}
-          </button>
+          </Button>
         }
       >
         <form id={FORM_ID} className={styles.form} onSubmit={(e) => void submit(e)} noValidate>
@@ -118,9 +119,9 @@ export function TrainingProfileSheet({ client, onClose }: { client: Client; onCl
               <legend className={styles.legend}>{t('hub.tailor.equipment.label')}</legend>
               <div className={styles.chips}>
                 {HOME_EQUIPMENT.map((id) => (
-                  <button key={id} type="button" className={styles.chip} aria-pressed={equipment.includes(id)} onClick={() => setEquipment((cur) => toggle(cur, id))}>
+                  <Chip key={id} pressed={equipment.includes(id)} onClick={() => setEquipment((cur) => toggle(cur, id))}>
                     {equipmentName(id)}
-                  </button>
+                  </Chip>
                 ))}
               </div>
               <p className={styles.hint}>{t('hub.tailor.equipment.hint')}</p>
@@ -141,9 +142,9 @@ export function TrainingProfileSheet({ client, onClose }: { client: Client; onCl
             <legend className={styles.legend}>{t('hub.tailor.joints.label')}</legend>
             <div className={styles.chips}>
               {JOINT_IDS.map((j) => (
-                <button key={j} type="button" className={`${styles.chip} ${styles.warnChip}`} aria-pressed={joints.includes(j)} onClick={() => setJoints((cur) => toggle(cur, j))}>
+                <Chip key={j} tone="warn" pressed={joints.includes(j)} onClick={() => setJoints((cur) => toggle(cur, j))}>
                   {t(`hub.tailor.joints.${j}`)}
-                </button>
+                </Chip>
               ))}
             </div>
           </fieldset>

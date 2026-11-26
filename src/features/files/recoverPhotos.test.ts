@@ -4,7 +4,7 @@ import { createTestData } from '@/data/testing';
 import type { ImageId } from '@/domain/models';
 import { FakeCloudFilesClient } from '@/services/files/fakeCloudFilesClient';
 import { FILES_KEY_META, FileSyncService } from '@/services/files/fileSyncService';
-import { memoryMetaStore } from '@/services/meta/metaStore';
+import { memoryMetaStore } from '@/data/metaStore';
 import { FakeImageDownscaler } from '@/services/storage/fakeImageDownscaler';
 import { PHOTOS_TO_RECOVER_KEY, recoverPhotosIfPending } from './photoRecovery';
 import { recoverPhotos } from './recoverPhotos';

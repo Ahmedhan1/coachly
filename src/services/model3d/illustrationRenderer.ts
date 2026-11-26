@@ -3,7 +3,7 @@ import type { IllustrationSpec, MuscleGroupId } from '@/domain/exercises';
 import { distanceForHeight, regionView } from './framing';
 import { roleOfObject } from './meshNames';
 import { loadMuscleModel } from './loader';
-import type { MuscleMapPalette } from './palette';
+import type { MuscleMapPalette } from '@/domain/exercises/musclePalette';
 import { CAMERA_FOV, createLights, frameModel, placeCamera } from './stage';
 import { disposeModel, tintModel } from './tint';
 

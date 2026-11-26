@@ -1,7 +1,7 @@
 import { dateAfterWeeks, rateFromKcal, realisticTarget, realisticWeeks, type BodyNow, type GoalPlanCoefficients, type PlanGoal } from '@/domain/nutrition';
 import { bmrCoefficientsFrom, type DietProfile, type GoalDiet, type NutritionSettings } from '@/domain/meals';
 import { t } from '@/i18n';
-import { Button, LineChart, Select, Tx } from '@/ui';
+import { Button, Chip, LineChart, Select, Tx } from '@/ui';
 import { formatIsoDate } from '@/ui/format';
 import { Slider } from '../shared/Slider';
 import common from '../shared/common.module.css';
@@ -128,9 +128,9 @@ export function GoalPanel({ body, goal, state, diet, coeffs, settings, now, body
       {state.proteinPerKg === null && macros.basis === 'adjusted' && <p className={styles.rowSub}>{t('nutrition.goal.adjusted')}</p>}
       {state.proteinPerKg === null && macros.age50 && <p className={styles.rowSub}>{t('nutrition.goal.age50')}</p>}
       {state.proteinPerKg !== null && (
-        <button type="button" className={styles.chip} onClick={() => onChange({ ...state, proteinPerKg: null })}>
+        <Chip onClick={() => onChange({ ...state, proteinPerKg: null })}>
           {t('nutrition.goal.proteinReset')}
-        </button>
+        </Chip>
       )}
       {plan.flags.map((f) => (
         <p key={f} className={common.note} role="status">

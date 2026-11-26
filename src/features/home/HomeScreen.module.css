@@ -93,6 +93,7 @@
   padding: var(--sp-4);
   border-radius: var(--r-lg);
   background: var(--surface);
+  box-shadow: var(--shadow-card);
 }
 
 .noNextTitle {
@@ -253,14 +254,6 @@
 
 .demoBody {
   font: var(--t-caption);
-}
-
-.backupRow svg {
-  color: var(--text-3);
-}
-
-.backupDue svg {
-  color: var(--danger, var(--brand));
 }
 
 .followBtn {

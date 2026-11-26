@@ -5,8 +5,8 @@ import type { Client } from '@/domain/models';
 import { setClientExerciseNote } from '@/domain/programs/tailor';
 import { t } from '@/i18n';
 import { Button, Sheet, TextField } from '@/ui';
-import { useExerciseCatalog } from '@/features/programs/catalog';
-import { exerciseName as programExerciseName } from '@/features/programs/names';
+import { useExerciseCatalog } from '@/app/catalog';
+import { exerciseName as programExerciseName } from '@/i18n/programNames';
 import styles from './Tailor.module.css';
 
 const FORM_ID = 'client-note-form';
@@ -53,9 +53,9 @@ export function ClientNoteSheet({ client, exerciseId, exerciseName, onClose }: C
       title={`${title} · ${t('hub.tailor.note.title', { name: client.name })}`}
       cancelLabel={t('common.cancel')}
       primaryAction={
-        <button type="submit" form={FORM_ID} className={styles.save}>
+        <Button size="small" type="submit" form={FORM_ID}>
           {t('common.save')}
-        </button>
+        </Button>
       }
     >
       <form id={FORM_ID} className={styles.form} onSubmit={submit} noValidate>

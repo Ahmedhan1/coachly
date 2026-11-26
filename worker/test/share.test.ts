@@ -5,6 +5,7 @@ import { base64UrlEncode } from '../../shared/bytes';
 import { findForbiddenTerms } from '../../src/i18n/fitness-terms';
 import { parseCheckinDocument, parseShareDocument } from '../src/share/document';
 import { checkinKey, shareKey } from '../src/share/routes';
+import { VIEWER_FONTS } from '../src/share/viewerFonts';
 import { VIEWER_SCRIPT } from '../src/share/viewerScript';
 import { envelopeBytes, freshIp, harness, readJson, storedBytes, type Harness } from './helpers';
 import { SAMPLE_DOCUMENT } from './sampleDocument';
@@ -242,6 +243,21 @@ describe('viewer page /c/:shareId', () => {
     const second = await h.send(`/c/${shareId}`);
     expect(second.headers.get('Content-Security-Policy')).not.toBe(csp); // fresh nonce per response
     expect((await h.send('/c/not-an-id')).status).toBe(404);
+  });
+
+  it('serves the app font (Rubik) from its own origin, cacheable forever, and declares it in the page', async () => {
+    const h = await harness();
+    const csp = (await h.send(`/c/${newShareId()}`)).headers.get('Content-Security-Policy') ?? '';
+    expect(csp).toContain("font-src 'self'");
+    for (const f of VIEWER_FONTS) {
+      const res = await h.send(f.path);
+      expect(res.status).toBe(200);
+      expect(res.headers.get('Content-Type')).toBe('font/woff2');
+      expect(res.headers.get('Cache-Control')).toContain('immutable');
+      const bytes = new Uint8Array(await res.arrayBuffer());
+      expect(String.fromCharCode(...bytes.slice(0, 4))).toBe('wOF2');
+    }
+    expect((await h.send('/c/_/rubik-arabic.0000000000.woff2')).status).toBe(404);
   });
 
   it('uses no forbidden (literal-translation) gym words', async () => {

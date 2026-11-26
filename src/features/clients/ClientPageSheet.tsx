@@ -6,7 +6,7 @@ import { toIsoDate, type Client } from '@/domain/models';
 import { t } from '@/i18n';
 import { Button, Sheet } from '@/ui';
 import { formatIsoDate, formatTime } from '@/ui/format';
-import { readShare, saveShare } from '@/features/online/prefs';
+import { readShare, saveShare } from '@/data/prefs/online';
 import { publishClientPage } from '@/features/online/clientPagePublish';
 import { whatsappLink } from '@/domain/whatsapp';
 import styles from './ClientDetail.module.css';

@@ -4,7 +4,7 @@ import type { Client, Program } from '@/domain/models';
 import { BUILTIN_TEMPLATES, type BuiltinTemplate } from '@/domain/programs';
 import { t } from '@/i18n';
 import { Icon, ListRow, ListSection, Sheet, Tx } from '@/ui';
-import { templateName } from '@/features/programs/names';
+import { templateName } from '@/i18n/programNames';
 import styles from './Hub.module.css';
 
 export type ProgramChoice = { kind: 'builtin'; template: BuiltinTemplate } | { kind: 'copy'; program: Program } | { kind: 'adopt'; program: Program } | { kind: 'activate'; program: Program };

@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest';
 import { createTestData } from '@/data/testing';
 import type { ClientId } from '@/domain/models';
 import { fixedOffsetClock } from '@/domain/schedule';
-import { memoryMetaStore } from '@/services/meta/metaStore';
+import { memoryMetaStore } from '@/data/metaStore';
 import { DEFAULT_SCHEDULE_PREFS, LATE_CANCEL_KEY, parsePrefs, savePrefs } from './prefs';
 import { createScheduleWriter } from './scheduleWriter';
 

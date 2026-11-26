@@ -3,7 +3,7 @@ import { useRepos } from '@/app/services';
 import { useUiStore } from '@/app/uiStore';
 import { addDays, toIsoDate, type Client, type IsoDate } from '@/domain/models';
 import { t } from '@/i18n';
-import { Sheet, TextField } from '@/ui';
+import { Button, Sheet, TextField } from '@/ui';
 import { currencyLabel } from '@/ui/format';
 import { moneyInputValue, parseMoneyInput } from './moneyInput';
 import styles from './Money.module.css';
@@ -64,9 +64,9 @@ export function PackageSheet({ client, currency, onClose }: { client: Client; cu
       title={pkg ? t('schedule.pkg.editTitle') : t('schedule.pkg.newTitle')}
       cancelLabel={t('common.cancel')}
       primaryAction={
-        <button type="submit" form={FORM_ID} className={styles.save}>
+        <Button size="small" type="submit" form={FORM_ID}>
           {t('common.save')}
-        </button>
+        </Button>
       }
     >
       <form id={FORM_ID} className={styles.form} onSubmit={submit} noValidate>

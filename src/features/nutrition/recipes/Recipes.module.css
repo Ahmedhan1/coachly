@@ -184,21 +184,8 @@
   scrollbar-width: none;
 }
 
-.chip {
+.chips > * {
   flex: none;
-  min-block-size: 40px;
-  padding-inline: var(--sp-3);
-  border: 1px solid var(--line);
-  border-radius: var(--r-control);
-  background: var(--surface);
-  color: var(--text);
-  font: var(--t-label);
-}
-
-.chip[aria-pressed='true'] {
-  border-color: var(--text);
-  background: var(--text);
-  color: var(--bg);
 }
 
 .filterBar {

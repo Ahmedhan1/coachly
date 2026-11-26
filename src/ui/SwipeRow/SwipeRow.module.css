@@ -1,7 +1,8 @@
+/* Rows sit on the page (editorial index): --row-bg is the page colour, or --surface inside a sheet. */
 .row {
   position: relative;
   overflow: hidden;
-  background: var(--surface);
+  background: var(--row-bg, var(--bg));
 }
 
 /* Closed rows keep the action focusable (focus reveals it) but invisible, so no red bleeds at rounded corners. */
@@ -25,7 +26,7 @@
 
 .content {
   position: relative;
-  background: var(--surface);
+  background: var(--row-bg, var(--bg));
   touch-action: pan-y;
   transition: transform var(--dur-2) var(--ease-out);
   user-select: none;

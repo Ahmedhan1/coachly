@@ -112,7 +112,7 @@ function branding(id: PdfTestCaseId): PdfBranding {
     logoSize: 'medium',
     primaryColor: '#2F6F5E',
     secondaryColor: '#3A3A3C',
-    fontFamily: 'Readex Pro',
+    fontFamily: 'Rubik',
     background: null,
     coverImage: null,
     footerText: 'برنامج خاص بالعميل — ممنوع النشر',
@@ -125,7 +125,7 @@ function branding(id: PdfTestCaseId): PdfBranding {
       logoSize: 'large',
       logoPlacement: 'start',
       primaryColor: '#8A1C7C',
-      fontFamily: 'Alexandria',
+      fontFamily: 'Cairo',
       background: { image: stored(FIXTURE_IMAGE_IDS.background), opacity: 1 },
       coverImage: stored(FIXTURE_IMAGE_IDS.cover),
     };

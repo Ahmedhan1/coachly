@@ -6,7 +6,7 @@ import { detectWebGL, viewerMode } from './fallback';
 import { DRACO_EXTENSION, glbNeedsDraco, readGlbJson } from './glb';
 import { fetchModelBuffer, parseModel } from './loader';
 import { meshRole, missingGroups, roleOfObject } from './meshNames';
-import { paletteFill } from './palette';
+import { paletteFill } from '@/domain/exercises/musclePalette';
 import { frameModel } from './stage';
 import { meshColor, tintModel } from './tint';
 

@@ -11,6 +11,7 @@
   padding: var(--sp-5) var(--sp-3);
   border-radius: var(--r-lg);
   background: var(--surface);
+  box-shadow: var(--shadow-card);
 }
 
 /* Dark stage even in light mode is fine for the model (docs/DESIGN.md §5). */
@@ -46,6 +47,7 @@
   padding: var(--sp-4) var(--sp-3);
   border-radius: var(--r-lg);
   background: var(--surface);
+  box-shadow: var(--shadow-card);
 }
 
 .notice {
@@ -79,6 +81,7 @@
   background: var(--surface);
   font: var(--t-caption);
   color: var(--text-2);
+  box-shadow: var(--shadow-card);
 }
 
 .about summary {

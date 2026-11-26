@@ -22,26 +22,6 @@
   font: var(--t-callout);
 }
 
-.save {
-  position: relative;
-  min-block-size: 36px;
-  padding-inline: var(--sp-4);
-  border-radius: var(--r-control);
-  background: var(--brand);
-  color: var(--brand-on);
-  font: var(--t-button);
-}
-
-.save::after {
-  content: '';
-  position: absolute;
-  inset: -4px 0;
-}
-
-.save:disabled {
-  opacity: 0.45;
-}
-
 .error {
   font: var(--t-sub);
   color: var(--danger);
@@ -130,9 +110,4 @@
 .note {
   font: var(--t-sub);
   color: var(--text-2);
-}
-
-.noteOk {
-  font: var(--t-sub);
-  color: var(--ok);
 }

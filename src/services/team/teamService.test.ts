@@ -3,7 +3,7 @@ import { base64UrlEncode } from '../../../shared/bytes';
 import { readJoinFragment, type Roster } from '@/domain/team';
 import { WorkerApi } from '@/services/cloud/workerApi';
 import type { FetchFn } from '@/services/cloud/httpCloudBackupClient';
-import { memoryMetaStore } from '@/services/meta/metaStore';
+import { memoryMetaStore } from '@/data/metaStore';
 import { TEAM_META_KEYS, TeamService } from './teamService';
 
 const ROSTER: Roster = {

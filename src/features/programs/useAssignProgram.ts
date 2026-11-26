@@ -3,9 +3,9 @@ import { useServices } from '@/app/services';
 import type { Client, ClientId, Program } from '@/domain/models';
 import { copyProgramToClient, instantiateTemplate, type BuiltinTemplate } from '@/domain/programs';
 import { t } from '@/i18n';
-import { markActiveProgram } from './activePrograms';
+import { markActiveProgram } from '@/data/prefs/activePrograms';
 import { newLocalId } from './ids';
-import { templateDayName } from './names';
+import { templateDayName } from '@/i18n/programNames';
 
 /**
  * Giving a client a program, from anywhere (client hub, program builder, programs list). Whatever the
