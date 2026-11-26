@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { createTestData } from '@/data/testing';
-import { memoryMetaStore } from '@/services/license/metaStore';
+import { memoryMetaStore } from '@/data/metaStore';
 import { FakeImageDownscaler } from '@/services/storage/fakeImageDownscaler';
 import { generateRawKey, openWithKey, sealWithKey } from '../../../shared/envelope';
 import { base64UrlEncode } from '../../../shared/license';

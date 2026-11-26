@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from 'react';
 import { useServices } from '@/app/services';
-import { useStoredImageUrl } from '@/features/files/useStoredImageUrl';
+import { useStoredImageUrl } from '@/app/useStoredImageUrl';
 import { applyBrand } from '@/app/useBrandTheme';
 import { auditBrand, BRAND_PRESETS, deriveBrand, normalizeHex } from '@/domain/branding';
 import { t, type TKey } from '@/i18n';

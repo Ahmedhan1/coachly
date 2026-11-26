@@ -1,5 +1,5 @@
 import type { CatalogExercise } from '@/domain/exercises';
-import { equipmentName, exName, muscleName } from '@/features/exercises/localized';
+import { equipmentName, exName, muscleName } from '@/i18n/exerciseNames';
 import { localizeTemplateDayName, type BuiltinTemplateId } from '@/domain/programs';
 import { getLocale, t, type TKey } from '@/i18n';
 import { ar } from '@/i18n/ar';

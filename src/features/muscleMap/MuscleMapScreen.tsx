@@ -1,7 +1,7 @@
 import { lazy, Suspense, useMemo, useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { filterExercises, MUSCLE_GROUPS, type MuscleGroupId } from '@/domain/exercises';
-import { muscleName } from '@/features/exercises/localized';
+import { muscleName } from '@/i18n/exerciseNames';
 import { useCatalog } from '@/features/exercises/useCatalog';
 import { t } from '@/i18n';
 import { Button, ListRow, ListSection, PageHeader, SegmentedControl, Tx, Icon } from '@/ui';

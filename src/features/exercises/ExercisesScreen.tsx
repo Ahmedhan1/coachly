@@ -7,7 +7,7 @@ import { AddExerciseSheet } from './AddExerciseSheet';
 import { ExerciseRow, ROW_HEIGHT } from './ExerciseRow';
 import { FilterSheet } from './FilterSheet';
 import { activeFilterCount, NO_FILTERS, toggleIn, useLibraryUi, type LibraryFilters } from './libraryUi';
-import { equipmentName, levelName, muscleName } from './localized';
+import { equipmentName, levelName, muscleName } from '@/i18n/exerciseNames';
 import { OfflinePhotosSheet } from './OfflinePhotosSheet';
 import { libraryResults } from './results';
 import { useCatalog } from './useCatalog';

@@ -13,12 +13,12 @@ import { googleCalendarUrl } from '@/services/calendar';
 import { addSessionToCalendar, calendarEventFor } from './calendarExport';
 import { ClientPicker } from './ClientPicker';
 import { useActiveProgram } from '@/features/programs/activePrograms';
-import { programDayName } from '@/features/programs/names';
-import { attachSessionDay, readSessionDays } from './sessionDays';
+import { programDayName } from '@/i18n/programNames';
+import { attachSessionDay, readSessionDays } from '@/data/prefs/sessionDays';
 import { useScheduleWriter } from './hooks';
 import { futureOfSeries } from './scheduleWriter';
 import type { SchedulePrefs } from './prefs';
-import { deviceZone } from './zone';
+import { deviceZone } from '@/app/deviceZone';
 import styles from './Schedule.module.css';
 
 export type BookingTarget = { mode: 'new'; date: IsoDate; clientId: string | null } | { mode: 'edit'; session: Session };

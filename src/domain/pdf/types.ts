@@ -41,7 +41,7 @@ export interface PdfNutrition {
   waterMl: number | null;
 }
 
-/** Every user-visible word the PDF prints. The UI fills it from src/i18n/ar.ts. */
+/** Every user-visible word the PDF prints. The UI fills it from src/i18n/ar/. */
 export interface PdfLabels {
   sections: Record<PdfSection, string>;
   cover: { client: string; preparedBy: string; date: string; planFor: string; contact: string };

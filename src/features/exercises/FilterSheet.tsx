@@ -7,7 +7,7 @@ import {
 import { t } from '@/i18n';
 import { Button, Chip, ChipGroup, Sheet } from '@/ui';
 import { NO_FILTERS, toggleIn, type LibraryFilters } from './libraryUi';
-import { equipmentName, levelName, muscleName } from './localized';
+import { equipmentName, levelName, muscleName } from '@/i18n/exerciseNames';
 import styles from './Sheets.module.css';
 
 interface FilterSheetProps {

@@ -4,7 +4,7 @@ import type { CatalogExercise } from '@/domain/exercises';
 import { t } from '@/i18n';
 import { Icon, cx } from '@/ui';
 import { ExerciseThumb } from './ExerciseThumb';
-import { equipmentName, exName, muscleName } from './localized';
+import { equipmentName, exName, muscleName } from '@/i18n/exerciseNames';
 import styles from './ExerciseRow.module.css';
 
 export const ROW_HEIGHT = 84;

@@ -1,20 +1,6 @@
-import { assistant } from './ar/assistant';
-import { exercises } from './ar/exercises';
-import { files } from './ar/files';
-import { hub } from './ar/hub';
-import { nutrition } from './ar/nutrition';
-import { outbox } from './ar/outbox';
-import { pdf } from './ar/pdf';
-import { settings } from './ar/settings';
-import { storage } from './ar/storage';
-import { schedule } from './ar/schedule';
-import { training } from './ar/training';
-
-/**
- * Every user-visible string in the app. Egyptian Arabic, Western digits.
- * Placeholders use {name}. Fitness terms come from fitness-terms.ts, never translated here.
- */
-export const ar = {
+// Arabic for the shared sections (everything that is not a feature file). Egyptian Arabic, Western digits.
+// Placeholders use {name}. Fitness terms come from fitness-terms.ts, never translated here.
+export const core = {
   app: {
     name: 'كوتش',
     loading: 'ثانية واحدة…',
@@ -455,21 +441,8 @@ export const ar = {
       notPersisted: 'التخزين الدائم مش مفعّل',
     },
   },
-  schedule,
-  training,
-  exercises,
-  nutrition,
-  outbox,
-  pdf,
-  settings,
-  storage,
-  files,
-  assistant,
-  hub,
   units: {
     mb: '{n} ميجا',
     gb: '{n} جيجا',
   },
 } as const;
-
-export type Strings = typeof ar;

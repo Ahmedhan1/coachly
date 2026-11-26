@@ -5,7 +5,7 @@ import type { Client } from '@/domain/models';
 import { clientNoteText, fitProfileOf, hasTrainingProfile } from '@/domain/programs/tailor';
 import { getLocale, t } from '@/i18n';
 import { Button, cx, TitleIcon } from '@/ui';
-import { exerciseName } from '@/features/programs/names';
+import { exerciseName } from '@/i18n/programNames';
 import { ClientNoteSheet } from './ClientNoteSheet';
 import { TrainingProfileSheet } from './TrainingProfileSheet';
 import { useAutoProgram } from './useAutoProgram';

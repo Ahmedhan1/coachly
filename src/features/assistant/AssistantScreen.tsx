@@ -3,7 +3,7 @@ import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import { useServices } from '@/app/services';
 import { useUiStore } from '@/app/uiStore';
 import { useLive } from '@/app/useLive';
-import { deviceZone } from '@/features/schedule/zone';
+import { deviceZone } from '@/app/deviceZone';
 import { t, type TKey } from '@/i18n';
 import { Button, Chip, IconButton, PageHeader, TitleIcon } from '@/ui';
 import { readAiSettings, readGroqKey, saveAiSettings } from './aiSettings';

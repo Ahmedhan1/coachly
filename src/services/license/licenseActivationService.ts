@@ -1,7 +1,7 @@
 import { evaluateLicense, nextLastSeen, type LicenseInvalidReason } from '@/domain/license';
 import { normalizeShortCode, unwrapOfflineCode } from '../../../shared/license';
 import type { ActivationError, ActivationResult, ActivationService, ActivationState } from '../activation/types';
-import type { MetaStore } from './metaStore';
+import type { MetaStore } from '@/data/metaStore';
 
 export const META_KEYS = {
   deviceId: 'license.deviceId',

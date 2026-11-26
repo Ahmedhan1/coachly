@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { useServices } from '@/app/services';
 import { t } from '@/i18n';
 import { Button, FileButton } from '@/ui';
-import { useStoredImageUrl } from './useStoredImageUrl';
+import { useStoredImageUrl } from '@/app/useStoredImageUrl';
 import styles from './Files.module.css';
 
 const RECEIPT_MAX_SIDE = 1600;

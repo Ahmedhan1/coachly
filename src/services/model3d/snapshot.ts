@@ -1,6 +1,6 @@
 import { PerspectiveCamera, Scene, WebGLRenderer } from 'three';
 import { loadMuscleModel } from './loader';
-import type { MuscleIntensities, MuscleMapPalette } from './palette';
+import type { MuscleIntensities, MuscleMapPalette } from '@/domain/exercises/musclePalette';
 import { CAMERA_FOV, createLights, frameModel, placeCamera, type ModelView } from './stage';
 import { disposeModel, themePalette, tintModel } from './tint';
 

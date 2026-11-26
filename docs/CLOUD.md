@@ -69,7 +69,7 @@ with Web Crypto in the Worker (`worker/src/push/`); verified against RFC 8291 Ap
 
 - `id`: `[A-Za-z0-9_-]{1,64}`, unique in the list. `at`: integer unix seconds, from now − 1 h to now + 40 days.
   `title` 1–120 chars, `body` 0–120 chars, ≤ 100 items.
-- **Generic text only.** D1 stores the text in plain form. Build it from fixed templates in `src/i18n/ar.ts` with
+- **Generic text only.** D1 stores the text in plain form. Build it from fixed templates in `src/i18n/ar/` with
   only a time or count inserted (e.g. "عندك حصة بعد 30 دقيقة") — never a client name. The server cannot check this.
 - Endpoints are restricted to real push services (`web.push.apple.com`, `*.push.apple.com`, `fcm.googleapis.com`,
   `updates.push.services.mozilla.com`, `*.notify.windows.com`, https, default port) so the Worker cannot be used to

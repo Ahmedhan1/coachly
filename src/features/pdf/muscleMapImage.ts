@@ -1,7 +1,7 @@
 import { muscleLoadForExercise, type CatalogExercise } from '@/domain/exercises';
 import type { PdfImageRef } from '@/domain/pdf';
 import { BASE_PATHS, VIEW_PATHS, VIEWBOX, intensitiesFromLoad, type MuscleIntensities } from '@/ui/MuscleMap';
-import { paletteFill, type MuscleMapPalette } from '@/services/model3d/palette';
+import { paletteFill, type MuscleMapPalette } from '@/domain/exercises/musclePalette';
 
 const MIRROR = `matrix(-1 0 0 1 ${VIEWBOX.width} 0)`;
 

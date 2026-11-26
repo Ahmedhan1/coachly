@@ -3,9 +3,9 @@ import { useServices } from '@/app/services';
 import { useLive } from '@/app/useLive';
 import { followUps, plannedDay, splitClientPrograms, type FollowUpReason } from '@/domain/clientHub';
 import { localDayRange, subscriptionAttention, toIsoDate, type Client, type ClientAttention } from '@/domain/models';
-import { readActivePrograms } from '@/features/programs/activePrograms';
-import { programDayName } from '@/features/programs/names';
-import { readSessionDays } from '@/features/schedule/sessionDays';
+import { readActivePrograms } from '@/data/prefs/activePrograms';
+import { programDayName } from '@/i18n/programNames';
+import { readSessionDays } from '@/data/prefs/sessionDays';
 import { attentionRank, localWeekRange, planToday } from './homeModel';
 
 export interface HomeData {

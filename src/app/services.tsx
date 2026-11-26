@@ -5,7 +5,7 @@ import type { BackupServices } from '@/services/backup';
 import type { ClientPageService } from '@/services/clientPage/clientPageService';
 import type { PushService } from '@/services/push/pushService';
 import type { FileSyncService } from '@/services/files/fileSyncService';
-import type { MetaStore } from '@/services/license/metaStore';
+import type { MetaStore } from '@/data/metaStore';
 import type { ImageDownscaler, StorageService } from '@/services/storage';
 
 export interface AppServices {

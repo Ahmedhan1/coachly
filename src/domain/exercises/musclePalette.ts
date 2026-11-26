@@ -1,4 +1,5 @@
-import { intensityStep, type MuscleGroupId } from '@/domain/exercises';
+import { intensityStep } from './muscleLoad';
+import type { MuscleGroupId } from './pack';
 
 /** Intensity 0..1 per muscle group; missing = not targeted. Shared by the 2D map and the 3D model. */
 export type MuscleIntensities = Partial<Record<MuscleGroupId, number>>;

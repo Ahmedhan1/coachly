@@ -12,7 +12,7 @@ import {
 import { t } from '@/i18n';
 import { Button, Chip, ChipGroup, Icon, SegmentedControl, Select, Sheet, TextField } from '@/ui';
 import { toggleIn } from './libraryUi';
-import { equipmentName, levelName, muscleName } from './localized';
+import { equipmentName, levelName, muscleName } from '@/i18n/exerciseNames';
 import { useLibraryStore } from './useCatalog';
 import { MAX_PHOTOS, usePhotoDrafts } from './usePhotoDrafts';
 import styles from './Sheets.module.css';

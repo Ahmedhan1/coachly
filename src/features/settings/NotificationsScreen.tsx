@@ -6,7 +6,7 @@ import { toIsoDate } from '@/domain/models';
 import { t } from '@/i18n';
 import { Badge, Button, PageHeader, Select, TitleIcon } from '@/ui';
 import { formatIsoDate, formatTime } from '@/ui/format';
-import { readPushPrefs, savePushPrefs, type PushPrefs } from '@/features/online/prefs';
+import { readPushPrefs, savePushPrefs, type PushPrefs } from '@/data/prefs/online';
 import { enablePushNotifications } from '@/features/online/enablePush';
 import { syncPush } from '@/features/online/sync';
 import styles from './Settings.module.css';

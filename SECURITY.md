@@ -104,7 +104,7 @@ Link format: `https://<app-host>/c/<pageId>#k=<base64url(32-byte key)>`
 Encrypted end-to-end to the browser push service per RFC 8291 (ECDH P-256 + HKDF + AES-128-GCM) and signed with
 VAPID (ES256), all with Web Crypto inside the Worker (Node's `web-push` package does not run on Workers). The
 text itself is stored in D1 in plain form, so it must stay **generic** (no client names) — enforced by building
-it from fixed templates in `src/i18n/ar.ts` with only a time/count inserted.
+it from fixed templates in `src/i18n/ar/` with only a time/count inserted.
 
 ### Device backup file envelope "PTB1" (implemented, `src/services/backup/chunkedEnvelope.ts`)
 

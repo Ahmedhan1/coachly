@@ -2,7 +2,7 @@ import type { AppDatabase } from '@/data';
 import { FakeActivationService } from '@/services/activation/fakeActivationService';
 import type { ActivationService } from '@/services/activation/types';
 import { LicenseActivationService } from '@/services/license/licenseActivationService';
-import { dexieMetaStore } from '@/services/license/metaStore';
+import { dexieMetaStore } from '@/data/metaStore';
 import { embeddedPublicKey, parsePublicKey } from '@/services/license/publicKey';
 import { resolveWorkerUrl } from '@/services/license/serverConfig';
 

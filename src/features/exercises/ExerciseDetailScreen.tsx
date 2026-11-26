@@ -13,7 +13,7 @@ import { Button, EmptyState, Icon, ListRow, ListSection, PageHeader, cx } from '
 import { MuscleMap } from '@/ui/MuscleMap';
 import { alternativesFor } from '@/domain/exercises';
 import { ExerciseThumb } from './ExerciseThumb';
-import { categoryName, equipmentName, exAltName, exCues, exName, levelName, muscleName } from './localized';
+import { categoryName, equipmentName, exAltName, exCues, exName, levelName, muscleName } from '@/i18n/exerciseNames';
 import { useExerciseClients } from './useExerciseClients';
 import { PhotoCarousel } from './PhotoCarousel';
 import { RenameSheet } from './RenameSheet';

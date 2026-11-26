@@ -1,6 +1,5 @@
 import { z } from 'zod';
-import type { MetaStore } from '@/services/license/metaStore';
-import type { ClientShare } from '@/services/clientPage/clientPageService';
+import type { MetaStore } from '@/data/metaStore';
 
 /** Device-local (`backup.` prefix → never inside a backup): the push subscription belongs to this phone. */
 export const PUSH_PREFS_KEY = 'backup.push';
@@ -36,7 +35,7 @@ const shareRecordSchema = z.object({
   /** Fingerprint of the last uploaded document (skip re-uploads of an unchanged page). */
   docHash: z.string().max(64).optional(),
 });
-export type ShareRecord = z.infer<typeof shareRecordSchema> & ClientShare;
+export type ShareRecord = z.infer<typeof shareRecordSchema>;
 
 export async function readShare(meta: MetaStore, clientId: string): Promise<ShareRecord | null> {
   const r = shareRecordSchema.safeParse(await meta.get(clientShareKey(clientId)));

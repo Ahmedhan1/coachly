@@ -1,6 +1,6 @@
 import type { CatalogExercise } from '@/domain/exercises';
-import { muscleName } from '@/features/exercises/localized';
-import { dayLabel } from './names';
+import { muscleName } from '@/i18n/exerciseNames';
+import { dayLabel } from '@/i18n/programNames';
 import type { ProgramDay } from '@/domain/models';
 import { dayMuscleLoad, estimateDayMinutes, totalSets, weeklySetsPerMuscle, type ProgramBody } from '@/domain/programs';
 import { t } from '@/i18n';

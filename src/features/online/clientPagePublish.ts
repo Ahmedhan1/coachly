@@ -7,11 +7,11 @@ import { newClientShare } from '@/services/clientPage/clientPageService';
 import { ExerciseLibraryStore } from '@/data/exerciseLibraryStore';
 import { mergeCatalog, type CatalogExercise } from '@/domain/exercises';
 import { mealItemRows } from '@/domain/meals';
-import { loadBuiltinCatalog } from '@/features/programs/catalog';
-import { exerciseName } from '@/features/programs/names';
+import { loadBuiltinCatalog } from '@/app/catalog';
+import { exerciseName } from '@/i18n/programNames';
 import { clientNoteText } from '@/domain/programs/tailor';
 import { clientPageLogo, clientPageTrainerPhoto } from '@/features/identity/brandAssets';
-import { readShare, saveShare, type ShareRecord } from './prefs';
+import { readShare, saveShare, type ShareRecord } from '@/data/prefs/online';
 
 /** Meal items as client-page lines: exact grams per food when the item came from the gram planner. */
 const itemRows = (i: MealPlan['meals'][number]['items'][number], recipeName: ReadonlyMap<string, string>): string[] =>

@@ -1,4 +1,4 @@
-// English for the shared sections of src/i18n/ar.ts (everything that is not a feature file).
+// English for the shared sections (src/i18n/ar/core.ts): everything that is not a feature file.
 // Mirrors the Arabic keys exactly; {placeholders} are identical.
 import type { StringShape } from './types';
 import type { Strings } from '../ar';

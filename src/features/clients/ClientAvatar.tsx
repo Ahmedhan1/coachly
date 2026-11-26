@@ -1,5 +1,5 @@
 import type { Client } from '@/domain/models';
-import { useStoredImageUrl } from '@/features/files/useStoredImageUrl';
+import { useStoredImageUrl } from '@/app/useStoredImageUrl';
 import { Avatar } from '@/ui';
 
 /** The client's photo (small copy) or the first letter of their name. */

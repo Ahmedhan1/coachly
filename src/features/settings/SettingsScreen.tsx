@@ -5,7 +5,7 @@ import { useUiStore } from '@/app/uiStore';
 import { useLive } from '@/app/useLive';
 import { toIsoDate } from '@/domain/models';
 import { DeviceIdCard } from '@/features/activation/DeviceIdCard';
-import { CLIENT_PAGES_ENABLED_KEY, clientPagesEnabled } from '@/features/online/prefs';
+import { CLIENT_PAGES_ENABLED_KEY, clientPagesEnabled } from '@/data/prefs/online';
 import { t } from '@/i18n';
 import { Badge, Icon, ListRow, ListSection, PageHeader } from '@/ui';
 import { formatIsoDate } from '@/ui/format';

@@ -3,7 +3,7 @@ import { metaTokenProvider } from '@/services/cloud/networkStatus';
 import { GroqAiService } from '@/services/ai/aiService';
 import { GroqChatService, type ChatService } from '@/services/ai/chatService';
 import { META_KEYS } from '@/services/license/licenseActivationService';
-import type { MetaStore } from '@/services/license/metaStore';
+import type { MetaStore } from '@/data/metaStore';
 
 /**
  * One Groq client per app session (so "use the relay" is remembered after the first CORS failure).

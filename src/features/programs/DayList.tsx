@@ -18,7 +18,7 @@ import { compactTempo, dayBlocks, displayReps } from '@/domain/programs';
 import { t } from '@/i18n';
 import { Icon, Num, Tx, cx } from '@/ui';
 import { ExerciseThumb } from './ExerciseThumb';
-import { exerciseName, exerciseSubline } from './names';
+import { exerciseName, exerciseSubline } from '@/i18n/programNames';
 import styles from './Builder.module.css';
 
 export interface DayListProps {

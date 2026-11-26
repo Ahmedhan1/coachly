@@ -1,6 +1,6 @@
 import type { AppServices } from '@/app/services';
 import { setClientPhotoFromImage } from '@/features/clients/clientPhoto';
-import { readShare } from '@/features/online/prefs';
+import { readShare } from '@/data/prefs/online';
 
 /**
  * Brings in profile photos clients uploaded from their page and makes each the client's photo (which also

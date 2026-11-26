@@ -7,7 +7,7 @@ import {
   type LicensePayload,
 } from '../../../shared/license';
 import { LicenseActivationService, META_KEYS, type LicenseServiceDeps } from './licenseActivationService';
-import { memoryMetaStore } from './metaStore';
+import { memoryMetaStore } from '@/data/metaStore';
 import { parsePublicKey } from './publicKey';
 
 const DEVICE = '0b8a4f0e-2a7b-4d0e-8c43-2f2d7a3c9a10';

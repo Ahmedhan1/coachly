@@ -1,5 +1,5 @@
 import { illustrationKey, type IllustrationSpec } from '@/domain/exercises';
-import type { MuscleMapPalette } from './palette';
+import type { MuscleMapPalette } from '@/domain/exercises/musclePalette';
 
 /** Draws one exercise illustration; the real one lazy-loads three.js (illustrationRenderer.ts). */
 export type RenderIllustration = (spec: IllustrationSpec, palette: MuscleMapPalette) => Promise<Blob>;

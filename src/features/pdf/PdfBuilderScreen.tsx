@@ -12,7 +12,7 @@ import { formatBytes } from '@/ui/format';
 import { Button, Icon, IconButton, PageHeader, Select, Sheet, TextArea, TextField, TitleIcon, cx } from '@/ui';
 import { createImageSource, HtmlPdfRenderer, type PdfRenderProgress, type RenderedPdf } from '@/services/pdf';
 import { BrowserShareService } from '@/services/share';
-import { useExerciseCatalog } from '@/features/programs/catalog';
+import { useExerciseCatalog } from '@/app/catalog';
 import { buildPdfInput } from './buildPdfInput';
 import { muscleMapRefs } from './muscleMapImage';
 import { BrandingSheet } from './BrandingSheet';

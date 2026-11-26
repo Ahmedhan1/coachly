@@ -9,10 +9,10 @@ import {
 } from '@/domain/models';
 import { t } from '@/i18n';
 import { Button, Chip, Icon, IconButton, SegmentedControl, Select, Sheet, TextField } from '@/ui';
-import { equipmentName } from '@/features/exercises/localized';
-import { useExerciseCatalog } from '@/features/programs/catalog';
+import { equipmentName } from '@/i18n/exerciseNames';
+import { useExerciseCatalog } from '@/app/catalog';
 import { ExercisePickerSheet } from '@/features/programs/ExercisePickerSheet';
-import { exerciseName } from '@/features/programs/names';
+import { exerciseName } from '@/i18n/programNames';
 import styles from './Tailor.module.css';
 
 const FORM_ID = 'training-profile-form';
