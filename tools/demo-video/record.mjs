@@ -113,18 +113,25 @@ const page = filmed.page;
 const framesDir = join(out, 'frames');
 mkdirSync(framesDir, { recursive: true });
 const frames = [];
-const cdp = await filmed.context.newCDPSession(page);
+let cdp = await filmed.context.newCDPSession(page);
 let filming = true;
-// Back-to-back captures at full device pixels (headless screencast ignores the 2× scale). ~15-25 frames a second.
+const withTimeout = (p, ms) => Promise.race([p, new Promise((_, reject) => setTimeout(() => reject(new Error('capture timeout')), ms))]);
+// Back-to-back captures at full device pixels (headless screencast ignores the 2× scale). A capture that stalls
+// (page reload) is abandoned and the capture session reopened, so filming never freezes.
 const camera = (async () => {
   while (filming) {
     try {
-      const { data } = await cdp.send('Page.captureScreenshot', { format: 'jpeg', quality: 90, optimizeForSpeed: true, clip: { x: 0, y: 0, width: VIEW.width, height: VIEW.height, scale: 2 } });
+      const { data } = await withTimeout(
+        cdp.send('Page.captureScreenshot', { format: 'jpeg', quality: 90, optimizeForSpeed: true, clip: { x: 0, y: 0, width: VIEW.width, height: VIEW.height, scale: 2 } }),
+        1500,
+      );
       const file = join(framesDir, `f${String(frames.length).padStart(5, '0')}.jpg`);
       writeFileSync(file, Buffer.from(data, 'base64'));
       frames.push({ file, ms: Date.now() });
     } catch {
-      await new Promise((r) => setTimeout(r, 30)); // navigating: try again
+      await cdp.detach().catch(() => undefined);
+      cdp = await filmed.context.newCDPSession(page).catch(() => cdp);
+      await new Promise((r) => setTimeout(r, 30));
     }
   }
 })();
