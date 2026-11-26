@@ -4,7 +4,7 @@ import { base64UrlEncode } from '../../shared/bytes';
 import type { CloudFileInfo } from '../../shared/files';
 import { MemoryObjectStore } from '../src/files/objectStore';
 import { fileKey } from '../src/files/routes';
-import { envelopeBytes, freshIp, harness, readJson, type Harness } from './helpers';
+import { envelopeBytes, freshIp, harness, readJson, storedBytes, type Harness } from './helpers';
 import { SAMPLE_DOCUMENT } from './sampleDocument';
 
 async function setup(store = new MemoryObjectStore()) {
@@ -232,5 +232,27 @@ describe('client page uploads', () => {
     await clientUpload(h, shareId, key, 'client_photo', envelopeBytes('PTK1', 64));
     const [file] = await list(h, token);
     expect([...store.objects.keys()]).toEqual([fileKey(await h.accountId(token), file!.id)]);
+  });
+});
+
+describe('files in the Worker R2 bucket (no iDrive keys set)', () => {
+  it('stores in R2 under files/<account>/<id>, counts toward the global guard, and gives the bytes back on delete', async () => {
+    const { env } = await import('cloudflare:workers');
+    const h = await harness();
+    const token = await h.account();
+    const before = await storedBytes();
+    const file = await created(await upload(h, token, envelopeBytes('PTK1', 4096), '?kind=client_photo&ref=c1'));
+    expect(await env.BACKUPS.head(fileKey(await h.accountId(token), file.id))).not.toBeNull();
+    expect(await storedBytes()).toBe(before + 4096);
+    expect((await h.authed(`/api/files/${file.id}`, token)).status).toBe(200);
+    expect((await h.authed(`/api/files/${file.id}`, token, { method: 'DELETE' })).status).toBe(200);
+    expect(await storedBytes()).toBe(before);
+  });
+
+  it('refuses growth past the global guard with storage_full', async () => {
+    const h = await harness({ cloudConfig: { storageGuardBytes: 1 } });
+    const token = await h.account();
+    const res = await upload(h, token, envelopeBytes('PTK1', 2048), '?kind=client_photo&ref=c2');
+    expect([res.status, await readJson(res)]).toEqual([507, { error: 'storage_full' }]);
   });
 });

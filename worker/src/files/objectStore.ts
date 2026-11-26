@@ -1,5 +1,5 @@
-// Object storage for cloud files, behind a small port so tests use memory and production uses iDrive e2 (any
-// S3-compatible service). Requests are signed with AWS Signature V4 (aws4fetch, MIT). Keys are made by the
+// Object storage for cloud files, behind a small port so tests use memory and production uses R2 (the Worker's own
+// free bucket) or, when its keys are set, iDrive e2 (any S3-compatible service). Requests are signed with AWS Signature V4 (aws4fetch, MIT). Keys are made by the
 // Worker (files/<account>/<id>); bodies are ciphertext.
 import { AwsClient } from 'aws4fetch';
 
@@ -114,5 +114,26 @@ export class MemoryObjectStore implements ObjectStore {
   async delete(key: string): Promise<void> {
     this.check();
     this.objects.delete(key);
+  }
+}
+
+/**
+ * Cloud files in the Worker's own R2 bucket (free tier), under `files/<account>/<id>`. Used when no S3 keys are set.
+ * Shares the 10 GB with backups and client pages, so its bytes count toward the global storage guard.
+ */
+export class R2ObjectStore implements ObjectStore {
+  constructor(private readonly bucket: R2Bucket) {}
+
+  async put(key: string, bytes: Uint8Array): Promise<void> {
+    await this.bucket.put(key, bytes, { httpMetadata: { contentType: 'application/octet-stream' } });
+  }
+
+  async get(key: string): Promise<StoredObject | null> {
+    const object = await this.bucket.get(key);
+    return object === null ? null : { body: object.body, size: object.size };
+  }
+
+  async delete(key: string): Promise<void> {
+    await this.bucket.delete(key);
   }
 }

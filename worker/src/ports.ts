@@ -57,6 +57,8 @@ export interface VapidSource {
 export interface FilesDeps {
   /** null when the object store is not configured: the files API answers 503 `files_unavailable`. */
   store: ObjectStore | null;
+  /** True when the store is the Worker's R2 bucket: file bytes then count toward the global storage guard. */
+  sharesR2: boolean;
   /** Largest file from the trainer's app. */
   maxBytes: number;
   /** Largest file from a client page. */

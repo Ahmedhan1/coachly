@@ -5,9 +5,12 @@ main = "src/index.ts"
 compatibility_date = "2026-08-01"
 # better-auth uses node:async_hooks (AsyncLocalStorage). Free; part of the Workers runtime.
 compatibility_flags = ["nodejs_compat"]
+# Free: runs the Worker near the D1 database, so requests with several queries (sign-in, backup) are faster.
+[placement]
+mode = "smart"
 
 [vars]
-# Address of the installed app (Cloudflare Pages). Several origins may be separated by commas.
+# Address of the installed app (the `pt-coach` Worker, deploy/app). Several origins may be separated by commas.
 APP_ORIGIN = "https://pt-coach.nexus-ahmed.workers.dev"
 # This Worker's own public address (better-auth builds Google's callback URL from it).
 BETTER_AUTH_URL = "https://pt-coach-license.nexus-ahmed.workers.dev"
@@ -18,11 +21,10 @@ GOOGLE_CLIENT_ID = ""
 BACKUP_MAX_BYTES = "104857600"
 # Above this total (9 GiB of the 10 GB free R2), uploads that would grow storage get `storage_full`.
 STORAGE_GUARD_BYTES = "9663676416"
-# Cloud files (client/trainer photos, thumbnails, invoices, PDFs): iDrive e2, S3 API. Files are encrypted on
-# the device before upload. The owner chose iDrive e2 for these (2026-11-19); everything else stays on R2.
-FILES_ENDPOINT = "s3.us-west-4.idrivee2.com"
-FILES_REGION = "us-west-4"
-FILES_BUCKET = "onlincoaching"
+# Cloud files (client/trainer photos, thumbnails, invoices, PDFs) are stored in the R2 bucket below, under files/.
+# Encrypted on the phone before upload. They share the free 10 GB with backups (STORAGE_GUARD_BYTES covers both).
+# Optional: to use an S3-compatible service instead (e.g. iDrive e2), add FILES_ENDPOINT, FILES_REGION, FILES_BUCKET
+# vars and the two FILES_* secrets below.
 # Cloud-file cap per trainer account, bytes (1 GiB).
 FILES_ACCOUNT_MAX_BYTES = "1073741824"
 
@@ -34,8 +36,8 @@ FILES_ACCOUNT_MAX_BYTES = "1073741824"
 #   VAPID_PRIVATE_KEY    Web Push private key from `npm run vapid:keys` (push is off until all three VAPID_* exist)
 #   VAPID_PUBLIC_KEY     Web Push public key from `npm run vapid:keys`
 #   VAPID_SUBJECT        contact for push services, e.g. mailto:you@example.com
-#   FILES_ACCESS_KEY_ID      iDrive e2 access key id (cloud files are off until both FILES_* keys exist)
-#   FILES_SECRET_ACCESS_KEY  iDrive e2 secret access key
+#   FILES_ACCESS_KEY_ID      optional: S3-compatible files store instead of R2 (with FILES_SECRET_ACCESS_KEY)
+#   FILES_SECRET_ACCESS_KEY
 
 [[d1_databases]]
 binding = "DB"
@@ -51,3 +53,7 @@ bucket_name = "pt-coach-backups"
 # One cron (the Free plan allows 5 per account): sends due Web Push notifications every minute.
 [triggers]
 crons = ["* * * * *"]
+
+[observability]
+enabled = true
+head_sampling_rate = 0.1

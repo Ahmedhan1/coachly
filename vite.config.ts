@@ -1,9 +1,9 @@
 import { execSync } from 'node:child_process';
 import { fileURLToPath, URL } from 'node:url';
 import react from '@vitejs/plugin-react';
-import { defineConfig } from 'vite';
+import { defineConfig, type Plugin } from 'vite';
 import { VitePWA } from 'vite-plugin-pwa';
-import { APP_SECURITY_HEADERS } from './shared/appHeaders.ts';
+import { APP_SECURITY_HEADERS, appHeadersFile } from './shared/appHeaders.ts';
 
 /** Short build stamp shown on the sign-in and About screens, so a screenshot tells which build a phone runs. */
 function buildId(): string {
@@ -13,6 +13,16 @@ function buildId(): string {
   } catch {
     return day;
   }
+}
+
+/** Emits `_headers` for Cloudflare Workers Static Assets (security headers + cache rules, see shared/appHeaders.ts). */
+function cloudflareHeaders(): Plugin {
+  return {
+    name: 'pt-coach-cloudflare-headers',
+    generateBundle() {
+      this.emitFile({ type: 'asset', fileName: '_headers', source: appHeadersFile() });
+    },
+  };
 }
 
 export default defineConfig({
@@ -32,6 +42,7 @@ export default defineConfig({
   preview: { headers: { ...APP_SECURITY_HEADERS } },
   plugins: [
     react(),
+    cloudflareHeaders(),
     VitePWA({
       // A new version waits until the trainer taps "update" (src/app/pwa/swUpdate.ts) or closes the app: the open
       // page never mixes old code with a new precache. Registration is done by the app itself.
