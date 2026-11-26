@@ -20,10 +20,11 @@ export interface IdentityDraft {
 /** The shipped domain default predates direction B; first-run setup starts from the B signal orange. */
 const LEGACY_DEFAULT_COLOR = '#2F6F5E';
 
-export function draftFrom(settings: TrainerSettings, firstRun: boolean): IdentityDraft {
+/** `accountName`: the name on the trainer's account, offered on first run when the profile has none yet. */
+export function draftFrom(settings: TrainerSettings, firstRun: boolean, accountName = ''): IdentityDraft {
   const color = firstRun && settings.primaryColor.toUpperCase() === LEGACY_DEFAULT_COLOR ? DEFAULT_BRAND : settings.primaryColor;
   return {
-    name: settings.name,
+    name: settings.name || (firstRun ? accountName.trim().slice(0, 80) : ''),
     logoImageId: settings.logoImageId,
     photoImageId: settings.photoImageId ?? null,
     color: color.toUpperCase(),
@@ -36,16 +37,21 @@ export function draftFrom(settings: TrainerSettings, firstRun: boolean): Identit
 /** Loads the draft from settings and saves it back (plus the "setup done" flag). */
 export function useIdentityDraft(firstRun: boolean) {
   const services = useServices();
-  const { data, meta } = services;
+  const { data, meta, auth: authService } = services;
   const [draft, setDraft] = useState<IdentityDraft | null>(null);
 
   useEffect(() => {
     let cancelled = false;
-    void data.repos.settings.get().then((s) => !cancelled && setDraft(draftFrom(s, firstRun)));
+    void (async () => {
+      const settings = await data.repos.settings.get();
+      const auth = await authService?.getState().catch(() => null);
+      const accountName = auth?.status === 'signedIn' ? auth.account.name : '';
+      if (!cancelled) setDraft(draftFrom(settings, firstRun, accountName));
+    })();
     return () => {
       cancelled = true;
     };
-  }, [data, firstRun]);
+  }, [data, authService, firstRun]);
 
   const update = useCallback((patch: Partial<IdentityDraft>) => setDraft((d) => (d ? { ...d, ...patch } : d)), []);
 

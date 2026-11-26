@@ -9,6 +9,7 @@ import { pagesSignature, republishChangedPages } from './clientPagePublish';
 import { pullCheckins, syncPush } from './sync';
 import { pullClientPhotos } from '@/features/files/pullClientPhotos';
 import { syncRoster } from '@/features/team/rosterSync';
+import { recoverPhotosIfPending } from '@/features/files/photoRecovery';
 
 /** Wait after the last data change before re-uploading pages (editing a program is many small saves). */
 const REPUBLISH_DEBOUNCE_MS = 20_000;
@@ -41,6 +42,9 @@ export function useOnlineSync(active: boolean): void {
         if (photos.length === 1) showToast({ message: t('files.clientPhoto.arrived', { name: photos[0] ?? '' }), duration: 4000 });
         else if (photos.length > 1) showToast({ message: t('files.clientPhoto.arrivedMany', { n: photos.length }), duration: 4000 });
         await services.online?.files?.run().catch(() => null);
+        // After a cloud restore: full-size photos come back from the encrypted copies in the bucket.
+        const back = await recoverPhotosIfPending(services).catch(() => 0);
+        if (back > 0) showToast({ message: t('files.recovered', { n: back }), duration: 4000 });
         // Pages whose data changed (or failed to upload last time) go up again; unchanged ones are skipped.
         await republishChangedPages(services).catch(() => 0);
         // Gym trainers: the encrypted client summary for the gym manager (at most every 30 minutes).

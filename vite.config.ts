@@ -3,7 +3,7 @@ import { fileURLToPath, URL } from 'node:url';
 import react from '@vitejs/plugin-react';
 import { defineConfig } from 'vite';
 import { VitePWA } from 'vite-plugin-pwa';
-import { APP_SECURITY_HEADERS } from './shared/appHeaders';
+import { APP_SECURITY_HEADERS } from './shared/appHeaders.ts';
 
 /** Short build stamp shown on the sign-in and About screens, so a screenshot tells which build a phone runs. */
 function buildId(): string {

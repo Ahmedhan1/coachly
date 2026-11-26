@@ -5,6 +5,7 @@ import { useLive } from '@/app/useLive';
 import { t, type TKey } from '@/i18n';
 import { MIN_BACKUP_PASSWORD_LENGTH, type ImportSummary, type SchedulerState } from '@/services/backup';
 import { DeviceBackupFlow } from '@/features/storage/DeviceBackupFlow';
+import { PHOTOS_TO_RECOVER_KEY } from '@/features/files/photoRecovery';
 import { Badge, Button, Icon, ListRow, ListSection, PageHeader, Sheet, TextField, TitleIcon } from '@/ui';
 import { formatBytes, formatIsoDate, formatTime } from '@/ui/format';
 import { toIsoDate } from '@/domain/models';
@@ -276,6 +277,7 @@ function RestoreCloudSheet({ onClose }: { onClose: () => void }) {
     setWorking(false);
     if (!r.ok) return setError(errorText(r.error in IMPORT_ERRORS ? 'importErrors' : 'cloudErrors', r.error));
     await meta.set(CLOUD_PASSWORD_KEY, password);
+    await meta.set(PHOTOS_TO_RECOVER_KEY, true);
     window.alert(t('settings.backup.imported'));
     window.location.replace('/');
   };

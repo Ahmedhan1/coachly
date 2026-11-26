@@ -1,13 +1,14 @@
 import './zodConfig';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { RouterProvider } from 'react-router-dom';
-import { AppDatabase, createDataLayer } from '@/data';
+import { AppDatabase, createDataLayer, DATA_OWNER_KEY } from '@/data';
 import { AccountGateScreen } from '@/features/auth/AccountGateScreen';
 import { SignInScreen } from '@/features/auth/SignInScreen';
+import { OtherAccountDataScreen, RestoreOfferScreen } from '@/features/auth/DeviceDataScreens';
 import { IdentitySetupScreen } from '@/features/identity/IdentitySetupScreen';
 import { InstallGateScreen } from '@/features/install/InstallGateScreen';
 import { t } from '@/i18n';
-import { canUseApp, type Account, type AuthError, type AuthState } from '@/domain/account';
+import { canUseApp, dataOwnership, type Account, type AuthError, type AuthState } from '@/domain/account';
 import { dexieMetaStore } from '@/services/meta/metaStore';
 import { BrowserStorageService, CanvasImageDownscaler } from '@/services/storage';
 import { createBackupServices } from '@/services/backup';
@@ -75,6 +76,18 @@ export function createBrowserServices(): AppServices {
   };
 }
 
+/** Device-local: the account a restore was already offered to on this phone (offered once, never nagging). */
+const RESTORE_OFFERED_KEY = 'auth.restoreOfferedFor';
+
+/** An empty phone, first sign-in of this account here, and a cloud backup exists: offer to bring the data back. */
+async function shouldOfferRestore(services: AppServices, accountId: string): Promise<boolean> {
+  if (!services.backup || (await services.meta.get(RESTORE_OFFERED_KEY)) === accountId) return false;
+  const info = await services.backup.cloud.info();
+  if (!info.ok) return false;
+  await services.meta.set(RESTORE_OFFERED_KEY, accountId);
+  return info.value !== null;
+}
+
 /** Waits for a background step, but never longer than `ms` (a slow network must not hold the app). */
 const settle = (p: Promise<unknown>, ms = 5000) => Promise.race([p, new Promise((resolve) => setTimeout(resolve, ms))]);
 
@@ -83,6 +96,8 @@ type BootPhase =
   | { phase: 'error' }
   | { phase: 'signIn'; error: AuthError | null }
   | { phase: 'gate'; account: Account }
+  | { phase: 'otherAccount' }
+  | { phase: 'restoreOffer' }
   | { phase: 'setup' }
   | { phase: 'ready' };
 
@@ -109,16 +124,30 @@ function Boot() {
   const [brandImport] = useState(() => importHostedBrand(services, new HttpBrandHosting(), window.location.search).catch(() => false));
 
   /** Where an auth state leads: the app (after first-run setup), the approval gate, or the sign-in screen. */
+  /** First-run setup or the app itself (the data on this phone is the signed-in trainer's). */
+  const open = useCallback(async (): Promise<BootPhase> => {
+    await services.data.ensureFirstRun(new Date());
+    await settle(brandImport);
+    const done = await services.meta.get(IDENTITY_SETUP_KEY);
+    return done ? { phase: 'ready' } : { phase: 'setup' };
+  }, [services, brandImport]);
+
   const route = useCallback(
     async (state: AuthState, error: AuthError | null = null): Promise<BootPhase> => {
       if (state.status === 'signedOut') return { phase: 'signIn', error };
       if (state.status === 'signedIn' && !canUseApp(state, new Date())) return { phase: 'gate', account: state.account };
-      await services.data.ensureFirstRun(new Date());
-      await settle(brandImport);
-      const done = await services.meta.get(IDENTITY_SETUP_KEY);
-      return done ? { phase: 'ready' } : { phase: 'setup' };
+      if (state.status === 'signedIn') {
+        // Whose data is on this phone: another account's clients are never shown or uploaded under this one.
+        const owner = await services.meta.get(DATA_OWNER_KEY);
+        const hasData = await services.data.hasUserData();
+        const ownership = dataOwnership({ owner: typeof owner === 'string' ? owner : null, accountId: state.account.id, hasData });
+        if (ownership === 'other_account') return { phase: 'otherAccount' };
+        if (ownership === 'claim') await services.meta.set(DATA_OWNER_KEY, state.account.id);
+        if (!hasData && (await settle(shouldOfferRestore(services, state.account.id), 6000)) === true) return { phase: 'restoreOffer' };
+      }
+      return open();
     },
-    [services, brandImport],
+    [services, open],
   );
 
   const go = useCallback(
@@ -180,6 +209,19 @@ function Boot() {
       return <SignInScreen initialError={boot.error} onSignedIn={go} />;
     case 'gate':
       return <AccountGateScreen account={boot.account} onChange={go} />;
+    case 'otherAccount':
+      return (
+        <OtherAccountDataScreen
+          onErased={async () => {
+            const state = await services.auth.getState();
+            if (state.status === 'signedIn') await services.meta.set(DATA_OWNER_KEY, state.account.id);
+            setBoot(await route(state));
+          }}
+          onSignedOut={() => setBoot({ phase: 'signIn', error: null })}
+        />
+      );
+    case 'restoreOffer':
+      return <RestoreOfferScreen onSkip={() => void open().then(setBoot)} />;
     case 'setup':
       return <IdentitySetupScreen onDone={() => setBoot({ phase: 'ready' })} />;
     case 'ready':

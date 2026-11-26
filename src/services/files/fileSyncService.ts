@@ -153,6 +153,12 @@ export class FileSyncService {
     return 'ok';
   }
 
+  /** The trainer's own files of one kind on the server (not client uploads). null when the server is unreachable. */
+  async remoteFiles(kind: CloudFileInfo['kind']): Promise<CloudFileInfo[] | null> {
+    const r = await this.d.client.list({ kind, source: 'trainer' });
+    return r.ok ? r.value : null;
+  }
+
   /** Downloads and decrypts a file (to view a PDF or invoice that is no longer on this phone). null on any failure. */
   async open(remoteId: string, key?: Uint8Array): Promise<OpenedFile | null> {
     const r = await this.d.client.download(remoteId);

@@ -59,8 +59,14 @@ tables in D1, `worker/migrations/0005_accounts.sql`).
   → `/auth/handoff` turns the first-party cookie into a 3-minute one-time token and redirects to
   `<app>/#auth=<token>` (or `#auth_error=…`); the app trades it at `POST /api/auth/one-time-token/verify`.
 - **Worker API**: `/api/auth/*` (better-auth, allow-listed paths only), `GET /api/account` →
-  `{ account: { id, name, email, status } }`, `GET /api/auth-config` → `{ google }`. Cloud endpoints answer
-  401 `invalid`, 403 `pending` / `disabled`.
+  `{ account: { id, name, email, status, role, plan, gym } }`, `GET /api/auth-config` → `{ google }`. Cloud endpoints answer
+  401 `invalid`, 403 `pending` / `disabled` / `expired`.
+- **Whose data is on the phone**: device-local `auth.dataOwner` = the user id the local data belongs to
+  (`dataOwnership`). Another account signing in on a phone with someone else's clients gets "sign out" or
+  "erase this phone's data" (`eraseLocalData`, also drops the previous `backup.*` keys); it never sees them.
+- **New phone**: first sign-in of an account on an empty phone with a cloud backup offers "restore your data"
+  (backup password, once per account per phone). After any cloud restore, `recoverPhotosIfPending` brings
+  full-size client/trainer photos back from the encrypted copies in the bucket (`recoverPhotos`).
 - **Guest**: "continue as guest" exists only in `npm run dev` and the e2e build (`guestAllowedIn`); never in
   production.
 
@@ -84,6 +90,8 @@ tables in D1, `worker/migrations/0005_accounts.sql`).
 - `npm run check` — typecheck + lint + unit tests + forbidden-words gate. Must pass before any phase is "done".
 - `npm run dev` / `npm run build`
 - Worker: `cd worker && npm test`
+- `npm run test:integration` — real stack (app build + `wrangler dev` with local D1/R2): sign-up, approval,
+  cloud backup on one phone, restore on another.
 
 ## Definition of done
 

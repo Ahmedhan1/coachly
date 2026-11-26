@@ -12,6 +12,9 @@ interface MockState {
   status: 'pending' | 'approved' | 'disabled';
   google: boolean;
   calls: string[];
+  /** Which account signs in (id), and whether it has a cloud backup. */
+  userId?: string;
+  backup?: boolean;
 }
 
 async function mockWorker(page: Page, initial: Partial<MockState> = {}): Promise<MockState> {
@@ -29,20 +32,28 @@ async function mockWorker(page: Page, initial: Partial<MockState> = {}): Promise
     if (request.method() === 'OPTIONS') return reply(route, 204, {});
     state.calls.push(`${request.method()} ${path}`);
     if (path === '/api/auth-config') return reply(route, 200, { google: state.google });
-    if (path === '/api/auth/sign-up/email') return reply(route, 200, { token: 'tok-up', user: USER });
+    if (path === '/api/auth/sign-up/email') return reply(route, 200, { token: 'tok-up', user: { ...USER, id: state.userId ?? USER.id } });
     if (path === '/api/auth/sign-in/email') {
       const body = request.postDataJSON() as { password?: string };
       return body.password === 'right-password'
-        ? reply(route, 200, { token: 'tok-in', user: USER })
+        ? reply(route, 200, { token: 'tok-in', user: { ...USER, id: state.userId ?? USER.id } })
         : reply(route, 401, { code: 'INVALID_EMAIL_OR_PASSWORD' });
     }
     if (path === '/api/auth/one-time-token/verify') return reply(route, 200, { session: { token: 'tok-google' }, user: USER });
     if (path === '/api/account') {
       return request.headers().authorization?.startsWith('Bearer tok-')
-        ? reply(route, 200, { account: { ...USER, status: state.status } })
+        ? reply(route, 200, { account: { ...USER, id: state.userId ?? USER.id, status: state.status } })
         : reply(route, 401, { error: 'invalid' });
     }
     if (path === '/api/auth/sign-out') return reply(route, 200, { success: true });
+    if (path === '/api/backup' && request.method() === 'HEAD') {
+      return state.backup
+        ? route.fulfill({
+            status: 200,
+            headers: { 'Access-Control-Allow-Origin': '*', 'Access-Control-Expose-Headers': 'X-Backup-Size, X-Backup-Uploaded-At', 'X-Backup-Size': '2048', 'X-Backup-Uploaded-At': '1790000000' },
+          })
+        : reply(route, 404, { error: 'not_found' });
+    }
     return reply(route, 404, { error: 'not_found' });
   });
   return state;
@@ -134,6 +145,51 @@ test('Google error on return shows a message on the sign-in screen', async ({ pa
 test('the dev/e2e guest button opens the app without an account', async ({ page }) => {
   await page.goto('/?standalone=1');
   await page.getByRole('button', { name: GUEST_BUTTON }).click();
+  await expect(setupStep(page)).toBeVisible();
+});
+
+async function signInAs(page: Page) {
+  await page.getByLabel('الإيميل').fill(USER.email);
+  await page.getByLabel('كلمة السر', { exact: true }).fill('right-password');
+  await page.getByRole('button', { name: 'دخول', exact: true }).click();
+}
+
+test('another account on the same phone never sees the first account clients', async ({ page }) => {
+  const worker = await mockWorker(page, { userId: 'account-a' });
+  await open(page);
+  await signInAs(page);
+  await page.getByRole('button', { name: 'بعدين' }).click();
+  // Account A adds a client of its own (the demo clients do not count as anyone's data).
+  await page.getByRole('button', { name: 'إضافة: عميل، حصة، برنامج' }).click();
+  await page.getByRole('dialog', { name: 'تضيف إيه؟' }).getByRole('button', { name: /عميل جديد/ }).click();
+  await page.getByLabel(/الاسم/).first().fill('عميل الحساب الأول');
+  await page.getByRole('button', { name: /حفظ|ضيف/ }).first().click();
+  await expect(page.getByRole('heading', { name: 'عميل الحساب الأول' })).toBeVisible();
+  await page.goto('/more/settings?standalone=1');
+  await page.getByRole('button', { name: /خروج من الحساب/ }).click();
+  await page.getByTestId('confirm-sign-out').click();
+
+  // Account B signs in on the same phone.
+  worker.userId = 'account-b';
+  await signInAs(page);
+  await expect(page.getByRole('heading', { level: 1, name: 'التليفون ده عليه بيانات حساب تاني' })).toBeVisible();
+  page.once('dialog', (d) => void d.accept());
+  await page.getByTestId('erase-device-data').click();
+  await expect(setupStep(page)).toBeVisible();
+  await page.getByRole('button', { name: 'بعدين' }).click();
+  await page.goto('/clients?standalone=1');
+  await expect(page.getByText('عميل الحساب الأول')).toHaveCount(0);
+});
+
+test('a new phone is offered its cloud backup once, and can skip it', async ({ page }) => {
+  await mockWorker(page, { userId: 'account-c', backup: true });
+  await open(page);
+  await signInAs(page);
+  await expect(page.getByRole('heading', { level: 1, name: 'رجّع بياناتك' })).toBeVisible();
+  await expect(page.getByText(/النسخة: .*آخر تحديث/)).toBeVisible();
+  await page.getByTestId('skip-restore').click();
+  await expect(setupStep(page)).toBeVisible();
+  await page.reload();
   await expect(setupStep(page)).toBeVisible();
 });
 
