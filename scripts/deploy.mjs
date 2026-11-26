@@ -3,10 +3,12 @@
 //   1. `npm run check` and the Worker tests (refuses to deploy on any failure),
 //   2. production build of the app, with a guard that it points at the account Worker,
 //   3. D1 migrations, then the account Worker (`worker/`),
-//   4. the app Worker with its static files (`deploy/app/`, Workers Static Assets: only changed files upload).
+//   4. the app Worker (`deploy/app/`), then the app files into its D1 store: a fresh random upload key is set as the
+//      Worker secret for every deploy (never stored anywhere), and deploy/app/upload.py sends only changed files.
 // Needs CLOUDFLARE_API_TOKEN (and CLOUDFLARE_ACCOUNT_ID when the token sees several accounts), or `wrangler login`.
 // Flags: --skip-checks (only after the checks just passed), --app-only, --worker-only.
 import { execFileSync } from 'node:child_process';
+import { randomBytes } from 'node:crypto';
 import { readdirSync, readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -43,6 +45,14 @@ if (!args.has('--app-only')) {
   run(wrangler, ['deploy'], join(root, 'worker'));
 }
 
-if (!args.has('--worker-only')) run(wrangler, ['deploy'], join(root, 'deploy/app'));
+if (!args.has('--worker-only')) {
+  const appDir = join(root, 'deploy/app');
+  run(wrangler, ['deploy'], appDir);
+  const uploadKey = randomBytes(32).toString('hex');
+  console.log('\n▶ wrangler secret put UPLOAD_KEY (fresh random key for this deploy)');
+  execFileSync(wrangler, ['secret', 'put', 'UPLOAD_KEY'], { cwd: appDir, input: uploadKey, stdio: ['pipe', 'inherit', 'inherit'], env });
+  console.log('\n▶ python3 deploy/app/upload.py (changed files only; entry files last)');
+  execFileSync('python3', [join(appDir, 'upload.py')], { cwd: root, stdio: 'inherit', env: { ...env, UPLOAD_KEY: uploadKey } });
+}
 
 console.log('\n✔ deployed: https://pt-coach.nexus-ahmed.workers.dev  (account Worker: https://pt-coach-license.nexus-ahmed.workers.dev)');

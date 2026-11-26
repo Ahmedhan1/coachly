@@ -90,6 +90,8 @@ tables in D1, `worker/migrations/0005_accounts.sql`).
 - `npm run check` — typecheck + lint + unit tests + forbidden-words gate. Must pass before any phase is "done".
 - `npm run dev` / `npm run build`
 - Worker: `cd worker && npm test`
+- `npm run deploy` — production (Cloudflare): all checks, build with guards, D1 migrations, both Workers, changed app
+  files only. Needs `CLOUDFLARE_API_TOKEN`. State and the optional Static Assets mode: `docs/DEPLOYMENT.md`.
 - `npm run test:integration` — real stack (app build + `wrangler dev` with local D1/R2): sign-up, approval,
   cloud backup on one phone, restore on another.
 

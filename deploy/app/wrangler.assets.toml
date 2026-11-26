@@ -1,0 +1,24 @@
+# Optional, fastest mode: Workers Static Assets. Cloudflare serves the app files from its edge cache without
+# running the Worker (free, unlimited), with dist/_headers (security headers + cache rules from shared/appHeaders.ts).
+# Deploy from a normal computer (not a proxied cloud session):  npm run build && cd deploy/app &&
+#   npx wrangler deploy -c wrangler.assets.toml
+# To go back to D1 mode, run `npm run deploy` (uses wrangler.toml).
+name = "pt-coach"
+main = "src/index.ts"
+compatibility_date = "2026-08-01"
+
+[assets]
+directory = "../../dist"
+binding = "ASSETS"
+not_found_handling = "single-page-application"
+# Only the branded icon routes run the Worker (they read D1).
+run_worker_first = ["/api/brand", "/b/*"]
+
+[[d1_databases]]
+binding = "APP"
+database_name = "pt-coach-app"
+database_id = "477aa926-49b7-4bb0-964b-bc5879286839"
+
+[observability]
+enabled = true
+head_sampling_rate = 0.1
