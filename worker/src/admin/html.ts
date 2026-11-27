@@ -85,6 +85,23 @@ textarea{min-block-size:180px;resize:vertical}
 .empty{text-align:center;padding:40px 16px;color:var(--muted)}
 .pager{display:flex;gap:12px;align-items:center;justify-content:center;margin-block-start:20px}
 .narrow{max-width:560px;margin-inline:auto}
+fieldset{border:0;margin:0;padding:0;min-inline-size:0}legend{font-weight:600;font-size:.92rem;margin-block-end:6px;padding:0}
+.seg{display:grid;grid-template-columns:1fr 1fr;gap:8px}.seg legend{grid-column:1/-1}
+.seg label{position:relative;cursor:pointer}.seg input{position:absolute;opacity:0;inset:0;margin:0;min-block-size:0}
+.seg span{display:flex;flex-direction:column;gap:2px;padding:12px 14px;border-radius:16px;background:var(--bg);box-shadow:inset 0 0 0 1px var(--line);font-weight:500}
+.seg b{font-size:1rem}.seg small{color:var(--muted);font-size:.82rem}
+.seg input:checked+span{background:var(--brand-tint);box-shadow:inset 0 0 0 2px var(--brand)}.seg input:checked+span b{color:var(--brand-ink)}
+.seg input:focus-visible+span{outline:2px solid var(--brand);outline-offset:2px}
+form:has(input[name=kind][value=trainer]:checked) .gym-only{display:none}
+.pair{display:grid;grid-template-columns:1fr 1fr;gap:12px}form:has(input[name=kind][value=trainer]:checked) .pair{grid-template-columns:1fr}
+label small{display:block;font-weight:500;margin-block-start:4px}
+dialog{border:0;padding:0;background:transparent;inline-size:min(560px,calc(100vw - 32px));max-block-size:calc(100dvh - 32px);color:var(--ink)}
+dialog::backdrop{background:rgba(20,15,10,.45);backdrop-filter:blur(3px)}
+dialog .card{position:relative;max-block-size:calc(100dvh - 32px);overflow:auto;box-shadow:0 20px 60px rgba(0,0,0,.25)}
+dialog[open]{animation:pop .16s ease-out}@keyframes pop{from{opacity:0;transform:translateY(8px) scale(.98)}}
+.x{position:absolute;inset-block-start:12px;inset-inline-end:12px;inline-size:36px;block-size:36px;border-radius:999px;border:0;background:var(--off-tint);color:var(--ink);font:700 1.1rem/1 system-ui;cursor:pointer}
+dialog .stack>.stack{margin:0}dialog [data-frag].stack>.card+.card{margin-block-start:12px}
+@media (max-width:560px){.pair{grid-template-columns:1fr}}
 .code{font:700 2rem/1.3 ui-monospace,Menlo,Consolas,monospace;letter-spacing:.08em;direction:ltr;unicode-bidi:isolate;user-select:all;padding:12px 16px;border:2px dashed var(--brand);border-radius:16px;display:inline-block}
 .actions{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
 .copied{color:var(--ok);font-weight:700;min-inline-size:4em}
@@ -97,7 +114,7 @@ export function page(title: string, body: string): string {
   return `<!doctype html>
 <html lang="ar" dir="rtl"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <meta name="robots" content="noindex,nofollow"><meta name="theme-color" content="#F25C1F"><title>${escapeHtml(title)}</title><style>${STYLE}</style>
-<script src="/admin/admin.js" defer></script></head>
+<script src="/admin/admin.js?v=3" defer></script></head>
 <body><main>${body}</main></body></html>`;
 }
 
@@ -125,9 +142,30 @@ var f=e.target;if(!f||!f.hasAttribute||!f.hasAttribute('data-inline')||!window.f
 e.preventDefault();var card=f.closest('.acct');var btn=f.querySelector('button');if(btn)btn.disabled=true;
 fetch(f.action,{method:'POST',body:new URLSearchParams(new FormData(f)),headers:{'X-Admin-Inline':'1'},credentials:'same-origin'})
 .then(function(r){if(!r.ok)throw r;return r.text();})
-.then(function(html){if(!card)return location.reload();var t=document.createElement('div');t.innerHTML=html.trim();var n=t.firstElementChild;if(n)card.replaceWith(n);var w=document.getElementById('waiting-count');if(w&&/\/approve$/.test(f.action)){var c=Math.max(0,(parseInt(w.textContent,10)||1)-1);w.textContent=String(c);}})
+.then(function(html){if(!card)return location.reload();var t=document.createElement('div');t.innerHTML=html.trim();var n=t.firstElementChild;if(n)card.replaceWith(n);var w=document.getElementById('waiting-count');if(w&&f.action.slice(-8)==='/approve'){var c=Math.max(0,(parseInt(w.textContent,10)||1)-1);w.textContent=String(c);}})
 .catch(function(){f.removeAttribute('data-inline');f.submit();});
-});`;
+});
+(function(){
+var dlg=null;
+function frag(html){var d=new DOMParser().parseFromString(html,'text/html');return d.querySelector('[data-frag]');}
+function close(){if(dlg){dlg.close();}}
+function show(node){
+if(!dlg){dlg=document.createElement('dialog');dlg.addEventListener('click',function(e){if(e.target===dlg)close();});document.body.appendChild(dlg);}
+dlg.innerHTML='';var wrap=node.classList.contains('card')?node:(function(){var c=document.createElement('div');c.className='card';c.appendChild(node);return c;})();
+var x=document.createElement('button');x.type='button';x.className='x';x.setAttribute('aria-label','قفل');x.textContent='×';x.addEventListener('click',close);wrap.insertBefore(x,wrap.firstChild);
+dlg.appendChild(wrap);if(!dlg.open)dlg.showModal();var first=wrap.querySelector('input:not([type=hidden]):not([type=radio]),select,textarea');if(first&&first.type!=='date')first.focus();
+}
+function go(f){var get=(f.method||'').toLowerCase()==='get';var body=new URLSearchParams(new FormData(f));
+var url=get?f.action+'?'+body.toString():f.action;
+return fetch(url,get?{credentials:'same-origin'}:{method:'POST',body:body,credentials:'same-origin'}).then(function(r){
+var u=new URL(r.url);if(u.pathname==='/admin'||u.pathname==='/admin/'){location.href=r.url;return null;}
+return r.text().then(function(t){var n=frag(t);if(!n){location.href=r.url;return null;}show(n);return n;});});}
+document.addEventListener('submit',function(e){var f=e.target;if(!f||!window.fetch||!window.HTMLDialogElement)return;
+var inDlg=dlg&&dlg.contains(f);if(!inDlg&&!f.hasAttribute('data-dialog'))return;
+e.preventDefault();var b=f.querySelector('button[type=submit]');if(b)b.disabled=true;
+go(f).catch(function(){f.removeAttribute('data-dialog');f.submit();}).then(function(){if(b)b.disabled=false;});});
+document.addEventListener('click',function(e){var a=e.target&&e.target.closest?e.target.closest('a[href="/admin"]'):null;if(a&&dlg&&dlg.contains(a)){e.preventDefault();close();}});
+})();`;
 
 export function loginPage(error: string | null, notice: string | null = null): string {
   return page(
@@ -142,7 +180,7 @@ ${error === null ? '' : `<p class="error">${escapeHtml(error)}</p>`}
 }
 
 export function messagePage(title: string, text: string): string {
-  return page(title, `<div class="narrow">${brandBar()}<div class="card stack"><h2>${escapeHtml(title)}</h2><p>${escapeHtml(text)}</p><a class="btn line" href="/admin">رجوع للوحة</a></div></div>`);
+  return page(title, `<div class="narrow">${brandBar()}<div class="card stack" data-frag><h2>${escapeHtml(title)}</h2><p>${escapeHtml(text)}</p><a class="btn line" href="/admin">رجوع للوحة</a></div></div>`);
 }
 
 export type AccountAction = 'approve' | 'disable' | 'enable' | 'password' | 'plan' | 'delete';
@@ -159,7 +197,7 @@ const ACTION_LABELS: Record<AccountAction, string> = {
 function actionForm(action: AccountAction, id: string): string {
   const cls = action === 'approve' || action === 'enable' ? 'btn sm' : action === 'disable' ? 'btn sm warn' : action === 'delete' ? 'btn sm warn' : 'btn sm line';
   const method = action === 'plan' ? 'get' : 'post';
-  const inline = action === 'approve' || action === 'enable' ? ' data-inline' : '';
+  const inline = action === 'approve' || action === 'enable' ? ' data-inline' : ' data-dialog';
   const push = action === 'delete' ? ' class="push"' : '';
   return `<form method="${method}" action="/admin/accounts/${action}"${inline}${push}>
 <input type="hidden" name="id" value="${escapeHtml(id)}">
@@ -297,7 +335,7 @@ export function deletePage(record: AccountRecord, info: { gymTrainers: number; i
   const who = `<strong>${escapeHtml(record.name === '' ? record.email : record.name)}</strong> (<span class="ltr">${escapeHtml(record.email)}</span>)`;
   return page(
     'مسح الحساب',
-    `<div class="narrow">${brandBar()}<div class="card stack danger-box">
+    `<div class="narrow">${brandBar()}<div class="card stack danger-box" data-frag>
 <h2>مسح ${who} نهائياً</h2>
 <p>ده بيمسح كل حاجة على السيرفر للحساب ده، ومينفعش يرجع:</p>
 <ul class="list"><li>الحساب نفسه وكل أجهزته اللي داخلة (هيخرج منها)</li><li>الخطة والاشتراك</li>
@@ -322,7 +360,7 @@ export function confirmPage(action: 'disable' | 'password', record: AccountRecor
 <label>كلمة السر الجديدة (8 حروف على الأقل)<input name="password" class="ltr mono" minlength="8" maxlength="128" value="${escapeHtml(suggestedPassword)}" required autocomplete="off"></label>`;
   return page(
     'تأكيد',
-    `<div class="narrow">${brandBar()}<div class="card">
+    `<div class="narrow">${brandBar()}<div class="card" data-frag>
 <form method="post" action="/admin/accounts/${action}" class="stack">
 <input type="hidden" name="id" value="${escapeHtml(record.id)}"><input type="hidden" name="confirmed" value="yes">
 ${body}
@@ -344,7 +382,7 @@ export function passwordSetPage(input: { record: AccountRecord; password: string
   const wa = `https://wa.me/?text=${encodeURIComponent(message)}`;
   return page(
     'كلمة السر الجديدة',
-    `<div class="narrow stack">${brandBar()}
+    `<div class="narrow stack">${brandBar()}<div class="stack" data-frag>
 <div class="card stack"><h2>كلمة السر الجديدة</h2><p>الحساب: <strong>${escapeHtml(input.record.name)}</strong> (<span class="ltr">${escapeHtml(input.record.email)}</span>)</p>
 <p><span id="pw" class="code">${escapeHtml(input.password)}</span></p>
 <div class="actions"><button type="button" class="btn" data-copy="pw">نسخ</button><span class="copied" id="pw-copied" role="status"></span></div>
@@ -353,7 +391,7 @@ export function passwordSetPage(input: { record: AccountRecord; password: string
 <textarea id="msg" readonly dir="rtl">${escapeHtml(message)}</textarea>
 <div class="actions"><a class="btn wa" href="${escapeHtml(wa)}" target="_blank" rel="noopener">ابعت على واتساب</a>
 <button type="button" class="btn line" data-copy="msg">نسخ الرسالة</button><span class="copied" id="msg-copied" role="status"></span></div></div>
-<a class="btn line" href="/admin">رجوع للوحة</a></div>`,
+<a class="btn line" href="/admin">رجوع للوحة</a></div></div>`,
   );
 }
 
@@ -364,18 +402,19 @@ export function planPage(record: AccountRecord, plan: Plan | null, gymName: stri
   const until = plan?.expiresAt === null || plan?.expiresAt === undefined ? '' : lastDay(plan.expiresAt);
   return page(
     'الخطة',
-    `<div class="narrow">${brandBar()}<div class="card stack"><h2>الخطة</h2>
+    `<div class="narrow">${brandBar()}<div class="card stack" data-frag><h2>الخطة</h2>
 <p><strong>${escapeHtml(record.name === '' ? record.email : record.name)}</strong> (<span class="ltr">${escapeHtml(record.email)}</span>)</p>
 ${error === null ? '' : `<p class="error">${escapeHtml(error)}</p>`}
 <form method="post" action="/admin/accounts/plan" class="stack">
 <input type="hidden" name="id" value="${escapeHtml(record.id)}">
-<label>النوع<select name="kind">
-<option value="trainer"${kind === 'trainer' ? ' selected' : ''}>مدرب</option>
-<option value="gym"${kind === 'gym' ? ' selected' : ''}>جيم (بيدير مدربين)</option></select></label>
-<label>اسم الجيم (للجيم بس)<input name="gymName" maxlength="100" value="${escapeHtml(gymName)}" autocomplete="off"></label>
-<label>أقصى عدد عملاء لكل مدرب (فاضي = من غير حد)<input name="maxClients" type="number" inputmode="numeric" min="0" max="100000" value="${value(plan?.maxClients)}"></label>
-<label>أقصى عدد مدربين في الجيم (للجيم بس، فاضي = من غير حد)<input name="maxTrainers" type="number" inputmode="numeric" min="0" max="10000" value="${value(plan?.maxTrainers)}"></label>
-<label>آخر يوم في الاشتراك (فاضي = مفتوح)<input name="until" type="date" value="${until}"></label>
+<fieldset class="seg"><legend>النوع</legend>
+<label><input type="radio" name="kind" value="trainer"${kind === 'trainer' ? ' checked' : ''}><span><b>مدرب</b><small>بيدير عملاءه بس</small></span></label>
+<label><input type="radio" name="kind" value="gym"${kind === 'gym' ? ' checked' : ''}><span><b>جيم</b><small>بيدير مدربين</small></span></label></fieldset>
+<label class="gym-only">اسم الجيم<input name="gymName" maxlength="100" value="${escapeHtml(gymName)}" autocomplete="off" placeholder="مثلاً: جيم الأبطال"></label>
+<div class="pair">
+<label>أقصى عدد عملاء لكل مدرب<input name="maxClients" type="number" inputmode="numeric" min="0" max="100000" value="${value(plan?.maxClients)}" placeholder="من غير حد"></label>
+<label class="gym-only">أقصى عدد مدربين<input name="maxTrainers" type="number" inputmode="numeric" min="0" max="10000" value="${value(plan?.maxTrainers)}" placeholder="من غير حد"></label></div>
+<label>آخر يوم في الاشتراك<input name="until" type="date" value="${until}"><small class="muted">فاضي = الاشتراك مفتوح</small></label>
 <p class="muted">بعد آخر يوم التطبيق بيقفل عند المدرب (ومدربين الجيم كمان)، والنسخة السحابية بتقف. بياناتهم بتفضل على تليفوناتهم.</p>
 <div class="actions"><button type="submit" class="btn">احفظ</button><a class="btn line" href="/admin">رجوع</a></div></form></div></div>`,
   );
