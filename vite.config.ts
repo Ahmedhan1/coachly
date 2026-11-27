@@ -5,6 +5,14 @@ import { defineConfig, type Plugin } from 'vite';
 import { VitePWA } from 'vite-plugin-pwa';
 import { APP_SECURITY_HEADERS, appHeadersFile } from './shared/appHeaders.ts';
 
+/** Production security headers for `vite preview`; `extraConnect` (an http://127.0.0.1:port origin) for local tests. */
+function previewHeaders(extraConnect: string | undefined): Record<string, string> {
+  if (!extraConnect || !/^http:\/\/127\.0\.0\.1:\d+$/.test(extraConnect)) return { ...APP_SECURITY_HEADERS };
+  const csp = APP_SECURITY_HEADERS['Content-Security-Policy'];
+  if (!csp) return { ...APP_SECURITY_HEADERS };
+  return { ...APP_SECURITY_HEADERS, 'Content-Security-Policy': csp.replace("connect-src 'self'", `connect-src 'self' ${extraConnect}`) };
+}
+
 /** Short build stamp shown on the sign-in and About screens, so a screenshot tells which build a phone runs. */
 function buildId(): string {
   const day = new Date().toISOString().slice(0, 10);
@@ -39,7 +47,9 @@ export default defineConfig({
   },
   // Same headers as production (deploy/app), so e2e and manual checks run under the real CSP. Not on the dev
   // server: Vite's HMR client needs inline scripts.
-  preview: { headers: { ...APP_SECURITY_HEADERS } },
+  // PREVIEW_EXTRA_CONNECT (npm run test:integration only) adds the local http Worker to connect-src; the production
+  // _headers file and deploy/app never read it.
+  preview: { headers: previewHeaders(process.env.PREVIEW_EXTRA_CONNECT) },
   plugins: [
     react(),
     cloudflareHeaders(),
