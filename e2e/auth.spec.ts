@@ -189,7 +189,11 @@ test('another account on the same phone never sees the first account clients', a
   await expect(page.getByRole('heading', { name: 'عميل الحساب الأول' })).toBeVisible();
   await page.goto('/more/settings?standalone=1');
   await page.getByRole('button', { name: /خروج من الحساب/ }).click();
+  // Signing out reloads the app. Go on only once the reloaded page is up: in WebKit that reload can otherwise
+  // land in the middle of the next steps.
+  const reloaded = page.waitForEvent('load');
   await page.getByTestId('confirm-sign-out').click();
+  await reloaded;
 
   // Account B signs in on the same phone.
   worker.userId = 'account-b';
@@ -199,7 +203,10 @@ test('another account on the same phone never sees the first account clients', a
   await page.getByTestId('erase-device-data').click();
   await expect(setupStep(page)).toBeVisible();
   await page.getByRole('button', { name: 'بعدين' }).click();
-  await page.goto('/clients?standalone=1');
+  // Through the tab bar, as the trainer would. A page.goto here races a reload WebKit replays from the earlier
+  // sign-out (seen only under the driver, never from the app's own code).
+  await page.getByRole('link', { name: 'العملاء', exact: true }).click();
+  await expect(page.getByRole('heading', { level: 1, name: 'العملاء' })).toBeVisible();
   await expect(page.getByText('عميل الحساب الأول')).toHaveCount(0);
 });
 

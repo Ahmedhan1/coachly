@@ -15,11 +15,12 @@ const E2E_WORKER_STORAGE = 'pt-coach.e2e-worker';
 /**
  * e2e build only: `?worker=<https url>` (kept for the tab in sessionStorage) points the app at a server the
  * Playwright test mocks, so sign-in and teams are tested end to end without touching the other e2e specs.
+ * `http://127.0.0.1:<port>` is a real local mock (e2e/servers.ts), for tests that keep the service worker.
  */
 function e2eWorkerUrl(): string | undefined {
   try {
     const fromUrl = new URLSearchParams(window.location.search).get('worker');
-    if (fromUrl && /^https:\/\/[^\s/]+$/.test(fromUrl)) window.sessionStorage.setItem(E2E_WORKER_STORAGE, fromUrl);
+    if (fromUrl && /^(https:\/\/[^\s/]+|http:\/\/127\.0\.0\.1:\d+)$/.test(fromUrl)) window.sessionStorage.setItem(E2E_WORKER_STORAGE, fromUrl);
     return window.sessionStorage.getItem(E2E_WORKER_STORAGE) ?? undefined;
   } catch {
     return undefined;

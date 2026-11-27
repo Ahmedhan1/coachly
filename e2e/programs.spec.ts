@@ -11,16 +11,32 @@ async function openSaraProgramFromTemplate(page: Page) {
   await expect(page.getByTestId('exercise-card').first()).toBeVisible();
 }
 
-/** One touch event at (x, y), sent to the element under that point, as a finger would. */
+/**
+ * One touch event at (x, y), sent to the element under that point, as a finger would. WebKit refuses
+ * `new Touch()` from page script, so there the event is a real UIEvent given TouchEvent's prototype (dnd-kit
+ * checks `instanceof TouchEvent`), with every TouchEvent-only field set on the event itself: reading an
+ * inherited TouchEvent getter on it would throw, and React reads them all.
+ */
 async function touch(page: Page, type: 'touchstart' | 'touchmove' | 'touchend', x: number, y: number): Promise<void> {
   await page.evaluate(
     ({ type, x, y }) => {
       const w = window as unknown as { __touchTarget?: Element };
       if (type === 'touchstart') w.__touchTarget = document.elementFromPoint(x, y) ?? document.body;
       const target = w.__touchTarget ?? document.body;
-      const point = new Touch({ identifier: 1, target, clientX: x, clientY: y, pageX: x + window.scrollX, pageY: y + window.scrollY });
-      const active = type === 'touchend' ? [] : [point];
-      target.dispatchEvent(new TouchEvent(type, { bubbles: true, cancelable: true, touches: active, targetTouches: active, changedTouches: [point] }));
+      const init = { identifier: 1, target, clientX: x, clientY: y, pageX: x + window.scrollX, pageY: y + window.scrollY, screenX: x, screenY: y, radiusX: 1, radiusY: 1, rotationAngle: 0, force: 1 };
+      let event: Event;
+      try {
+        const point = new Touch(init);
+        const active = type === 'touchend' ? [] : [point];
+        event = new TouchEvent(type, { bubbles: true, cancelable: true, view: window, touches: active, targetTouches: active, changedTouches: [point] });
+      } catch {
+        event = new UIEvent(type, { bubbles: true, cancelable: true, view: window });
+        Object.setPrototypeOf(event, TouchEvent.prototype);
+        const active = type === 'touchend' ? [] : [init];
+        const fields = { touches: active, targetTouches: active, changedTouches: [init], altKey: false, metaKey: false, ctrlKey: false, shiftKey: false };
+        for (const [key, value] of Object.entries(fields)) Object.defineProperty(event, key, { value });
+      }
+      target.dispatchEvent(event);
     },
     { type, x, y },
   );
@@ -31,6 +47,8 @@ const order = (page: Page) => page.getByTestId('exercise-card').evaluateAll((els
 test('program builder: touch drag-and-drop reorders exercises', async ({ page }) => {
   await openSaraProgramFromTemplate(page);
   const before = await order(page);
+  // Keep the whole drag on screen on a short phone (iPhone 13 in WebKit): centre the middle card first.
+  await page.getByTestId('exercise-card').nth(1).evaluate((el) => el.scrollIntoView({ block: 'center' }));
   const grip = page.getByTestId('exercise-card').first().getByRole('button', { name: /^اسحب لترتيب/ });
   const target = page.getByTestId('exercise-card').nth(2);
   const a = await grip.boundingBox();

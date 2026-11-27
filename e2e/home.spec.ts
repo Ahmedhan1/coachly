@@ -36,8 +36,17 @@ test('home: next session starts session mode, WhatsApp uses the real number, eve
 test('home: tapping the next client name opens the client file', async ({ page }) => {
   await openApp(page);
   const hero = page.getByRole('region', { name: 'الحصة الجاية' });
-  const name = (await hero.getByRole('button').first().textContent()) ?? '';
-  await hero.getByRole('button', { name }).click();
+  const button = hero.getByRole('button').first();
+  // The name as a screen reader hears it: the avatar's initial is aria-hidden.
+  const name = await button.evaluate((el) =>
+    Array.from(el.childNodes)
+      .filter((n) => !(n instanceof Element && n.getAttribute('aria-hidden') === 'true'))
+      .map((n) => n.textContent ?? '')
+      .join('')
+      .trim(),
+  );
+  await expect(button).toHaveAccessibleName(name);
+  await button.click();
   await expect(page).toHaveURL(/\/clients\/[^/]+$/);
   await expect(page.getByRole('heading', { name })).toBeVisible();
 });
