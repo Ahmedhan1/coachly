@@ -3,6 +3,7 @@ import type { Client, Session } from '@/domain/models';
 import { t } from '@/i18n';
 import { Icon, Num, Tx, cx } from '@/ui';
 import { timeParts } from '@/ui/format';
+import { ClientAvatar } from '@/features/clients/ClientAvatar';
 import { AttendanceToggle } from './AttendanceToggle';
 import styles from './Schedule.module.css';
 
@@ -28,6 +29,7 @@ export function SessionRow({ session, client, lateCancel, isNext, dayLabel, onOp
           <Num>{clock}</Num>
           <small>{period}</small>
         </span>
+        {client && <ClientAvatar client={client} />}
         <span className={styles.sessionText}>
           <span className={styles.sessionName}>{name}</span>
           <span className={styles.sessionSub}>

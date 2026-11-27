@@ -1,4 +1,5 @@
 import { ClientAvatar } from '@/features/clients/ClientAvatar';
+import { useStoredImageUrl } from '@/app/useStoredImageUrl';
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useGo } from '@/app/shell/nav';
@@ -17,6 +18,12 @@ import type { AgendaItem, NextSession } from './homeModel';
 import { useHomeData, type HomeData } from './useHomeData';
 import styles from './HomeScreen.module.css';
 
+/** The trainer's photo on the round profile button, or the first letter of their name. */
+function ProfileFace({ name, photoId }: { name: string; photoId: string | null }) {
+  const src = useStoredImageUrl(photoId);
+  return src ? <img src={src} alt="" className={styles.profilePhoto} draggable={false} /> : <>{name.charAt(0)}</>;
+}
+
 export function HomeScreen() {
   const home = useHomeData();
   const navigate = useNavigate();
@@ -25,7 +32,7 @@ export function HomeScreen() {
     <>
       <IconButton icon="search" label={t('hub.search.open')} onClick={openSearch} />
       <button type="button" className={styles.profile} aria-label={t('home.profile')} title={t('home.profile')} onClick={() => navigate('/more')}>
-        {(home?.trainerName.trim() || t('app.name')).charAt(0)}
+        <ProfileFace name={home?.trainerName.trim() || t('app.name')} photoId={home?.trainerPhotoId ?? null} />
       </button>
     </>
   );
@@ -101,7 +108,8 @@ function Hero({ next, plan }: { next: NextSession; plan: string | null }) {
         <small>{period}</small>
       </p>
       <button type="button" className={styles.heroWho} onClick={() => go(clientUrl(next.client.id))}>
-        {next.client.name}
+        <ClientAvatar client={next.client} />
+        <span>{next.client.name}</span>
       </button>
       <p className={styles.heroWhat}>
         {t(`goals.${next.client.goal}`)}

@@ -10,6 +10,8 @@ import { attentionRank, localWeekRange, planToday } from './homeModel';
 
 export interface HomeData {
   trainerName: string;
+  /** The trainer's own photo (Identity), shown on the profile button. */
+  trainerPhotoId: string | null;
   currency: string;
   now: Date;
   plan: ReturnType<typeof planToday>;
@@ -86,6 +88,7 @@ export function useHomeData(): HomeData | undefined {
 
   return {
     trainerName: settings.name,
+    trainerPhotoId: settings.photoImageId ?? null,
     currency: settings.currency,
     now,
     plan: planToday(todaySessions, now.getTime()),
