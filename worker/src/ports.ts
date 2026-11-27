@@ -3,7 +3,7 @@ import type { TeamStore } from './team/store';
 import type { ObjectStore } from './files/objectStore';
 import type { VapidKeys } from './push/vapid';
 
-export type AuditAction = 'login_ok' | 'login_failed' | 'approved' | 'disabled' | 'enabled' | 'password_set' | 'plan_set';
+export type AuditAction = 'login_ok' | 'login_failed' | 'approved' | 'disabled' | 'enabled' | 'password_set' | 'plan_set' | 'deleted';
 
 /** Owner actions. Entries carry an account id at most: never names, emails or device ids. */
 export interface AuditLog {

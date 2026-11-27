@@ -37,52 +37,79 @@ function statusTone(status: AccountStatus): string {
 }
 
 const STYLE = `
-:root{color-scheme:light dark;--bg:#ededea;--fg:#16181a;--card:#fff;--line:#d6d6d0;--accent:#1d5fd6;--danger:#b42318;--muted:#5b6066;--ok:#1d7a3a;--wait:#8a5a00;--wa:#128c4a}
-@media (prefers-color-scheme:dark){:root{--bg:#111315;--fg:#ecedee;--card:#1b1e21;--line:#30353a;--accent:#6ea2ff;--danger:#f07167;--muted:#9aa1a8;--ok:#5fcf86;--wait:#e3b04b;--wa:#3ccf7d}}
-*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--fg);font:16px/1.6 system-ui,-apple-system,"Segoe UI",Tahoma,sans-serif}
-main{max-width:1040px;margin:0 auto;padding:16px}h1{font-size:1.4rem;margin:8px 0 16px}h2{font-size:1.1rem;margin-block-start:0}
-a{color:var(--accent)}
-.card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:16px;margin-block-end:16px}
-label{display:block;margin-block-end:12px}input,select,textarea{display:block;width:100%;max-width:420px;font:inherit;padding:10px;border:1px solid var(--line);border-radius:8px;background:var(--bg);color:var(--fg);min-height:44px}
-textarea{max-width:none;min-height:180px;resize:vertical}
-button,.btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;font:inherit;font-weight:600;min-height:44px;padding:8px 16px;border-radius:8px;border:0;background:var(--accent);color:#fff;cursor:pointer;text-decoration:none}
-button.danger{background:var(--danger)}button.quiet{background:transparent;color:var(--accent);border:1px solid var(--line)}button.link{background:none;color:var(--accent);padding:0 8px}
-.btn.wa{background:var(--wa)}
-.code{font:700 2rem/1.3 ui-monospace,Menlo,Consolas,monospace;letter-spacing:.08em;direction:ltr;unicode-bidi:isolate;user-select:all;padding:12px 16px;border:2px dashed var(--accent);border-radius:12px;display:inline-block}
+:root{color-scheme:light dark;--bg:#F3F1ED;--card:#fff;--ink:#1C1A17;--muted:#6B655C;--line:#E4DED5;--brand:#F25C1F;--brand-ink:#AE4216;--brand-tint:#FDE9DF;--ok:#1E7A45;--ok-tint:#E3F3E8;--wait:#9A6200;--wait-tint:#FBF0D9;--off:#6B655C;--off-tint:#EEEBE6;--danger:#C8321E;--danger-tint:#FBE4E0;--wa:#128C4A;--shadow:0 1px 2px rgba(40,30,20,.06),0 6px 20px rgba(40,30,20,.06)}
+@media (prefers-color-scheme:dark){:root{--bg:#141311;--card:#1E1C1A;--ink:#F3F1ED;--muted:#A39C92;--line:#2F2C28;--brand:#FF6A2B;--brand-ink:#FF9A6B;--brand-tint:#3A2217;--ok:#5FCF86;--ok-tint:#183326;--wait:#E3B04B;--wait-tint:#3A2E14;--off:#A39C92;--off-tint:#2A2825;--danger:#FF7B6B;--danger-tint:#3D1C18;--wa:#3CCF7D;--shadow:none}}
+*{box-sizing:border-box}html{-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.55 system-ui,-apple-system,"Segoe UI",Tahoma,sans-serif}
+main{max-width:1120px;margin:0 auto;padding:16px 16px 48px}
+a{color:var(--brand-ink);font-weight:600;text-decoration:none}a:hover{text-decoration:underline}
+h1{font-size:1.6rem;line-height:1.2;margin:0}h2{font-size:1.15rem;margin:0 0 8px}
+.bar{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-block:8px 20px}
+.brand{display:flex;align-items:center;gap:12px}.brand small{display:block;color:var(--muted);font-weight:500;font-size:.85rem}
+.mark{flex:none;inline-size:44px;block-size:44px;border-radius:14px;background:var(--brand);color:#fff;display:grid;place-items:center;font:800 1.5rem/1 system-ui,sans-serif}
+.card{background:var(--card);border-radius:20px;padding:18px;box-shadow:var(--shadow);border:1px solid var(--line)}
+.stack>*+*{margin-block-start:16px}
+label{display:block;font-weight:600;font-size:.92rem}label>input,label>select{margin-block-start:6px}
+input,select,textarea{display:block;inline-size:100%;font:inherit;padding:10px 14px;border:1px solid var(--line);border-radius:14px;background:var(--bg);color:var(--ink);min-block-size:46px}
+input:focus,select:focus,textarea:focus{outline:2px solid var(--brand);outline-offset:1px}
+textarea{min-block-size:180px;resize:vertical}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;font:inherit;font-weight:700;font-size:.95rem;min-block-size:44px;padding:8px 18px;border-radius:999px;border:0;background:var(--brand);color:#fff;cursor:pointer;text-decoration:none;white-space:nowrap}
+.btn:hover{text-decoration:none;filter:brightness(1.05)}.btn:disabled{opacity:.55;cursor:default}
+.btn.soft{background:var(--brand-tint);color:var(--brand-ink)}
+.btn.line{background:var(--card);color:var(--ink);box-shadow:inset 0 0 0 1px var(--line)}
+.btn.warn{background:var(--card);color:var(--danger);box-shadow:inset 0 0 0 1px var(--danger-tint)}
+.btn.danger{background:var(--danger);color:#fff}
+.btn.wa{background:var(--wa)}.btn.sm{min-block-size:38px;padding:6px 14px;font-size:.88rem}
+.notice{display:flex;align-items:center;gap:10px;padding:12px 16px;border-radius:16px;background:var(--ok-tint);color:var(--ok);font-weight:700;margin-block-end:16px}
+.notice.wait{background:var(--wait-tint);color:var(--wait)}
+.error{color:var(--danger);font-weight:700}.muted{color:var(--muted)}.small{font-size:.88rem}
 .ltr{direction:ltr;unicode-bidi:isolate}.mono{font-family:ui-monospace,Menlo,Consolas,monospace}
-.muted{color:var(--muted)}.error{color:var(--danger);font-weight:600}.notice{border-color:var(--accent)}
-.actions{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-block:12px}
-.copied{color:var(--ok);font-weight:600;min-width:4em}
-.pill{display:inline-block;padding:2px 10px;border-radius:999px;font-size:.85rem;font-weight:600;border:1px solid currentColor;white-space:nowrap}
-.pill.ok{color:var(--ok)}.pill.wait{color:var(--wait)}.pill.off{color:var(--muted)}
-table{width:100%;border-collapse:collapse;font-size:.95rem}th,td{text-align:start;padding:8px;border-block-end:1px solid var(--line);vertical-align:top}
-td.acts{white-space:nowrap}td form{display:inline-block;margin-inline-end:8px;margin-block-end:4px}
-.top{display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap}
-.filters{display:flex;flex-wrap:wrap;gap:8px;align-items:flex-end;margin-block-end:12px}.filters label{margin:0;flex:1 1 180px}
-.pager{display:flex;gap:12px;align-items:center;justify-content:center;margin-block-start:12px}
-ol.steps{padding-inline-start:1.4em;margin:8px 0}
-@media (max-width:720px){
- table,thead,tbody,tr,td{display:block}thead{display:none}
- tr{border:1px solid var(--line);border-radius:10px;padding:8px 12px;margin-block-end:12px}
- td{border:0;padding:4px 0;display:flex;gap:8px;justify-content:space-between}
- td::before{content:attr(data-label);color:var(--muted);flex:none}
- td.name{font-weight:700;font-size:1.05rem}td.name::before{content:none}
- td.acts{justify-content:flex-start;flex-wrap:wrap}td.acts::before{content:none}
- .code{font-size:1.6rem}
-}
+.tabs{display:flex;gap:8px;overflow-x:auto;padding-block-end:4px;margin-block-end:12px;scrollbar-width:none}
+.tab{display:inline-flex;align-items:center;gap:8px;padding:8px 14px;border-radius:999px;background:var(--card);color:var(--ink);box-shadow:inset 0 0 0 1px var(--line);font-weight:700;white-space:nowrap}
+.tab b{min-inline-size:24px;padding:0 7px;border-radius:999px;background:var(--off-tint);font-size:.82rem;text-align:center}
+.tab[aria-current=page]{background:var(--ink);color:var(--bg);box-shadow:none}.tab[aria-current=page] b{background:var(--brand);color:#fff}
+.tab.hot b{background:var(--brand);color:#fff}
+.search{display:flex;gap:8px;margin-block-end:18px}.search input{flex:1}
+.grid{display:grid;gap:14px;grid-template-columns:repeat(auto-fill,minmax(320px,1fr))}
+.acct{display:flex;flex-direction:column;gap:12px}
+.acct.gone{opacity:.45;pointer-events:none}
+.who{display:flex;align-items:center;gap:12px;min-inline-size:0}
+.avatar{flex:none;inline-size:44px;block-size:44px;border-radius:999px;display:grid;place-items:center;background:var(--brand-tint);color:var(--brand-ink);font-weight:800;font-size:1.15rem}
+.who .text{min-inline-size:0;flex:1}.who strong{display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:1.05rem}
+.who .mail{display:block;color:var(--muted);font-size:.88rem;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.pill{display:inline-block;padding:3px 10px;border-radius:999px;font-size:.8rem;font-weight:700;white-space:nowrap}
+.pill.ok{background:var(--ok-tint);color:var(--ok)}.pill.wait{background:var(--wait-tint);color:var(--wait)}.pill.off{background:var(--off-tint);color:var(--off)}
+.meta{font-size:.88rem;color:var(--muted);line-height:1.6}
+.acts{display:flex;flex-wrap:wrap;gap:8px;border-block-start:1px solid var(--line);padding-block-start:12px}
+.acts form{margin:0}.acts .push{margin-inline-start:auto}
+.empty{text-align:center;padding:40px 16px;color:var(--muted)}
+.pager{display:flex;gap:12px;align-items:center;justify-content:center;margin-block-start:20px}
+.narrow{max-width:560px;margin-inline:auto}
+.code{font:700 2rem/1.3 ui-monospace,Menlo,Consolas,monospace;letter-spacing:.08em;direction:ltr;unicode-bidi:isolate;user-select:all;padding:12px 16px;border:2px dashed var(--brand);border-radius:16px;display:inline-block}
+.actions{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.copied{color:var(--ok);font-weight:700;min-inline-size:4em}
+ul.list{margin:8px 0;padding-inline-start:1.3em}ul.list li+li{margin-block-start:4px}
+.danger-box{border-color:var(--danger-tint)}
+@media (max-width:560px){h1{font-size:1.35rem}.grid{grid-template-columns:1fr}.code{font-size:1.6rem}}
 `;
 
 export function page(title: string, body: string): string {
   return `<!doctype html>
 <html lang="ar" dir="rtl"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<meta name="robots" content="noindex,nofollow"><title>${escapeHtml(title)}</title><style>${STYLE}</style>
+<meta name="robots" content="noindex,nofollow"><meta name="theme-color" content="#F25C1F"><title>${escapeHtml(title)}</title><style>${STYLE}</style>
 <script src="/admin/admin.js" defer></script></head>
 <body><main>${body}</main></body></html>`;
 }
 
+function brandBar(right = ''): string {
+  return `<header class="bar"><div class="brand"><span class="mark" aria-hidden="true">C</span><div><h1>لوحة الحسابات</h1><small>Coachly · المالك</small></div></div>${right}</header>`;
+}
+
 /**
- * The only script on the admin pages (served as a file so the CSP stays `script-src 'self'`): copy buttons
- * with a fallback for browsers without the async clipboard API.
+ * The only script on the admin pages (served as a file so the CSP stays `script-src 'self'`):
+ * - copy buttons, with a fallback for browsers without the async clipboard API;
+ * - quick actions (approve / enable) without a page reload: the form posts with `X-Admin-Inline: 1` and the
+ *   server answers with the updated card, which replaces the old one. Without JS the form posts normally.
  */
 export const ADMIN_SCRIPT = `document.addEventListener('click',function(e){
 var b=e.target&&e.target.closest?e.target.closest('[data-copy]'):null;if(!b)return;
@@ -92,25 +119,33 @@ var out=document.getElementById(b.getAttribute('data-copy')+'-copied');
 function ok(){if(out){out.textContent='اتنسخ';setTimeout(function(){out.textContent='';},2500);}}
 function fallback(){var t=document.createElement('textarea');t.value=text;t.setAttribute('readonly','');t.style.position='fixed';t.style.opacity='0';document.body.appendChild(t);t.select();try{document.execCommand('copy');ok();}catch(_){}document.body.removeChild(t);}
 if(navigator.clipboard&&window.isSecureContext){navigator.clipboard.writeText(text).then(ok,fallback);}else{fallback();}
+});
+document.addEventListener('submit',function(e){
+var f=e.target;if(!f||!f.hasAttribute||!f.hasAttribute('data-inline')||!window.fetch)return;
+e.preventDefault();var card=f.closest('.acct');var btn=f.querySelector('button');if(btn)btn.disabled=true;
+fetch(f.action,{method:'POST',body:new URLSearchParams(new FormData(f)),headers:{'X-Admin-Inline':'1'},credentials:'same-origin'})
+.then(function(r){if(!r.ok)throw r;return r.text();})
+.then(function(html){if(!card)return location.reload();var t=document.createElement('div');t.innerHTML=html.trim();var n=t.firstElementChild;if(n)card.replaceWith(n);var w=document.getElementById('waiting-count');if(w&&/\/approve$/.test(f.action)){var c=Math.max(0,(parseInt(w.textContent,10)||1)-1);w.textContent=String(c);}})
+.catch(function(){f.removeAttribute('data-inline');f.submit();});
 });`;
 
 export function loginPage(error: string | null, notice: string | null = null): string {
   return page(
     'دخول لوحة الحسابات',
-    `<h1>لوحة الحسابات</h1>
-${notice === null ? '' : `<div class="card notice"><strong>${escapeHtml(notice)}</strong></div>`}
-<div class="card"><form method="post" action="/admin/login">
-<label>كلمة السر<input type="password" name="password" autocomplete="current-password" required autofocus></label>
+    `<div class="narrow">${brandBar()}
+${notice === null ? '' : `<div class="notice wait">${escapeHtml(notice)}</div>`}
+<div class="card"><form method="post" action="/admin/login" class="stack">
+<label>كلمة سر المالك<input type="password" name="password" autocomplete="current-password" required autofocus></label>
 ${error === null ? '' : `<p class="error">${escapeHtml(error)}</p>`}
-<button type="submit">دخول</button></form></div>`,
+<button class="btn" type="submit">دخول</button></form></div></div>`,
   );
 }
 
 export function messagePage(title: string, text: string): string {
-  return page(title, `<h1>${escapeHtml(title)}</h1><div class="card"><p>${escapeHtml(text)}</p><p><a href="/admin">رجوع للوحة</a></p></div>`);
+  return page(title, `<div class="narrow">${brandBar()}<div class="card stack"><h2>${escapeHtml(title)}</h2><p>${escapeHtml(text)}</p><a class="btn line" href="/admin">رجوع للوحة</a></div></div>`);
 }
 
-export type AccountAction = 'approve' | 'disable' | 'enable' | 'password' | 'plan';
+export type AccountAction = 'approve' | 'disable' | 'enable' | 'password' | 'plan' | 'delete';
 
 const ACTION_LABELS: Record<AccountAction, string> = {
   approve: 'موافقة',
@@ -118,14 +153,17 @@ const ACTION_LABELS: Record<AccountAction, string> = {
   disable: 'إيقاف',
   password: 'كلمة سر جديدة',
   plan: 'الخطة',
+  delete: 'مسح نهائي',
 };
 
 function actionForm(action: AccountAction, id: string): string {
-  const cls = action === 'disable' ? 'danger' : action === 'password' || action === 'plan' ? 'quiet' : '';
+  const cls = action === 'approve' || action === 'enable' ? 'btn sm' : action === 'disable' ? 'btn sm warn' : action === 'delete' ? 'btn sm warn' : 'btn sm line';
   const method = action === 'plan' ? 'get' : 'post';
-  return `<form method="${method}" action="/admin/accounts/${action}">
+  const inline = action === 'approve' || action === 'enable' ? ' data-inline' : '';
+  const push = action === 'delete' ? ' class="push"' : '';
+  return `<form method="${method}" action="/admin/accounts/${action}"${inline}${push}>
 <input type="hidden" name="id" value="${escapeHtml(id)}">
-<button type="submit"${cls === '' ? '' : ` class="${cls}"`}>${escapeHtml(ACTION_LABELS[action])}</button></form>`;
+<button type="submit" class="${cls}">${escapeHtml(ACTION_LABELS[action])}</button></form>`;
 }
 
 /** A trainer who joined a gym and has no approval of their own: the gym approves them, not the owner. */
@@ -142,14 +180,14 @@ function statusPill(r: AccountRecord, info: RowInfo): string {
 }
 
 export function actionsFor(status: AccountStatus, viaGym = false): AccountAction[] {
-  if (viaGym) return ['disable', 'plan', 'password'];
+  if (viaGym) return ['plan', 'password', 'disable', 'delete'];
   switch (status) {
     case 'pending':
-      return ['approve', 'disable', 'plan', 'password'];
+      return ['approve', 'plan', 'password', 'disable', 'delete'];
     case 'approved':
-      return ['disable', 'plan', 'password'];
+      return ['plan', 'password', 'disable', 'delete'];
     case 'disabled':
-      return ['enable', 'plan', 'password'];
+      return ['enable', 'plan', 'password', 'delete'];
   }
 }
 
@@ -185,39 +223,35 @@ export function planSummary(info: RowInfo): string {
   return parts.join('<br>');
 }
 
-function row(r: AccountRecord, info: RowInfo): string {
-  const cell = (label: string, value: string, cls = '') =>
-    `<td data-label="${label}"${cls === '' ? '' : ` class="${cls}"`}>${value}</td>`;
-  return `<tr>${cell('الاسم', escapeHtml(r.name === '' ? '—' : r.name), 'name')}
-${cell('الإيميل', `<span class="ltr">${escapeHtml(r.email)}</span>`)}
-${cell('الحالة', statusPill(r, info))}
-${cell('النوع والخطة', `<span class="muted">${planSummary(info)}</span>`)}
-${cell('اتسجل', `<span class="ltr">${formatDate(r.createdAt)}</span>`)}
-<td class="acts">${actionsFor(r.status, handledByGym(r, info))
+/** One account as a card (also returned alone for quick actions, see ADMIN_SCRIPT). */
+export function accountCard(r: AccountRecord, info: RowInfo): string {
+  const display = r.name === '' ? r.email : r.name;
+  return `<article class="card acct" id="acct-${escapeHtml(r.id)}">
+<div class="who"><span class="avatar" aria-hidden="true">${escapeHtml(display.trim().charAt(0).toUpperCase() || '?')}</span>
+<div class="text"><strong>${escapeHtml(r.name === '' ? '—' : r.name)}</strong><span class="mail ltr">${escapeHtml(r.email)}</span></div>${statusPill(r, info)}</div>
+<div class="meta">${planSummary(info)}<br>اتسجل <span class="ltr">${formatDate(r.createdAt)}</span></div>
+<div class="acts">${actionsFor(r.status, handledByGym(r, info))
     .map((a) => actionForm(a, r.id))
-    .join('')}</td></tr>`;
+    .join('')}</div></article>`;
 }
 
 export interface DashboardView {
   records: readonly AccountRecord[];
   info: ReadonlyMap<string, RowInfo>;
+  /** Matches for the current search / filter. */
   total: number;
-  /** Count before filtering. */
-  all: number;
-  pending: number;
+  counts: { all: number; approved: number; disabled: number; pending: number; waiting: number };
   page: number;
   pages: number;
   q: string;
   status: string;
   notice: string | null;
-  /** The list hit the server's read cap: the oldest accounts are not shown. */
-  capped: boolean;
 }
 
-function pageLink(view: DashboardView, n: number): string {
+function link(q: string, status: string, n = 1): string {
   const params = new URLSearchParams();
-  if (view.q !== '') params.set('q', view.q);
-  if (view.status !== '') params.set('status', view.status);
+  if (q !== '') params.set('q', q);
+  if (status !== '') params.set('status', status);
   if (n > 1) params.set('page', String(n));
   const query = params.toString();
   return escapeHtml(`/admin${query === '' ? '' : `?${query}`}`);
@@ -225,40 +259,56 @@ function pageLink(view: DashboardView, n: number): string {
 
 function pager(view: DashboardView): string {
   if (view.pages <= 1) return '';
-  const prev = view.page > 1 ? `<a href="${pageLink(view, view.page - 1)}">السابق</a>` : '<span class="muted">السابق</span>';
-  const next = view.page < view.pages ? `<a href="${pageLink(view, view.page + 1)}">التالي</a>` : '<span class="muted">التالي</span>';
-  return `<nav class="pager" aria-label="الصفحات">${prev}<span>صفحة <span class="ltr">${view.page} / ${view.pages}</span></span>${next}</nav>`;
+  const prev = view.page > 1 ? `<a class="btn line sm" href="${link(view.q, view.status, view.page - 1)}">السابق</a>` : '';
+  const next = view.page < view.pages ? `<a class="btn line sm" href="${link(view.q, view.status, view.page + 1)}">التالي</a>` : '';
+  return `<nav class="pager" aria-label="الصفحات">${prev}<span class="muted">صفحة <span class="ltr">${view.page} / ${view.pages}</span></span>${next}</nav>`;
 }
 
 export function dashboardPage(view: DashboardView): string {
-  const rows = view.records.map((r) => row(r, view.info.get(r.id) ?? { plan: null, membership: null, trainers: 0 })).join('');
-  const statusOptions = STATUS_FILTERS.map(
-    (o) => `<option value="${o.value}"${o.value === view.status ? ' selected' : ''}>${escapeHtml(o.label)}</option>`,
-  ).join('');
+  const cards = view.records.map((r) => accountCard(r, view.info.get(r.id) ?? { plan: null, membership: null, trainers: 0 })).join('');
+  const count: Record<string, number> = { '': view.counts.all, pending: view.counts.pending, approved: view.counts.approved, disabled: view.counts.disabled };
+  const tabs = STATUS_FILTERS.map((o) => {
+    const current = o.value === view.status;
+    const hot = o.value === 'pending' && view.counts.waiting > 0 && !current;
+    const n = o.value === 'pending' ? `<b id="waiting-count">${view.counts.waiting}</b>` : `<b>${count[o.value] ?? 0}</b>`;
+    return `<a class="tab${hot ? ' hot' : ''}" href="${link(view.q, o.value)}"${current ? ' aria-current="page"' : ''}>${escapeHtml(o.label)}${n}</a>`;
+  }).join('');
   const filtered = view.q !== '' || view.status !== '';
-  const empty = filtered ? 'مفيش نتايج للبحث ده.' : 'لسه مفيش حد عمل حساب. ابعت لينك التطبيق للمدرب، ولما يسجل هيظهر هنا.';
-  const waiting =
-    view.pending === 0
-      ? ''
-      : `<div class="card notice"><strong>فيه <span class="ltr">${view.pending}</span> حساب مستني موافقتك.</strong> <a href="/admin?status=pending">اعرضهم</a></div>`;
+  const empty = filtered
+    ? 'مفيش نتايج.'
+    : 'لسه مفيش حد عمل حساب. ابعت لينك التطبيق للمدرب، ولما يسجل هيظهر هنا.';
   return page(
     'لوحة الحسابات',
-    `<div class="top"><h1>لوحة الحسابات</h1><form method="post" action="/admin/logout"><button class="link" type="submit">خروج</button></form></div>
-${view.notice === null ? '' : `<div class="card notice"><strong>${escapeHtml(view.notice)}</strong></div>`}
-${waiting}
-<div class="card"><h2>المدربين (${filtered ? `<span class="ltr">${view.total}</span> من <span class="ltr">${view.all}</span>` : `<span class="ltr">${view.all}</span>`})</h2>
-<p class="muted">المدرب أو الجيم بيعمل حسابه من التطبيق (إيميل وكلمة سر، أو جوجل). الحساب الجديد بيفضل مستني لحد ما تدوس «موافقة».
-عشان تخلي الحساب <strong>جيم</strong>: «الخطة» ← النوع «جيم». مدربين الجيم بيدخلوا بلينك دعوة من الجيم، والجيم هو اللي بيوافق عليهم.</p>
-<form class="filters" method="get" action="/admin" role="search">
-<label>بحث بالاسم أو الإيميل<input type="search" name="q" value="${escapeHtml(view.q)}" autocomplete="off"></label>
-<label>الحالة<select name="status">${statusOptions}</select></label>
-<button type="submit" class="quiet">بحث</button>${filtered ? '<a href="/admin">مسح</a>' : ''}</form>
-<table>
-<thead><tr><th>الاسم</th><th>الإيميل</th><th>الحالة</th><th>النوع والخطة</th><th>اتسجل</th><th></th></tr></thead>
-<tbody>${rows === '' ? `<tr><td colspan="6" class="muted">${empty}</td></tr>` : rows}</tbody></table>
+    `${brandBar('<form method="post" action="/admin/logout"><button class="btn line sm" type="submit">خروج</button></form>')}
+${view.notice === null ? '' : `<div class="notice" role="status">${escapeHtml(view.notice)}</div>`}
+<nav class="tabs" aria-label="الحالة">${tabs}</nav>
+<form class="search" method="get" action="/admin" role="search">
+${view.status === '' ? '' : `<input type="hidden" name="status" value="${escapeHtml(view.status)}">`}
+<input type="search" name="q" value="${escapeHtml(view.q)}" placeholder="دوّر بالاسم أو الإيميل" aria-label="بحث بالاسم أو الإيميل" autocomplete="off">
+<button type="submit" class="btn soft">بحث</button>${view.q !== '' ? `<a class="btn line" href="${link('', view.status)}">مسح</a>` : ''}</form>
+${cards === '' ? `<div class="card empty">${empty}</div>` : `<p class="muted small">${filtered ? `<span class="ltr">${view.total}</span> نتيجة` : `<span class="ltr">${view.total}</span> حساب`} · الجديد الأول</p><section class="grid">${cards}</section>`}
 ${pager(view)}
-${view.capped ? '<p class="muted">القائمة بتعرض أحدث الحسابات بس. استخدم البحث عشان توصل للأقدم.</p>' : ''}
-</div>`,
+<p class="muted small" style="margin-block-start:24px">المدرب أو الجيم بيعمل حسابه من التطبيق (إيميل وكلمة سر، أو جوجل) وبيفضل مستني لحد ما توافق. عشان تخلي الحساب جيم: «الخطة» ← النوع «جيم». مدربين الجيم بيدخلوا بلينك دعوة، والجيم هو اللي بيوافق عليهم.</p>`,
+  );
+}
+
+/** What a complete delete removes, shown before the owner confirms by typing the email. */
+export function deletePage(record: AccountRecord, info: { gymTrainers: number; isGym: boolean }, error: string | null = null): string {
+  const who = `<strong>${escapeHtml(record.name === '' ? record.email : record.name)}</strong> (<span class="ltr">${escapeHtml(record.email)}</span>)`;
+  return page(
+    'مسح الحساب',
+    `<div class="narrow">${brandBar()}<div class="card stack danger-box">
+<h2>مسح ${who} نهائياً</h2>
+<p>ده بيمسح كل حاجة على السيرفر للحساب ده، ومينفعش يرجع:</p>
+<ul class="list"><li>الحساب نفسه وكل أجهزته اللي داخلة (هيخرج منها)</li><li>الخطة والاشتراك</li>
+<li>النسخ الاحتياطية السحابية، وصفحات العملاء ومتابعاتهم، والصور والملفات المرفوعة</li><li>التذكيرات والإشعارات</li>
+${info.isGym ? `<li>الجيم نفسه: <strong class="ltr">${info.gymTrainers}</strong> مدرب هيبقوا مش تبع جيم (حساباتهم بتفضل، ومحتاجة موافقتك لو كانوا شغالين عن طريق الجيم)</li>` : ''}</ul>
+<p class="muted small">البيانات اللي على تليفون المدرب نفسه مش بتتمسح. لو عايز توقفه بس من غير مسح، استخدم «إيقاف».</p>
+${error === null ? '' : `<p class="error">${escapeHtml(error)}</p>`}
+<form method="post" action="/admin/accounts/delete" class="stack">
+<input type="hidden" name="id" value="${escapeHtml(record.id)}"><input type="hidden" name="confirmed" value="yes">
+<label>اكتب الإيميل عشان تأكد<input name="email" class="ltr" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="${escapeHtml(record.email)}" required></label>
+<div class="actions"><button type="submit" class="btn danger">امسح الحساب نهائياً</button><a class="btn line" href="/admin">لأ، رجوع</a></div></form></div></div>`,
   );
 }
 
@@ -272,12 +322,11 @@ export function confirmPage(action: 'disable' | 'password', record: AccountRecor
 <label>كلمة السر الجديدة (8 حروف على الأقل)<input name="password" class="ltr mono" minlength="8" maxlength="128" value="${escapeHtml(suggestedPassword)}" required autocomplete="off"></label>`;
   return page(
     'تأكيد',
-    `<h1>تأكيد</h1><div class="card">
-<form method="post" action="/admin/accounts/${action}">
+    `<div class="narrow">${brandBar()}<div class="card">
+<form method="post" action="/admin/accounts/${action}" class="stack">
 <input type="hidden" name="id" value="${escapeHtml(record.id)}"><input type="hidden" name="confirmed" value="yes">
 ${body}
-<button type="submit" class="${action === 'disable' ? 'danger' : ''}">${action === 'disable' ? 'أيوه، وقّف' : 'غيّر كلمة السر'}</button></form>
-<p><a href="/admin">لأ، رجوع</a></p></div>`,
+<div class="actions"><button type="submit" class="btn${action === 'disable' ? ' danger' : ''}">${action === 'disable' ? 'أيوه، وقّف' : 'غيّر كلمة السر'}</button><a class="btn line" href="/admin">لأ، رجوع</a></div></form></div></div>`,
   );
 }
 
@@ -295,19 +344,18 @@ export function passwordSetPage(input: { record: AccountRecord; password: string
   const wa = `https://wa.me/?text=${encodeURIComponent(message)}`;
   return page(
     'كلمة السر الجديدة',
-    `<h1>كلمة السر الجديدة</h1>
-<div class="card"><p>الحساب: <strong>${escapeHtml(input.record.name)}</strong> (<span class="ltr">${escapeHtml(input.record.email)}</span>)</p>
+    `<div class="narrow stack">${brandBar()}
+<div class="card stack"><h2>كلمة السر الجديدة</h2><p>الحساب: <strong>${escapeHtml(input.record.name)}</strong> (<span class="ltr">${escapeHtml(input.record.email)}</span>)</p>
 <p><span id="pw" class="code">${escapeHtml(input.password)}</span></p>
-<div class="actions"><button type="button" data-copy="pw">نسخ</button><span class="copied" id="pw-copied" role="status"></span></div>
+<div class="actions"><button type="button" class="btn" data-copy="pw">نسخ</button><span class="copied" id="pw-copied" role="status"></span></div>
 <p class="error">كلمة السر دي بتظهر هنا مرة واحدة بس. ابعتها دلوقتي.</p></div>
-<div class="card"><h2>رسالة جاهزة للمدرب</h2>
+<div class="card stack"><h2>رسالة جاهزة للمدرب</h2>
 <textarea id="msg" readonly dir="rtl">${escapeHtml(message)}</textarea>
 <div class="actions"><a class="btn wa" href="${escapeHtml(wa)}" target="_blank" rel="noopener">ابعت على واتساب</a>
-<button type="button" class="quiet" data-copy="msg">نسخ الرسالة</button><span class="copied" id="msg-copied" role="status"></span></div></div>
-<p><a href="/admin">رجوع للوحة</a></p>`,
+<button type="button" class="btn line" data-copy="msg">نسخ الرسالة</button><span class="copied" id="msg-copied" role="status"></span></div></div>
+<a class="btn line" href="/admin">رجوع للوحة</a></div>`,
   );
 }
-
 
 /** Owner's plan form for one account: type (trainer / gym), limits and end date. */
 export function planPage(record: AccountRecord, plan: Plan | null, gymName: string, error: string | null = null): string {
@@ -316,10 +364,10 @@ export function planPage(record: AccountRecord, plan: Plan | null, gymName: stri
   const until = plan?.expiresAt === null || plan?.expiresAt === undefined ? '' : lastDay(plan.expiresAt);
   return page(
     'الخطة',
-    `<h1>الخطة</h1><div class="card">
+    `<div class="narrow">${brandBar()}<div class="card stack"><h2>الخطة</h2>
 <p><strong>${escapeHtml(record.name === '' ? record.email : record.name)}</strong> (<span class="ltr">${escapeHtml(record.email)}</span>)</p>
 ${error === null ? '' : `<p class="error">${escapeHtml(error)}</p>`}
-<form method="post" action="/admin/accounts/plan">
+<form method="post" action="/admin/accounts/plan" class="stack">
 <input type="hidden" name="id" value="${escapeHtml(record.id)}">
 <label>النوع<select name="kind">
 <option value="trainer"${kind === 'trainer' ? ' selected' : ''}>مدرب</option>
@@ -329,7 +377,6 @@ ${error === null ? '' : `<p class="error">${escapeHtml(error)}</p>`}
 <label>أقصى عدد مدربين في الجيم (للجيم بس، فاضي = من غير حد)<input name="maxTrainers" type="number" inputmode="numeric" min="0" max="10000" value="${value(plan?.maxTrainers)}"></label>
 <label>آخر يوم في الاشتراك (فاضي = مفتوح)<input name="until" type="date" value="${until}"></label>
 <p class="muted">بعد آخر يوم التطبيق بيقفل عند المدرب (ومدربين الجيم كمان)، والنسخة السحابية بتقف. بياناتهم بتفضل على تليفوناتهم.</p>
-<button type="submit">احفظ</button></form>
-<p><a href="/admin">رجوع للوحة</a></p></div>`,
+<div class="actions"><button type="submit" class="btn">احفظ</button><a class="btn line" href="/admin">رجوع</a></div></form></div></div>`,
   );
 }
