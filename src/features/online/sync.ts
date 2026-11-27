@@ -10,9 +10,22 @@ import { NutritionStore } from '@/data/nutritionStore';
 import { mealPicksKey, parseMealPicks } from '@/domain/meals';
 import { entryNavyEstimate } from '@/domain/nutrition';
 import { readPushPrefs, readShare, savePushPrefs } from '@/data/prefs/online';
+import { shouldSendPushSchedule } from './syncThrottle';
 
-/** Rebuilds this device's push schedule from the next 40 days of sessions and subscription ends. */
-export async function syncPush(services: AppServices, now = Date.now()): Promise<number | null> {
+/** Device-local (`backup.` prefix: never in a backup): fingerprint of the last schedule the server accepted. */
+const PUSH_SENT_KEY = 'backup.push.sent';
+
+function readSent(v: unknown): { fingerprint: string; at: number } | null {
+  if (typeof v !== 'object' || v === null) return null;
+  const r = v as Record<string, unknown>;
+  return typeof r.fingerprint === 'string' && typeof r.at === 'number' ? { fingerprint: r.fingerprint, at: r.at } : null;
+}
+
+/**
+ * Rebuilds this device's push schedule from the next 40 days of sessions and subscription ends.
+ * `skipUnchanged` (background sync): an identical schedule sent recently is not sent again (saves a request).
+ */
+export async function syncPush(services: AppServices, now = Date.now(), opts: { skipUnchanged?: boolean } = {}): Promise<number | null> {
   const push = services.online?.push;
   if (!push) return null;
   const prefs = await readPushPrefs(services.meta);
@@ -42,9 +55,13 @@ export async function syncPush(services: AppServices, now = Date.now()): Promise
     if (count > 0) items.push({ id: `digest-${date}`, at: Math.floor(at / 1000), title: t('outbox.digestTitle'), body: t('outbox.digestBody', { n: count }) });
   }
   items.sort((a, b) => a.at - b.at);
-  const r = await push.sync(items.slice(0, PUSH_MAX_ITEMS));
+  const batch = items.slice(0, PUSH_MAX_ITEMS);
+  const fingerprint = JSON.stringify(batch);
+  if (opts.skipUnchanged && !shouldSendPushSchedule({ fingerprint, last: readSent(await services.meta.get(PUSH_SENT_KEY)), now })) return null;
+  const r = await push.sync(batch);
   if (!r.ok) return null;
   await savePushPrefs(services.meta, { ...prefs, lastSyncAt: now });
+  await services.meta.set(PUSH_SENT_KEY, { fingerprint, at: now });
   return r.value;
 }
 
