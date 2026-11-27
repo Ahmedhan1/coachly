@@ -23,6 +23,14 @@
 اتجرّب على السيرفر الحقيقي: عمل حساب، دخول، «حسابك مستني الموافقة» في التطبيق نفسه، ومفيش أخطاء في الكونسول.
 وقت المعالج (CPU) لكل طلب 1–5 ملّي ثانية (الحد المجاني 10).
 
+## النشر الأوتوماتيك (كل push على main)
+
+`.github/workflows/deploy.yml` بيشغّل `npm run deploy` على GitHub Actions مع كل push على `main` (وتقدر تشغّله
+بإيدك من تبويب Actions ← Deploy ← Run workflow). لو أي اختبار فشل، مفيش حاجة بتتنشر.
+
+مرة واحدة بس: في GitHub ← المستودع ← Settings ← Secrets and variables ← Actions ← New repository secret:
+`CLOUDFLARE_API_TOKEN` (ولو التوكن شايف أكتر من حساب Cloudflare، ضيف `CLOUDFLARE_ACCOUNT_ID` كمان).
+
 ## إزاي ترفع نسخة جديدة (أمر واحد)
 
 ```

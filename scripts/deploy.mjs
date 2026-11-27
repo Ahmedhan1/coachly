@@ -17,6 +17,9 @@ const root = fileURLToPath(new URL('..', import.meta.url));
 const args = new Set(process.argv.slice(2));
 const wrangler = join(root, 'worker/node_modules/.bin/wrangler');
 const env = { ...process.env, WRANGLER_SEND_METRICS: 'false' };
+// CI passes unset repository secrets as empty strings: an empty account id must mean "not set" for wrangler.
+if (!env.CLOUDFLARE_ACCOUNT_ID) delete env.CLOUDFLARE_ACCOUNT_ID;
+if (!env.CLOUDFLARE_API_TOKEN && process.env.CI) throw new Error('CLOUDFLARE_API_TOKEN is not set (add it as a repository secret)');
 
 function run(cmd, cmdArgs, cwd = root) {
   console.log(`\n▶ ${cmd} ${cmdArgs.join(' ')}  (${cwd.replace(root, '.') || '.'})`);
