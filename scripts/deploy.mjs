@@ -16,6 +16,7 @@ import { fileURLToPath } from 'node:url';
 const root = fileURLToPath(new URL('..', import.meta.url));
 const args = new Set(process.argv.slice(2));
 const wrangler = join(root, 'worker/node_modules/.bin/wrangler');
+// Every wrangler call names its config (-c): the repo-root wrangler.jsonc is the app for Workers Builds.
 const env = { ...process.env, WRANGLER_SEND_METRICS: 'false' };
 // CI passes unset repository secrets as empty strings: an empty account id must mean "not set" for wrangler.
 if (!env.CLOUDFLARE_ACCOUNT_ID) delete env.CLOUDFLARE_ACCOUNT_ID;
@@ -44,16 +45,16 @@ if (!args.has('--worker-only')) {
 }
 
 if (!args.has('--app-only')) {
-  run(wrangler, ['d1', 'migrations', 'apply', 'pt-coach-licenses', '--remote'], join(root, 'worker'));
-  run(wrangler, ['deploy'], join(root, 'worker'));
+  run(wrangler, ['d1', 'migrations', 'apply', 'pt-coach-licenses', '--remote', '-c', 'wrangler.toml'], join(root, 'worker'));
+  run(wrangler, ['deploy', '-c', 'wrangler.toml'], join(root, 'worker'));
 }
 
 if (!args.has('--worker-only')) {
   const appDir = join(root, 'deploy/app');
-  run(wrangler, ['deploy'], appDir);
+  run(wrangler, ['deploy', '-c', 'wrangler.toml'], appDir);
   const uploadKey = randomBytes(32).toString('hex');
   console.log('\n▶ wrangler secret put UPLOAD_KEY (fresh random key for this deploy)');
-  execFileSync(wrangler, ['secret', 'put', 'UPLOAD_KEY'], { cwd: appDir, input: uploadKey, stdio: ['pipe', 'inherit', 'inherit'], env });
+  execFileSync(wrangler, ['secret', 'put', 'UPLOAD_KEY', '-c', 'wrangler.toml'], { cwd: appDir, input: uploadKey, stdio: ['pipe', 'inherit', 'inherit'], env });
   console.log('\n▶ python3 deploy/app/upload.py (changed files only; entry files last)');
   execFileSync('python3', [join(appDir, 'upload.py')], { cwd: root, stdio: 'inherit', env: { ...env, UPLOAD_KEY: uploadKey } });
 }

@@ -25,15 +25,18 @@
 
 ## النشر الأوتوماتيك (كل push على main)
 
-- **التطبيق** (`app.getcoachly…`): Cloudflare Workers Builds (متوصّل بالمستودع من لوحة Cloudflare) بيبني
-  (`npm run build`) وينشر من `wrangler.jsonc` اللي في أول المستودع: الملفات من الـ Static Assets، والـ Worker
-  بيشتغل بس على `/api/brand` و `/b/*` (أيقونة اللوجو). قبل الملف ده كان بينشر الملفات لوحدها، فرفع اللوجو كان
-  بيرجع 405.
-- **السيرفر** (`api.getcoachly…`): `.github/workflows/deploy.yml` بيشغّل كل الاختبارات وبعدين الـ migrations
-  والـ Worker مع كل push على `main` (أو بإيدك: Actions ← Deploy API ← Run workflow). لو اختبار فشل مفيش نشر.
-  محتاج مرة واحدة: GitHub ← Settings ← Secrets and variables ← Actions ← New repository secret ←
-  `CLOUDFLARE_API_TOKEN` (و`CLOUDFLARE_ACCOUNT_ID` لو التوكن شايف أكتر من حساب).
-- `npm run deploy` بإيدك بيرجّع التطبيق لوضع D1؛ أول push بعده بيرجّعه للـ Static Assets.
+Cloudflare Workers Builds متوصّل بالمستودع (لوحة Cloudflare ← Workers ← app / api ← Settings ← Builds). مع كل
+push على `main` بيشتغل اتنين، ولو أي اختبار فشل مفيش نشر:
+
+| الـ Worker | المجلد | Build | Deploy |
+| --- | --- | --- | --- |
+| `app` (التطبيق) | `/` | `npm run check && npm run build` | `npx wrangler deploy -c wrangler.jsonc` |
+| `api` (السيرفر) | `/worker` | `npm run typecheck && npm test` | `npx wrangler d1 migrations apply pt-coach-licenses --remote -c wrangler.toml && npx wrangler deploy -c wrangler.toml` |
+
+- `wrangler.jsonc` في أول المستودع = التطبيق في وضع Static Assets: الملفات من حافة Cloudflare، والـ Worker بيشتغل
+  بس على `/api/brand` و `/b/*` (أيقونة اللوجو). قبله الـ build كان بينشر الملفات لوحدها، فرفع اللوجو كان بيرجع 405.
+- محدش محتاج يعمل حاجة: التوكن محفوظ في Cloudflare نفسه (Workers Builds token).
+- `npm run deploy` بإيدك لسه شغال (بيرجّع التطبيق لوضع D1؛ أول push بعده بيرجّعه للـ Static Assets).
 
 ## إزاي ترفع نسخة جديدة (أمر واحد)
 
