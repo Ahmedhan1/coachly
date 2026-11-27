@@ -18,6 +18,15 @@
   font: var(--t-large-title);
 }
 
+/* The Coachly mark, drawn in the brand's text colour (follows the trainer's brand colour). */
+.markGlyph {
+  inline-size: 62%;
+  block-size: 62%;
+  background: currentColor;
+  -webkit-mask: url('/brand/coachly-mark.png') center / contain no-repeat;
+  mask: url('/brand/coachly-mark.png') center / contain no-repeat;
+}
+
 .title {
   font: var(--t-display);
 }

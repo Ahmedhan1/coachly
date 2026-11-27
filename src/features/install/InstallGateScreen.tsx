@@ -44,11 +44,10 @@ function useInstallPrompt() {
 }
 
 function StepArt({ art }: { art: Step['art'] }) {
-  const mark = t('app.name').charAt(0);
   if (art === 'safari') return <SafariBarIllustration label={t('install.shareIconLabel')} />;
   if (art === 'share') return <ShareSheetIllustration label={t('install.addIconLabel')} />;
   if (art === 'chromeMenu') return <ChromeMenuIllustration label={t('install.androidMenuLabel')} />;
-  if (art === 'home') return <HomeScreenIllustration label={t('install.homeIconLabel')} mark={mark} />;
+  if (art === 'home') return <HomeScreenIllustration label={t('install.homeIconLabel')} />;
   return null;
 }
 
@@ -92,7 +91,7 @@ export function InstallGateScreen({ platform: forced }: { platform?: PlatformInf
     <main className={styles.page} data-testid="install-gate" data-platform={info.platform}>
       <header className={styles.header}>
         <span className={styles.mark} aria-hidden="true">
-          {t('app.name').charAt(0)}
+          <span className={styles.markGlyph} />
         </span>
         <h1 className={styles.title}>{mobile ? t('install.title') : t('install.desktopTitle')}</h1>
         <p className={styles.lead}>

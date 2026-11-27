@@ -261,3 +261,35 @@ Other agents are adding dependencies in `worker/` and the root **right now**. At
 - Wave 5 food data: `ingredients.ar.json` v5 (13 new foods, 315 in total) and `recipes.ar.json` v4 (128 new original
   recipes, 342 in total, each with prep time and cuisine). Food photos: Wikimedia Commons only, each checked by eye,
   listed with author / license / source in `docs/FOOD_PHOTOS.md`; files cached at run time (not precached).
+
+## App logo (Coachly mark)
+
+The app icon, launch image, sign-in / install mark and admin mark use the logo of **UI Skills**
+(`public/uiskills-logo-light.webp`, `public/uiskills-logo-dark.webp` from https://github.com/ibelick/ui-skills),
+redrawn at larger sizes in `public/icons/*.png` and `public/brand/coachly-mark.png`.
+
+```text
+MIT License
+
+Copyright (c) 2026 Julien Thibeaut
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+```
+
+Note: the MIT license covers copyright only; it grants no trademark rights to the UI Skills name or mark.

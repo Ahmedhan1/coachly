@@ -66,9 +66,3 @@
   fill: var(--brand);
 }
 
-.appMark {
-  fill: var(--brand-on);
-  font-size: 15px;
-  font-weight: 700;
-  font-family: var(--font-display);
-}

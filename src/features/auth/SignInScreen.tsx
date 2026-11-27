@@ -101,7 +101,7 @@ export function SignInScreen({ initialError = null, onSignedIn }: SignInScreenPr
         <LanguageToggle />
       </div>
       <span className={styles.mark} aria-hidden="true">
-        {t('app.name').charAt(0)}
+        <span className={styles.markGlyph} />
       </span>
       <h1 className={styles.title}>{t('auth.title')}</h1>
       <p className={styles.lead}>{t('auth.lead')}</p>

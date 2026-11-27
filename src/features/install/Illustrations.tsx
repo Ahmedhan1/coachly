@@ -30,7 +30,7 @@ export function ShareSheetIllustration({ label }: { label: string }) {
   );
 }
 
-export function HomeScreenIllustration({ label, mark }: { label: string; mark: string }) {
+export function HomeScreenIllustration({ label }: { label: string }) {
   return (
     <svg className={styles.art} viewBox="0 0 240 120" role="img" aria-label={label}>
       <rect className={styles.device} x="20" y="8" width="200" height="104" rx="14" />
@@ -41,10 +41,11 @@ export function HomeScreenIllustration({ label, mark }: { label: string; mark: s
           const isApp = col === 1 && row === 1;
           return isApp ? (
             <g key={`${col}-${row}`}>
+              <clipPath id="install-app-icon">
+                <rect x={x} y={y} width="28" height="28" rx="7" />
+              </clipPath>
               <rect className={styles.appIcon} x={x} y={y} width="28" height="28" rx="7" />
-              <text className={styles.appMark} x={x + 14} y={y + 19.5} textAnchor="middle">
-                {mark}
-              </text>
+              <image href="/icons/icon-192.png" x={x} y={y} width="28" height="28" clipPath="url(#install-app-icon)" />
               <circle className={styles.focusRing} cx={x + 14} cy={y + 14} r="20" />
             </g>
           ) : (
