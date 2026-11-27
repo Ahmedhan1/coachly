@@ -119,6 +119,11 @@ async function lookup(env: Env, path: string): Promise<{ path: string; type: str
 export default {
   async fetch(request: Request, env: Env, ctx: ExecutionContext): Promise<Response> {
     const url = new URL(request.url);
+    // Never serve the app over plain http (the browser would say "not secure"): send it to https.
+    if (url.protocol === 'http:') {
+      url.protocol = 'https:';
+      return new Response(null, { status: 301, headers: { Location: url.toString(), 'Strict-Transport-Security': 'max-age=63072000' } });
+    }
     if (url.pathname.startsWith('/__deploy/')) return deploy(request, env, url.pathname);
     const brand = await brandRoute(request, env, url, ctx, SECURITY_HEADERS);
     if (brand) return brand;
