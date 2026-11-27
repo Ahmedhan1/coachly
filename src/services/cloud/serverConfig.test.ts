@@ -10,7 +10,7 @@ describe('resolveWorkerUrl', () => {
 
   it('ignores a non-https override', () => {
     expect(resolveWorkerUrl('http://example.com')).toBe(DEFAULT_WORKER_URL);
-    expect(resolveWorkerUrl('coachly-api.example.workers.dev')).toBe(DEFAULT_WORKER_URL);
+    expect(resolveWorkerUrl('api.getcoachly.example.workers.dev')).toBe(DEFAULT_WORKER_URL);
   });
 
   it('uses a proper https override without a trailing slash', () => {

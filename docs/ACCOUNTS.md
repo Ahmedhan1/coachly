@@ -70,7 +70,7 @@ npx wrangler deploy
 1. ادخل console.cloud.google.com ← APIs & Services ← Credentials ← Create credentials ← OAuth client ID.
 2. النوع: **Web application**.
 3. في **Authorized redirect URIs** حط:
-   `https://coachly-api.nexus-ahmed.workers.dev/api/auth/callback/google`
+   `https://api.getcoachly.workers.dev/api/auth/callback/google`
 4. انسخ الـ Client ID وحطه في `worker/wrangler.toml` مكان `GOOGLE_CLIENT_ID = ""`، وارفع تاني (`npx wrangler deploy`).
 5. حط الـ Client secret:
 
@@ -82,7 +82,7 @@ npx wrangler deploy
 
 ## 5) لوحة الحسابات
 
-افتح `https://coachly-api.nexus-ahmed.workers.dev/admin` وادخل بكلمة سر اللوحة.
+افتح `https://api.getcoachly.workers.dev/admin` وادخل بكلمة سر اللوحة.
 
 - **موافقة**: الحساب يشتغل. المدرب يدوس «اتأكد تاني» أو يفتح التطبيق من جديد.
 - **إيقاف** (بعد تأكيد): التطبيق عنده يقفل أول ما يلاقي نت، والنسخة الاحتياطية والتذكيرات تقف. بياناته

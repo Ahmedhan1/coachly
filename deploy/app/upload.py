@@ -2,7 +2,7 @@
 """Uploads dist/ to the app Worker (only changed files). Usage: UPLOAD_KEY=... python3 deploy/app/upload.py [base_url]"""
 import base64, hashlib, json, mimetypes, os, sys, urllib.request, time
 
-BASE = sys.argv[1] if len(sys.argv) > 1 else 'https://coachly.nexus-ahmed.workers.dev'
+BASE = sys.argv[1] if len(sys.argv) > 1 else 'https://app.getcoachly.workers.dev'
 KEY = os.environ['UPLOAD_KEY']
 DIST = os.path.join(os.path.dirname(__file__), '..', '..', 'dist')
 
@@ -16,7 +16,7 @@ def _bundle_text():
                 out.append(f.read())
     return '\n'.join(out)
 _text = _bundle_text()
-if 'coachly-api.' not in _text:
+if 'api.getcoachly.' not in _text:
     sys.exit('refusing to upload: dist/ was built without VITE_WORKER_URL (see .env.production)')
 TYPES = {'.webmanifest': 'application/manifest+json', '.js': 'text/javascript; charset=utf-8', '.css': 'text/css; charset=utf-8',
          '.html': 'text/html; charset=utf-8', '.json': 'application/json', '.woff2': 'font/woff2', '.glb': 'model/gltf-binary',

@@ -4,7 +4,7 @@ export interface Env {
   BACKUPS: R2Bucket;
   /** Secret: better-auth secret (random, at least 32 characters). Also derives the Worker's HMAC keys. */
   BETTER_AUTH_SECRET: string;
-  /** Var: this Worker's public address, e.g. https://coachly-api.<account>.workers.dev */
+  /** Var: this Worker's public address, e.g. https://api.getcoachly.<account>.workers.dev */
   BETTER_AUTH_URL: string;
   /** Var: Google OAuth client id. Google sign-in is off until both GOOGLE_* are set. */
   GOOGLE_CLIENT_ID?: string;

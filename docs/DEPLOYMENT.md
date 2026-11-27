@@ -4,9 +4,9 @@
 
 | الحاجة | العنوان |
 | --- | --- |
-| التطبيق (اللي المدرب يثبّته من Safari) | https://coachly.nexus-ahmed.workers.dev |
-| السيرفر (حسابات المدربين، الإشعارات، صفحة العميل، النسخ السحابي) | https://coachly-api.nexus-ahmed.workers.dev |
-| لوحة الحسابات بتاعتك (الموافقة على المدربين) | https://coachly-api.nexus-ahmed.workers.dev/admin |
+| التطبيق (اللي المدرب يثبّته من Safari) | https://app.getcoachly.workers.dev |
+| السيرفر (حسابات المدربين، الإشعارات، صفحة العميل، النسخ السحابي) | https://api.getcoachly.workers.dev |
+| لوحة الحسابات بتاعتك (الموافقة على المدربين) | https://api.getcoachly.workers.dev/admin |
 
 بيانات المدرب مربوطة بعنوان التطبيق، فما تغيّرش اسم الـ Worker `pt-coach` ولا الـ subdomain.
 

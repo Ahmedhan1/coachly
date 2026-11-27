@@ -4,7 +4,7 @@
  *
  * Never change this for an existing install base: trainers' apps talk to this address forever.
  */
-export const DEFAULT_WORKER_URL = 'https://coachly-api.nexus-ahmed.workers.dev';
+export const DEFAULT_WORKER_URL = 'https://api.getcoachly.workers.dev';
 
 /**
  * Picks the build-time override when it is a proper https URL (or a local `wrangler dev` on http://localhost /
