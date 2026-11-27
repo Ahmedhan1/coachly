@@ -23,6 +23,23 @@ export async function openApp(page: Page, path = '/'): Promise<void> {
   }
   if (await later.isVisible()) await later.click();
   await expect(tabs.or(backToClients)).toBeVisible();
+  await waitForOfflineReady(page);
+}
+
+/**
+ * Waits until the first service worker controls the page: the app is offline-ready, as on any phone past its
+ * first launch. The worker's takeover (clients.claim) cancels a navigation WebKit has in flight ("interrupted
+ * by another navigation"), so a test that navigates during the first seconds would race it. Does nothing when
+ * the test blocks service workers (Playwright then replaces `register`, which is otherwise native code).
+ */
+export async function waitForOfflineReady(page: Page): Promise<void> {
+  await page.evaluate(async () => {
+    const sw = navigator.serviceWorker as ServiceWorkerContainer | undefined;
+    if (!sw || !/\[native code\]/.test(String(sw.register))) return;
+    await sw.ready;
+    if (sw.controller) return;
+    await new Promise<void>((resolve) => sw.addEventListener('controllerchange', () => resolve(), { once: true }));
+  });
 }
 
 /** Center "+" → "عميل جديد": the add-client sheet. */

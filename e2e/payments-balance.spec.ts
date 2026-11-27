@@ -32,7 +32,7 @@ test('money tab: balance is the package price minus what was paid, and updates o
   await expect(page.getByText(/^باقي عليه 700 ج\.م · اتدفع 300 ج\.م من 1,000 ج\.م$/)).toBeVisible();
   await recordPayment(page, '150', true);
   await expect(page.getByText(/^باقي عليه 700 ج\.م · اتدفع 300 ج\.م من 1,000 ج\.م$/)).toBeVisible();
-  await page.mouse.wheel(0, 3000);
+  await page.evaluate(() => window.scrollBy(0, 3000)); // WebKit on a touch device has no mouse wheel
   await expect(page.getByText('اتسجلت الدفعة')).toBeHidden({ timeout: 10_000 });
   await page.screenshot({ path: process.env.PAY_SHOT ?? 'test-results/payments-balance.png', fullPage: false });
   await recordPayment(page, '700', false);

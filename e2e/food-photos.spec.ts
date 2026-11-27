@@ -1,10 +1,11 @@
 import { expect, test, type Page } from '@playwright/test';
 import { openApp } from './helpers';
+import { startAppServer } from './servers';
 
 const SHOTS = process.env.E2E_SHOTS ?? 'node_modules/.e2e-food-shots';
 
-async function recipeBook(page: Page): Promise<void> {
-  await openApp(page, '/more/recipes');
+async function recipeBook(page: Page, origin = ''): Promise<void> {
+  await openApp(page, `${origin}/more/recipes`);
   await expect(page.getByRole('heading', { level: 1, name: 'كتيّب الوصفات' })).toBeVisible();
   await expect(page.getByTestId('recipe-filters')).toBeVisible();
 }
@@ -54,23 +55,28 @@ for (const [w, h] of [
 }
 
 test('food photos: offline download stores every photo', async ({ page }) => {
-  await page.setViewportSize({ width: 412, height: 915 });
-  await recipeBook(page);
-  const box = page.getByTestId('food-photos-offline');
-  await box.scrollIntoViewIfNeeded();
-  await expect(box.getByText(/Wikimedia Commons/)).toBeVisible();
-  await box.getByRole('button', { name: 'نزّل كل صور الأكل' }).click();
-  await expect(box.getByText(/كل صور الأكل متخزنة/)).toBeVisible({ timeout: 20_000 });
-  await page.screenshot({ path: `${SHOTS}/offline-done.png` });
+  // Its own app server, stopped below: a real outage (servers.ts explains why not context.setOffline).
+  const server = await startAppServer();
+  try {
+    await page.setViewportSize({ width: 412, height: 915 });
+    await recipeBook(page, server.origin);
+    const box = page.getByTestId('food-photos-offline');
+    await box.scrollIntoViewIfNeeded();
+    await expect(box.getByText(/Wikimedia Commons/)).toBeVisible();
+    await box.getByRole('button', { name: 'نزّل كل صور الأكل' }).click();
+    await expect(box.getByText(/كل صور الأكل متخزنة/)).toBeVisible({ timeout: 20_000 });
+    await page.screenshot({ path: `${SHOTS}/offline-done.png` });
 
-  // Offline: a recipe far down the list (never shown before) still shows its photo.
-  await page.context().setOffline(true);
-  await page.reload();
-  await page.getByRole('searchbox', { name: 'دوّر على وصفة' }).fill('harira');
-  const photo = page.locator('[data-kind="photo"] img').first();
-  await expect(photo).toBeVisible();
-  await expect.poll(() => photo.evaluate((img: HTMLImageElement) => img.complete && img.naturalWidth > 0)).toBe(true);
-  await page.context().setOffline(false);
+    // Offline: a recipe far down the list (never shown before) still shows its photo.
+    await server.stop();
+    await page.reload();
+    await page.getByRole('searchbox', { name: 'دوّر على وصفة' }).fill('harira');
+    const photo = page.locator('[data-kind="photo"] img').first();
+    await expect(photo).toBeVisible();
+    await expect.poll(() => photo.evaluate((img: HTMLImageElement) => img.complete && img.naturalWidth > 0)).toBe(true);
+  } finally {
+    await server.stop();
+  }
 });
 
 test('food table shows food photos', async ({ page }) => {

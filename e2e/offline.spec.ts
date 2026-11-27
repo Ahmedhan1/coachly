@@ -1,17 +1,22 @@
 import { expect, test } from '@playwright/test';
 import { openApp } from './helpers';
+import { startAppServer, type OwnServer } from './servers';
 
-test('works fully offline after the first load', async ({ page, context }) => {
-  await openApp(page);
-  // Wait until the service worker has precached everything and controls the page.
-  await page.evaluate(async () => {
-    await navigator.serviceWorker.ready;
-    if (!navigator.serviceWorker.controller) {
-      await new Promise<void>((resolve) => navigator.serviceWorker.addEventListener('controllerchange', () => resolve()));
-    }
-  });
+// The network goes away for real: the test stops its own copy of the app server (see servers.ts for why not
+// context.setOffline). Nothing can answer after that, so whatever still works came from the phone.
+let server: OwnServer;
+test.beforeEach(async () => {
+  server = await startAppServer();
+});
+test.afterEach(async () => {
+  await server.stop();
+});
 
-  await context.setOffline(true);
+test('works fully offline after the first load', async ({ page }) => {
+  await openApp(page, `${server.origin}/`);
+  // openApp returns once the service worker has precached everything and controls the page.
+
+  await server.stop();
   await page.reload();
   await expect(page.getByRole('heading', { name: 'باقي اليوم' })).toBeVisible();
 
@@ -37,7 +42,6 @@ test('works fully offline after the first load', async ({ page, context }) => {
   await expect(page.getByRole('heading', { level: 1, name: 'عميل أوفلاين' })).toBeVisible();
 
   // A deep link opened cold while offline falls back to the cached index.html.
-  await page.goto('/clients');
+  await page.goto(`${server.origin}/clients`);
   await expect(page.getByRole('link', { name: /عميل أوفلاين/ })).toBeVisible();
-  await context.setOffline(false);
 });

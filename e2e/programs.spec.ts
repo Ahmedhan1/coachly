@@ -11,6 +11,21 @@ async function openSaraProgramFromTemplate(page: Page) {
   await expect(page.getByTestId('exercise-card').first()).toBeVisible();
 }
 
+/** One touch event at (x, y), sent to the element under that point, as a finger would. */
+async function touch(page: Page, type: 'touchstart' | 'touchmove' | 'touchend', x: number, y: number): Promise<void> {
+  await page.evaluate(
+    ({ type, x, y }) => {
+      const w = window as unknown as { __touchTarget?: Element };
+      if (type === 'touchstart') w.__touchTarget = document.elementFromPoint(x, y) ?? document.body;
+      const target = w.__touchTarget ?? document.body;
+      const point = new Touch({ identifier: 1, target, clientX: x, clientY: y, pageX: x + window.scrollX, pageY: y + window.scrollY });
+      const active = type === 'touchend' ? [] : [point];
+      target.dispatchEvent(new TouchEvent(type, { bubbles: true, cancelable: true, touches: active, targetTouches: active, changedTouches: [point] }));
+    },
+    { type, x, y },
+  );
+}
+
 const order = (page: Page) => page.getByTestId('exercise-card').evaluateAll((els) => els.map((e) => e.getAttribute('data-exercise')));
 
 test('program builder: touch drag-and-drop reorders exercises', async ({ page }) => {
@@ -21,19 +36,17 @@ test('program builder: touch drag-and-drop reorders exercises', async ({ page })
   const a = await grip.boundingBox();
   const b = await target.boundingBox();
   if (!a || !b) throw new Error('cards not visible');
-  const cdp = await page.context().newCDPSession(page);
+  // Real TouchEvents dispatched in the page (the same in WebKit and Chromium; Playwright's touchscreen only taps).
   const x = a.x + a.width / 2;
-  const touch = (type: 'touchStart' | 'touchMove' | 'touchEnd', y: number) =>
-    cdp.send('Input.dispatchTouchEvent', { type, touchPoints: type === 'touchEnd' ? [] : [{ x, y }] });
   const y0 = a.y + a.height / 2;
   const y1 = b.y + b.height * 0.75;
-  await touch('touchStart', y0);
+  await touch(page, 'touchstart', x, y0);
   await page.waitForTimeout(300); // hold past the activation delay
   for (let i = 1; i <= 12; i++) {
-    await touch('touchMove', y0 + ((y1 - y0) * i) / 12);
+    await touch(page, 'touchmove', x, y0 + ((y1 - y0) * i) / 12);
     await page.waitForTimeout(16);
   }
-  await touch('touchEnd', y1);
+  await touch(page, 'touchend', x, y1);
   await expect.poll(() => order(page)).not.toEqual(before);
   const after = await order(page);
   expect(after[0]).toBe(before[1]);

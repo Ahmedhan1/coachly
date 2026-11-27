@@ -108,8 +108,9 @@ test.describe('installed app', () => {
     await expect.poll(() => page.evaluate(() => (window as { __splashAtDcl?: boolean }).__splashAtDcl)).toBe(true);
   });
 
-  test('a trainer who already installed gets a ready "new icon" link from the identity screen', async ({ page, context }) => {
-    await context.grantPermissions(['clipboard-read', 'clipboard-write']);
+  test('a trainer who already installed gets a ready "new icon" link from the identity screen', async ({ page, context, browserName }) => {
+    // Chromium asks for clipboard permission; Safari allows a copy from a tap and knows no such permission.
+    if (browserName === 'chromium') await context.grantPermissions(['clipboard-read', 'clipboard-write']);
     const uploads = await mockBrandServer(page);
     await page.goto(`/?brand=${ID}&standalone=1`);
     await page.getByRole('button', { name: GUEST_BUTTON }).click();

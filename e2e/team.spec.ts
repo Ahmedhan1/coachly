@@ -93,7 +93,14 @@ async function mock(page: Page, s: Server): Promise<void> {
 }
 
 async function phone(browser: Browser, s: Server): Promise<Page> {
-  const context = await browser.newContext({ viewport: { width: 390, height: 844 }, deviceScaleFactor: 2, locale: 'ar-EG', timezoneId: 'Africa/Cairo' });
+  // No service worker: in WebKit, requests from a page it controls never reach page.route (the mock).
+  const context = await browser.newContext({
+    viewport: { width: 390, height: 844 },
+    deviceScaleFactor: 2,
+    locale: 'ar-EG',
+    timezoneId: 'Africa/Cairo',
+    serviceWorkers: 'block',
+  });
   const page = await context.newPage();
   await mock(page, s);
   return page;

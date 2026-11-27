@@ -29,8 +29,11 @@ test('backup: encrypted file export → change data → restore from the file br
   await imp.getByLabel('كلمة السر').fill('secret-pass-1');
   page.on('dialog', (d) => void d.accept());
   await imp.getByRole('button', { name: 'أيوه، استرجع' }).click();
+  // The app reopens itself at "/" (location.replace). Navigate only once that page is up: a goto sent earlier
+  // races the app's own navigation, and WebKit cancels ours.
   await page.waitForURL((u) => u.pathname === '/', { timeout: 30_000 });
-  await page.goto('/clients?standalone=1');
+  await expect(page.getByRole('heading', { level: 1, name: 'النهارده' })).toBeVisible({ timeout: 30_000 });
+  await page.getByRole('link', { name: 'العملاء', exact: true }).click();
   await expect(page.getByRole('link', { name: /سارة محمود/ })).toBeVisible();
   await expect(page.getByRole('link', { name: /عميل بعد النسخة/ })).toHaveCount(0);
 });

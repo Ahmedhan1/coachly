@@ -1,9 +1,13 @@
 import { expect, test, type Page, type Route } from '@playwright/test';
 import { GUEST_BUTTON } from './helpers';
+import { startAppServer, startMockServer, type MockReply, type MockRequest } from './servers';
 
 /**
  * Sign-in against a mocked account Worker (`?worker=` is honoured by the e2e build only). Covers email +
  * password, owner approval, Google's return trip (#auth=<one-time token>), offline after sign-in, and guest.
+ *
+ * The service worker is blocked here: in WebKit, requests from a page it controls never reach page.route. The
+ * offline test needs it, so it runs its own app server and a real local mock Worker, then stops both.
  */
 const WORKER = 'https://worker.e2e.test';
 const USER = { id: 'u-e2e', name: 'كابتن تجربة', email: 'coach@example.com' };
@@ -17,47 +21,53 @@ interface MockState {
   backup?: boolean;
 }
 
+/** The mocked account Worker: one answer per request, used through page.route or a real local server. */
+function workerReply(state: MockState, request: MockRequest): MockReply {
+  const json = (status: number, body: unknown): MockReply => ({ status, headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) });
+  const { method, path } = request;
+  const userId = state.userId ?? USER.id;
+  state.calls.push(`${method} ${path}`);
+  if (path === '/api/auth-config') return json(200, { google: state.google });
+  if (path === '/api/auth/sign-up/email') return json(200, { token: 'tok-up', user: { ...USER, id: userId } });
+  if (path === '/api/auth/sign-in/email') {
+    const body = JSON.parse(request.body || '{}') as { password?: string };
+    return body.password === 'right-password'
+      ? json(200, { token: 'tok-in', user: { ...USER, id: userId } })
+      : json(401, { code: 'INVALID_EMAIL_OR_PASSWORD' });
+  }
+  if (path === '/api/auth/one-time-token/verify') return json(200, { session: { token: 'tok-google' }, user: USER });
+  if (path === '/api/account') {
+    return request.authorization.startsWith('Bearer tok-') ? json(200, { account: { ...USER, id: userId, status: state.status } }) : json(401, { error: 'invalid' });
+  }
+  if (path === '/api/auth/sign-out') return json(200, { success: true });
+  if (path === '/api/backup' && method === 'HEAD') {
+    return state.backup
+      ? { status: 200, headers: { 'Access-Control-Expose-Headers': 'X-Backup-Size, X-Backup-Uploaded-At', 'X-Backup-Size': '2048', 'X-Backup-Uploaded-At': '1790000000' } }
+      : json(404, { error: 'not_found' });
+  }
+  return json(404, { error: 'not_found' });
+}
+
+const newState = (initial: Partial<MockState>): MockState => ({ status: 'approved', google: false, calls: [], ...initial });
+
 async function mockWorker(page: Page, initial: Partial<MockState> = {}): Promise<MockState> {
-  const state: MockState = { status: 'approved', google: false, calls: [], ...initial };
-  const reply = (route: Route, status: number, body: unknown) =>
-    route.fulfill({
-      status,
-      contentType: 'application/json',
-      headers: { 'Access-Control-Allow-Origin': '*', 'Access-Control-Allow-Headers': 'Content-Type, Authorization' },
-      body: JSON.stringify(body),
-    });
-  await page.route(`${WORKER}/**`, async (route) => {
+  const state = newState(initial);
+  const cors = { 'Access-Control-Allow-Origin': '*', 'Access-Control-Allow-Headers': 'Content-Type, Authorization' };
+  await page.route(`${WORKER}/**`, async (route: Route) => {
     const request = route.request();
-    const path = new URL(request.url()).pathname;
-    if (request.method() === 'OPTIONS') return reply(route, 204, {});
-    state.calls.push(`${request.method()} ${path}`);
-    if (path === '/api/auth-config') return reply(route, 200, { google: state.google });
-    if (path === '/api/auth/sign-up/email') return reply(route, 200, { token: 'tok-up', user: { ...USER, id: state.userId ?? USER.id } });
-    if (path === '/api/auth/sign-in/email') {
-      const body = request.postDataJSON() as { password?: string };
-      return body.password === 'right-password'
-        ? reply(route, 200, { token: 'tok-in', user: { ...USER, id: state.userId ?? USER.id } })
-        : reply(route, 401, { code: 'INVALID_EMAIL_OR_PASSWORD' });
-    }
-    if (path === '/api/auth/one-time-token/verify') return reply(route, 200, { session: { token: 'tok-google' }, user: USER });
-    if (path === '/api/account') {
-      return request.headers().authorization?.startsWith('Bearer tok-')
-        ? reply(route, 200, { account: { ...USER, id: state.userId ?? USER.id, status: state.status } })
-        : reply(route, 401, { error: 'invalid' });
-    }
-    if (path === '/api/auth/sign-out') return reply(route, 200, { success: true });
-    if (path === '/api/backup' && request.method() === 'HEAD') {
-      return state.backup
-        ? route.fulfill({
-            status: 200,
-            headers: { 'Access-Control-Allow-Origin': '*', 'Access-Control-Expose-Headers': 'X-Backup-Size, X-Backup-Uploaded-At', 'X-Backup-Size': '2048', 'X-Backup-Uploaded-At': '1790000000' },
-          })
-        : reply(route, 404, { error: 'not_found' });
-    }
-    return reply(route, 404, { error: 'not_found' });
+    if (request.method() === 'OPTIONS') return route.fulfill({ status: 204, headers: cors });
+    const reply = workerReply(state, {
+      method: request.method(),
+      path: new URL(request.url()).pathname,
+      authorization: request.headers().authorization ?? '',
+      body: request.postData() ?? '',
+    });
+    return route.fulfill({ status: reply.status, headers: { ...cors, ...reply.headers }, body: reply.body ?? '' });
   });
   return state;
 }
+
+test.use({ serviceWorkers: 'block' });
 
 const open = (page: Page, extra = '') => page.goto(`/?standalone=1&worker=${encodeURIComponent(WORKER)}${extra}`);
 const setupStep = (page: Page) => page.getByText('خطوة 1 من 4');
@@ -86,33 +96,45 @@ test('a new account waits for the owner, then opens the app once approved', asyn
   await expect(setupStep(page)).toBeVisible();
 });
 
-test('signs in with email + password, then works offline after a reload', async ({ page, context }) => {
-  await mockWorker(page);
-  await open(page);
-  await page.getByLabel('الإيميل').fill(USER.email);
-  await page.getByLabel('كلمة السر', { exact: true }).fill('wrong-password');
-  await page.getByRole('button', { name: 'دخول', exact: true }).click();
-  await expect(page.getByRole('alert')).toHaveText('الإيميل أو كلمة السر غلط.');
+test.describe('with the service worker', () => {
+  test.use({ serviceWorkers: 'allow' });
 
-  await page.getByLabel('كلمة السر', { exact: true }).fill('right-password');
-  await page.getByRole('button', { name: 'دخول', exact: true }).click();
-  await expect(setupStep(page)).toBeVisible();
-  await page.getByRole('button', { name: 'بعدين' }).click();
-  await expect(page.getByRole('navigation', { name: 'التنقل الرئيسي' })).toBeVisible();
+  test('signs in with email + password, then works offline after a reload', async ({ page }) => {
+    const state = newState({});
+    const worker = await startMockServer((request) => workerReply(state, request));
+    const app = await startAppServer(worker.origin);
+    try {
+      await page.goto(`${app.origin}/?standalone=1&worker=${encodeURIComponent(worker.origin)}`);
+      await page.getByLabel('الإيميل').fill(USER.email);
+      await page.getByLabel('كلمة السر', { exact: true }).fill('wrong-password');
+      await page.getByRole('button', { name: 'دخول', exact: true }).click();
+      await expect(page.getByRole('alert')).toHaveText('الإيميل أو كلمة السر غلط.');
 
-  // Golden rule: once signed in, no network is needed.
-  await page.waitForFunction(() => navigator.serviceWorker?.controller !== null);
-  await context.setOffline(true);
-  await page.reload();
-  await expect(page.getByRole('navigation', { name: 'التنقل الرئيسي' })).toBeVisible();
-  await context.setOffline(false);
+      await page.getByLabel('كلمة السر', { exact: true }).fill('right-password');
+      await page.getByRole('button', { name: 'دخول', exact: true }).click();
+      await expect(setupStep(page)).toBeVisible();
+      await page.getByRole('button', { name: 'بعدين' }).click();
+      await expect(page.getByRole('navigation', { name: 'التنقل الرئيسي' })).toBeVisible();
 
-  await page.getByRole('button', { name: 'المزيد والإعدادات' }).click();
-  await page.getByRole('link', { name: /الإعدادات/ }).click();
-  await expect(page.getByText(USER.email)).toBeVisible();
-  await page.getByRole('button', { name: /خروج من الحساب/ }).click();
-  await page.getByTestId('confirm-sign-out').click();
-  await expect(page.getByRole('heading', { level: 1, name: 'أهلاً بيك' })).toBeVisible();
+      // Golden rule: once signed in, no network is needed. Both servers go away for real.
+      await page.waitForFunction(() => navigator.serviceWorker?.controller !== null);
+      await worker.stop();
+      await app.stop();
+      await page.reload();
+      await expect(page.getByRole('navigation', { name: 'التنقل الرئيسي' })).toBeVisible();
+
+      // Still offline: the account is on the phone, and signing out works without the Worker.
+      await page.getByRole('button', { name: 'المزيد والإعدادات' }).click();
+      await page.getByRole('link', { name: /الإعدادات/ }).click();
+      await expect(page.getByText(USER.email)).toBeVisible();
+      await page.getByRole('button', { name: /خروج من الحساب/ }).click();
+      await page.getByTestId('confirm-sign-out').click();
+      await expect(page.getByRole('heading', { level: 1, name: 'أهلاً بيك' })).toBeVisible();
+    } finally {
+      await worker.stop();
+      await app.stop();
+    }
+  });
 });
 
 test('a disabled account is locked with a clear message', async ({ page }) => {

@@ -148,11 +148,15 @@ test.describe('Android', () => {
   });
 });
 
-test('200 clients and 2,000 sessions: lists stay usable (long tasks under 4× CPU throttling)', async ({ page, context }) => {
+test('200 clients and 2,000 sessions: lists stay usable (long tasks under 4× CPU throttling)', async ({ page, context, browserName }) => {
   test.setTimeout(120_000);
+  // The timing budget needs CPU throttling (Chrome DevTools Protocol) and the Long Tasks API, which Safari does
+  // not have. WebKit still runs every step below: the lists load, scroll and search with this much data.
+  const timed = browserName === 'chromium';
   await context.addInitScript(() => {
     const w = window as unknown as { __lt: number[] };
     w.__lt = [];
+    if (!PerformanceObserver.supportedEntryTypes.includes('longtask')) return;
     new PerformanceObserver((l) => {
       for (const e of l.getEntries()) w.__lt.push(e.duration);
     }).observe({ type: 'longtask', buffered: true });
@@ -180,8 +184,10 @@ test('200 clients and 2,000 sessions: lists stay usable (long tasks under 4× CP
     }
     await new Promise((res) => (tx.oncomplete = res));
   });
-  const cdp = await context.newCDPSession(page);
-  await cdp.send('Emulation.setCPUThrottlingRate', { rate: 4 });
+  if (timed) {
+    const cdp = await context.newCDPSession(page);
+    await cdp.send('Emulation.setCPUThrottlingRate', { rate: 4 });
+  }
   const longest = async () => {
     const lt = await page.evaluate(() => (window as unknown as { __lt: number[] }).__lt.splice(0));
     return Math.max(0, ...lt);
@@ -189,7 +195,7 @@ test('200 clients and 2,000 sessions: lists stay usable (long tasks under 4× CP
   await page.goto('/clients?standalone=1');
   await expect(page.getByText('205 عميل')).toBeVisible();
   await longest();
-  for (let i = 0; i < 8; i++) await page.mouse.wheel(0, 1200);
+  for (let i = 0; i < 8; i++) await page.evaluate(() => window.scrollBy(0, 1200)); // no mouse wheel on a WebKit touch device
   await page.getByRole('searchbox', { name: 'بحث' }).pressSequentially('ضغط 19', { delay: 60 });
   await expect(page.getByRole('link', { name: /عميل ضغط 199/ })).toBeVisible();
   const clientsMax = await longest();
@@ -199,8 +205,10 @@ test('200 clients and 2,000 sessions: lists stay usable (long tasks under 4× CP
   await expect(page.getByText(/حصة كمان/)).toBeVisible();
   const scheduleMax = await longest();
   console.log(`longest task after load (4× CPU): clients ${Math.round(clientsMax)}ms, schedule ${Math.round(scheduleMax)}ms`);
-  expect(clientsMax).toBeLessThan(400);
-  expect(scheduleMax).toBeLessThan(400);
+  if (timed) {
+    expect(clientsMax).toBeLessThan(400);
+    expect(scheduleMax).toBeLessThan(400);
+  }
 });
 
 test('"/clients/:id?renew=1" (Home «جدّد») renews once on arrival with undo', async ({ page }) => {
