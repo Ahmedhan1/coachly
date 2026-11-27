@@ -333,6 +333,57 @@ try {
     envelope = await lib.sealWithKey(key, new TextEncoder().encode(JSON.stringify(lib.SAMPLE_DOCUMENT)));
   });
 
+  await step('workout player: start, set done, rest countdown, progress kept after a reload; next-session countdown', async () => {
+    await page.goto(`${ORIGIN}/c/${shareId}#k=${b64url(key)}`);
+    await page.reload();
+    await page.waitForSelector('body[data-ready="1"]');
+    await page.evaluate(() => localStorage.clear());
+    assert.ok((await page.textContent('.next-count')).startsWith('باقي '), 'countdown to the next session');
+    await page.click('.pills .pill >> nth=0');
+    await page.click('.wk-bar .btn');
+    await page.waitForSelector('.wk');
+    let t = await page.textContent('.wk');
+    for (const x of ['تمرين 1 من 3', 'بنش برس', 'سيت 1 من 4', 'كمّلت 0 من 10 سيت']) assert.ok(t.includes(x), `player missing "${x}"`);
+    await page.click('.wk .btn:has-text("خلّصت السيت")');
+    t = await page.textContent('.wk');
+    assert.ok(t.includes('راحة') && t.includes('كمّلت 1 من 10 سيت'), 'rest view');
+    assert.match(await page.textContent('.wk-count'), /^1:(30|29|28)$/);
+    await page.screenshot({ path: join(shotDir, 'viewer-workout-rest.png') });
+    await page.click('.wk .btn:has-text("كفاية راحة")');
+    assert.ok((await page.textContent('.wk')).includes('سيت 2 من 4'), 'next set after rest');
+    await page.screenshot({ path: join(shotDir, 'viewer-workout-set.png') });
+    await page.click('.wk-close');
+    assert.equal(await page.locator('.wk').count(), 0);
+    assert.ok((await page.textContent('.wk-bar')).includes('كمّلت 1 من 10 سيت'), 'small progress under the day');
+    assert.ok((await page.textContent('.wk-bar .btn')).includes('كمّل التمرين'));
+    await page.reload();
+    await page.waitForSelector('body[data-ready="1"]');
+    await page.click('.pills .pill >> nth=0');
+    assert.ok((await page.textContent('.wk-bar')).includes('كمّلت 1 من 10 سيت'), 'progress kept after a reload');
+  });
+
+  await step('live page: the trainer’s new content shows by itself, same tab, check-in typing kept; timed set counts down', async () => {
+    await page.click('#t-p-checkin');
+    await page.fill('#p-checkin input[name=weight]', '72');
+    const doc = structuredClone(lib.SAMPLE_DOCUMENT);
+    doc.updatedAt += 60;
+    doc.days[0] = { title: 'اليوم 1 — كور', exercises: [{ name: 'بلانك', sets: 1, reps: '2s' }] };
+    envelope = await lib.sealWithKey(key, new TextEncoder().encode(JSON.stringify(doc)));
+    await page.waitForTimeout(5200);
+    await page.evaluate(() => window.dispatchEvent(new Event('focus')));
+    await page.waitForSelector('.flash', { timeout: 5000 });
+    assert.equal(await page.getAttribute('#t-p-checkin', 'aria-selected'), 'true', 'tab kept');
+    assert.equal(await page.inputValue('#p-checkin input[name=weight]'), '72', 'typed value kept');
+    await page.click('#t-p-program');
+    await page.click('.pills .pill >> nth=0');
+    assert.ok((await page.textContent('#app')).includes('بلانك'), 'new program shown');
+    await page.click('.wk-bar .btn');
+    await page.click('.wk .btn:has-text("ابدأ العدّ")');
+    await page.waitForSelector('.wk-done', { timeout: 6000 });
+    await page.click('.wk .btn:has-text("تمام")');
+    envelope = await lib.sealWithKey(key, new TextEncoder().encode(JSON.stringify(lib.SAMPLE_DOCUMENT)));
+  });
+
   await step('no CSP violations, no requests outside the page and app origins', async () => {
     assert.deepEqual(cspErrors, []);
     assert.deepEqual(externalRequests, []);

@@ -118,7 +118,7 @@ function Boot() {
   const router = useMemo(() => (ready ? createAppRouter() : null), [ready]);
   const settings = useLive(() => services.data.repos.settings.get(), [services]);
   useBrandTheme(boot.phase === 'ready' ? settings?.primaryColor : undefined);
-  useOnlineSync(boot.phase === 'ready');
+  useOnlineSync(boot.phase === 'ready', (to) => void router?.navigate(to));
 
   // Installed from a branded install page (/?brand=<id>): bring the logo and colour in before the setup wizard.
   const [brandImport] = useState(() => importHostedBrand(services, new HttpBrandHosting(), window.location.search).catch(() => false));

@@ -10,6 +10,7 @@ import { BackupReminderCard } from '@/features/storage/BackupReminderCard';
 import { useUiStore } from '@/app/uiStore';
 import { whatsappUrl } from '@/features/clients/contact';
 import { OutboxCard } from '@/features/outbox/OutboxCard';
+import { ActivityCard } from '@/features/activity/ActivityCard';
 import { ActiveSessionBanner } from '@/features/session/ActiveSessionBanner';
 import { t } from '@/i18n';
 import { Badge, Button, Icon, IconButton, ListRow, ListSection, Money, Num, PageHeader, SectionLink, Tx, cx } from '@/ui';
@@ -41,6 +42,7 @@ export function HomeScreen() {
     <>
       <PageHeader title={t('home.title')} actions={actions} subtitle={<DateLine home={home} />} />
       <ActiveSessionBanner />
+      <ActivityCard />
       {home.hasDemo && <DemoNotice />}
       {home.plan.next ? <Hero next={home.plan.next} plan={home.sessionPlans.get(home.plan.next.session.id) ?? null} /> : <NoNext />}
       <OutboxCard />

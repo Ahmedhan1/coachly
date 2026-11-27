@@ -36,6 +36,7 @@ test('money tab: balance is the package price minus what was paid, and updates o
   await expect(page.getByText('اتسجلت الدفعة')).toBeHidden({ timeout: 10_000 });
   await page.screenshot({ path: process.env.PAY_SHOT ?? 'test-results/payments-balance.png', fullPage: false });
   await recordPayment(page, '700', false);
-  // Package paid; the pending 150 above what the package needs is still shown as owed (an extra).
-  await expect(page.getByText(/^باقي عليه 150 ج\.م · الباقة مدفوعة بالكامل$/)).toBeVisible();
+  // Package paid in full. The pending 150 is dated on the package's first day, so it is part of the package
+  // price (packageBalance: a first-day charge is the package itself), not an extra: nothing is owed.
+  await expect(page.getByText(/^الباقة مدفوعة بالكامل$/)).toBeVisible();
 });

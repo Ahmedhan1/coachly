@@ -211,6 +211,7 @@ export const schedule: EnArea<'schedule'> = {
     balance: '{amount} still due',
     paidOfPrice: '{paid} of {price} paid',
     paidInFull: 'Package paid in full',
+    otherOwed: '{amount} due besides the package',
     methods: {
       cash: 'Cash',
       instapay: 'InstaPay',

@@ -61,6 +61,17 @@ test.describe('install page (iPhone Safari)', () => {
     expect((uploads[1] as { color: string }).color).toBe('#1D5FD1');
   });
 
+  test('says the icon service is down (not "no internet") when /api/brand does not reach the Worker', async ({ page }) => {
+    // What production did: the host served its own files for /api/brand and answered 405.
+    await page.route('**/api/brand', (route) => route.fulfill({ status: 405, body: '' }));
+    await page.goto('/');
+    const card = page.getByTestId('brand-icon-card');
+    await card.locator('input[type=file]').setInputFiles({ name: 'logo.png', mimeType: 'image/png', buffer: LOGO_PNG });
+    await expect(card.getByRole('alert')).toContainText('خدمة الأيقونة مش شغالة دلوقتي');
+    await expect(card.getByRole('alert')).not.toContainText('مفيش نت');
+    await expect(card.getByRole('button', { name: 'جرّب تاني' })).toBeVisible();
+  });
+
   test('an in-app icon link arrives ready', async ({ page }) => {
     await mockBrandServer(page);
     await page.goto(`/?brand=${ID}`);

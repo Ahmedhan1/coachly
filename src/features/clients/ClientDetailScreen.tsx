@@ -7,6 +7,7 @@ import { useUiStore } from '@/app/uiStore';
 import { useLive } from '@/app/useLive';
 import { readAiKey } from '@/features/online/integrations';
 import { clientPagesEnabled } from '@/data/prefs/online';
+import { seeActivity } from '@/data/prefs/activity';
 import { sessionForWorkout } from '@/domain/clientHub';
 import { localDayRange, subscriptionAttention, type Client, type Payment, type Program } from '@/domain/models';
 import type { BuiltinKind } from '@/domain/whatsapp';
@@ -49,6 +50,11 @@ export function ClientDetailScreen() {
   const repos = useRepos();
   // null = loaded but missing; undefined = still loading
   const client = useLive(async () => (await repos.clients.get(clientId)) ?? null, [repos, clientId]);
+  const { meta } = useServices();
+  // Opening the client counts as seeing what they sent (Home's "new from your clients").
+  useEffect(() => {
+    if (clientId) void seeActivity(meta, { clientId }).catch(() => undefined);
+  }, [meta, clientId]);
   if (client === undefined) return <PageHeader title="" back={BACK} />;
   if (client === null) {
     return (

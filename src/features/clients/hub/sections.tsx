@@ -128,15 +128,20 @@ export function InjuriesSection({ client }: { client: Client }) {
   );
 }
 
-/** "باقي عليه 700 · اتدفع 300 من 1,000": the balance and, with a priced package, how it was worked out. */
+/**
+ * The money line under the payments. Package not fully paid: "باقي عليه 700 · اتدفع 300 من 1,000". Package paid in
+ * full: says so first, then what is still due for other charges ("مستحق عليه 30 غير الباقة"), never "owes X" alone
+ * next to "paid in full". Without a priced package: just the balance.
+ */
 function paymentsFooter(owed: number, packagePaid: PackagePaid | null, currency: string): string | undefined {
-  const balance = owed > 0 ? t('schedule.pay.balance', { amount: formatMoney(owed, currency) }) : null;
-  if (!packagePaid) return balance ?? undefined;
-  const progress =
-    packagePaid.paidMinor >= packagePaid.priceMinor
-      ? t('schedule.pay.paidInFull')
-      : t('schedule.pay.paidOfPrice', { paid: formatMoney(packagePaid.paidMinor, currency), price: formatMoney(packagePaid.priceMinor, currency) });
-  return balance ? `${balance} · ${progress}` : progress;
+  const amount = formatMoney(owed, currency);
+  if (!packagePaid) return owed > 0 ? t('schedule.pay.balance', { amount }) : undefined;
+  if (packagePaid.paidMinor >= packagePaid.priceMinor) {
+    const paidInFull = t('schedule.pay.paidInFull');
+    return owed > 0 ? `${paidInFull} · ${t('schedule.pay.otherOwed', { amount })}` : paidInFull;
+  }
+  const progress = t('schedule.pay.paidOfPrice', { paid: formatMoney(packagePaid.paidMinor, currency), price: formatMoney(packagePaid.priceMinor, currency) });
+  return owed > 0 ? `${t('schedule.pay.balance', { amount })} · ${progress}` : progress;
 }
 
 type PackagePaid = { paidMinor: number; priceMinor: number };

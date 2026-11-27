@@ -25,9 +25,9 @@ export const RULES = {
   pushSchedule: { name: 'push-schedule', limit: 60, windowSeconds: 3600 },
   shareWrite: { name: 'share-write', limit: 300, windowSeconds: 86_400 },
   checkinOwner: { name: 'checkin-owner', limit: 600, windowSeconds: 3600 },
-  /** Public client-page reads: per page id and per IP. */
-  shareReadPage: { name: 'share-read', limit: 120, windowSeconds: 3600 },
-  shareReadIp: { name: 'share-read-ip', limit: 300, windowSeconds: 3600 },
+  /** Public client-page reads: per page id and per IP. An open page re-checks every 20 s (mostly 304s): 180/h. */
+  shareReadPage: { name: 'share-read', limit: 240, windowSeconds: 3600 },
+  shareReadIp: { name: 'share-read-ip', limit: 600, windowSeconds: 3600 },
   /** Public check-in posts: strict per IP, plus per page id. */
   checkinIpHour: { name: 'checkin-ip-h', limit: 6, windowSeconds: 3600 },
   checkinIpDay: { name: 'checkin-ip-d', limit: 20, windowSeconds: 86_400 },

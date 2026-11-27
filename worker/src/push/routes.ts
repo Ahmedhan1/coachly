@@ -129,6 +129,8 @@ function scheduleDiff(db: D1Database, deviceKey: string, stored: readonly Stored
   const wanted = new Set(items.map((item) => item.id));
   const statements: D1PreparedStatement[] = [];
   for (const row of stored) {
+    // Client events (check-in, photo) are queued by the Worker, not by the app's schedule: keep them.
+    if (row.item_id.startsWith('evt-')) continue;
     if (!wanted.has(row.item_id)) {
       statements.push(db.prepare('DELETE FROM push_items WHERE device_key = ? AND item_id = ?').bind(deviceKey, row.item_id));
     }

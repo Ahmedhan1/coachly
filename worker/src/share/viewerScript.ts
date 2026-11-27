@@ -96,6 +96,28 @@ var AR = {
   removePhoto: 'شيل الصورة',
   photoCount: function (n) { return n + ' من 3 صور'; },
   privateNote: 'الصفحة دي خاصة بيك. ما تبعتش اللينك لحد.',
+  startWorkout: 'ابدأ التمرين',
+  resumeWorkout: 'كمّل التمرين',
+  workoutDone: 'برافو! خلّصت تمرين النهارده',
+  workoutTime: 'وقت التمرين: ',
+  setOf: function (a, b) { return 'سيت ' + a + ' من ' + b; },
+  exOf: function (a, b) { return 'تمرين ' + a + ' من ' + b; },
+  setsDone: function (a, b) { return 'كمّلت ' + a + ' من ' + b + ' سيت'; },
+  doneSet: 'خلّصت السيت',
+  restNow: 'راحة',
+  skipRest: 'كفاية راحة',
+  addRest: '+15 ث',
+  holdStart: 'ابدأ العدّ',
+  holdNow: 'اثبت…',
+  upNext: 'الجاي: ',
+  prevEx: 'اللي قبله',
+  nextEx: 'اللي بعده',
+  closeWorkout: 'اقفل',
+  okDone: 'تمام',
+  restartWorkout: 'ابدأ من الأول',
+  cdNow: 'الحصة شغالة دلوقتي',
+  cd: function (d, h, m) { return 'باقي ' + (d ? d + ' يوم' + (h ? ' و' + h + ' ساعة' : '') : h ? h + ' ساعة' + (m ? ' و' + m + ' دقيقة' : '') : Math.max(1, m) + ' دقيقة'); },
+  pageUpdated: 'المدرب حدّث صفحتك',
   days: ['الأحد', 'الاتنين', 'التلات', 'الأربع', 'الخميس', 'الجمعة', 'السبت'],
   am: 'ص',
   pm: 'م',
@@ -215,6 +237,28 @@ var EN = {
   removePhoto: 'Remove photo',
   photoCount: function (n) { return n + ' of 3 photos'; },
   privateNote: 'This page is private to you. Do not share the link.',
+  startWorkout: 'Start workout',
+  resumeWorkout: 'Continue workout',
+  workoutDone: 'Well done! Today\'s workout is finished',
+  workoutTime: 'Workout time: ',
+  setOf: function (a, b) { return 'Set ' + a + ' of ' + b; },
+  exOf: function (a, b) { return 'Exercise ' + a + ' of ' + b; },
+  setsDone: function (a, b) { return a + ' of ' + b + ' sets done'; },
+  doneSet: 'Set done',
+  restNow: 'Rest',
+  skipRest: 'Skip rest',
+  addRest: '+15 s',
+  holdStart: 'Start timer',
+  holdNow: 'Hold…',
+  upNext: 'Next: ',
+  prevEx: 'Previous',
+  nextEx: 'Next',
+  closeWorkout: 'Close',
+  okDone: 'OK',
+  restartWorkout: 'Start over',
+  cdNow: 'Your session is on now',
+  cd: function (d, h, m) { return 'In ' + (d ? d + (d === 1 ? ' day' : ' days') + (h ? ' ' + h + ' h' : '') : h ? h + ' h' + (m ? ' ' + m + ' min' : '') : Math.max(1, m) + ' min'); },
+  pageUpdated: 'Your trainer updated your page',
   days: ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'],
   am: 'am',
   pm: 'pm',
@@ -268,6 +312,9 @@ var enc = new TextEncoder();
 var MAGIC = [80, 84, 75, 49]; // "PTK1"
 var SVG = 'http://www.w3.org/2000/svg';
 var IMAGE_FILE = /^[A-Za-z0-9_-][A-Za-z0-9_.-]{0,127}$/;
+// What the client is looking at, kept when the page refreshes itself with the trainer's new content.
+var viewState = { tab: 'p-program', progDay: null, mealDay: 0 };
+var currentDoc = null;
 
 function b64urlDecode(s) {
   if (!/^[A-Za-z0-9_-]*$/.test(s)) return null;
@@ -444,6 +491,12 @@ function summary(doc) {
     next.appendChild(el('span', 'next-label', T.nextSession));
     next.appendChild(el('span', 'next-day', dayLabel(d)));
     next.appendChild(el('span', 'next-time', clock(d) + ' · ' + s.durationMin + T.minutes));
+    var cdText = countdownText(s.at, s.durationMin);
+    if (cdText) {
+      var cdEl = el('span', 'next-count', cdText);
+      next.appendChild(cdEl);
+      countdowns.push({ el: cdEl, at: s.at, dur: s.durationMin });
+    }
     box.appendChild(next);
   } else if (Array.isArray(doc.sessions)) {
     facts.appendChild(fact(T.nextSession, T.noNextSession, ''));
@@ -545,11 +598,294 @@ function dayView(day, isNext) {
   var sets = exs.reduce(function (n, x) { return n + (isNum(x.sets) ? x.sets : 0); }, 0);
   head.appendChild(el('span', 'sub', count(exs.length, T.exFew, T.exMany) + (sets ? ' · ' + sets + T.setsTotal : '')));
   box.appendChild(head);
+  if (exs.length) box.appendChild(workoutBar(day));
   var ul = el('ul', 'list');
   exs.forEach(function (x, i) { ul.appendChild(exerciseCard(x, i + 1)); });
   box.appendChild(ul);
   return box;
 }
+// Workout player: the day's exercises set by set, a rest countdown after each set, a countdown for timed sets
+// ("30s", "1:00") and a small progress bar. State lives in this browser only (localStorage), per page and day,
+// so a reload or a page refresh from the trainer continues where the client was.
+var actx = null;
+function unlockAudio() {
+  if (!actx) {
+    var C = window.AudioContext || window.webkitAudioContext;
+    if (C) { try { actx = new C(); } catch (e) { actx = null; } }
+  }
+  if (actx && actx.state === 'suspended') actx.resume().catch(function () {});
+}
+function beep() {
+  if (navigator.vibrate) { try { navigator.vibrate([200, 100, 200]); } catch (e) {} }
+  if (!actx) return;
+  try {
+    [0, 0.25].forEach(function (t) {
+      var o = actx.createOscillator(), g = actx.createGain(), at = actx.currentTime + t;
+      o.frequency.value = 880;
+      g.gain.setValueAtTime(0.25, at);
+      g.gain.exponentialRampToValueAtTime(0.001, at + 0.2);
+      o.connect(g); g.connect(actx.destination);
+      o.start(at); o.stop(at + 0.2);
+    });
+  } catch (e) {}
+}
+/** Seconds for a timed set ("30s", "45 ث", "1:00", "2 min"), else 0. */
+function holdSeconds(reps) {
+  if (!isStr(reps, 20)) return 0;
+  var r = reps.trim().toLowerCase();
+  var m = /^(\d{1,2}):(\d{2})$/.exec(r);
+  if (m) return Math.min(3600, Number(m[1]) * 60 + Number(m[2]));
+  m = /^(\d{1,4})(?:\s*[-–]\s*\d{1,4})?\s*(s|sec|secs|ث|ثانية|ثواني)$/.exec(r);
+  if (m) return Math.min(3600, Number(m[1]));
+  m = /^(\d{1,3})(?:\s*[-–]\s*\d{1,3})?\s*(m|min|mins|د|دقيقة|دقايق)$/.exec(r);
+  if (m) return Math.min(3600, Number(m[1]) * 60);
+  return 0;
+}
+function mmss(sec) {
+  sec = Math.max(0, Math.ceil(sec));
+  var h = Math.floor(sec / 3600), m = Math.floor((sec % 3600) / 60), s = sec % 60;
+  return (h ? h + ':' + pad(m) : m) + ':' + pad(s);
+}
+function wkPlan(day) {
+  return arr(day.exercises).filter(Boolean).map(function (x) {
+    return {
+      x: x,
+      sets: isNum(x.sets) && x.sets >= 1 ? Math.min(20, Math.floor(x.sets)) : 1,
+      hold: holdSeconds(x.reps),
+      rest: isNum(x.restSec) && x.restSec > 0 ? Math.min(3600, Math.floor(x.restSec)) : 0
+    };
+  });
+}
+function wkKey(day) { return 'pt.workout.' + location.pathname + '.' + (isStr(day.title, 80) ? day.title : ''); }
+function wkSig(plan) { return plan.map(function (p) { return p.sets + (isStr(p.x.name, 120) ? p.x.name : ''); }).join('|'); }
+function readWk(day, plan) {
+  try {
+    var v = JSON.parse(localStorage.getItem(wkKey(day)) || 'null');
+    if (v && v.sig === wkSig(plan) && Array.isArray(v.done) && v.done.length === plan.length) return v;
+  } catch (e) {}
+  return null;
+}
+function saveWk(day, st) { try { localStorage.setItem(wkKey(day), JSON.stringify(st)); } catch (e) {} }
+function clearWk(day) { try { localStorage.removeItem(wkKey(day)); } catch (e) {} }
+function wkCounts(plan, st) {
+  var total = plan.reduce(function (n, p) { return n + p.sets; }, 0);
+  var done = st ? plan.reduce(function (n, p, i) { return n + Math.min(p.sets, Number(st.done[i]) || 0); }, 0) : 0;
+  return { total: total, done: done };
+}
+function meterEl(ratio, cls) {
+  var m = el('div', 'meter' + (cls ? ' ' + cls : ''));
+  var fill = el('span');
+  fill.style.inlineSize = Math.max(0, Math.min(100, ratio * 100)) + '%';
+  m.appendChild(fill);
+  return m;
+}
+function ringEl(ratio) {
+  var C = 2 * Math.PI * 54;
+  var s = svg('svg', { viewBox: '0 0 120 120', class: 'ring', 'aria-hidden': 'true' });
+  s.appendChild(svg('circle', { cx: 60, cy: 60, r: 54, class: 'ring-bg' }));
+  var c = svg('circle', { cx: 60, cy: 60, r: 54, class: 'ring-fg', 'stroke-dasharray': C.toFixed(1), 'stroke-dashoffset': (C * (1 - Math.max(0, Math.min(1, ratio)))).toFixed(1) });
+  s.appendChild(c);
+  s.setRing = function (r) { c.setAttribute('stroke-dashoffset', (C * (1 - Math.max(0, Math.min(1, r)))).toFixed(1)); };
+  return s;
+}
+var wakeLock = null;
+function keepAwake(on) {
+  try {
+    if (on && !wakeLock && navigator.wakeLock) navigator.wakeLock.request('screen').then(function (l) { wakeLock = l; }, function () {});
+    if (!on && wakeLock) { wakeLock.release().catch(function () {}); wakeLock = null; }
+  } catch (e) {}
+}
+var workoutOpen = false;
+function openWorkout(day, onClose) {
+  var plan = wkPlan(day);
+  if (!plan.length) return;
+  var st = readWk(day, plan) || { sig: wkSig(plan), startedAt: Date.now(), done: plan.map(function () { return 0; }), cur: 0, restUntil: 0, restTotal: 0, holdUntil: 0, finishedAt: 0 };
+  saveWk(day, st);
+  var box = el('div', 'wk');
+  box.setAttribute('role', 'dialog');
+  box.setAttribute('aria-modal', 'true');
+  document.body.appendChild(box);
+  document.body.classList.add('wk-open');
+  workoutOpen = true;
+  keepAwake(true);
+  var live = {};
+  var timer = 0;
+  var close = function () {
+    window.clearInterval(timer);
+    box.remove();
+    document.body.classList.remove('wk-open');
+    workoutOpen = false;
+    keepAwake(false);
+    if (onClose) onClose();
+  };
+  var nextUnfinished = function (from) {
+    for (var k = 0; k < plan.length; k++) {
+      var i = (from + k) % plan.length;
+      if ((st.done[i] || 0) < plan[i].sets) return i;
+    }
+    return -1;
+  };
+  var setDone = function () {
+    var p = plan[st.cur];
+    st.holdUntil = 0;
+    st.done[st.cur] = Math.min(p.sets, (st.done[st.cur] || 0) + 1);
+    var next = (st.done[st.cur] || 0) < p.sets ? st.cur : nextUnfinished(st.cur + 1);
+    if (next < 0) { st.finishedAt = Date.now(); st.restUntil = 0; }
+    else {
+      st.cur = next;
+      if (p.rest > 0) { st.restTotal = p.rest; st.restUntil = Date.now() + p.rest * 1000; }
+    }
+    saveWk(day, st);
+    draw();
+  };
+  var button = function (cls, text, fn) {
+    var b = el('button', cls, text);
+    b.type = 'button';
+    b.addEventListener('click', function () { unlockAudio(); fn(); });
+    return b;
+  };
+  var draw = function () {
+    box.textContent = '';
+    live = {};
+    var now = Date.now();
+    var head = el('div', 'wk-head');
+    head.appendChild(el('span', 'wk-title', isStr(day.title, 80) ? day.title : ''));
+    head.appendChild(button('wk-close', T.closeWorkout, close));
+    box.appendChild(head);
+    var c = wkCounts(plan, st);
+    var prog = el('div', 'wk-prog');
+    prog.appendChild(meterEl(c.total ? c.done / c.total : 0, 'wide'));
+    var line = el('div', 'wk-prog-line');
+    line.appendChild(el('span', '', T.setsDone(c.done, c.total)));
+    live.elapsed = el('span', 'num', mmss(((st.finishedAt || now) - st.startedAt) / 1000));
+    line.appendChild(live.elapsed);
+    prog.appendChild(line);
+    box.appendChild(prog);
+    var body = el('div', 'wk-body');
+    box.appendChild(body);
+    if (st.finishedAt) {
+      body.appendChild(el('p', 'wk-done', T.workoutDone));
+      body.appendChild(el('p', 'sub', T.workoutTime + mmss((st.finishedAt - st.startedAt) / 1000)));
+      var acts = el('div', 'wk-actions');
+      acts.appendChild(button('btn', T.okDone, function () { clearWk(day); close(); }));
+      body.appendChild(acts);
+      return;
+    }
+    var p = plan[st.cur];
+    var setNo = Math.min(p.sets, (st.done[st.cur] || 0) + 1);
+    if (st.restUntil > now) {
+      body.appendChild(el('p', 'wk-label', T.restNow));
+      var rw = el('div', 'wk-ring');
+      live.ring = ringEl((st.restUntil - now) / (st.restTotal * 1000));
+      rw.appendChild(live.ring);
+      live.rest = el('span', 'wk-count num', mmss((st.restUntil - now) / 1000));
+      rw.appendChild(live.rest);
+      body.appendChild(rw);
+      body.appendChild(el('p', 'sub wk-next', T.upNext + (isStr(p.x.name, 120) ? p.x.name : '') + ' · ' + T.setOf(setNo, p.sets)));
+      var ra = el('div', 'wk-actions');
+      ra.appendChild(button('btn ghost', T.addRest, function () { st.restUntil += 15000; st.restTotal += 15; saveWk(day, st); draw(); }));
+      ra.appendChild(button('btn', T.skipRest, function () { st.restUntil = 0; saveWk(day, st); draw(); }));
+      body.appendChild(ra);
+      return;
+    }
+    body.appendChild(el('p', 'wk-label', T.exOf(st.cur + 1, plan.length)));
+    var img = exerciseImage(p.x.image);
+    if (img) {
+      img.className = 'wk-img';
+      img.addEventListener('error', function () { img.remove(); });
+      body.appendChild(img);
+    }
+    body.appendChild(el('h2', 'wk-name', isStr(p.x.name, 120) ? p.x.name : ''));
+    body.appendChild(el('p', 'wk-set', T.setOf(setNo, p.sets)));
+    // One dot per set of this exercise: the small per-exercise progress.
+    var dots = el('div', 'wk-dots');
+    for (var i = 0; i < p.sets; i++) dots.appendChild(el('span', i < (st.done[st.cur] || 0) ? 'on' : ''));
+    body.appendChild(dots);
+    if (p.hold > 0) {
+      var hw = el('div', 'wk-ring');
+      var left = st.holdUntil > now ? (st.holdUntil - now) / 1000 : p.hold;
+      live.ring = ringEl(left / p.hold);
+      hw.appendChild(live.ring);
+      live.hold = el('span', 'wk-count num', mmss(left));
+      hw.appendChild(live.hold);
+      body.appendChild(hw);
+    } else if (isStr(p.x.reps, 20) && p.x.reps) {
+      body.appendChild(labelled('wk-reps', T.reps, p.x.reps));
+    }
+    var chips = el('div', 'chips');
+    if (p.rest > 0) chips.appendChild(el('span', 'chip', T.rest + p.rest + T.sec));
+    if (isStr(p.x.tempo, 20) && p.x.tempo) chips.appendChild(labelled('chip', T.tempo, p.x.tempo));
+    if (isNum(p.x.rpe)) chips.appendChild(labelled('chip', T.rpe, p.x.rpe));
+    if (chips.childNodes.length) body.appendChild(chips);
+    if (isStr(p.x.notes, 500) && p.x.notes) body.appendChild(el('p', 'sub', p.x.notes));
+    var acts2 = el('div', 'wk-actions');
+    if (p.hold > 0 && !(st.holdUntil > now)) {
+      acts2.appendChild(button('btn', T.holdStart, function () { st.holdUntil = Date.now() + p.hold * 1000; saveWk(day, st); draw(); }));
+    } else if (p.hold > 0) {
+      acts2.appendChild(el('p', 'wk-label', T.holdNow));
+    }
+    acts2.appendChild(button(p.hold > 0 && !(st.holdUntil > now) ? 'btn ghost' : 'btn', T.doneSet, setDone));
+    body.appendChild(acts2);
+    var nav = el('div', 'wk-nav');
+    var go = function (d) { return function () { st.cur = (st.cur + d + plan.length) % plan.length; st.holdUntil = 0; saveWk(day, st); draw(); }; };
+    if (plan.length > 1) {
+      nav.appendChild(button('pill', T.prevEx, go(-1)));
+      nav.appendChild(button('pill', T.nextEx, go(1)));
+    }
+    nav.appendChild(button('pill', T.restartWorkout, function () {
+      st = { sig: wkSig(plan), startedAt: Date.now(), done: plan.map(function () { return 0; }), cur: 0, restUntil: 0, restTotal: 0, holdUntil: 0, finishedAt: 0 };
+      saveWk(day, st);
+      draw();
+    }));
+    body.appendChild(nav);
+  };
+  var tick = function () {
+    var now = Date.now();
+    if (st.restUntil && now >= st.restUntil) { st.restUntil = 0; saveWk(day, st); beep(); draw(); return; }
+    if (st.holdUntil && now >= st.holdUntil) { beep(); setDone(); return; }
+    if (live.elapsed && !st.finishedAt) live.elapsed.textContent = mmss((now - st.startedAt) / 1000);
+    if (live.rest) { live.rest.textContent = mmss((st.restUntil - now) / 1000); live.ring.setRing((st.restUntil - now) / (st.restTotal * 1000)); }
+    if (live.hold && st.holdUntil) { live.hold.textContent = mmss((st.holdUntil - now) / 1000); live.ring.setRing((st.holdUntil - now) / (plan[st.cur].hold * 1000)); }
+  };
+  draw();
+  timer = window.setInterval(tick, 250);
+  box.focus && box.focus();
+}
+/** Under the day's title: start button, or the saved progress and "continue". */
+function workoutBar(day) {
+  var bar = el('div', 'wk-bar');
+  var plan = wkPlan(day);
+  var refresh = function () {
+    bar.textContent = '';
+    if (!plan.length) return;
+    var st = readWk(day, plan);
+    if (st && !st.finishedAt) {
+      var c = wkCounts(plan, st);
+      var info = el('div', 'wk-bar-info');
+      info.appendChild(el('span', 'sub', T.setsDone(c.done, c.total)));
+      info.appendChild(meterEl(c.total ? c.done / c.total : 0, 'wide'));
+      bar.appendChild(info);
+    }
+    var b = el('button', 'btn', st && !st.finishedAt ? T.resumeWorkout : T.startWorkout);
+    b.type = 'button';
+    b.addEventListener('click', function () { unlockAudio(); openWorkout(day, refresh); });
+    bar.appendChild(b);
+  };
+  refresh();
+  return bar;
+}
+/** "In 2 days 3 h" until the next session; kept current by the page ticker. */
+function countdownText(atSec, durationMin) {
+  var ms = atSec * 1000 - Date.now();
+  if (ms <= 0) return (atSec + durationMin * 60) * 1000 > Date.now() ? T.cdNow : '';
+  var mins = Math.floor(ms / 60000);
+  return T.cd(Math.floor(mins / 1440), Math.floor((mins % 1440) / 60), mins % 60);
+}
+var countdowns = [];
+window.setInterval(function () {
+  countdowns = countdowns.filter(function (c) { return document.body.contains(c.el); });
+  countdowns.forEach(function (c) { c.el.textContent = countdownText(c.at, c.dur); });
+}, 20000);
 function programSection(doc) {
   var s = el('section', 'panel');
   s.id = 'p-program';
@@ -558,12 +894,13 @@ function programSection(doc) {
     s.appendChild(el('p', 'card empty', T.noProgram));
   } else {
     var days = doc.days.filter(function (d) { return d && Array.isArray(d.exercises); });
-    var first = nextDayIndex(doc);
+    var marked = isNum(doc.nextDay) ? nextDayIndex(doc) : -1;
+    var first = viewState.progDay !== null && viewState.progDay < days.length ? viewState.progDay : nextDayIndex(doc);
     var holder = el('div');
-    var marked = isNum(doc.nextDay) ? first : -1;
     var showDay = function (i) { holder.textContent = ''; if (days[i]) holder.appendChild(dayView(days[i], i === marked)); };
+    var pickDay = function (i) { viewState.progDay = i; showDay(i); };
     if (days.length > 1) {
-      s.appendChild(pills(days.map(function (d, i) { return isStr(d.title, 80) && d.title ? d.title.split(' — ')[0] + (d.title.indexOf(' — ') > 0 ? ' · ' + d.title.split(' — ')[1] : '') : String(i + 1); }), first, isNum(doc.nextDay) ? first : -1, showDay));
+      s.appendChild(pills(days.map(function (d, i) { return isStr(d.title, 80) && d.title ? d.title.split(' — ')[0] + (d.title.indexOf(' — ') > 0 ? ' · ' + d.title.split(' — ')[1] : '') : String(i + 1); }), first, marked, pickDay));
     }
     s.appendChild(holder);
     showDay(first);
@@ -701,9 +1038,10 @@ function mealsSection(doc) {
     if (isNum(d.kcal) && days.length > 1) holder.appendChild(el('p', 'sub', Math.round(d.kcal) + T.dayKcal));
     holder.appendChild(mealCards(d.meals, i));
   };
-  if (days.length > 1) s.appendChild(pills(days.map(function (d, i) { return isStr(d.title, 80) && d.title ? d.title : String(i + 1); }), 0, -1, showDay));
+  var firstMeal = viewState.mealDay < days.length ? viewState.mealDay : 0;
+  if (days.length > 1) s.appendChild(pills(days.map(function (d, i) { return isStr(d.title, 80) && d.title ? d.title : String(i + 1); }), firstMeal, -1, function (i) { viewState.mealDay = i; showDay(i); }));
   s.appendChild(holder);
-  showDay(0);
+  showDay(firstMeal);
   if (doc.supplements.length) {
     var sc = el('div', 'card');
     sc.appendChild(el('h3', '', T.supplements));
@@ -1144,7 +1482,7 @@ function checkinSection(raw, page) {
     var files = chosen.map(function (p) { return p.file; });
     if (!anyNumber && !n && !files.length) { say(T.empty, 'err'); return; }
     if (n) doc.notes = n.slice(0, 1000);
-    var picks = currentPicks(page);
+    var picks = currentPicks(currentDoc || page);
     if (picks.length) doc.mealPicks = picks;
     btn.disabled = true;
     say(T.sending);
@@ -1173,17 +1511,27 @@ function checkinSection(raw, page) {
   return s;
 }
 
-function render(doc, raw) {
+var checkinPanel = null;
+function render(doc, raw, keep) {
+  currentDoc = doc;
+  var y = window.scrollY;
   applyBrand(doc.brand);
   hero(doc);
   app.textContent = '';
   var sum = summary(doc);
   if (sum) app.appendChild(sum);
   var panels = [['p-program', T.tabProgram, programSection(doc)], ['p-meals', T.tabMeals, mealsSection(doc)], ['p-progress', T.tabProgress, progressSection(doc)]];
-  if (doc.checkinsEnabled === true) panels.push(['p-checkin', T.tabCheckin, checkinSection(raw, doc)]);
+  // A live refresh keeps the check-in form as it is (what the client already typed or picked stays).
+  if (doc.checkinsEnabled === true) {
+    if (!keep || !checkinPanel) checkinPanel = checkinSection(raw, doc);
+    panels.push(['p-checkin', T.tabCheckin, checkinPanel]);
+  } else {
+    checkinPanel = null;
+  }
   var tabs = el('nav', 'tabs');
   tabs.setAttribute('role', 'tablist');
   var show = function (id) {
+    viewState.tab = id;
     panels.forEach(function (p) {
       p[2].hidden = p[0] !== id;
       var t = document.getElementById('t-' + p[0]);
@@ -1207,24 +1555,72 @@ function render(doc, raw) {
   app.appendChild(tabs);
   panels.forEach(function (p) { app.appendChild(p[2]); });
   app.appendChild(el('p', 'foot', T.privateNote));
-  show('p-program');
+  show(keep && panels.some(function (p) { return p[0] === viewState.tab; }) ? viewState.tab : 'p-program');
+  if (keep) window.scrollTo(0, y);
   document.body.setAttribute('data-ready', '1');
 }
 
+function flash(text) {
+  var f = el('div', 'flash', text);
+  f.setAttribute('role', 'status');
+  document.body.appendChild(f);
+  window.setTimeout(function () { f.remove(); }, 3500);
+}
+
+// Live page: while the page is open and visible it asks for the content again every 20 s (and when the client
+// comes back to it). The server answers 304 with no body when nothing changed, so this costs almost nothing.
+var POLL_MS = 20000;
+var feed = { raw: null, etag: null, text: null, lastAt: 0, busy: false };
+function openDoc(raw, buf) {
+  return openEnvelope(raw, new Uint8Array(buf)).then(function (plain) {
+    var text = plain ? new TextDecoder().decode(plain) : null;
+    var doc = null;
+    try { doc = text ? JSON.parse(text) : null; } catch (e) { doc = null; }
+    return { text: text, doc: valid(doc) ? doc : null };
+  });
+}
+function poll() {
+  if (!feed.raw || feed.busy || document.visibilityState !== 'visible') return;
+  feed.busy = true;
+  feed.lastAt = Date.now();
+  var raw = feed.raw;
+  var headers = feed.etag ? { 'If-None-Match': feed.etag } : {};
+  fetch('/api/share/' + shareId, { cache: 'no-store', credentials: 'omit', headers: headers })
+    .then(function (res) {
+      if (res.status === 404) { feed.raw = null; message(T.revoked, false); return null; }
+      if (res.status !== 200) return null;
+      var tag = res.headers.get('ETag');
+      return res.arrayBuffer().then(function (buf) { return openDoc(raw, buf); }).then(function (r) {
+        if (raw !== feed.raw || !r.doc) return;
+        feed.etag = tag;
+        if (r.text === feed.text) return;
+        feed.text = r.text;
+        applyLanguage(r.doc);
+        render(r.doc, raw, true);
+        flash(T.pageUpdated);
+      });
+    }, function () { return null; })
+    .then(function () { feed.busy = false; }, function () { feed.busy = false; });
+}
+window.setInterval(poll, POLL_MS);
+document.addEventListener('visibilitychange', function () { if (Date.now() - feed.lastAt > 5000) poll(); });
+window.addEventListener('focus', function () { if (Date.now() - feed.lastAt > 5000) poll(); });
+
 function start() {
   var raw = keyFromHash();
+  feed.raw = null;
   if (!raw) { message(T.noKey, false); return; }
   message(T.loading, false);
-  fetch('/api/share/' + shareId, { cache: 'no-cache', credentials: 'omit' })
+  fetch('/api/share/' + shareId, { cache: 'no-store', credentials: 'omit' })
     .then(function (res) {
       if (res.status === 404) { message(T.revoked, false); return null; }
       if (!res.ok) { message(T.offline, true); return null; }
-      return res.arrayBuffer().then(function (buf) { return openEnvelope(raw, new Uint8Array(buf)); }).then(function (plain) {
-        var doc = null;
-        try { doc = plain ? JSON.parse(new TextDecoder().decode(plain)) : null; } catch (e) { doc = null; }
-        if (!valid(doc)) { message(T.badKey, false); return; }
-        applyLanguage(doc);
-        render(doc, raw);
+      var tag = res.headers.get('ETag');
+      return res.arrayBuffer().then(function (buf) { return openDoc(raw, buf); }).then(function (r) {
+        if (!r.doc) { message(T.badKey, false); return; }
+        feed.raw = raw; feed.etag = tag; feed.text = r.text; feed.lastAt = Date.now();
+        applyLanguage(r.doc);
+        render(r.doc, raw, false);
       });
     }, function () { message(T.offline, true); });
 }

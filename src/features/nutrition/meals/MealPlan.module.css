@@ -53,16 +53,30 @@
 
 .totalsHead {
   display: flex;
+  flex-wrap: wrap;
   align-items: center;
   justify-content: space-between;
-  gap: var(--sp-3);
+  gap: var(--sp-2) var(--sp-3);
+  min-inline-size: 0;
+}
+
+/* The badge ("on target (diff 133)") goes under the number when both do not fit, never outside the card. */
+.totalsHead > :last-child {
+  max-inline-size: 100%;
 }
 
 .totalsKcal {
   display: flex;
+  flex-wrap: wrap;
   align-items: baseline;
   gap: var(--sp-1);
+  min-inline-size: 0;
+  margin: 0;
   font: var(--t-num-lg);
+}
+
+.totalsKcal > * {
+  white-space: nowrap;
 }
 
 .totalsTarget {
@@ -109,6 +123,7 @@
 .macroTargets dd {
   margin: 0;
   font: var(--t-num);
+  overflow-wrap: anywhere;
 }
 
 .of {
@@ -333,4 +348,15 @@
   display: flex;
   justify-content: space-between;
   gap: var(--sp-2);
+}
+
+/* Ingredient name takes the free width; "305 g · 296 kcal" stays on one line at the end. */
+.lines li > :first-child {
+  flex: 1;
+  min-inline-size: 0;
+}
+
+.lines li > :last-child {
+  flex: none;
+  white-space: nowrap;
 }

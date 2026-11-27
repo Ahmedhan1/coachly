@@ -10,6 +10,9 @@ html {
   -webkit-text-size-adjust: 100%;
   text-size-adjust: 100%;
   -webkit-tap-highlight-color: transparent;
+  /* One element wider than the screen must never make the whole app pan sideways (the tab bar and toasts
+     then look shifted). `clip` keeps position: sticky working, unlike `hidden`. */
+  overflow-x: clip;
 }
 
 body {
@@ -20,6 +23,7 @@ body {
   font: var(--t-body);
   -webkit-font-smoothing: antialiased;
   overscroll-behavior-y: none;
+  overflow-x: clip;
 }
 
 h1,

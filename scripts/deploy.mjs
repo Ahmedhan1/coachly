@@ -55,4 +55,23 @@ if (!args.has('--worker-only')) {
   execFileSync('python3', [join(appDir, 'upload.py')], { cwd: root, stdio: 'inherit', env: { ...env, UPLOAD_KEY: uploadKey } });
 }
 
+if (!args.has('--worker-only')) {
+  // Smoke check: the home-screen logo needs the app Worker on /api/brand and /b/*. An assets-only deploy answers
+  // 405 / index.html there, and the install page could never set a logo (seen in production, 27 Nov 2026).
+  const app = 'https://app.getcoachly.workers.dev';
+  const probe = (args) => {
+    try {
+      return execFileSync('curl', ['-s', '-m', '20', ...args], { encoding: 'utf8', env });
+    } catch {
+      return null;
+    }
+  };
+  const upload = probe(['-X', 'POST', '-H', 'Content-Type: application/json', '-H', `Origin: ${app}`, '-d', '{}', '-w', '\n%{http_code}', `${app}/api/brand`]);
+  const brand = probe(['-o', '/dev/null', '-w', '%{http_code}', `${app}/b/000000000000000000000000/brand.json`]);
+  if (upload === null || brand === null) console.warn('\n⚠ could not reach the app to check the logo routes; check /api/brand by hand');
+  else if (!upload.trim().endsWith('400') || !upload.includes('"error"') || brand.trim() !== '404') {
+    throw new Error(`the app Worker does not serve /api/brand and /b/* (got ${upload.trim().split('\n').pop()} and ${brand.trim()}): trainers cannot put their logo on the icon`);
+  } else console.log('\n✔ logo routes answer from the app Worker');
+}
+
 console.log('\n✔ deployed: https://app.getcoachly.workers.dev  (account Worker: https://api.getcoachly.workers.dev)');

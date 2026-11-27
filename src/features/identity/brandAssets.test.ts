@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { containRect, onColorFor } from './brandAssets';
+import { containRect, dataUrlBytes, onColorFor } from './brandAssets';
 
 describe('brand icon geometry', () => {
   it('fits a wide logo inside the padded square, centred, aspect kept', () => {
@@ -10,5 +10,14 @@ describe('brand icon geometry', () => {
   it('picks a readable text colour on the brand', () => {
     expect(onColorFor('#C81E3A')).toBe('#FFFFFF');
     expect(onColorFor('#F2E81F')).toBe('#111111');
+  });
+});
+
+describe('dataUrlBytes', () => {
+  it('is the decoded size of the base64 payload', () => {
+    expect(dataUrlBytes('data:image/png;base64,AAAA')).toBe(3);
+    expect(dataUrlBytes('data:image/png;base64,AAA=')).toBe(2);
+    expect(dataUrlBytes('data:image/png;base64,AA==')).toBe(1);
+    expect(dataUrlBytes(`data:image/png;base64,${'A'.repeat(800_000)}`)).toBe(600_000);
   });
 });

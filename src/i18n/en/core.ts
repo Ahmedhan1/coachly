@@ -7,7 +7,7 @@ type CoreKeys = 'app' | 'common' | 'tabs' | 'quickAdd' | 'install' | 'auth' | 'i
 
 export const core: StringShape<Pick<Strings, CoreKeys>> = {
   app: {
-    name: 'Coach',
+    name: 'Coachly',
     loading: 'One second…',
     loadError: 'Something went wrong opening your data. Close the app and open it again.',
     storageFull: 'Your phone is out of space, so the last change was not saved. Free some space and try again.',
@@ -78,7 +78,7 @@ export const core: StringShape<Pick<Strings, CoreKeys>> = {
     installButton: 'Install the app',
     installButtonHint: 'One tap, then “Install”.',
     installedTitle: 'Installed',
-    installedBody: 'Close this page and open the app from the “Coach” icon on your home screen.',
+    installedBody: 'Close this page and open the app from the “Coachly” icon on your home screen.',
     androidStep1Title: 'Open this page in Chrome',
     androidStep1Body: 'If you opened it from WhatsApp or Facebook: tap ⋮ at the top and choose “Open in Chrome”.',
     androidStep2Title: 'Tap ⋮ in the top corner',
@@ -100,7 +100,14 @@ export const core: StringShape<Pick<Strings, CoreKeys>> = {
       preparing: 'Preparing the icon…',
       ready: 'The icon is ready with your logo',
       readyHint: 'Follow the install steps below and the icon and launch screen will show your logo. Your logo will already be inside the app too.',
-      failed: 'Could not prepare the icon (needs internet). Try again, or continue without it.',
+      failed: {
+        offline: 'No internet right now, and the icon needs it once. Check your connection and try again, or continue without it.',
+        timeout: 'The connection is slow and the upload took too long. Try again, or continue without it.',
+        unavailable: 'The icon service is not working right now; it is not your phone. Try again a bit later, or install without it.',
+        rejected: 'This picture is too large or not suitable for the icon. Try a smaller one.',
+        busy: 'Too many tries today. Try again tomorrow, or continue without it.',
+      },
+      retry: 'Try again',
       badImage: 'This image did not open. Try another one (PNG or JPG).',
       privacy: 'Only the icon picture and the color are uploaded, so the iPhone can take them. Nothing else.',
       previewAlt: 'App icon preview',
@@ -245,6 +252,17 @@ export const core: StringShape<Pick<Strings, CoreKeys>> = {
     },
   },
   home: {
+    activity: {
+      title: 'New from your clients',
+      checkin: 'sent a check-in',
+      photo: 'sent a photo',
+      when: '{date} · {time}',
+      seeAll: 'Mark seen',
+      toastCheckin: 'Check-in from {name}',
+      toastPhoto: 'New photo from {name}',
+      toastMany: '{n} new items from clients',
+      open: 'View',
+    },
     title: 'Today',
     greeting: 'Hi Coach',
     greetingNamed: 'Hi Coach {name}',

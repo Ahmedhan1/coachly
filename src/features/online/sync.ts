@@ -10,6 +10,7 @@ import { NutritionStore } from '@/data/nutritionStore';
 import { mealPicksKey, parseMealPicks } from '@/domain/meals';
 import { entryNavyEstimate } from '@/domain/nutrition';
 import { readPushPrefs, readShare, savePushPrefs } from '@/data/prefs/online';
+import { recordActivity } from '@/data/prefs/activity';
 import { shouldSendPushSchedule } from './syncThrottle';
 
 /** Device-local (`backup.` prefix: never in a backup): fingerprint of the last schedule the server accepted. */
@@ -63,6 +64,18 @@ export async function syncPush(services: AppServices, now = Date.now(), opts: { 
   await savePushPrefs(services.meta, { ...prefs, lastSyncAt: now });
   await services.meta.set(PUSH_SENT_KEY, { fingerprint, at: now });
   return r.value;
+}
+
+/** Cheap signature of what the push schedule is built from (sessions ahead, package ends, push settings). */
+export async function pushScheduleSignature(services: AppServices, now = Date.now()): Promise<string> {
+  const prefs = await readPushPrefs(services.meta);
+  if (!prefs.enabled) return 'off';
+  const repos = services.data.repos;
+  const dayStart = now - (now % 86_400_000);
+  const [sessions, clients] = await Promise.all([repos.sessions.listBetween(dayStart, dayStart + 41 * 86_400_000), repos.clients.list()]);
+  const s = sessions.map((x) => `${x.id}@${x.startsAt}:${x.attendance}`).join(',');
+  const c = clients.map((x) => `${x.id}:${x.endDate ?? ''}`).join(',');
+  return `${prefs.leadMinutes}/${prefs.renewalDays}|${s}|${c}`;
 }
 
 async function dataUrlToBlob(url: string): Promise<Blob | null> {
@@ -139,6 +152,8 @@ export async function pullCheckins(services: AppServices): Promise<number> {
     });
     if (d.mealPicks) await saveMealPicks(services, clientId, d.createdAt, d.mealPicks);
     if (photos.length > 0) await store.setEntryPhotos(entry.id, photos).catch(() => undefined);
+    // The trainer's inbox: who sent it, when, and the start of what they wrote (a question, a note).
+    await recordActivity(services.meta, [{ id: `chk-${c.id}`, kind: 'checkin', clientId, at: d.createdAt * 1000, seen: false, ...(d.notes?.trim() ? { note: d.notes } : {}) }]).catch(() => undefined);
     imported.push(c.id);
     await services.meta.set(IMPORTED_CHECKINS_KEY, imported.slice(-200));
     await page.acknowledge(c);

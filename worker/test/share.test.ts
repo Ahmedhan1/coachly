@@ -1,3 +1,4 @@
+import { RULES } from '../src/rateLimit';
 import { env } from 'cloudflare:workers';
 import { describe, expect, it } from 'vitest';
 import { generateRawKey, openWithKey, sealWithKey } from '../../shared/envelope';
@@ -143,7 +144,7 @@ describe('client page content', () => {
     const shareId = newShareId();
     await publish(h, token, shareId, generateRawKey());
     let last = 0;
-    for (let i = 0; i < 121; i++) last = (await h.send(`/api/share/${shareId}`, { ip: freshIp() })).status;
+    for (let i = 0; i <= RULES.shareReadPage.limit; i++) last = (await h.send(`/api/share/${shareId}`, { ip: freshIp() })).status;
     expect(last).toBe(429);
   });
 });
@@ -174,6 +175,30 @@ describe('check-ins', () => {
 
     expect(await readJson(await h.authed(`/api/share/${shareId}/checkins/${id}`, token, { method: 'DELETE' }))).toEqual({ ok: true });
     expect(await readJson(await h.authed(`/api/share/${shareId}/checkins`, token))).toEqual({ checkins: [] });
+  });
+
+  it("queues an instant, nameless push to the trainer's phones; the app's schedule PUT keeps it", async () => {
+    const h = await harness();
+    const token = await h.account();
+    const sub = {
+      subscription: {
+        endpoint: 'https://web.push.apple.com/trainer-phone',
+        keys: { p256dh: 'BCVxsr7N_eNgVRqvHtD0zTZsEc6-VV-JvLexhqUzORcxaOzi6-AYWXvTBHm4bjyPjs7Vd8pZGH6SRpkNtoIAiw4', auth: 'BTBZMqHH6r4Tts7J_aSIgg' },
+      },
+    };
+    expect((await h.authed('/api/push/subscribe', token, { method: 'POST', body: JSON.stringify(sub) })).status).toBe(200);
+    const shareId = newShareId();
+    const key = generateRawKey();
+    await publish(h, token, shareId, key);
+    const res = await postCheckin(h, shareId, key, freshIp());
+    const { id } = (await res.json()) as { id: string };
+    const items = async () => (await env.DB.prepare('SELECT item_id, due_at, title, body FROM push_items').all<{ item_id: string; due_at: number; title: string; body: string }>()).results;
+    const queued = await items();
+    expect(queued).toHaveLength(1);
+    expect(queued[0]).toMatchObject({ item_id: `evt-chk-${id}`, due_at: h.clock.now });
+    expect(queued[0]?.body).not.toMatch(/Test|Client/);
+    expect((await h.authed('/api/push/schedule', token, { method: 'PUT', body: JSON.stringify({ items: [] }) })).status).toBe(200);
+    expect((await items()).map((r) => r.item_id)).toEqual([`evt-chk-${id}`]);
   });
 
   it('refuses non-PTK1 bodies and bodies over 3 MB', async () => {

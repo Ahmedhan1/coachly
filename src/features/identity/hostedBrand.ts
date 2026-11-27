@@ -1,8 +1,8 @@
 import type { AppServices } from '@/app/services';
 import { readBrandCache } from '@/app/pwa/BootSplash';
-import type { BrandHosting, BrandIconSet } from '@/services/brand/brandHosting';
-import { brandParam, brandPath, startupMedia } from '../../../shared/brandIcon';
-import { buildBrandCache, refreshBrandAssets } from './brandAssets';
+import type { BrandHosting, BrandIconSet, BrandUploadFailure } from '@/services/brand/brandHosting';
+import { BRAND_LIMITS, brandParam, brandPath, startupMedia } from '../../../shared/brandIcon';
+import { buildBrandCache, dataUrlBytes, refreshBrandAssets } from './brandAssets';
 
 /** Meta key: the hosted brand id already copied into this app's settings (so a removed logo stays removed). */
 export const BRAND_IMPORTED_KEY = 'identity.brandImported';
@@ -33,20 +33,30 @@ export function applyHostedBrand(id: string, startup: { width: number; height: n
   window.history.replaceState(window.history.state, '', url.pathname + url.search + url.hash);
 }
 
-function iconSetFrom(cache: Awaited<ReturnType<typeof buildBrandCache>>): BrandIconSet | null {
+/**
+ * The upload body from a built cache, inside the server's caps (shared/brandIcon BRAND_LIMITS): a launch image
+ * that is too large is left out (the icon still works) rather than having the whole upload refused.
+ */
+export function iconSetFrom(cache: Awaited<ReturnType<typeof buildBrandCache>>): BrandIconSet | null {
   if (!cache.icon180 || !cache.icon512 || !cache.logo) return null;
-  return { color: cache.color, icon180: cache.icon180, icon512: cache.icon512, logo: cache.logo, startup: cache.startup };
+  if (dataUrlBytes(cache.icon180) > BRAND_LIMITS.icon180 || dataUrlBytes(cache.icon512) > BRAND_LIMITS.icon512 || dataUrlBytes(cache.logo) > BRAND_LIMITS.logo) return null;
+  const startup = cache.startup && dataUrlBytes(cache.startup.url) <= BRAND_LIMITS.startup ? cache.startup : null;
+  return { color: cache.color, icon180: cache.icon180, icon512: cache.icon512, logo: cache.logo, startup };
 }
 
-/** Install page: builds the icon set from a picked logo and uploads it. Returns the brand id and the preview. */
-export async function hostLogo(hosting: BrandHosting, color: string, logo: Blob): Promise<{ id: string; preview: string; startup: { width: number; height: number; ratio: number } | null } | null> {
-  const cache = await buildBrandCache(color, logo);
-  const set = iconSetFrom(cache);
-  if (!set) return null;
-  const id = await hosting.upload(set);
-  if (!id) return null;
-  const startup = cache.startup ? { width: cache.startup.width, height: cache.startup.height, ratio: cache.startup.ratio } : null;
-  return { id, preview: set.icon180, startup };
+export type HostLogoResult =
+  | { ok: true; id: string; preview: string; startup: { width: number; height: number; ratio: number } | null }
+  | { ok: false; reason: BrandUploadFailure | 'image' };
+
+/** Install page: builds the icon set from a picked logo and uploads it. Never throws. */
+export async function hostLogo(hosting: BrandHosting, color: string, logo: Blob): Promise<HostLogoResult> {
+  const cache = await buildBrandCache(color, logo).catch(() => null);
+  const set = cache && iconSetFrom(cache);
+  if (!set) return { ok: false, reason: 'image' };
+  const up = await hosting.upload(set).catch(() => ({ ok: false as const, reason: 'unavailable' as const }));
+  if (!up.ok) return up;
+  const startup = set.startup ? { width: set.startup.width, height: set.startup.height, ratio: set.startup.ratio } : null;
+  return { ok: true, id: up.id, preview: set.icon180, startup };
 }
 
 /** Inside the installed app: uploads the current logo's icon set (for a "re-add with the new icon" link). */
@@ -54,7 +64,9 @@ export async function hostCurrentBrand(services: Pick<AppServices, 'data'>, host
   await refreshBrandAssets(services);
   const cache = readBrandCache();
   const set = cache && iconSetFrom(cache);
-  return set ? hosting.upload(set) : null;
+  if (!set) return null;
+  const up = await hosting.upload(set);
+  return up.ok ? up.id : null;
 }
 
 /**

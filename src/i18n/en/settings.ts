@@ -101,7 +101,7 @@ export const settings: EnArea<'settings'> = {
     syncNow: 'Update the schedule now',
     syncedOk: '{n} reminders updated',
     unsupported: 'Notifications are not supported here. Install the app on the home screen and update to iOS 16.4 or later. The calendar file always works as a backup.',
-    denied: 'Notifications are blocked. Allow them in your phone settings → Notifications → Coach.',
+    denied: 'Notifications are blocked. Allow them in your phone settings → Notifications → Coachly.',
     notConfigured: 'Notifications need the server to be set up first (docs/CLOUD.md).',
     failed: 'Could not reach the server. We will retry on our own.',
     calendarFallback: 'Without notifications: open the session and tap “Add to calendar”, and the calendar will remind you offline.',

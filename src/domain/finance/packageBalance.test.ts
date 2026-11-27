@@ -31,6 +31,26 @@ describe('packageBalance', () => {
     expect(packageBalance(pkg, [paid(100_000, '2026-11-19'), due(20_000, '2026-11-22')]).owedMinor).toBe(20_000);
   });
 
+  it('the reported bug: 4,000 package paid, an extra 330 due and 300 paid later in the period → 30 still owed, package paid at most its price', () => {
+    const start = { priceMinor: 400_000, startDate: '2026-10-18' };
+    const b = packageBalance(start, [paid(400_000, '2026-10-18'), due(33_000, '2026-11-27'), paid(30_000, '2026-11-27')]);
+    expect(b).toEqual({ owedMinor: 3_000, paidMinor: 400_000, priceMinor: 400_000 });
+  });
+
+  it('paying an extra in full leaves nothing owed', () => {
+    expect(packageBalance(pkg, [paid(100_000, '2026-11-19'), paid(20_000, '2026-11-22', '2026-11-22')]).owedMinor).toBe(0);
+  });
+
+  it('a partly settled extra (paid part + due remainder) owes the remainder', () => {
+    const rows = [paid(100_000, '2026-11-19'), paid(10_000, '2026-11-23', '2026-11-22'), due(10_000, '2026-11-22')];
+    expect(packageBalance(pkg, rows).owedMinor).toBe(10_000);
+  });
+
+  it('a settled renewal charge pays the package; a later payment counts toward an extra', () => {
+    const rows = [paid(100_000, '2026-11-19', '2026-11-19'), due(20_000, '2026-11-22'), paid(25_000, '2026-11-24')];
+    expect(packageBalance(pkg, rows)).toEqual({ owedMinor: 0, paidMinor: 100_000, priceMinor: 100_000 });
+  });
+
   it('debt from before the package started stays owed on top', () => {
     const b = packageBalance(pkg, [due(25_000, '2026-10-19'), paid(100_000, '2026-11-19')]);
     expect(b.owedMinor).toBe(25_000);

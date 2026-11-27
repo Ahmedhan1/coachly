@@ -10,6 +10,7 @@ import { RULES } from '../rateLimit';
 import { constantTimeEqual } from '../serverCrypto';
 import { overPagesQuota } from './quota';
 import { deleteShareFiles } from '../files/routes';
+import { notifyClientEvent } from '../push/events';
 
 export const SHARE_ID = /^[A-Za-z0-9_-]{22,64}$/;
 const HASH_B64 = /^[A-Za-z0-9_-]{43}$/;
@@ -191,6 +192,7 @@ async function postCheckin(request: Request, deps: Deps, clientKey: string, shar
       .bind(id, shareId, row.lid, check.length, now),
     adjustUsage(cloud.db, check.length),
   ]);
+  await notifyClientEvent(cloud.db, row.lid, 'checkin', id, now);
   return json({ id }, 201);
 }
 

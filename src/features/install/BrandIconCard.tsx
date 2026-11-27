@@ -2,12 +2,12 @@ import { useEffect, useId, useMemo, useState } from 'react';
 import { BRAND_PRESETS, DEFAULT_BRAND } from '@/domain/branding';
 import { applyHostedBrand, hostLogo } from '@/features/identity/hostedBrand';
 import { t, type TKey } from '@/i18n';
-import { HttpBrandHosting, type BrandHosting } from '@/services/brand/brandHosting';
-import { Icon } from '@/ui';
+import { HttpBrandHosting, type BrandHosting, type BrandUploadFailure } from '@/services/brand/brandHosting';
+import { Button, Icon } from '@/ui';
 import { brandParam, brandPath } from '../../../shared/brandIcon';
 import styles from './BrandIconCard.module.css';
 
-type State = { kind: 'idle' } | { kind: 'busy' } | { kind: 'ready'; preview: string } | { kind: 'failed' } | { kind: 'badImage' };
+type State = { kind: 'idle' } | { kind: 'busy' } | { kind: 'ready'; preview: string } | { kind: 'failed'; reason: BrandUploadFailure } | { kind: 'badImage' };
 
 async function opens(file: Blob): Promise<boolean> {
   try {
@@ -60,8 +60,8 @@ export function BrandIconCard({ hosting: given }: { hosting?: BrandHosting }) {
   const run = async (file: Blob, hex: string) => {
     setState({ kind: 'busy' });
     if (!(await opens(file))) return setState({ kind: 'badImage' });
-    const hosted = await hostLogo(hosting, hex, file).catch(() => null);
-    if (!hosted) return setState({ kind: 'failed' });
+    const hosted = await hostLogo(hosting, hex, file);
+    if (!hosted.ok) return setState(hosted.reason === 'image' ? { kind: 'badImage' } : { kind: 'failed', reason: hosted.reason });
     applyHostedBrand(hosted.id, hosted.startup);
     setState({ kind: 'ready', preview: hosted.preview });
   };
@@ -137,9 +137,14 @@ export function BrandIconCard({ hosting: given }: { hosting?: BrandHosting }) {
         </div>
       )}
       {state.kind === 'failed' && (
-        <p className={styles.error} role="alert">
-          {t('install.brand.failed')}
-        </p>
+        <div className={styles.error} role="alert">
+          <p>{t(`install.brand.failed.${state.reason}` as TKey)}</p>
+          {logo && state.reason !== 'rejected' && (
+            <Button icon="refresh" variant="secondary" onClick={() => void run(logo, color)}>
+              {t('install.brand.retry')}
+            </Button>
+          )}
+        </div>
       )}
       {state.kind === 'badImage' && (
         <p className={styles.error} role="alert">

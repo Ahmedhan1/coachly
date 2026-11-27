@@ -1,3 +1,4 @@
+import { recordActivity } from '@/data/prefs/activity';
 import type { AppServices } from '@/app/services';
 import { setClientPhotoFromImage } from '@/features/clients/clientPhoto';
 import { readShare } from '@/data/prefs/online';
@@ -25,6 +26,7 @@ export async function pullClientPhotos(services: AppServices): Promise<string[]>
     const client = clients.find((c) => c.id === clientId);
     if (!client) continue;
     await setClientPhotoFromImage(services, client, imageId);
+    await recordActivity(services.meta, [{ id: `pho-${imageId}`, kind: 'photo', clientId: client.id, at: Date.now(), seen: false }]).catch(() => undefined);
     names.push(client.name);
   }
   return names;

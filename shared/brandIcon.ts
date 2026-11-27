@@ -104,8 +104,8 @@ export const brandPath = (id: string, file: 'icon-180.png' | 'icon-512.png' | 'l
 export function brandManifest(id: string, color: string) {
   return {
     id: '/',
-    name: 'كوتش',
-    short_name: 'كوتش',
+    name: 'Coachly',
+    short_name: 'Coachly',
     lang: 'ar',
     dir: 'rtl',
     display: 'standalone',

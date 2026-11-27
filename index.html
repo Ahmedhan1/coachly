@@ -9,13 +9,31 @@
     <meta name="apple-mobile-web-app-capable" content="yes" />
     <meta name="mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-status-bar-style" content="default" />
-    <meta name="apple-mobile-web-app-title" content="كوتش" />
+    <meta name="apple-mobile-web-app-title" content="Coachly" />
+    <meta name="application-name" content="Coachly" />
     <meta name="format-detection" content="telephone=no" />
     <link rel="icon" type="image/png" sizes="192x192" href="/icons/icon-192.png" />
     <link rel="apple-touch-icon" sizes="180x180" href="/icons/apple-touch-icon-180.png" />
     <!-- No font preloads: after the first visit the service worker serves the fonts from the precache, where
          Chromium reports the preload as unused; the stylesheet discovers them just as early. -->
-    <title>كوتش</title>
+    <title>Coachly | تطبيق المدرب الشخصي</title>
+    <meta name="description" content="Coachly: تطبيق المدرب الشخصي في مصر. عملاءك ومواعيدك وبرامج التمرين والأكل والفلوس في مكان واحد، وبيشتغل من غير نت." />
+    <meta name="robots" content="index, follow" />
+    <!-- Open Graph / Twitter: link previews (WhatsApp, Facebook, X). The SEO plugin in vite.config.ts makes the
+         image URL absolute and adds canonical + og:url when VITE_APP_ORIGIN is set (.env.production). -->
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="Coachly" />
+    <meta property="og:locale" content="ar_EG" />
+    <meta property="og:title" content="Coachly | تطبيق المدرب الشخصي" />
+    <meta property="og:description" content="عملاءك ومواعيدك وبرامج التمرين والأكل والفلوس في مكان واحد، وبيشتغل من غير نت." />
+    <meta property="og:image" content="/icons/icon-512.png" />
+    <meta property="og:image:width" content="512" />
+    <meta property="og:image:height" content="512" />
+    <meta property="og:image:alt" content="Coachly" />
+    <meta name="twitter:card" content="summary" />
+    <meta name="twitter:title" content="Coachly | تطبيق المدرب الشخصي" />
+    <meta name="twitter:description" content="عملاءك ومواعيدك وبرامج التمرين والأكل والفلوس في مكان واحد، وبيشتغل من غير نت." />
+    <meta name="twitter:image" content="/icons/icon-512.png" />
     <!-- Before the script runs: the app icon centred (the script swaps in the trainer's logo splash). -->
     <style>
       #root:empty { min-height: 100vh; min-height: 100dvh; background: #f3f1ed url(/icons/icon-512.png) center / min(36vw, 180px) no-repeat; }

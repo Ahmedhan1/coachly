@@ -209,6 +209,7 @@ export const schedule = {
     balance: 'باقي عليه {amount}',
     paidOfPrice: 'اتدفع {paid} من {price}',
     paidInFull: 'الباقة مدفوعة بالكامل',
+    otherOwed: 'مستحق عليه {amount} غير الباقة',
     methods: {
       cash: 'كاش',
       instapay: 'إنستاباي',

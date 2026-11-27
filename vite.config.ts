@@ -33,6 +33,32 @@ function cloudflareHeaders(): Plugin {
   };
 }
 
+/**
+ * SEO with a known public origin (VITE_APP_ORIGIN, e.g. in .env.production): canonical + og:url, and absolute
+ * og:image / twitter:image URLs (link previews ignore relative ones). Without it index.html stays as written.
+ */
+function seoOrigin(): Plugin {
+  let origin = '';
+  return {
+    name: 'pt-coach-seo-origin',
+    configResolved(config) {
+      const value = config.env.VITE_APP_ORIGIN;
+      origin = typeof value === 'string' && /^https:\/\/[a-z0-9.-]+$/.test(value) ? value : '';
+    },
+    transformIndexHtml(html) {
+      if (!origin) return html;
+      const withImages = html.replace(/(<meta (?:property="og:image"|name="twitter:image") content=")\//g, `$1${origin}/`);
+      return {
+        html: withImages,
+        tags: [
+          { tag: 'link', attrs: { rel: 'canonical', href: `${origin}/` }, injectTo: 'head' },
+          { tag: 'meta', attrs: { property: 'og:url', content: `${origin}/` }, injectTo: 'head' },
+        ],
+      };
+    },
+  };
+}
+
 export default defineConfig({
   define: { 'import.meta.env.VITE_BUILD_ID': JSON.stringify(buildId()) },
   resolve: {
@@ -53,6 +79,7 @@ export default defineConfig({
   plugins: [
     react(),
     cloudflareHeaders(),
+    seoOrigin(),
     VitePWA({
       // A new version waits until the trainer taps "update" (src/app/pwa/swUpdate.ts) or closes the app: the open
       // page never mixes old code with a new precache. Registration is done by the app itself.
@@ -61,8 +88,8 @@ export default defineConfig({
       includeAssets: ['icons/*.png'],
       manifest: {
         id: '/',
-        name: 'كوتش',
-        short_name: 'كوتش',
+        name: 'Coachly',
+        short_name: 'Coachly',
         description: 'أداة المدرب الشخصي: العملاء، المواعيد، البرامج',
         lang: 'ar',
         dir: 'rtl',

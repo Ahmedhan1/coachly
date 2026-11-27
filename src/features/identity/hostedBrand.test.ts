@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest';
 import { createTestData } from '@/data/testing';
 import { FakeBrandHosting } from '@/services/brand/brandHosting';
 import { FakeImageDownscaler } from '@/services/storage/fakeImageDownscaler';
-import { BRAND_IMPORTED_KEY, importHostedBrand } from './hostedBrand';
+import { BRAND_IMPORTED_KEY, hostLogo, iconSetFrom, importHostedBrand } from './hostedBrand';
 
 const ID = '0123456789abcdef01234567';
 
@@ -47,5 +47,34 @@ describe('importHostedBrand', () => {
     expect(await importHostedBrand(services, hosting, '?brand=nope')).toBe(false);
     expect(await importHostedBrand(services, hosting, '?brand=ffffffffffffffffffffffff')).toBe(false);
     expect((await repos.settings.get()).logoImageId).toBeNull();
+  });
+});
+
+const png = (bytes: number) => `data:image/png;base64,${'A'.repeat(Math.ceil(bytes / 3) * 4)}`;
+const cache = { color: '#123ABC', onColor: '#FFFFFF', logo: png(10), icon180: png(10), icon512: png(10), startup: { url: png(10), width: 1, height: 2, ratio: 3 } };
+
+describe('iconSetFrom', () => {
+  it('keeps a set inside the server caps', () => {
+    expect(iconSetFrom(cache)?.startup).toEqual(cache.startup);
+  });
+
+  it('leaves out a launch image that is too large instead of having the whole upload refused', () => {
+    const set = iconSetFrom({ ...cache, startup: { ...cache.startup, url: png(1_600_000) } });
+    expect(set).not.toBeNull();
+    expect(set?.startup).toBeNull();
+  });
+
+  it('is null when an icon or the logo is over its cap or missing', () => {
+    expect(iconSetFrom({ ...cache, logo: png(700_000) })).toBeNull();
+    expect(iconSetFrom({ ...cache, icon180: png(200_000) })).toBeNull();
+    expect(iconSetFrom({ ...cache, icon512: null })).toBeNull();
+  });
+});
+
+describe('hostLogo', () => {
+  it('reports a picture that cannot be drawn as an image problem, without uploading', async () => {
+    const { hosting } = setup();
+    expect(await hostLogo(hosting, '#123ABC', new Blob(['not a picture'], { type: 'image/png' }))).toEqual({ ok: false, reason: 'image' });
+    expect(hosting.uploads).toHaveLength(0);
   });
 });

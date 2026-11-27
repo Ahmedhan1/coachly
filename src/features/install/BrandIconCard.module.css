@@ -130,3 +130,10 @@
   font: var(--t-caption);
   color: var(--text-3);
 }
+
+div.error {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--sp-2);
+}

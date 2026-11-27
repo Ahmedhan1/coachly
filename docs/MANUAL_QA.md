@@ -297,3 +297,13 @@
       ظاهر في الإعدادات وفي الـ PDF.
 - [ ] صورة عميل اتاخدت بالكاميرا: نفس الاختبار بعد يوم: ظاهرة في كارت العميل وفي الـ PDF.
 - [ ] لو صورة قديمة كانت باظت قبل التحديث (iOS مسح ملفها خلاص): بتظهر فاضية في الـ PDF من غير ما الـ PDF يقف؛ اختارها تاني.
+
+## Client events, live client page, workout player (2026-11-27)
+
+- [ ] Trainer's iPhone, app closed (swiped away), notifications on: a client sends a check-in from his page → within about a minute a notification "متابعة جديدة من عميل" shows on the lock screen. Same for a client photo ("صورة جديدة من عميل").
+- [ ] Tap that notification → the app opens on Home; "جديد من عملائك" lists the client's name, what they sent, the time and the start of their note. Opening the client clears it.
+- [ ] App open in the foreground when a client sends a check-in → the toast names the client, stays 10 s and «شوف» opens them.
+- [ ] Book a session for in 2 hours, close the app at once → the session reminder still arrives (schedule is re-sent ~5 s after the change).
+- [ ] Client page open in Safari on the client's iPhone; the trainer edits the program → within about 20 s (or when the client returns to the tab) the page updates by itself with «المدرب حدّث صفحتك», same tab, typed check-in values kept.
+- [ ] Client page → «ابدأ التمرين»: set done → rest countdown; when it ends the phone beeps (sound on) and the screen stayed on during the rest; a "30s" set counts down by itself. Close and reopen the page → «كمّل التمرين» with the same progress.
+- [ ] Next session card on the client page shows «باقي … » and updates.

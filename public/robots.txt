@@ -1,0 +1,5 @@
+# Coachly: only the public install / landing page is meant for search engines.
+User-agent: *
+Allow: /
+Disallow: /admin
+Disallow: /c/

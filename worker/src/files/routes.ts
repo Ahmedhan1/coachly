@@ -10,6 +10,7 @@
 // Client page (X-Checkin-Token, the same write token as check-ins):
 //   POST   /api/share/:shareId/files?kind=client_photo|client_upload → 201 { id }
 //          A new client_photo replaces the client's previous one from that page.
+import { notifyClientEvent } from '../push/events';
 import { base64UrlDecode, base64UrlEncode } from '../../../shared/bytes';
 import {
   FILE_ID,
@@ -282,6 +283,7 @@ export async function postClientFile(request: Request, deps: Deps, clientKey: st
     .bind(id, share.lid, kind, 'client', shareId, body.bytes.length, now, now)
     .run();
   for (const old of previous.results) await removeRow(deps, old);
+  await notifyClientEvent(db, share.lid, kind, id, now);
   return json({ id }, 201);
 }
 

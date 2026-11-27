@@ -1,6 +1,7 @@
 import type { AppServices } from '@/app/services';
 import { readBrandCache, writeBrandCache, applyHeadIcons, type BrandCache } from '@/app/pwa/BootSplash';
 import { contrastRatio, normalizeHex, ON_DARK, ON_LIGHT, DEFAULT_BRAND } from '@/domain/branding';
+import { BRAND_LIMITS } from '../../../shared/brandIcon';
 
 /** Where a `w × h` picture lands inside a `box` square with `pad` (fraction of the box) on each side, aspect kept. */
 export function containRect(w: number, h: number, box: number, pad: number): { x: number; y: number; w: number; h: number } {
@@ -74,6 +75,24 @@ export function scaledLogo(bmp: Bitmap, max: number): string | null {
   return drawPng(w, h, (c) => c.drawImage(bmp.source, 0, 0, w, h));
 }
 
+/** Decoded size of a base64 data URL, in bytes. */
+export function dataUrlBytes(dataUrl: string): number {
+  const comma = dataUrl.indexOf(',');
+  const b64 = comma >= 0 ? dataUrl.slice(comma + 1) : dataUrl;
+  const pad = b64.endsWith('==') ? 2 : b64.endsWith('=') ? 1 : 0;
+  return Math.floor((b64.length * 3) / 4) - pad;
+}
+
+/** The logo at the largest of 512 / 384 / 256 px whose PNG fits the hosting cap (a photo PNG can be large). */
+function fittedLogo(bmp: Bitmap): string | null {
+  let url: string | null = null;
+  for (const max of [512, 384, 256]) {
+    url = scaledLogo(bmp, max);
+    if (!url || dataUrlBytes(url) <= BRAND_LIMITS.logo) return url;
+  }
+  return url;
+}
+
 /** Launch image for this screen: brand colour with the logo card in the middle (portrait, device pixels). */
 function startupImage(bmp: Bitmap, color: string): BrandCache['startup'] {
   const ratio = Math.min(3, Math.max(1, Math.round(window.devicePixelRatio || 2)));
@@ -103,7 +122,7 @@ export async function buildBrandCache(colorInput: string, logo: Blob | undefined
   const bmp = logo ? await bitmapOf(logo) : null;
   if (!bmp) return base;
   try {
-    return { ...base, logo: scaledLogo(bmp, 512), icon180: squareIcon(bmp, 180, color), icon512: squareIcon(bmp, 512, color), startup: startupImage(bmp, color) };
+    return { ...base, logo: fittedLogo(bmp), icon180: squareIcon(bmp, 180, color), icon512: squareIcon(bmp, 512, color), startup: startupImage(bmp, color) };
   } finally {
     bmp.close();
   }
