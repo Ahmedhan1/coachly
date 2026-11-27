@@ -155,6 +155,10 @@ try {
   b.once('dialog', (d) => void d.accept());
   await b.getByRole('button', { name: 'رجّع البيانات' }).click();
   await b.waitForURL(`${APP}/`);
+  // The app reloads itself to / after a restore: wait until that load has finished and the app is on screen,
+  // or WebKit aborts the next goto ("interrupted by another navigation").
+  await b.waitForLoadState('load');
+  await b.getByRole('navigation', { name: 'التنقل الرئيسي' }).waitFor({ timeout: 30_000 });
   await b.goto(`${APP}/clients?standalone=1`);
   await b.getByText('عميل متزامن').waitFor();
   ok('phone B: sign in → restore offer → wrong password refused → restore → the client is there');
