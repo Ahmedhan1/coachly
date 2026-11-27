@@ -25,11 +25,15 @@
 
 ## النشر الأوتوماتيك (كل push على main)
 
-`.github/workflows/deploy.yml` بيشغّل `npm run deploy` على GitHub Actions مع كل push على `main` (وتقدر تشغّله
-بإيدك من تبويب Actions ← Deploy ← Run workflow). لو أي اختبار فشل، مفيش حاجة بتتنشر.
-
-مرة واحدة بس: في GitHub ← المستودع ← Settings ← Secrets and variables ← Actions ← New repository secret:
-`CLOUDFLARE_API_TOKEN` (ولو التوكن شايف أكتر من حساب Cloudflare، ضيف `CLOUDFLARE_ACCOUNT_ID` كمان).
+- **التطبيق** (`app.getcoachly…`): Cloudflare Workers Builds (متوصّل بالمستودع من لوحة Cloudflare) بيبني
+  (`npm run build`) وينشر من `wrangler.jsonc` اللي في أول المستودع: الملفات من الـ Static Assets، والـ Worker
+  بيشتغل بس على `/api/brand` و `/b/*` (أيقونة اللوجو). قبل الملف ده كان بينشر الملفات لوحدها، فرفع اللوجو كان
+  بيرجع 405.
+- **السيرفر** (`api.getcoachly…`): `.github/workflows/deploy.yml` بيشغّل كل الاختبارات وبعدين الـ migrations
+  والـ Worker مع كل push على `main` (أو بإيدك: Actions ← Deploy API ← Run workflow). لو اختبار فشل مفيش نشر.
+  محتاج مرة واحدة: GitHub ← Settings ← Secrets and variables ← Actions ← New repository secret ←
+  `CLOUDFLARE_API_TOKEN` (و`CLOUDFLARE_ACCOUNT_ID` لو التوكن شايف أكتر من حساب).
+- `npm run deploy` بإيدك بيرجّع التطبيق لوضع D1؛ أول push بعده بيرجّعه للـ Static Assets.
 
 ## إزاي ترفع نسخة جديدة (أمر واحد)
 

@@ -1,8 +1,9 @@
-# Auto-deploy to Cloudflare on every push to main (free for public and private repos within the Actions minutes).
-# Runs the same one-step deploy as `npm run deploy`: every check first, so a red build never goes live.
+# Auto-deploy of the account Worker (api.getcoachly…: accounts, client pages, push, backups) on every push to main.
+# Every check runs first, then the D1 migrations and the Worker (`npm run deploy -- --worker-only`).
+# The app itself (app.getcoachly…) is deployed by Cloudflare Workers Builds from the root wrangler.jsonc.
 # Needs the repository secret CLOUDFLARE_API_TOKEN (Settings → Secrets and variables → Actions), and
 # CLOUDFLARE_ACCOUNT_ID too if the token can see more than one Cloudflare account.
-name: Deploy
+name: Deploy API
 
 on:
   push:
@@ -39,8 +40,8 @@ jobs:
         run: npm ci
         working-directory: worker
 
-      - name: Check, build and deploy
-        run: npm run deploy
+      - name: Check and deploy the account Worker
+        run: npm run deploy -- --worker-only
         env:
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}

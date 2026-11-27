@@ -1,0 +1,18 @@
+// The installed app (https://app.getcoachly.workers.dev), deployed by Cloudflare Workers Builds on every push to main
+// (it builds with `npm run build`, then runs `wrangler deploy` here). Workers Static Assets serve dist/ from the
+// edge; only the branded-icon routes run the Worker (they read D1). Without this file the build deployed the files
+// alone, so /api/brand answered 405 and no trainer could put a logo on the icon.
+// The account Worker (api.getcoachly…) is deployed by .github/workflows/deploy.yml. Same as deploy/app/wrangler.assets.toml.
+{
+  "name": "app",
+  "main": "deploy/app/src/index.ts",
+  "compatibility_date": "2026-08-01",
+  "assets": {
+    "directory": "./dist",
+    "binding": "ASSETS",
+    "not_found_handling": "single-page-application",
+    "run_worker_first": ["/api/brand", "/b/*"]
+  },
+  "d1_databases": [{ "binding": "APP", "database_name": "pt-coach-app", "database_id": "477aa926-49b7-4bb0-964b-bc5879286839" }],
+  "observability": { "enabled": true, "head_sampling_rate": 0.1 }
+}
