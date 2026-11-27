@@ -4,9 +4,9 @@
 
 | الحاجة | العنوان |
 | --- | --- |
-| التطبيق (اللي المدرب يثبّته من Safari) | https://pt-coach.nexus-ahmed.workers.dev |
-| السيرفر (حسابات المدربين، الإشعارات، صفحة العميل، النسخ السحابي) | https://pt-coach-license.nexus-ahmed.workers.dev |
-| لوحة الحسابات بتاعتك (الموافقة على المدربين) | https://pt-coach-license.nexus-ahmed.workers.dev/admin |
+| التطبيق (اللي المدرب يثبّته من Safari) | https://coachly.nexus-ahmed.workers.dev |
+| السيرفر (حسابات المدربين، الإشعارات، صفحة العميل، النسخ السحابي) | https://coachly-api.nexus-ahmed.workers.dev |
+| لوحة الحسابات بتاعتك (الموافقة على المدربين) | https://coachly-api.nexus-ahmed.workers.dev/admin |
 
 بيانات المدرب مربوطة بعنوان التطبيق، فما تغيّرش اسم الـ Worker `pt-coach` ولا الـ subdomain.
 
@@ -14,7 +14,7 @@
 
 | الحاجة | الحالة |
 | --- | --- |
-| Worker `pt-coach-license` | النسخة الجديدة: حسابات (better-auth)، جيمات وخطط، نسخ سحابي، إشعارات، صور العملاء. Smart Placement (بيشتغل جنب قاعدة البيانات) |
+| Worker `coachly-api` | النسخة الجديدة: حسابات (better-auth)، جيمات وخطط، نسخ سحابي، إشعارات، صور العملاء. Smart Placement (بيشتغل جنب قاعدة البيانات) |
 | D1 `pt-coach-licenses` | كل الـ migrations اتطبقت (لحد `0006_teams`). جدول الأكواد القديم اتشال (اتعمل منه نسخة قبلها) |
 | R2 `pt-coach-backups` | النسخ السحابية + صفحات العملاء + **صور العملاء** (تحت `files/`) — كله ضمن الـ 10 جيجا المجانية |
 | Worker `pt-coach` (التطبيق) | بيخدم الملفات من D1 `pt-coach-app` مع كاش على حافة Cloudflare لمدة سنة للملفات الثابتة |

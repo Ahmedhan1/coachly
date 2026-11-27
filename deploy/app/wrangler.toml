@@ -2,7 +2,7 @@
 # Files live in D1 (`pt-coach-app`), uploaded by deploy/app/upload.py: run `npm run deploy` in the repo root.
 # (Workers Static Assets would be faster, but its upload step cannot run through a credential-injecting proxy;
 #  see docs/DEPLOYMENT.md for the one-time switch from a normal computer.)
-name = "pt-coach"
+name = "coachly"
 main = "src/index.ts"
 compatibility_date = "2026-08-01"
 

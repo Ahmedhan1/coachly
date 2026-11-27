@@ -24,7 +24,7 @@ export interface AuthSettings {
   database: D1Database;
   /** BETTER_AUTH_SECRET: signs cookies and tokens. At least 32 characters. */
   secret: string;
-  /** Public address of this Worker, e.g. https://pt-coach-license.example.workers.dev */
+  /** Public address of this Worker, e.g. https://coachly-api.example.workers.dev */
   baseURL: string;
   /** The app's origin(s); browsers there may call the auth API. */
   appOrigins: readonly string[];

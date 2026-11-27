@@ -3,7 +3,7 @@
 # Deploy from a normal computer (not a proxied cloud session):  npm run build && cd deploy/app &&
 #   npx wrangler deploy -c wrangler.assets.toml
 # To go back to D1 mode, run `npm run deploy` (uses wrangler.toml).
-name = "pt-coach"
+name = "coachly"
 main = "src/index.ts"
 compatibility_date = "2026-08-01"
 

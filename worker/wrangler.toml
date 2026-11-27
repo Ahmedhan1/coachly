@@ -1,6 +1,6 @@
 # Cloudflare Worker for PT Coach: trainer accounts (better-auth), cloud backup, Web Push, client page. Free tier
 # only: Workers + D1 + R2 + one Cron Trigger. Owner guides (Arabic): ../docs/ACCOUNTS.md, ../docs/CLOUD.md
-name = "pt-coach-license"
+name = "coachly-api"
 main = "src/index.ts"
 compatibility_date = "2026-08-01"
 # better-auth uses node:async_hooks (AsyncLocalStorage). Free; part of the Workers runtime.
@@ -11,9 +11,9 @@ mode = "smart"
 
 [vars]
 # Address of the installed app (the `pt-coach` Worker, deploy/app). Several origins may be separated by commas.
-APP_ORIGIN = "https://pt-coach.nexus-ahmed.workers.dev"
+APP_ORIGIN = "https://coachly.nexus-ahmed.workers.dev"
 # This Worker's own public address (better-auth builds Google's callback URL from it).
-BETTER_AUTH_URL = "https://pt-coach-license.nexus-ahmed.workers.dev"
+BETTER_AUTH_URL = "https://coachly-api.nexus-ahmed.workers.dev"
 # Google sign-in: the OAuth client id from Google Cloud Console (not secret). Empty = Google button hidden/off.
 # Authorised redirect URI there: <BETTER_AUTH_URL>/api/auth/callback/google
 GOOGLE_CLIENT_ID = ""

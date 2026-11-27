@@ -36,7 +36,7 @@ if (!args.has('--worker-only')) {
     .filter((f) => f.endsWith('.js'))
     .map((f) => readFileSync(join(assets, f), 'utf8'))
     .join('\n');
-  if (!bundle.includes('pt-coach-license.')) throw new Error('refusing to deploy: dist/ does not point at the account Worker');
+  if (!bundle.includes('coachly-api.')) throw new Error('refusing to deploy: dist/ does not point at the account Worker');
   if (!readFileSync(join(root, 'dist/_headers'), 'utf8').includes('Content-Security-Policy')) throw new Error('refusing to deploy: dist/_headers has no CSP');
 }
 
@@ -55,4 +55,4 @@ if (!args.has('--worker-only')) {
   execFileSync('python3', [join(appDir, 'upload.py')], { cwd: root, stdio: 'inherit', env: { ...env, UPLOAD_KEY: uploadKey } });
 }
 
-console.log('\n✔ deployed: https://pt-coach.nexus-ahmed.workers.dev  (account Worker: https://pt-coach-license.nexus-ahmed.workers.dev)');
+console.log('\n✔ deployed: https://coachly.nexus-ahmed.workers.dev  (account Worker: https://coachly-api.nexus-ahmed.workers.dev)');

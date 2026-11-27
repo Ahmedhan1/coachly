@@ -122,7 +122,7 @@ const stills = {
      .tags{display:flex;gap:18px}.tags span{padding:14px 34px;border-radius:999px;background:#fff;font-size:38px;font-weight:600;color:#AE4216;box-shadow:0 4px 14px rgba(40,30,20,.06)}`,
   ),
   outro: page(
-    `<div class="wrap"><div class="mark">ك</div><h1>جاهز على الآيفون</h1><p>من Safari ← «إضافة إلى الشاشة الرئيسية»</p><div class="url">pt-coach.nexus-ahmed.workers.dev</div></div>`,
+    `<div class="wrap"><div class="mark">ك</div><h1>جاهز على الآيفون</h1><p>من Safari ← «إضافة إلى الشاشة الرئيسية»</p><div class="url">coachly.nexus-ahmed.workers.dev</div></div>`,
     `body{background:#F25C1F}.wrap{height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:36px;color:#111}
      .mark{width:200px;height:200px;border-radius:54px;background:#111;color:#F25C1F;display:grid;place-items:center;font-size:124px;font-weight:700}
      h1{font-size:96px;font-weight:700}p{font-size:42px;font-weight:500;opacity:.85}

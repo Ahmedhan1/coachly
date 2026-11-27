@@ -11,7 +11,7 @@ export const AUTH_META_KEYS = {
 
 export interface WorkerAuthDeps {
   store: MetaStore;
-  /** e.g. https://pt-coach-license.example.workers.dev; undefined disables every online path. */
+  /** e.g. https://coachly-api.example.workers.dev; undefined disables every online path. */
   workerUrl: string | undefined;
   /** Origin of this app; the Worker returns the browser here after Google. */
   appOrigin: string;
